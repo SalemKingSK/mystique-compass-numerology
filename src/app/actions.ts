@@ -1,16 +1,16 @@
 'use server';
 
-import { interpretFirebaseInit } from '@/ai/flows/interpret-firebase-init';
+import { getAstroInsight } from '@/ai/flows/astro-insight-flow';
 
-export async function getGuidanceAction(featureSelections: string) {
+export async function getAstroInsightAction(celestialObject: string) {
   try {
-    if (!featureSelections) {
-      return { success: false, error: 'Please select at least one feature.' };
+    if (!celestialObject) {
+      return { success: false, error: 'Please enter a celestial object.' };
     }
-    const result = await interpretFirebaseInit({ featureSelections });
-    return { success: true, guidance: result.guidance };
+    const result = await getAstroInsight({ celestialObject });
+    return { success: true, insight: result };
   } catch (error) {
-    console.error('Error getting guidance:', error);
-    return { success: false, error: 'An error occurred while fetching guidance. Please try again.' };
+    console.error('Error getting insight:', error);
+    return { success: false, error: 'An error occurred while fetching insights. Please try again.' };
   }
 }

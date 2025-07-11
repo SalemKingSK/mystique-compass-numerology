@@ -1,4 +1,4 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/interpret-firebase-init.ts';
+import '@/ai/flows/astro-insight-flow.ts';

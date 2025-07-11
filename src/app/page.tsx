@@ -1,4 +1,4 @@
-import { FirebaseSetupWizard } from '@/components/firebase-setup-wizard';
+import { AstroInsights } from '@/components/astro-insights';
 import { Card } from '@/components/ui/card';
 
 export default function Home() {
@@ -8,19 +8,19 @@ export default function Home() {
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight text-primary">
-              Firebase Setup Helper
+              Astro Insights
             </h1>
             <p className="mt-3 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Select your desired Firebase features to receive personalized setup guidance powered by AI.
+              Ask about a celestial object and get AI-powered insights.
             </p>
           </header>
           
           <Card className="overflow-hidden shadow-lg">
-             <FirebaseSetupWizard />
+             <AstroInsights />
           </Card>
 
           <footer className="text-center mt-12 text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Firebase Setup Helper. All Rights Reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Astro Insights. All Rights Reserved.</p>
           </footer>
         </div>
       </main>
