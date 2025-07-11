@@ -26,28 +26,48 @@ const calculateDestiny = (day: number, month: number, year: number): number => {
   return reduceToSingleDigit(sum);
 };
 
+/**
+ * **CORRECTED** Calculates the Kua Number based on year and gender.
+ * @param {number} year - The four-digit year of birth.
+ * @param {string} gender - 'male' or 'female'.
+ * @returns {number} The Kua Number.
+ */
 const calculateKua = (year: number, gender: string): number => {
-  const yearSum = reduceToSingleDigit(
-    String(year)
-      .split('')
-      .reduce((acc, digit) => acc + parseInt(digit, 10), 0)
-  );
-
+  // 1. Sum the digits of the year.
+  const yearSum = String(year)
+    .split('')
+    .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+  
+  // 2. Reduce the sum to a single digit.
+  const reducedYearSum = reduceToSingleDigit(yearSum);
+  
   let kua;
+  // 3. Apply the correct formula based on year and gender.
   if (year < 2000) {
-    kua = gender.toLowerCase() === 'male' ? 11 - yearSum : yearSum + 4;
-  } else {
-    kua = gender.toLowerCase() === 'male' ? 10 - yearSum : yearSum + 5;
+    if (gender.toLowerCase() === 'male') {
+      kua = 11 - reducedYearSum;
+    } else { // female
+      kua = reducedYearSum + 4;
+    }
+  } else { // For years 2000 and after
+    if (gender.toLowerCase() === 'male') {
+      kua = 10 - reducedYearSum;
+    } else { // female
+      kua = reducedYearSum + 5;
+    }
   }
 
-  let finalKua = reduceToSingleDigit(kua);
-
-  // The special Kua 5 rule
+  // 4. Reduce the result to a single digit one last time.
+  const finalKua = reduceToSingleDigit(kua);
+  
+  // 5. Handle the special case for Kua 5.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
+  
   return finalKua;
 };
+
 
 // --- Main Grid Generation Function ---
 
@@ -59,12 +79,12 @@ interface UserData {
 }
 
 export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
-  // 1. Calculate all core numbers
+  // 1. Calculate all core numbers using the corrected functions
   const psycheNum = calculatePsyche(day);
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  // 2. Aggregate ALL digits for the grid (the corrected logic)
+  // 2. Aggregate ALL digits for the grid
   const birthDigits = (String(day) + String(month) + String(year))
     .split('')
     .filter(d => d !== '0');
