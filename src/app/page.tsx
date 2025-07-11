@@ -1,3 +1,29 @@
+import { FirebaseSetupWizard } from '@/components/firebase-setup-wizard';
+import { Card } from '@/components/ui/card';
+
 export default function Home() {
-  return <></>;
+  return (
+    <div className="min-h-screen bg-background text-foreground font-body">
+      <main className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
+        <div className="max-w-3xl mx-auto">
+          <header className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight text-primary">
+              Firebase Setup Helper
+            </h1>
+            <p className="mt-3 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Select your desired Firebase features to receive personalized setup guidance powered by AI.
+            </p>
+          </header>
+          
+          <Card className="overflow-hidden shadow-lg">
+             <FirebaseSetupWizard />
+          </Card>
+
+          <footer className="text-center mt-12 text-sm text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} Firebase Setup Helper. All Rights Reserved.</p>
+          </footer>
+        </div>
+      </main>
+    </div>
+  );
 }
