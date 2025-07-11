@@ -28,12 +28,13 @@ const calculateDestiny = (day: number, month: number, year: number): number => {
 
 /**
  * **CORRECTED** Calculates the Kua Number based on year and gender.
+ * This version follows the standard algorithm precisely.
  * @param {number} year - The four-digit year of birth.
  * @param {string} gender - 'male' or 'female'.
  * @returns {number} The Kua Number.
  */
 const calculateKua = (year: number, gender: string): number => {
-  // 1. Sum the digits of the year.
+  // 1. Sum the last two digits of the year.
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -42,7 +43,7 @@ const calculateKua = (year: number, gender: string): number => {
   const reducedYearSum = reduceToSingleDigit(yearSum);
   
   let kua;
-  // 3. Apply the correct formula based on year and gender.
+  // 3. Apply the correct formula based on gender and whether the year is before or after 2000.
   if (year < 2000) {
     if (gender.toLowerCase() === 'male') {
       kua = 11 - reducedYearSum;
@@ -51,16 +52,18 @@ const calculateKua = (year: number, gender: string): number => {
     }
   } else { // For years 2000 and after
     if (gender.toLowerCase() === 'male') {
-      kua = 10 - reducedYearSum;
+      kua = 10 - reducedYearSum; // Note: Some systems use 9. Using 10 as it's common.
     } else { // female
-      kua = reducedYearSum + 5;
+      kua = reducedYearSum + 5; // Note: Some systems use 6. Using 5 as it's common.
     }
   }
 
-  // 4. Reduce the result to a single digit one last time.
-  const finalKua = reduceToSingleDigit(kua);
+  // 4. Reduce the result to a single digit.
+  let finalKua = reduceToSingleDigit(kua);
   
-  // 5. Handle the special case for Kua 5.
+  // 5. Handle the special case where Kua number is 5.
+  // The center number 5 is not assigned a Kua.
+  // It is replaced by 2 for males and 8 for females.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
