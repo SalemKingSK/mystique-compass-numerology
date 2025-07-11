@@ -24,8 +24,8 @@ function ResultsDisplay({ insight, onReset }: { insight: AstroInsightOutput, onR
 
             <Tabs defaultValue="numerology" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 mb-4">
-                    <TabsTrigger value="numerology">Numerology Grid</TabsTrigger>
-                    <TabsTrigger value="chinese_zodiac">Chinese Animal Sign</TabsTrigger>
+                    <TabsTrigger value="numerology">Numerology</TabsTrigger>
+                    <TabsTrigger value="chinese_zodiac">Chinese Zodiac</TabsTrigger>
                     <TabsTrigger value="new_astrology">New Astrology</TabsTrigger>
                 </TabsList>
 
@@ -147,6 +147,7 @@ export function ProfileGenerator() {
         gender: ''
     });
     const [insight, setInsight] = React.useState<AstroInsightOutput | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -159,11 +160,13 @@ export function ProfileGenerator() {
     
     const handleReset = () => {
         setInsight(null);
+        setError(null);
         setFormData({ name: '', day: '', month: '', year: '', gender: '' });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
         const { name, day, month, year, gender } = formData;
         if (!name || !day || !month || !year || !gender) {
             toast({
@@ -184,17 +187,9 @@ export function ProfileGenerator() {
             });
             if (result.success && result.insight) {
                 setInsight(result.insight);
-                 toast({
-                    title: 'Success!',
-                    description: `Your reading for ${result.insight.name} is ready.`,
-                });
             } else {
                 setInsight(null);
-                toast({
-                    variant: 'destructive',
-                    title: 'Error',
-                    description: result.error,
-                });
+                setError(result.error || 'An unexpected error occurred.');
             }
         });
     };
@@ -226,6 +221,12 @@ export function ProfileGenerator() {
                                 <CardDescription>Enter your details for a personalized reading.</CardDescription>
                             </CardHeader>
                             <CardContent className="p-6 pt-0 space-y-4">
+                                {error && (
+                                     <div className="bg-destructive/10 text-destructive border border-destructive/20 p-3 rounded-md text-sm">
+                                        <p className="font-bold">Error</p>
+                                        <p>{error}</p>
+                                    </div>
+                                )}
                                 <div className="form-group">
                                     <Label htmlFor="name">Your Full Name</Label>
                                     <Input id="name" name="name" placeholder="e.g., Jane Doe" required value={formData.name} onChange={handleChange} disabled={isPending} />

@@ -44,11 +44,6 @@ const AstroInsightOutputSchema = z.object({
   general_desc: z.string().describe('A general description of the Chinese animal sign.'),
   elemental_desc: z.string().describe('A description of the element\'s influence on the sign.'),
   compatibilities: z.string().describe('A description of the sign\'s compatibilities.'),
-  future_predictions: z.record(z.object({
-      element: z.string(),
-      year: z.string(),
-      prediction: z.string()
-  })).describe('Predictions for future years based on the Chinese zodiac. The key should be the year.'),
   new_astrology_desc: z.string().describe('A description of the combined New Astrology sign.'),
 });
 export type AstroInsightOutput = z.infer<typeof AstroInsightOutputSchema>;
@@ -119,7 +114,6 @@ Please generate a complete profile including:
     *   Provide a general description of their animal sign.
     *   Describe the influence of their element on their sign.
     *   Detail their compatibilities.
-    *   Provide predictions for the next 3 relevant animal years.
 5.  **Simple Profile**: Also provide a simple reading, a lucky number, and a lucky color.
   `,
 });
