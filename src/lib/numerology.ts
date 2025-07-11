@@ -1,9 +1,16 @@
-// Helper function to reduce a number to a single digit (unless it's a master number)
+// --- Helper Functions ---
+
+/**
+ * Reduces a number to a single digit by summing its digits repeatedly.
+ * Handles master numbers (11, 22, 33) by not reducing them.
+ * @param n - The number to reduce.
+ * @returns The single-digit number or a master number.
+ */
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
     if (num === 11 || num === 22 || num === 33) {
-      return num; // Don't reduce master numbers
+      return num;
     }
     num = String(num)
       .split('')
@@ -12,12 +19,25 @@ const reduceToSingleDigit = (n: number): number => {
   return num;
 };
 
+
 // --- Core Number Calculations ---
 
+/**
+ * Calculates the Psyche Number from the day of birth.
+ * @param {number} day - The day of birth (1-31).
+ * @returns {number} The Psyche Number.
+ */
 const calculatePsyche = (day: number): number => {
   return reduceToSingleDigit(day);
 };
 
+/**
+ * Calculates the Destiny (Life Path) Number from the full date of birth.
+ * @param {number} day
+ * @param {number} month
+ * @param {number} year
+ * @returns {number} The Destiny Number.
+ */
 const calculateDestiny = (day: number, month: number, year: number): number => {
   const fullDateStr = String(day) + String(month) + String(year);
   const sum = fullDateStr
@@ -27,43 +47,41 @@ const calculateDestiny = (day: number, month: number, year: number): number => {
 };
 
 /**
- * **CORRECTED** Calculates the Kua Number based on year and gender.
- * This version follows the standard algorithm precisely.
- * @param {number} year - The four-digit year of birth.
- * @param {string} gender - 'male' or 'female'.
- * @returns {number} The Kua Number.
+ * Calculates the Kua Number based on year and gender.
+ * @param year - The four-digit year of birth.
+ * @param gender - 'male' or 'female'.
+ * @returns The Kua Number.
  */
-const calculateKua = (year: number, gender: string): number => {
-  // 1. Sum the last two digits of the year.
+export const calculateKua = (year: number, gender: string): number => {
+  // 1. Sum the four digits of the birth year.
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   
-  // 2. Reduce the sum to a single digit.
+  // 2. Reduce that sum to a single digit.
   const reducedYearSum = reduceToSingleDigit(yearSum);
   
-  let kua;
-  // 3. Apply the correct formula based on gender and whether the year is before or after 2000.
+  let kuaResult: number;
+
+  // 3. Apply the correct formula based on the user's birth century and gender.
   if (year < 2000) {
     if (gender.toLowerCase() === 'male') {
-      kua = 11 - reducedYearSum;
+      kuaResult = 11 - reducedYearSum;
     } else { // female
-      kua = reducedYearSum + 4;
+      kuaResult = reducedYearSum + 4;
     }
   } else { // For years 2000 and after
     if (gender.toLowerCase() === 'male') {
-      kua = 10 - reducedYearSum; // Note: Some systems use 9. Using 10 as it's common.
+      kuaResult = 10 - reducedYearSum;
     } else { // female
-      kua = reducedYearSum + 5; // Note: Some systems use 6. Using 5 as it's common.
+      kuaResult = reducedYearSum + 5;
     }
   }
 
-  // 4. Reduce the result to a single digit.
-  let finalKua = reduceToSingleDigit(kua);
+  // 4. Reduce the result of the formula to a final single digit.
+  const finalKua = reduceToSingleDigit(kuaResult);
   
-  // 5. Handle the special case where Kua number is 5.
-  // The center number 5 is not assigned a Kua.
-  // It is replaced by 2 for males and 8 for females.
+  // 5. Apply the special rule for Kua 5.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
@@ -81,6 +99,11 @@ interface UserData {
     gender: string;
 }
 
+/**
+ * Generates all numerology data including the Lo Shu Grid.
+ * @param {object} userData - An object with day, month, year, gender.
+ * @returns {object} An object containing all calculated results.
+ */
 export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   // 1. Calculate all core numbers using the corrected functions
   const psycheNum = calculatePsyche(day);
@@ -124,6 +147,5 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     destinyNum,
     kuaNum,
     loShuGrid: gridLayout,
-    // You can add more returned data here later, like arrows etc.
   };
 };
