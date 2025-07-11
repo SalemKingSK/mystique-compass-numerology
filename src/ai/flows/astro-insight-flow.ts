@@ -75,7 +75,12 @@ Please generate a complete profile including:
     *   Calculate their Psyche, Destiny, and Kua numbers.
     *   Create their 3x3 Lo Shu grid. Represent empty cells with null.
     *   Identify any "Arrows of Strength" and describe them.
-    *   Analyze any repeated numbers in their birth date and describe the meaning.
+    *   Analyze any repeated numbers in their birth date and describe the meaning. Use the following specific meanings for repeated numbers.
+        *   **One 1**: Faces difficulty in communication & expression (verbal). They can communicate by other means, through art, craft, design, sculpturing, cartoons, graffiti, painting, writing, dancing etc. But they never able to soak themselves into anything, they touch the crust but never reach the core. Find it difficult to understand others point of view. Good financial level, as 6 & 8 are also in this plane.
+        *   **Two 1s**: Good in Expression & Communication. Impartial & Balanced outlook towards everyone in life. Way of living life is very neutral. They understand others point of view as well as their own. Good in financial matters. Perfect placement of pair in a chart.
+        *   **Three 1s**: Good in Expression, Very Sensitive & Caring. Number of Extra Marital Relation (concept of Pati, Patni & Wo). Some times Too much Talkative, they Never stop talking. But Sometimes they can be Very Quiet & Introvert, as they have both of the extremes in behaviors. They keep on changing their behavior according to time & Situations. They have materialistic growth if other two numbers are supporting. Generally they are Happy, Good Entertainers in Life. Love going out of House.
+        *   **Four 1s**: Blockage at Vishudha or Throat chakra hence it is extremely difficult for them to open their heart out verbally. Very sensitive & caring by nature but they are mostly misunderstood. They are always on their toes, anxious, overly energetic. Take rest or get relaxed very rarely, always hyperactive. Only materialistic desires will be found & more focus on wealth accumulation other than anything else in their life.
+        *   **Five or more 1s**: Face too much difficulties in Expressing their Emotions out Verbally. Very much misunderstood Personalities. They direct their Energy of Expression into other forms of Expressions like Writing, Painting, Dancing, Art, Sculpture, Creativity etc. Over Indulge in Alcoholism, Drug, Food, Many Relationships or any other types of Addictions.
 4.  **Chinese Zodiac**:
     *   Provide a general description of their animal sign.
     *   Describe the influence of their element on their sign.
