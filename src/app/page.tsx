@@ -1,4 +1,4 @@
-import { AstroInsights } from '@/components/astro-insights';
+import { ProfileGenerator } from '@/components/profile-generator';
 import { Card } from '@/components/ui/card';
 
 export default function Home() {
@@ -8,15 +8,15 @@ export default function Home() {
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight text-primary">
-              Astro Insights
+              AstroInsights
             </h1>
             <p className="mt-3 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Ask about a celestial object and get AI-powered insights.
+              Enter your details to generate a complete personal profile.
             </p>
           </header>
           
           <Card className="overflow-hidden shadow-lg">
-             <AstroInsights />
+             <ProfileGenerator />
           </Card>
 
           <footer className="text-center mt-12 text-sm text-muted-foreground">

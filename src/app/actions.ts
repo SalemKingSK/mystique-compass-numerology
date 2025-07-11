@@ -1,13 +1,13 @@
 'use server';
 
-import { getAstroInsight } from '@/ai/flows/astro-insight-flow';
+import { getAstroInsight, type AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 
-export async function getAstroInsightAction(celestialObject: string) {
+export async function getAstroInsightAction(formData: AstroInsightInput) {
   try {
-    if (!celestialObject) {
-      return { success: false, error: 'Please enter a celestial object.' };
+    if (!formData.name || !formData.day || !formData.month || !formData.year || !formData.gender) {
+      return { success: false, error: 'Please fill out all fields.' };
     }
-    const result = await getAstroInsight({ celestialObject });
+    const result = await getAstroInsight(formData);
     return { success: true, insight: result };
   } catch (error) {
     console.error('Error getting insight:', error);
