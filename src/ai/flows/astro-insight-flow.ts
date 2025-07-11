@@ -31,7 +31,7 @@ const AstroInsightOutputSchema = z.object({
   psyche_num: z.number().describe('The Psyche number from numerology.'),
   destiny_num: z.number().describe('The Destiny number from numerology.'),
   kua_num: z.number().describe('The Kua number from numerology.'),
-  lo_shu_grid: z.array(z.array(z.nullable(z.number()))).describe('A 3x3 Lo Shu grid, represented as a 2D array. Empty cells should be null.'),
+  lo_shu_grid: z.array(z.array(z.nullable(z.string()))).describe('A 3x3 Lo Shu grid, represented as a 2D array. Cells should contain a string of the numbers from the birth date that belong in that cell. For example, if the birth date has three 9s, the cell for 9 should contain "999". Empty cells should be null.'),
   found_arrows: z.array(z.object({
     name: z.string().describe('The name of the found arrow of strength.'),
     description: z.string().describe('The description of the arrow of strength.'),
@@ -64,11 +64,15 @@ Date of Birth: {{{day}}}/{{{month}}}/{{{year}}}
 Gender: {{{gender}}}
 
 Please generate a complete profile including:
-1.  **Core Information**: Western sign, Chinese animal sign, and element.
-2.  **New Astrology**: Their combined sign and a detailed description.
+1.  **Core Information**: Correctly determine the Western sign, Chinese animal sign, and element. Ensure the Chinese animal sign is consistent throughout the entire response.
+2.  **New Astrology**: Their combined sign (e.g., "Aries/Rooster") and a detailed description.
 3.  **Numerology**:
     *   Calculate their Psyche, Destiny, and Kua numbers.
-    *   Create their 3x3 Lo Shu grid. Represent empty cells with null.
+    *   Create their 3x3 Lo Shu grid. The standard Lo Shu grid positions are:
+        [4, 9, 2]
+        [3, 5, 7]
+        [8, 1, 6]
+        Populate the grid ONLY with the numbers from the person's birth date (day, month, year digits). For example, if the birth date is 18/03/1999, the digits are 1, 8, 3, 1, 9, 9, 9. The cell for '1' should contain "11", the cell for '8' should contain "8", the cell for '3' should contain "3", and the cell for '9' should contain "999". All other cells should be null. The output should be a 2D array of strings.
     *   Identify any "Arrows of Strength" and describe them.
     *   Analyze any repeated numbers in their birth date and describe the meaning. Use the following specific meanings for repeated numbers.
         *   **One 1**: Faces difficulty in communication & expression (verbal). They can communicate by other means, through art, craft, design, sculpturing, cartoons, graffiti, painting, writing, dancing etc. But they never able to soak themselves into anything, they touch the crust but never reach the core. Find it difficult to understand others point of view. Good financial level, as 6 & 8 are also in this plane.
@@ -129,3 +133,5 @@ const astroInsightFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    

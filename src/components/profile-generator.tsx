@@ -190,6 +190,11 @@ export function ProfileGenerator() {
             } else {
                 setInsight(null);
                 setError(result.error || 'An unexpected error occurred.');
+                toast({
+                  variant: 'destructive',
+                  title: 'Error Generating Profile',
+                  description: result.error || 'An unexpected error occurred while fetching insights. Please try again.',
+                });
             }
         });
     };
@@ -221,12 +226,6 @@ export function ProfileGenerator() {
                                 <CardDescription>Enter your details for a personalized reading.</CardDescription>
                             </CardHeader>
                             <CardContent className="p-6 pt-0 space-y-4">
-                                {error && (
-                                     <div className="bg-destructive/10 text-destructive border border-destructive/20 p-3 rounded-md text-sm">
-                                        <p className="font-bold">Error</p>
-                                        <p>{error}</p>
-                                    </div>
-                                )}
                                 <div className="form-group">
                                     <Label htmlFor="name">Your Full Name</Label>
                                     <Input id="name" name="name" placeholder="e.g., Jane Doe" required value={formData.name} onChange={handleChange} disabled={isPending} />
@@ -270,3 +269,5 @@ export function ProfileGenerator() {
         </div>
     );
 }
+
+    
