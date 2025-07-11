@@ -12,8 +12,12 @@ import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { generateLoShuData } from '@/lib/numerology';
 
-function ResultsDisplay({ insight, onReset }: { insight: AstroInsightOutput, onReset: () => void }) {
+
+type NumerologyData = ReturnType<typeof generateLoShuData>;
+
+function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
     return (
         <div className="p-6 bg-background rounded-lg">
             <div className="text-center mb-6 pb-4 border-b">
@@ -39,15 +43,15 @@ function ResultsDisplay({ insight, onReset }: { insight: AstroInsightOutput, onR
                                 <CardContent>
                                     <div className="grid grid-cols-3 text-center gap-4">
                                         <div>
-                                            <div className="text-4xl font-bold text-accent">{insight.psyche_num}</div>
+                                            <div className="text-4xl font-bold text-accent">{numerology.psycheNum}</div>
                                             <div className="text-xs text-muted-foreground">Psyche</div>
                                         </div>
                                         <div>
-                                            <div className="text-4xl font-bold text-accent">{insight.destiny_num}</div>
+                                            <div className="text-4xl font-bold text-accent">{numerology.destinyNum}</div>
                                             <div className="text-xs text-muted-foreground">Destiny</div>
                                         </div>
                                         <div>
-                                            <div className="text-4xl font-bold text-accent">{insight.kua_num}</div>
+                                            <div className="text-4xl font-bold text-accent">{numerology.kuaNum}</div>
                                             <div className="text-xs text-muted-foreground">Kua</div>
                                         </div>
                                     </div>
@@ -60,7 +64,7 @@ function ResultsDisplay({ insight, onReset }: { insight: AstroInsightOutput, onR
                                 <CardContent>
                                     <table className="w-full border-collapse">
                                         <tbody>
-                                            {insight.lo_shu_grid.map((row, i) => (
+                                            {numerology.loShuGrid.map((row, i) => (
                                                 <tr key={i}>
                                                     {row.map((cell, j) => (
                                                         <td key={j} className="border text-center h-16 w-16 text-2xl font-bold text-primary">
@@ -75,32 +79,16 @@ function ResultsDisplay({ insight, onReset }: { insight: AstroInsightOutput, onR
                             </Card>
                         </aside>
                         <main className="md:col-span-2 space-y-6">
-                            {insight.found_arrows?.length > 0 && (
-                                <Card>
-                                    <CardHeader><CardTitle>Arrows of Strength</CardTitle></CardHeader>
-                                    <CardContent className="space-y-4">
-                                        {insight.found_arrows.map(arrow => (
-                                            <div key={arrow.name}>
-                                                <h5 className="font-semibold">{arrow.name}</h5>
-                                                <p className="text-muted-foreground text-sm">{arrow.description}</p>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
-                             {insight.number_analysis?.length > 0 && (
-                                <Card>
-                                    <CardHeader><CardTitle>Number Repetition Analysis</CardTitle></CardHeader>
-                                    <CardContent className="space-y-4">
-                                        {insight.number_analysis.map(item => (
-                                            <div key={item.number}>
-                                                <h5 className="font-semibold">Number {item.number} ({item.count} appearance/s)</h5>
-                                                <p className="text-muted-foreground text-sm">{item.meaning}</p>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
+                             <Card>
+                                <CardHeader><CardTitle>Reading</CardTitle></CardHeader>
+                                <CardContent>
+                                    <p className="whitespace-pre-wrap">{insight.reading}</p>
+                                    <div className="flex justify-around mt-4">
+                                        <div>Lucky Number: <span className="font-bold text-accent">{insight.luckyNumber}</span></div>
+                                        <div>Lucky Color: <span className="font-bold text-accent">{insight.luckyColor}</span></div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </main>
                     </div>
                 </TabsContent>
@@ -147,6 +135,7 @@ export function ProfileGenerator() {
         gender: ''
     });
     const [insight, setInsight] = React.useState<AstroInsightOutput | null>(null);
+    const [numerology, setNumerology] = React.useState<NumerologyData | null>(null);
     const [error, setError] = React.useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +149,7 @@ export function ProfileGenerator() {
     
     const handleReset = () => {
         setInsight(null);
+        setNumerology(null);
         setError(null);
         setFormData({ name: '', day: '', month: '', year: '', gender: '' });
     };
@@ -185,10 +175,12 @@ export function ProfileGenerator() {
                 year: parseInt(year),
                 gender,
             });
-            if (result.success && result.insight) {
+            if (result.success && result.insight && result.numerology) {
                 setInsight(result.insight);
+                setNumerology(result.numerology);
             } else {
                 setInsight(null);
+                setNumerology(null);
                 setError(result.error || 'An unexpected error occurred.');
                 toast({
                   variant: 'destructive',
@@ -202,7 +194,7 @@ export function ProfileGenerator() {
     return (
         <div>
             <AnimatePresence mode="wait">
-                {insight ? (
+                {insight && numerology ? (
                     <motion.div
                         key="result"
                         initial={{ opacity: 0, y: 20 }}
@@ -210,7 +202,7 @@ export function ProfileGenerator() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <ResultsDisplay insight={insight} onReset={handleReset} />
+                        <ResultsDisplay insight={insight} numerology={numerology} onReset={handleReset} />
                     </motion.div>
                 ) : (
                     <motion.div
@@ -269,5 +261,3 @@ export function ProfileGenerator() {
         </div>
     );
 }
-
-    
