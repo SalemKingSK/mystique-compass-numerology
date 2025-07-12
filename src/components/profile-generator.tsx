@@ -55,10 +55,11 @@ const repeatedNumberMeanings: { [key: string]: string } = {
     "8_3": "You are hardworking, inflexible, harsh & agitated all the time. You bring variety, change & variable thinking into your life. Your progress is slow or you see no progress in your young life; real progress takes place by the age of 40. Your complete inclination is towards materialism, but you should understand the priorities of life & the definition of real happiness. If you want something, you desire to occupy that thing, and until then, you roam around pointless, directionless & aimless.",
     "8_4": "You are hardworking, inflexible, harsh & agitated all the time. You bring variety, change & variable thinking into your life. Your progress is slow or you see no progress in your young life; real progress takes place by the age of 40. Your complete inclination is towards materialism, but you should understand the priorities of life & the definition of real happiness. If you want something, you desire to occupy that thing, and until then, you roam around pointless, directionless & aimless.",
     "8_5": "You are hardworking, inflexible, harsh & agitated all the time. You bring variety, change & variable thinking into your life. Your progress is slow or you see no progress in your young life; real progress takes place by the age of 40. Your complete inclination is towards materialism, but you should understand the priorities of life & the definition of real happiness. If you want something, you desire to occupy that thing, and until then, you roam around pointless, directionless & aimless.",
-    "9_1": "You are a humanitarian and a philanthropist. You have a big heart and a desire to serve others. You may be too idealistic and impractical. You need to learn to be more grounded and realistic.",
-    "9_2": "You have a strong intuition and a compassionate soul. You are a good healer and a spiritual guide. You may be too emotional and self-sacrificing. You need to learn to set healthy boundaries.",
-    "9_3": "A creative and inspiring person. You can make a positive impact on the world through your art and words. You are a good motivator but may be too preachy. You need to learn to lead by example.",
-    "9_4": "You are a practical idealist. You can turn your noble visions into reality. You are a good social reformer but may be too impatient. You need to learn to work with others to achieve your goals."
+    "9_1": "You are ambitious, determined & have a very strong wish for self-improvement. If supported by 4 & 2, then you can be humorous, intellectual, affluent, prosperous, spiritual & divine. If there is no support of 4 & 2, then there will be a tussle in all areas of your life.",
+    "9_2": "You have a 'Master Number' impact, but the Master Number activation is required. You are idealistic & brainy in your life. You love to learn about everything around you. You can do too much criticism of others. You have a sympathetic attitude & you love to work in fields in which much use of the brain is required. It is necessary for you to get along with people of all levels of society.",
+    "9_3": "You are idealistic, smart, & intellectual in your life & can do well in education, but multiple 9s make your survival in the world difficult. You can have arrogance & a bad temper. Multiple 9s give you the power of escapism & life in your own fairytale world. You have a tendency to stretch unrequired topics (तित का ताइ करना), and you need to control this nature of yourself. You are joyful & progressive when you handle your life & nature with care. You have an inclination for becoming unsatisfied & unhappy. You can do good for the world if you understand the power you are blessed with & learn how to channelize that too.",
+    "9_4": "You are idealistic, smart, & intellectual in your life & can do well in education, but multiple 9s make your survival in the world difficult. You can have arrogance & a bad temper. Multiple 9s give you the power of escapism & life in your own fairytale world. You have a tendency to stretch unrequired topics (तित का ताइ करना), and you need to control this nature of yourself. You are joyful & progressive when you handle their life & nature with care. You have an inclination for becoming unsatisfied & unhappy. You can do good for the world if you understand the power you are blessed with & learn how to channelize that too.",
+    "9_5": "You are idealistic, smart, & intellectual in your life & can do well in education, but multiple 9s make your survival in the world difficult. You can have arrogance & a bad temper. Multiple 9s give you the power of escapism & life in your own fairytale world. You have a tendency to stretch unrequired topics (तित का ताइ करना), and you need to control this nature of yourself. You are joyful & progressive when you handle their life & nature with care. You have an inclination for becoming unsatisfied & unhappy. You can do good for the world if you understand the power you are blessed with & learn how to channelize that too."
 };
 
 function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
@@ -152,7 +153,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                 <CardContent className="space-y-4 text-sm">
                                     {Object.entries(numberCounts).map(([num, count]) => {
                                         if (count === 0) return null;
-                                        const key = `${num}_${count}`;
+                                        const key = `${num}_${count > 5 ? 5 : count}`; // Cap count at 5 for lookup
                                         const meaning = repeatedNumberMeanings[key];
                                         return (
                                             <div key={key}>
@@ -170,7 +171,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                 <TabsContent value="chinese_zodiac" className="space-y-6">
                      <Card>
                         <CardHeader><CardTitle>Your Animal Sign: The {insight.sign}</CardTitle></CardHeader>
-                        <CardContent><p className="whitespace-pre-wrap">{insight.general_desc}</p></CardContent>
+                        <CardContent><p className="whitespace-pre-wrap">{insight.general__desc}</p></CardContent>
                     </Card>
                      <Card>
                         <CardHeader><CardTitle>The Influence of the {insight.element} Element</CardTitle></CardHeader>
