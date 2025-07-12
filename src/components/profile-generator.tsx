@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, Target, Zap } from 'lucide-react';
+import { ArrowRight, Loader2, ShieldOff, Sparkles, Zap } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import { personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
@@ -44,7 +44,7 @@ const repeatedNumberMeanings: { [key: string]: string } = {
     "5_5": "You can be bossy, uncontrollable, and tough to deal with. You may engage in brainless talking which in turn can hurt you & your family members. You are filled with too much energy & joy, but you need to have control over it. You have too much of a desire for enjoyment, exploration, enthusiasm, and a persistent want for change, and you take avoidable risks. Four or five 5s is a very dangerous, accidental combination. You need to slow down in your approach & lifestyle; you should talk through your head, not your hat. Brainless talking can hurt others, willingly or unwillingly.",
     "6_1": "You show love, regard & care for your family, relations & loved ones. You enjoy your home duties & have creative or innovative abilities. You are a DECENT PARENT and provide suggestions in family matters when required. You can be insecure, worried & afraid about being left alone in life (e.g., death of a life partner). You are a lucky person but with narrow-mindedness. You will have financial stability, a good lifestyle with fewer discomforts, if 8 & 1 are also in your chart. If 8 & 1 are not there, then only financial security will be there. You are family-oriented & love to work in an enjoyable & friendly environment.",
     "6_2": "You are highly creative, but lack self-confidence & believe less in your work & their abilities. You take unnecessary tension for your family & family members, which makes your energy drained/exhausted & hence you feel tired most of the time. You are too stressed all the time because of your thinking style. You are overprotective by nature, hence you keep interfering in the lives of your family members (especially towards your kids). You can provide an obstruction to your children in becoming self-dependent. Your life is filled with creativity, activeness & beauty. You require constant support & encouragement from your family & friends.",
-    "6_3": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
+    "6_3": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in their behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "6_4": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in their behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "6_5": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in their behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "7_1": "You learn the lessons of your life through RELATIONAL LOSS or LOSS OF LOVED ONES, LOSS OF BELONGINGS, or on the COST of HEALTH & WELL-BEING. With the lessons you learn throughout your life & losses, you become more inclined towards the spiritual field & spiritual practices. If supported by 3 & 5, you start your quest for the ultimate reality of life & precision or perfection in the journey of life. Your career can be in a spiritual or humanitarian field. If 3 & 5 are there, your behavior is rigid.",
@@ -207,6 +207,24 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                     </CardHeader>
                                     <CardContent className="space-y-4 text-sm">
                                         {numerology.arrowsOfStrength.map(arrow => (
+                                            <div key={arrow.name}>
+                                                <p className="font-bold text-primary">{arrow.name}</p>
+                                                <p className="text-muted-foreground">{arrow.description}</p>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            )}
+                            {numerology.arrowsOfWeakness.length > 0 && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <ShieldOff className="text-muted-foreground" />
+                                            Arrows of Weakness
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4 text-sm">
+                                        {numerology.arrowsOfWeakness.map(arrow => (
                                             <div key={arrow.name}>
                                                 <p className="font-bold text-primary">{arrow.name}</p>
                                                 <p className="text-muted-foreground">{arrow.description}</p>
