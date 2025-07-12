@@ -4,6 +4,7 @@
 
 
 
+
       
 export const zodiac_data = {
     "Rat": {
@@ -149,7 +150,7 @@ Tiger with Horse: Auspicious, to say the least. Both of you have unruly natures.
 
 Tiger with Goat: This union is among the worst possible known to Chinese astrologers. Although you may make a fabulous start (in bed), from there on it's all downhill. The practicalities just don't work out. The Goat is charming, beautifully seductive, and loving. You are passion and mettle. But who will bring home the bacon? In this family, nobody wants the job. No concessions are made. The Goat remains laid back while you, the ambitious Tiger, bombast a hole in the kitchen ceiling. What was a great passion ends in lifelong misunderstanding and acrimony. Affairs? Yes. Marriage? Abstinence is advised.
 
-Tiger with Monkey: You two make eager lovers. Initially, you will leap frequently on each other’s bones, accomplishing astonishing feats of extreme passion, but in the long run, the ardor may die a natural death, because you hate to be clung to— and innately neurotic Monkeys don’t know how not to cling. The strong intellectual tug between you frequently keeps you together, anyway. You admire the Monkey’s keen eye for strategy, and the Monkey enjoys and applauds your feisty wit and temerity. You have an easy, common viewpoint and, even if you cannot keep the love flame burning, will go far together as lifelong pals. Except… the Chinese say that you should beware. Traditionally, a Monkey is the Tiger’s natural enemy. Marriage is not advised.
+Tiger with Monkey: You two make eager lovers. Initially, you will leap frequently on each other’s bones, accomplishing astonishing feats of extreme passion, but in the long run, the ardor may die a natural death, because you hate to be clung to— and innately neurotic Monkeys don’t know how not to cling. The strong intellectual tug between you frequently keeps you together, anyway. You admire the Monkey’s keen eye for strategy, and the Monkey enjoys and applauds your feisty wit and temerity. You have an easy, common viewpoint and, even if you cannot keep the love flame burning, will go far together as lifelong pals. Except… the Chinese say that you should beware. Traditionally, the Monkey is the Tiger’s natural enemy. Marriage is not advised.
 
 Tiger with Dog: Harmony incarnate. You and the Dog just plain get along. You have common causes and common philosophies. But you are very different. You are overly optimistic, the Dog pessimistic. Each helps the other to understand these basic character differences. The Chinese call this pairing a happy alliance of muscle and heart. You have the strength to put the Dog’s ideals across to the public. The disquiet Dog keeps watch and prevents you from leaping into the wrong frays. You are, simply, a great couple. Harmony reigns right from the start.
 
@@ -294,80 +295,80 @@ Some advice? Be generous with your glory. Try to decline the spotlight when some
             "Metal": `You, a Metal Snake, lust after a grand life and an even grander wealth. You are a person with grandiose ideas—you might even say, delusions of grandeur. You are ambitious and want notoriety. You seek to show off your talents to get the attention of the entire world. Because of your searing need for public acclaim, you often succeed at becoming something of a star. The life of a hyper-talented Metal Snake like you is marked by difficulty. You often suffer giant reversals, losing fortunes or loved ones, falling into excesses or cultivating religious foolishness, both of which lead to disaster. But you always pull yourself together and start your quest again. Like all Snakes, because of your deep desire to please and be accepted, you are vulnerable, but you are even more so because you don't hesitate to wear your heart on your sleeve. You melt with joy at the thunderous applause but are unwary of the fickleness behind it.`,
             "Water": `Your claim to fame is your skill at using your intuition. Of course, all Snakes are sensitive and pick up easily on feelings—but Water confers a special talent for intuiting the flavor and tone of even the most subtle of life's situations. Where hints of danger, twinges of fear, or suggestions of sexuality may pass unnoticed under the noses of less perceptive folk, every nuance is picked up by you. You seem able to understand without learning and to know certain things instinctively. Although compassion is the emotion that can be most profoundly felt by you, you are oddly egocentric and quite unable to escape from your golden bubble of preoccupation with yourself long enough to relate to those you might feel sorry for. You are neither a natural care provider nor are you very altruistic. Rather, you sense the way things are moving, then zigzag through the loaded minefields of life, relying solely on your inner radar to guide you. You are wildly imaginative and spend much of your time meditating on new ways to solve old problems.`
         },
-        "compatibilities": "PENDING_SNAKE_COMPATIBILITIES",
-        "futures": "PENDING_SNAKE_FUTURES"
+        "compatibilities": `PENDING_SNAKE_COMPATIBILITIES`,
+        "futures": `PENDING_SNAKE_FUTURES`
     },
     "Horse": {
-        "general": "PENDING_HORSE_INTRODUCTION",
+        "general": `PENDING_HORSE_INTRODUCTION`,
         "elements": {
-            "Wood": "PENDING_HORSE_WOOD",
-            "Fire": "PENDING_HORSE_FIRE",
-            "Earth": "PENDING_HORSE_EARTH",
-            "Metal": "PENDING_HORSE_METAL",
-            "Water": "PENDING_HORSE_WATER"
+            "Wood": `PENDING_HORSE_WOOD`,
+            "Fire": `PENDING_HORSE_FIRE`,
+            "Earth": `PENDING_HORSE_EARTH`,
+            "Metal": `PENDING_HORSE_METAL`,
+            "Water": `PENDING_HORSE_WATER`
         },
-        "compatibilities": "PENDING_HORSE_COMPATIBILITIES",
-        "futures": "PENDING_HORSE_FUTURES"
+        "compatibilities": `PENDING_HORSE_COMPATIBILITIES`,
+        "futures": `PENDING_HORSE_FUTURES`
     },
     "Goat": {
-        "general": "PENDING_GOAT_INTRODUCTION",
+        "general": `PENDING_GOAT_INTRODUCTION`,
         "elements": {
-            "Wood": "PENDING_GOAT_WOOD",
-            "Fire": "PENDING_GOAT_FIRE",
-            "Earth": "PENDING_GOAT_EARTH",
-            "Metal": "PENDING_GOAT_METAL",
-            "Water": "PENDING_GOAT_WATER"
+            "Wood": `PENDING_GOAT_WOOD`,
+            "Fire": `PENDING_GOAT_FIRE`,
+            "Earth": `PENDING_GOAT_EARTH`,
+            "Metal": `PENDING_GOAT_METAL`,
+            "Water": `PENDING_GOAT_WATER`
         },
-        "compatibilities": "PENDING_GOAT_COMPATIBILITIES",
-        "futures": "PENDING_GOAT_FUTURES"
+        "compatibilities": `PENDING_GOAT_COMPATIBILITIES`,
+        "futures": `PENDING_GOAT_FUTURES`
     },
     "Monkey": {
-        "general": "PENDING_MONKEY_INTRODUCTION",
+        "general": `PENDING_MONKEY_INTRODUCTION`,
         "elements": {
-            "Wood": "PENDING_MONKEY_WOOD",
-            "Fire": "PENDING_MONKEY_FIRE",
-            "Earth": "PENDING_MONKEY_EARTH",
-            "Metal": "PENDING_MONKEY_METAL",
-            "Water": "PENDING_MONKEY_WATER"
+            "Wood": `PENDING_MONKEY_WOOD`,
+            "Fire": `PENDING_MONKEY_FIRE`,
+            "Earth": `PENDING_MONKEY_EARTH`,
+            "Metal": `PENDING_MONKEY_METAL`,
+            "Water": `PENDING_MONKEY_WATER`
         },
-        "compatibilities": "PENDING_MONKEY_COMPATIBILITIES",
-        "futures": "PENDING_MONKEY_FUTURES"
+        "compatibilities": `PENDING_MONKEY_COMPATIBILITIES`,
+        "futures": `PENDING_MONKEY_FUTURES`
     },
     "Rooster": {
-        "general": "PENDING_ROOSTER_INTRODUCTION",
+        "general": `PENDING_ROOSTER_INTRODUCTION`,
         "elements": {
-            "Wood": "PENDING_ROOSTER_WOOD",
-            "Fire": "PENDING_ROOSTER_FIRE",
-            "Earth": "PENDING_ROOSTER_EARTH",
-            "Metal": "PENDING_ROOSTER_METAL",
-            "Water": "PENDING_ROOSTER_WATER"
+            "Wood": `PENDING_ROOSTER_WOOD`,
+            "Fire": `PENDING_ROOSTER_FIRE`,
+            "Earth": `PENDING_ROOSTER_EARTH`,
+            "Metal": `PENDING_ROOSTER_METAL`,
+            "Water": `PENDING_ROOSTER_WATER`
         },
-        "compatibilities": "PENDING_ROOSTER_COMPATIBILITIES",
-        "futures": "PENDING_ROOSTER_FUTURES"
+        "compatibilities": `PENDING_ROOSTER_COMPATIBILITIES`,
+        "futures": `PENDING_ROOSTER_FUTURES`
     },
     "Dog": {
-        "general": "PENDING_DOG_INTRODUCTION",
+        "general": `PENDING_DOG_INTRODUCTION`,
         "elements": {
-            "Wood": "PENDING_DOG_WOOD",
-            "Fire": "PENDING_DOG_FIRE",
-            "Earth": "PENDING_DOG_EARTH",
-            "Metal": "PENDING_DOG_METAL",
-            "Water": "PENDING_DOG_WATER"
+            "Wood": `PENDING_DOG_WOOD`,
+            "Fire": `PENDING_DOG_FIRE`,
+            "Earth": `PENDING_DOG_EARTH`,
+            "Metal": `PENDING_DOG_METAL`,
+            "Water": `PENDING_DOG_WATER`
         },
-        "compatibilities": "PENDING_DOG_COMPATIBILITIES",
-        "futures": "PENDING_DOG_FUTURES"
+        "compatibilities": `PENDING_DOG_COMPATIBILITIES`,
+        "futures": `PENDING_DOG_FUTURES`
     },
     "Pig": {
-        "general": "PENDING_PIG_INTRODUCTION",
+        "general": `PENDING_PIG_INTRODUCTION`,
         "elements": {
-            "Wood": "PENDING_PIG_WOOD",
-            "Fire": "PENDING_PIG_FIRE",
-            "Earth": "PENDING_PIG_EARTH",
-            "Metal": "PENDING_PIG_METAL",
-            "Water": "PENDING_PIG_WATER"
+            "Wood": `PENDING_PIG_WOOD`,
+            "Fire": `PENDING_PIG_FIRE`,
+            "Earth": `PENDING_PIG_EARTH`,
+            "Metal": `PENDING_PIG_METAL`,
+            "Water": `PENDING_PIG_WATER`
         },
-        "compatibilities": "PENDING_PIG_COMPATIBILITIES",
-        "futures": "PENDING_PIG_FUTURES"
+        "compatibilities": `PENDING_PIG_COMPATIBILITIES`,
+        "futures": `PENDING_PIG_FUTURES`
     },
 };
 
@@ -376,3 +377,6 @@ Some advice? Be generous with your glory. Try to decline the spotlight when some
     
 
 
+
+
+    
