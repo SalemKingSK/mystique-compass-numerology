@@ -34,7 +34,10 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
         const numbers = new Set<number>();
         numerology.loShuGrid.flat().forEach(cell => {
             if (cell) {
-                numbers.add(parseInt(cell[0]));
+                // Handle multiple digits in a cell, e.g., '111'
+                cell.split('').forEach(digitChar => {
+                    numbers.add(parseInt(digitChar));
+                });
             }
         });
         return Array.from(numbers).sort((a,b) => a - b);
