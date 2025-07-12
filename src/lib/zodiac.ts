@@ -113,7 +113,13 @@ Ox with Pig: Indeed, you two get on famously. The good-natured Pig is so malleab
         }
     },
     "Tiger": {
-        "general": "PENDING_TIGER_INTRODUCTION",
+        "general": `Honorable Tiger, you are noble and fearless. You are respected for your courage and dreaded for your ferocity and incessant intemperance. Like a raging torrent, you constantly overflow your banks. Where are you going in such a hurry? Can't you take just one teensy peek before you pounce? Try to slow down, practice a little moderation. Stop going around being so heartbreakingly attractive. It's exhausting.
+
+Of course, some people find you so dashing and plucky that they want to climb aboard and go along for the ride. But you, Tiger dear, are a swashbuckling loner. The top is the only place you want to be. You court danger. The fiercer the enemy, the more dramatic and calamitous the situation, the broader grows your Tigerish grin. Your changeability, disdain for rules, self-sufficiency and devil-may-care jauntiness could be your undoing.
+
+In matters of the heart, you are too demanding. But you certainly aren't boring. You get on best with devoted Dogs, who espouse your causes. Independent Horses will stay off your case and complicitous Dragons find loving you quite scrumptious as well. Monkeys admire you, but remember—Monkeys can be tricky. Whatever you do, don't take up with a tempestuous Tiger like yourself. You are lucky, but not that lucky.
+
+You'll breeze through your youth. But by the age of thirty-five, half a lifetime's excesses may start to catch up with you. Call yourself to order by forty, and by the time you reach fifty you'll be young again, ready for a productive old age. A piece of advice? Go ahead and take the job as a five-star general, but choose your lieutenants wisely—you’ll be needing lots of loyal counsel.`,
         "elements": {
             "Wood": "PENDING_TIGER_WOOD",
             "Fire": "PENDING_TIGER_FIRE",
