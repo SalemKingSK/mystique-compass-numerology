@@ -24,16 +24,18 @@ export type AstroInsightInput = z.infer<typeof AstroInsightInputSchema>;
 
 const AstroInsightOutputSchema = z.object({
   name: z.string().describe("The person's name."),
+  western_sign: z.string().describe('The Western zodiac sign (e.g., "Aries").'),
+  new_astrology_sign: z.string().describe('The combined New Astrology sign (e.g., "Aries/Dragon").'),
+  
+  // Chinese Zodiac Info
+  sign: z.string().describe('The Chinese zodiac animal sign (e.g., "Dragon").'),
+  element: z.string().describe('The Chinese zodiac element (e.g., "Wood").'),
+  signData: z.any().describe('The complete data object for the Chinese zodiac sign.'),
+  
+  // AI-generated creative content
   reading: z.string().describe('A simple, AI-powered astrological reading for the person.'),
   luckyNumber: z.number().describe('A lucky number for the person.'),
   luckyColor: z.string().describe('A lucky color for the person.'),
-  new_astrology_sign: z.string().describe('The combined New Astrology sign (e.g., "Aries/Dragon").'),
-  western_sign: z.string().describe('The Western zodiac sign (e.g., "Aries").'),
-  element: z.string().describe('The Chinese zodiac element (e.g., "Wood").'),
-  sign: z.string().describe('The Chinese zodiac animal sign (e.g., "Dragon").'),
-  introduction: z.string().describe('A general description of the Chinese animal sign.'),
-  elemental_desc: z.string().describe("A description of the element's influence on the sign."),
-  compatibilities: z.string().describe("A description of the sign's compatibilities."),
   new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
 });
 export type AstroInsightOutput = z.infer<typeof AstroInsightOutputSchema>;
@@ -42,6 +44,7 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
   return astroInsightFlow(input);
 }
 
+// This is the schema for the AI prompt, which only generates the creative parts.
 const CreativePromptInputSchema = z.object({
     name: z.string(),
     western_sign: z.string(),
@@ -57,7 +60,7 @@ const CreativePromptOutputSchema = z.object({
     new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
 });
 
-
+// This prompt is now ONLY for generating creative content.
 const creativePrompt = ai.definePrompt({
   name: 'astroCreativePrompt',
   input: {schema: CreativePromptInputSchema},
@@ -78,18 +81,20 @@ const astroInsightFlow = ai.defineFlow(
   async (input) => {
     const { year, month, day, name } = input;
     
-    // Determine Zodiac signs and data
+    // Determine Zodiac signs and get the full data object
     const western_sign = getWesternZodiacSign(day, month);
     const { sign, element } = getChineseZodiacSign(year);
     const new_astrology_sign = `${western_sign}/${sign}`;
+    
+    // 1. Get the ENTIRE data object for that sign
     const signData = zodiac_data[sign as keyof typeof zodiac_data];
 
-    // Check for missing data
+    // 2. Check for missing data. This check is still important.
     if (!signData || !signData.introduction || signData.introduction.startsWith('PENDING')) {
-        throw new Error(`Zodiac data for "${sign}" is incomplete. Please add it to zodiac.ts.`);
+        throw new Error(`Zodiac data for "${sign}" is incomplete or missing. Please add it to zodiac.ts.`);
     }
 
-    // Generate creative content
+    // 3. Generate creative content in parallel.
     const creativeResult = await creativePrompt({
         name,
         western_sign,
@@ -103,19 +108,17 @@ const astroInsightFlow = ai.defineFlow(
         throw new Error('Failed to generate creative content from the AI model.');
     }
 
-    // Combine generated and static data
+    // 4. Combine AI-generated data with the static data object and return.
     return {
         name,
+        western_sign,
+        new_astrology_sign,
+        sign,
+        element,
+        signData, // Return the whole object
         reading: creativeData.reading,
         luckyNumber: creativeData.luckyNumber,
         luckyColor: creativeData.luckyColor,
-        new_astrology_sign,
-        western_sign,
-        element,
-        sign,
-        introduction: signData.introduction,
-        elemental_desc: signData.elements[element as keyof typeof signData.elements],
-        compatibilities: signData.compatibilities,
         new_astrology_desc: creativeData.new_astrology_desc,
     };
   }
