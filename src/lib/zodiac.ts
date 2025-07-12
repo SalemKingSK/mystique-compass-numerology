@@ -56,7 +56,17 @@ Rat with Pig: Indeed, you two make marvelous mates. In China, the Pig symbolizes
         }
     },
     "Ox": {
-        "general": "PENDING_OX_INTRODUCTION",
+        "general": `Hail, Diligent Ox. You are a veritable Gibraltar, an indomitable fortress. Your sign might have been called Bulldozer instead of Ox. You are an essentially temperate person who cares greatly for rigor, labor, strength of character, and... results!
+
+You can stick at a task longer and go at it harder than anybody else. You spare no elbow grease. You hate to be beaten, so you simply never give up. Some may call you slow, while others complain that you are clumsy. In fact, you move at your own sweet pace and refuse to be pushed or prodded by hotheaded fly-by-nights. You believe in simplicity and achievement, and levity in business exasperates you.
+
+You are capable of profound, enduring love, yet romance leaves you cold. You prefer action to beds of roses and vials of exotic perfumes. You take life very seriously, but life doesn't always return the favor. You don't normally talk much, but you have a remarkable talent for storytelling.
+
+If it's really results you're after, use that special flair. Chat up the conservative Rooster you've been longing to invite to dinner, share some pink bubbly with a garrulous Rat, or send dozens of white roses to a luxury-loving Snake. They are all well equipped to handle your peculiar brand of seduction.
+
+The first two eras of your life will be characterized by hard work. During your second adult phase, a misunderstanding between you and a neighbor or colleague may cause a deep, long-lasting rift.
+
+Don't lose heart. Your old age will be both long and healthy, with peace of mind taking over after fifty as your priority number one. My advice? Yes. Lighten up. Stop judging others by your own high standards, as you'll only be disappointed. Nobody (except you, my dear Ox) is perfect.`,
         "elements": {
             "Wood": "PENDING_OX_WOOD",
             "Fire": "PENDING_OX_FIRE",
@@ -189,6 +199,8 @@ Rat with Pig: Indeed, you two make marvelous mates. In China, the Pig symbolizes
     },
 };
 
+
+    
 
     
 
