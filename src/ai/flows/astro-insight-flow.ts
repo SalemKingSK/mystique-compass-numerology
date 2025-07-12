@@ -74,6 +74,7 @@ const creativePrompt = ai.definePrompt({
   name: 'astroCreativePrompt',
   input: {schema: CreativePromptInputSchema},
   output: {schema: CreativePromptOutputSchema},
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert astrologer. For the person named {{{name}}}, who is a {{{new_astrology_sign}}} ({{{western_sign}}} and {{{element}}} {{{chinese_sign}}}), generate the following:
 1. A simple, AI-powered astrological reading.
 2. A lucky number.
