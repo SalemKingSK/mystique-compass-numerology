@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { zodiac_data } from '@/lib/zodiac';
 
 const AstroInsightInputSchema = z.object({
   name: z.string().describe('The full name of the person.'),
@@ -50,16 +52,14 @@ Name: {{{name}}}
 Date of Birth: {{{day}}}/{{{month}}}/{{{year}}}
 Gender: {{{gender}}}
 
-Please generate a profile including:
-1.  **Core Information**: Correctly determine the Western sign, Chinese animal sign, and element. Ensure the Chinese animal sign is consistent throughout the entire response.
-2.  **New Astrology**: Their combined sign (e.g., "Aries/Rooster") and a detailed description.
-3.  **Chinese Zodiac**:
-    *   Provide a general description of their animal sign.
-    *   Describe the influence of their element on their sign.
-    *   Detail their compatibilities.
-4.  **Simple Profile**: Also provide a simple reading, a lucky number, and a lucky color.
+First, determine the correct Western Zodiac sign, Chinese Animal sign, and Chinese Element.
 
-Do NOT provide numerology readings or Lo Shu grid information. Focus only on the astrological aspects requested.
+Then, using the provided data, fill in the descriptions for the Chinese Astrology portion. The descriptions for 'general_desc', 'elemental_desc', and 'compatibilities' MUST come from the data provided below. Do NOT invent new descriptions for these fields.
+
+Finally, generate the rest of the profile, including the combined "New Astrology" sign and its description, a simple reading, a lucky number, and a lucky color.
+
+**Zodiac Data:**
+${JSON.stringify(zodiac_data, null, 2)}
   `,
 });
 
@@ -74,3 +74,4 @@ const astroInsightFlow = ai.defineFlow(
     return output!;
   }
 );
+
