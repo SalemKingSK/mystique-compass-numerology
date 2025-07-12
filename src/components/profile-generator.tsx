@@ -105,7 +105,7 @@ function PersonalizedMeaning({ text, allDigits }: { text: string, allDigits: str
         return <p className="text-muted-foreground">{text}</p>
     }
 
-    return <p className="text-muted-foreground">{personalizedText}</p>
+    return <p className="whitespace-pre-wrap leading-relaxed">{personalizedText}</p>
 }
 
 const arrowCoordinates: { [key: string]: { x1: string; y1: string; x2: string; y2: string } } = {
@@ -144,7 +144,7 @@ const LoShuArrow = ({ name, type }: { name: string, type: 'strength' | 'weakness
             y1={coords.y1}
             x2={coords.x2}
             y2={coords.y2}
-            stroke={type === 'strength' ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))'}
+            stroke={type === 'strength' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))'}
             strokeWidth="3"
             strokeLinecap="round"
             strokeDasharray={type === 'weakness' ? "5, 5" : undefined}
@@ -189,91 +189,92 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
     
 
     return (
-        <div className="p-6 bg-background rounded-lg">
-            <div className="text-center mb-6 pb-4 border-b">
-                <h1 className="text-3xl font-bold text-primary">{insight.name}</h1>
-                <h2 className="text-xl text-accent font-semibold">{insight.new_astrology_sign}</h2>
-                <p className="text-muted-foreground">(A {insight.western_sign} born in the year of the {insight.element} {insight.sign})</p>
-            </div>
+        <div className="p-1">
+            <header className="text-center mb-10 pb-6 border-b">
+                <h1 className="font-headline text-5xl text-gray-800">{insight.name}</h1>
+                <h2 className="text-2xl text-primary font-bold mt-2">{insight.new_astrology_sign}</h2>
+                <p className="text-muted-foreground text-lg mt-1">(A {insight.western_sign} born in the year of the {insight.element} {insight.sign})</p>
+            </header>
 
             <Tabs defaultValue="numerology" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4">
-                    <TabsTrigger value="numerology">Numerology</TabsTrigger>
-                    <TabsTrigger value="chinese_zodiac">Chinese Zodiac</TabsTrigger>
-                    <TabsTrigger value="new_astrology">New Astrology</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 mb-8 bg-transparent p-0 gap-4 border-b-0">
+                    <TabsTrigger value="numerology" className="text-lg pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent">Numerology Grid</TabsTrigger>
+                    <TabsTrigger value="chinese_zodiac" className="text-lg pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent">Chinese Animal Sign</TabsTrigger>
+                    <TabsTrigger value="new_astrology" className="text-lg pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent">New Astrology</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="numerology">
-                    <div className="grid md:grid-cols-3 gap-6">
-                        <aside className="md:col-span-1 space-y-6">
-                            <Card>
+                     <div className="grid md:grid-cols-[320px_1fr] gap-8 items-start">
+                        <aside className="space-y-6">
+                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Core Numbers</CardTitle>
+                                    <CardTitle className="font-headline text-2xl border-b pb-3">Core Numbers</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-3 text-center gap-4">
-                                        <div>
-                                            <div className="text-4xl font-bold text-accent">{numerology.psycheNum}</div>
-                                            <div className="text-xs text-muted-foreground">Psyche</div>
+                                        <div className="num-box">
+                                            <div className="text-4xl font-bold text-gray-800">{numerology.psycheNum}</div>
+                                            <div className="text-xs text-muted-foreground uppercase tracking-wider">Psyche</div>
                                         </div>
-                                        <div>
-                                            <div className="text-4xl font-bold text-accent">{numerology.destinyNum}</div>
-                                            <div className="text-xs text-muted-foreground">Destiny</div>
+                                        <div className="num-box">
+                                            <div className="text-4xl font-bold text-gray-800">{numerology.destinyNum}</div>
+                                            <div className="text-xs text-muted-foreground uppercase tracking-wider">Destiny</div>
                                         </div>
-                                        <div>
-                                            <div className="text-4xl font-bold text-accent">{numerology.kuaNum}</div>
-                                            <div className="text-xs text-muted-foreground">Kua</div>
+                                        <div className="num-box">
+                                            <div className="text-4xl font-bold text-gray-800">{numerology.kuaNum}</div>
+                                            <div className="text-xs text-muted-foreground uppercase tracking-wider">Kua</div>
                                         </div>
                                     </div>
                                 </CardContent>
                             </Card>
+                            {numerology.kuaAttributes && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="font-headline text-2xl border-b pb-3">Your Kua Attributes</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-sm">
+                                        <ul className="space-y-3 pt-2">
+                                            <li className="flex justify-between items-center">
+                                                <span>Guiding Element</span>
+                                                <strong className="text-primary">{numerology.kuaAttributes.element}</strong>
+                                            </li>
+                                             <li className="flex justify-between items-center">
+                                                <span>Lucky Colours</span>
+                                                <strong className="text-primary text-right">{numerology.kuaAttributes.colors}</strong>
+                                            </li>
+                                             <li className="flex justify-between items-center">
+                                                <span>Lucky Season</span>
+                                                <strong className="text-primary">{numerology.kuaAttributes.season}</strong>
+                                            </li>
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            )}
                             {numerology.auspiciousDirections && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Your Auspicious Directions</CardTitle>
+                                        <CardTitle className="font-headline text-2xl border-b pb-3">Auspicious Directions</CardTitle>
                                     </CardHeader>
                                     <CardContent className="text-sm">
-                                        <ul className="space-y-2">
+                                        <ul className="space-y-3 pt-2">
                                             {Object.entries(numerology.auspiciousDirections).map(([aspect, direction]) => (
-                                                <li key={aspect} className="flex justify-between">
+                                                <li key={aspect} className="flex justify-between items-center">
                                                     <span>{aspect}</span>
-                                                    <strong className="text-accent">{direction}</strong>
+                                                    <strong className="text-primary">{direction}</strong>
                                                 </li>
                                             ))}
                                         </ul>
                                     </CardContent>
                                 </Card>
                             )}
-                             {numerology.kuaAttributes && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Your Kua Attributes</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm">
-                                        <ul className="space-y-2">
-                                            <li className="flex justify-between">
-                                                <span>Guiding Element</span>
-                                                <strong className="text-accent">{numerology.kuaAttributes.element}</strong>
-                                            </li>
-                                            <li className="flex justify-between">
-                                                <span>Lucky Colours</span>
-                                                <strong className="text-accent">{numerology.kuaAttributes.colors}</strong>
-                                            </li>
-                                             <li className="flex justify-between">
-                                                <span>Lucky Season</span>
-                                                <strong className="text-accent">{numerology.kuaAttributes.season}</strong>
-                                            </li>
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-                            )}
-                             <Card>
-                                <CardHeader>
-                                    <CardTitle>Lo Shu Grid</CardTitle>
-                                    <CardDescription>Click a number to see its meaning.</CardDescription>
+                        </aside>
+                        <main className="space-y-6">
+                            <Card>
+                                 <CardHeader>
+                                    <CardTitle className="font-headline text-2xl border-b pb-3">Lo Shu Grid</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="relative aspect-square">
+                                <CardContent className="flex justify-center p-4">
+                                    <div className="relative aspect-square w-full max-w-[300px]">
                                         <svg
                                             className="absolute top-0 left-0 w-full h-full"
                                             viewBox="0 0 100 100"
@@ -287,16 +288,16 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                                 return <LoShuArrow key={arrow.name} name={strengthArrowName} type="weakness" />
                                             })}
                                         </svg>
-                                        <table className="w-full h-full border-collapse relative">
+                                        <table className="w-full h-full border-collapse relative bg-transparent">
                                             <tbody>
                                                 {numerology.loShuGrid.map((row, i) => (
                                                     <tr key={i}>
                                                         {row.map((cell, j) => (
-                                                            <td key={j} className="border text-center h-1/3 w-1/3 text-2xl font-bold p-0">
+                                                            <td key={j} className="border-2 text-center h-1/3 w-1/3 text-2xl font-bold p-0">
                                                                 {cell ? (
                                                                     <button 
                                                                         onClick={() => handleGridClick(cell)}
-                                                                        className="w-full h-full flex items-center justify-center text-primary hover:bg-accent/20 transition-colors duration-200 disabled:hover:bg-transparent disabled:cursor-default"
+                                                                        className="w-full h-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors duration-200 disabled:hover:bg-transparent disabled:cursor-default"
                                                                         aria-label={`Meaning for number ${cell[0]}`}
                                                                     >
                                                                         {cell}
@@ -313,31 +314,19 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                     </div>
                                 </CardContent>
                             </Card>
-                        </aside>
-                        <main className="md:col-span-2 space-y-6">
-                            <Card>
-                                <CardHeader><CardTitle>AI Reading</CardTitle></CardHeader>
-                                <CardContent>
-                                    <p className="whitespace-pre-wrap">{insight.reading}</p>
-                                    <div className="flex justify-around mt-4">
-                                        <div>Lucky Number: <span className="font-bold text-accent">{insight.luckyNumber}</span></div>
-                                        <div>Lucky Color: <span className="font-bold text-accent">{insight.luckyColor}</span></div>
-                                    </div>
-                                </CardContent>
-                            </Card>
                              {numerology.arrowsOfStrength.length > 0 && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Zap className="text-accent" />
+                                        <CardTitle className="font-headline text-2xl border-b pb-3 flex items-center gap-2">
+                                            <Zap className="text-primary" />
                                             Arrows of Strength
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="space-y-4 text-sm">
+                                    <CardContent className="space-y-4 pt-4">
                                         {numerology.arrowsOfStrength.map(arrow => (
                                             <div key={arrow.name}>
-                                                <p className="font-bold text-primary">{arrow.name}</p>
-                                                <p className="text-muted-foreground">{arrow.description}</p>
+                                                <h5 className="font-bold font-subheadline text-gray-800">{arrow.name}</h5>
+                                                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
                                             </div>
                                         ))}
                                     </CardContent>
@@ -346,37 +335,42 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                             {numerology.arrowsOfWeakness.length > 0 && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
+                                        <CardTitle className="font-headline text-2xl border-b pb-3 flex items-center gap-2">
                                             <ShieldOff className="text-muted-foreground" />
                                             Arrows of Weakness
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="space-y-4 text-sm">
+                                    <CardContent className="space-y-4 pt-4">
                                         {numerology.arrowsOfWeakness.map(arrow => (
                                             <div key={arrow.name}>
-                                                <p className="font-bold text-primary">{arrow.name}</p>
-                                                <p className="text-muted-foreground">{arrow.description}</p>
+                                                <h5 className="font-bold font-subheadline text-gray-800">{arrow.name}</h5>
+                                                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
                                             </div>
                                         ))}
                                     </CardContent>
                                 </Card>
                             )}
-                            <Card>
-                                <CardHeader><CardTitle>Personalized Number Meanings</CardTitle></CardHeader>
-                                <CardContent className="space-y-4 text-sm">
-                                    {Object.entries(numberCounts).map(([num, count]) => {
-                                        if (count === 0) return null;
-                                        const key = `${num}_${Math.min(count, 5)}`; // Cap count at 5 for lookup
-                                        const meaning = repeatedNumberMeanings[key];
-                                        if (!meaning) return null;
-                                        
-                                        return (
-                                            <div key={key}>
-                                                <p className="font-bold text-primary">Number {num} (Repeated {count} time{count > 1 ? 's' : ''})</p>
-                                                <PersonalizedMeaning text={meaning} allDigits={numerology.allDigitsForGrid} />
-                                            </div>
-                                        );
-                                    })}
+                             <Card>
+                                <CardHeader>
+                                    <CardTitle className="font-headline text-2xl border-b pb-3">Personalized Number Meanings</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4 pt-4">
+                                    {Object.entries(numberCounts).filter(([, count]) => count > 0).length > 0 ?
+                                        Object.entries(numberCounts).map(([num, count]) => {
+                                            if (count === 0) return null;
+                                            const key = `${num}_${Math.min(count, 5)}`;
+                                            const meaning = repeatedNumberMeanings[key];
+                                            if (!meaning) return null;
+                                            
+                                            return (
+                                                <div key={key}>
+                                                    <h5 className="font-bold font-subheadline text-gray-800">Number {num} (Repeated {count} time{count > 1 ? 's' : ''})</h5>
+                                                    <PersonalizedMeaning text={meaning} allDigits={numerology.allDigitsForGrid} />
+                                                </div>
+                                            );
+                                        })
+                                    : <p className="text-muted-foreground">No repeated numbers with special meanings found in your chart.</p>
+                                    }
                                 </CardContent>
                             </Card>
                         </main>
@@ -385,37 +379,47 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                 
                 <TabsContent value="chinese_zodiac" className="space-y-6">
                      <Card>
-                        <CardHeader><CardTitle>Your Animal Sign: The {insight.sign}</CardTitle></CardHeader>
-                        <CardContent><p className="whitespace-pre-wrap">{insight.general_desc}</p></CardContent>
+                        <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">Your Animal Sign: The {insight.sign}</CardTitle></CardHeader>
+                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.general_desc}</p></CardContent>
                     </Card>
                      <Card>
-                        <CardHeader><CardTitle>The Influence of the {insight.element} Element</CardTitle></CardHeader>
-                        <CardContent><p className="whitespace-pre-wrap">{insight.elemental_desc}</p></CardContent>
+                        <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">The Influence of the {insight.element} Element</CardTitle></CardHeader>
+                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.elemental_desc}</p></CardContent>
                     </Card>
                      <Card>
-                        <CardHeader><CardTitle>Compatibilities</CardTitle></CardHeader>
-                        <CardContent><p className="whitespace-pre-wrap">{insight.compatibilities}</p></CardContent>
+                        <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">Compatibilities</CardTitle></CardHeader>
+                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.compatibilities}</p></CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="new_astrology">
+                <TabsContent value="new_astrology" className="space-y-6">
                      <Card>
-                        <CardHeader><CardTitle>Your Combined Sign: {insight.new_astrology_sign}</CardTitle></CardHeader>
-                        <CardContent><p className="whitespace-pre-wrap">{insight.new_astrology_desc}</p></CardContent>
+                        <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">Your Combined Sign: {insight.new_astrology_sign}</CardTitle></CardHeader>
+                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.new_astrology_desc}</p></CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">AI Generated Reading</CardTitle></CardHeader>
+                        <CardContent className="pt-4">
+                            <p className="whitespace-pre-wrap leading-relaxed">{insight.reading}</p>
+                            <div className="flex justify-around mt-4 text-center">
+                                <div><span className="text-muted-foreground">Lucky Number</span><br/><span className="font-bold text-primary text-xl">{insight.luckyNumber}</span></div>
+                                <div><span className="text-muted-foreground">Lucky Color</span><br/><span className="font-bold text-primary text-xl">{insight.luckyColor}</span></div>
+                            </div>
+                        </CardContent>
                     </Card>
                 </TabsContent>
             </Tabs>
 
-            <div className="text-center mt-8">
-                 <Button onClick={onReset} variant="outline">← Create a New Profile</Button>
+            <div className="text-center mt-12">
+                 <Button onClick={onReset} variant="link" className="text-primary text-lg">← Create a New Profile</Button>
             </div>
 
             <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{dialogContent?.title}</AlertDialogTitle>
+                        <AlertDialogTitle className="font-headline text-2xl">{dialogContent?.title}</AlertDialogTitle>
                         <AlertDialogDescription asChild>
-                           <div className="max-h-[60vh] overflow-y-auto pr-4">
+                           <div className="max-h-[60vh] overflow-y-auto pr-4 pt-4 text-base">
                             {dialogContent?.description}
                            </div>
                         </AlertDialogDescription>
@@ -528,26 +532,26 @@ export function ProfileGenerator() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <form onSubmit={handleSubmit}>
-                            <CardHeader className="p-6">
-                                <CardTitle className="text-2xl font-bold tracking-tight">Generate Your Profile</CardTitle>
-                                <CardDescription>Enter your details for a personalized reading.</CardDescription>
+                         <form onSubmit={handleSubmit}>
+                            <CardHeader className="p-6 text-center">
+                                <CardTitle className="font-headline text-3xl">Generate Your Profile</CardTitle>
+                                <CardDescription className="text-lg">Enter your details for a personalized reading.</CardDescription>
                             </CardHeader>
                             <CardContent className="p-6 pt-0 space-y-4">
-                                <div className="form-group">
-                                    <Label htmlFor="name">Your Full Name</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="name" className="text-base">Your Full Name</Label>
                                     <Input id="name" name="name" placeholder="e.g., Jane Doe" required value={formData.name} onChange={handleChange} disabled={isPending} />
                                 </div>
-                                 <div className="form-group">
-                                    <Label>Date of Birth</Label>
+                                 <div className="space-y-2">
+                                    <Label className="text-base">Date of Birth</Label>
                                     <div className="grid grid-cols-3 gap-4">
                                         <Input type="number" name="day" min="1" max="31" placeholder="Day" required value={formData.day} onChange={handleChange} disabled={isPending} />
                                         <Input type="number" name="month" min="1" max="12" placeholder="Month" required value={formData.month} onChange={handleChange} disabled={isPending} />
                                         <Input type="number" name="year" min="1900" max={new Date().getFullYear()} placeholder="Year" required value={formData.year} onChange={handleChange} disabled={isPending} />
                                     </div>
                                 </div>
-                                <div className="form-group">
-                                    <Label htmlFor="gender">Gender</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="gender" className="text-base">Gender</Label>
                                     <Select name="gender" required onValueChange={handleSelectChange} value={formData.gender} disabled={isPending}>
                                         <SelectTrigger id="gender">
                                             <SelectValue placeholder="Select..." />
@@ -560,7 +564,7 @@ export function ProfileGenerator() {
                                 </div>
                             </CardContent>
                             <CardFooter className="flex-col items-stretch p-6 bg-secondary/30">
-                                <Button type="submit" disabled={isPending} size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base py-6 group">
+                                <Button type="submit" disabled={isPending} size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base py-6 group">
                                     {isPending ? (
                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                     ) : (
