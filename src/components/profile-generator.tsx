@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, Target, Zap } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import { personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
@@ -187,7 +187,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                             </Card>
                         </aside>
                         <main className="md:col-span-2 space-y-6">
-                             <Card>
+                            <Card>
                                 <CardHeader><CardTitle>AI Reading</CardTitle></CardHeader>
                                 <CardContent>
                                     <p className="whitespace-pre-wrap">{insight.reading}</p>
@@ -197,6 +197,24 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                     </div>
                                 </CardContent>
                             </Card>
+                             {numerology.arrowsOfStrength.length > 0 && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Zap className="text-accent" />
+                                            Arrows of Strength
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4 text-sm">
+                                        {numerology.arrowsOfStrength.map(arrow => (
+                                            <div key={arrow.name}>
+                                                <p className="font-bold text-primary">{arrow.name}</p>
+                                                <p className="text-muted-foreground">{arrow.description}</p>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            )}
                             <Card>
                                 <CardHeader><CardTitle>Personalized Number Meanings</CardTitle></CardHeader>
                                 <CardContent className="space-y-4 text-sm">

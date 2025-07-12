@@ -15,7 +15,6 @@ const reduceToSingleDigit = (n: number): number => {
   return num;
 };
 
-
 /**
  * Calculates the Psyche Number from the day of birth.
  * This function does not preserve master numbers.
@@ -73,6 +72,48 @@ export const calculateKua = (year: number, gender: string): number => {
   return finalKua;
 };
 
+export const ARROWS_OF_STRENGTH = [
+  {
+    name: "Arrow of Planning",
+    numbers: [4, 3, 8],
+    description: "This is the 1st Vertical Row, indicating the Arrow of Planning & Proper Execution. It gives you shrewdness, cunningness, and intelligence. Your nature can be unethical, like a 'Dirty Player' who doesn't go by the rules. You possess a high degree of intelligence and can be a politician."
+  },
+  {
+    name: "Arrow of Willpower",
+    numbers: [9, 5, 1],
+    description: "This is the 2nd Vertical Row, indicating the Arrow of Success. You exhibit stubbornness & persistence in your behavior. This behavior leads you towards being victorious in life. You possess a high level of determination and are not hesitant in expressing your opinion about everything."
+  },
+  {
+    name: "Arrow of Action",
+    numbers: [2, 7, 6],
+    description: "This is the 3rd Vertical Row, also known as the Arrow of Outlook / Action. It signifies a life of activity and practical engagement with the world."
+  },
+  {
+    name: "Arrow of Intellect",
+    numbers: [4, 9, 2],
+    description: "This is the 1st Horizontal Row, also known as the Brain / Mental plane. You are a thinker with a powerful intellect, an orderly and tidy mind, and excellent memory. You are not easily fooled and are considered a very brainy person."
+  },
+  {
+    name: "Arrow of Spirituality",
+    numbers: [3, 5, 7],
+    description: "This is the Central Horizontal Row, indicating the Arrow of Emotional Harmony, Emotions, Spiritual Ethics & Values. It leads to contentment, calmness & inner peace after 30-40 years of age. You may come to the field of spirituality after seeing too much trouble in life. It is also known as the Heart / Emotional plane."
+  },
+  {
+    name: "Arrow of Prosperity",
+    numbers: [8, 1, 6],
+    description: "This is the 3rd Horizontal Row (at the bottom), known as the Action / Practical plane. It indicates a materialistic or commercial success and prosperity with practicality. You are always interested in superficial life & success, and never inclined towards a higher purpose in life. If you have few or no numbers in the upper two rows, you will be cold towards emotions & only focused on self-benefit."
+  },
+  {
+    name: "Arrow of Determination",
+    numbers: [2, 5, 8],
+    description: "This is a Diagonal Row indicating a strong will and determination. It signifies your resolve and drive to see things through to the end."
+  },
+  {
+    name: "Arrow of Emotional Balance",
+    numbers: [4, 5, 6],
+    description: "This is the 1st Diagonal Row. You are humanitarian, helping & compassionate by nature, and this often leads you to make your career out of the same. You are psychic, intuitive, sensitive, emotional, caring & understanding. You easily understand the demands of the people around you. You are quite, gentle, generous, shy, and introverted by nature, especially in your young age."
+  }
+];
 
 // Defines the shape of the user data object
 interface UserData {
@@ -83,7 +124,7 @@ interface UserData {
 }
 
 /**
- * Generates all numerology data including the Lo Shu Grid.
+ * Generates all numerology data including the Lo Shu Grid and arrows.
  * @param userData - An object with day, month, year, gender.
  * @returns An object containing all calculated results.
  */
@@ -104,6 +145,8 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     ...String(destinyNum).split(''),
     ...String(kuaNum).split(''),
   ];
+  
+  const presentDigits = new Set(allDigitsForGrid.map(d => parseInt(d, 10)));
 
   // 3. Count frequencies and create grid data
   const counts: { [key: string]: number } = {};
@@ -123,13 +166,19 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     [gridContent['3'], gridContent['5'], gridContent['7']],
     [gridContent['8'], gridContent['1'], gridContent['6']],
   ];
+
+  // 5. Determine present arrows of strength
+  const arrowsOfStrength = ARROWS_OF_STRENGTH.filter(arrow => 
+    arrow.numbers.every(num => presentDigits.has(num))
+  );
   
-  // 5. Return all calculated data
+  // 6. Return all calculated data
   return {
     psycheNum,
     destinyNum,
     kuaNum,
     loShuGrid: gridLayout,
-    allDigitsForGrid: allDigitsForGrid, // Pass this to the component
+    allDigitsForGrid: allDigitsForGrid,
+    arrowsOfStrength,
   };
 };
