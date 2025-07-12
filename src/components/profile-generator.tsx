@@ -10,9 +10,11 @@ import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
+import { personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateLoShuData } from '@/lib/numerology';
+import { Skeleton } from './ui/skeleton';
 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
 
@@ -43,7 +45,7 @@ const repeatedNumberMeanings: { [key: string]: string } = {
     "6_1": "You show love, regard & care for your family, relations & loved ones. You enjoy your home duties & have creative or innovative abilities. You are a DECENT PARENT and provide suggestions in family matters when required. You can be insecure, worried & afraid about being left alone in life (e.g., death of a life partner). You are a lucky person but with narrow-mindedness. You will have financial stability, a good lifestyle with fewer discomforts, if 8 & 1 are also in your chart. If 8 & 1 are not there, then only financial security will be there. You are family-oriented & love to work in an enjoyable & friendly environment.",
     "6_2": "You are highly creative, but lack self-confidence & believe less in your work & their abilities. You take unnecessary tension for your family & family members, which makes your energy drained/exhausted & hence you feel tired most of the time. You are too stressed all the time because of your thinking style. You are overprotective by nature, hence you keep interfering in the lives of your family members (especially towards your kids). You can provide an obstruction to your children in becoming self-dependent. Your life is filled with creativity, activeness & beauty. You require constant support & encouragement from your family & friends.",
     "6_3": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
-    "6_4": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
+    "6_4": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in their behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "6_5": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in their behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "7_1": "You learn the lessons of your life through RELATIONAL LOSS or LOSS OF LOVED ONES, LOSS OF BELONGINGS, or on the COST of HEALTH & WELL-BEING. With the lessons you learn throughout your life & losses, you become more inclined towards the spiritual field & spiritual practices. If supported by 3 & 5, you start your quest for the ultimate reality of life & precision or perfection in the journey of life. Your career can be in a spiritual or humanitarian field. If 3 & 5 are there, your behavior is rigid.",
     "7_2": "You gain your knowledge & wisdom at the cost of your loved ones, your health, or your monetary losses. This push will eventually take you to the path of occultism, spirituality & meditation. You have a technical (IT & Computers) & analytical (Mathematical & Reasoning) brain. You are good at minute, odd & baseless criticism. You are spiritual but have a tendency for show-off & bragging by nature. You have the potential to bring finance & prosperity into your life.",
@@ -62,6 +64,49 @@ const repeatedNumberMeanings: { [key: string]: string } = {
     "9_5": "You are idealistic, smart, & intellectual in your life & can do well in education, but multiple 9s make your survival in the world difficult. You can have arrogance & a bad temper. Multiple 9s give you the power of escapism & life in your own fairytale world. You have a tendency to stretch unrequired topics (तित का ताइ करना), and you need to control this nature of yourself. You are joyful & progressive when you handle their life & nature with care. You have an inclination for becoming unsatisfied & unhappy. You can do good for the world if you understand the power you are blessed with & learn how to channelize that too."
 };
 
+function PersonalizedMeaning({ text, allDigits }: { text: string, allDigits: string[] }) {
+    const [personalizedText, setPersonalizedText] = React.useState<string | null>(null);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
+    
+    React.useEffect(() => {
+        const getPersonalizedText = async () => {
+            setIsLoading(true);
+            setError(null);
+            const result = await personalizeReadingAction({
+                reading: text,
+                numbers: allDigits.map(d => parseInt(d, 10))
+            });
+
+            if(result.success) {
+                setPersonalizedText(result.personalizedReading!);
+            } else {
+                setError(result.error || 'Failed to personalize reading.');
+                setPersonalizedText(text); // Fallback to original text on error
+            }
+            setIsLoading(false);
+        };
+        
+        getPersonalizedText();
+    }, [text, allDigits]);
+
+    if(isLoading) {
+        return (
+             <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-[80%]" />
+             </div>
+        )
+    }
+
+    if(error) {
+        return <p className="text-muted-foreground">{text}</p>
+    }
+
+    return <p className="text-muted-foreground">{personalizedText}</p>
+}
+
+
 function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
     const numberCounts = React.useMemo(() => {
         const counts: { [key: number]: number } = {};
@@ -75,6 +120,10 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
             }
         });
         return counts;
+    }, [numerology.allDigitsForGrid]);
+    
+    const uniqueDigits = React.useMemo(() => {
+        return [...new Set(numerology.allDigitsForGrid)].map(d => parseInt(d, 10));
     }, [numerology.allDigitsForGrid]);
 
     return (
@@ -148,17 +197,19 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                     </div>
                                 </CardContent>
                             </Card>
-                             <Card>
-                                <CardHeader><CardTitle>Number Repetition Meanings</CardTitle></CardHeader>
+                            <Card>
+                                <CardHeader><CardTitle>Personalized Number Meanings</CardTitle></CardHeader>
                                 <CardContent className="space-y-4 text-sm">
                                     {Object.entries(numberCounts).map(([num, count]) => {
                                         if (count === 0) return null;
-                                        const key = `${num}_${count > 5 ? 5 : count}`; // Cap count at 5 for lookup
+                                        const key = `${num}_${Math.min(count, 5)}`; // Cap count at 5 for lookup
                                         const meaning = repeatedNumberMeanings[key];
+                                        if (!meaning) return null;
+                                        
                                         return (
                                             <div key={key}>
                                                 <p className="font-bold text-primary">Number {num} (Repeated {count} time{count > 1 ? 's' : ''})</p>
-                                                <p className="text-muted-foreground">{meaning || "No specific meaning found for this repetition count."}</p>
+                                                <PersonalizedMeaning text={meaning} allDigits={numerology.allDigitsForGrid} />
                                             </div>
                                         );
                                     })}
@@ -171,7 +222,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                 <TabsContent value="chinese_zodiac" className="space-y-6">
                      <Card>
                         <CardHeader><CardTitle>Your Animal Sign: The {insight.sign}</CardTitle></CardHeader>
-                        <CardContent><p className="whitespace-pre-wrap">{insight.general__desc}</p></CardContent>
+                        <CardContent><p className="whitespace-pre-wrap">{insight.general_desc}</p></CardContent>
                     </Card>
                      <Card>
                         <CardHeader><CardTitle>The Influence of the {insight.element} Element</CardTitle></CardHeader>

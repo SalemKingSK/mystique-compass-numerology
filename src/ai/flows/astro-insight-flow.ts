@@ -58,6 +58,8 @@ Please generate a profile including:
     *   Describe the influence of their element on their sign.
     *   Detail their compatibilities.
 4.  **Simple Profile**: Also provide a simple reading, a lucky number, and a lucky color.
+
+Do NOT provide numerology readings or Lo Shu grid information. Focus only on the astrological aspects requested.
   `,
 });
 
