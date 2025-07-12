@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -134,23 +135,37 @@ const arrowWeaknessMap: { [key: string]: string } = {
     "Arrow of Doubt": "Arrow of Determination",
 };
 
-const LoShuArrow = ({ name, type }: { name: string, type: 'strength' | 'weakness' }) => {
+const LoShuArrow = ({ name, type, onClick }: { name: string, type: 'strength' | 'weakness', onClick: () => void }) => {
     const coords = arrowCoordinates[name];
     if (!coords) return null;
+    const color = type === 'strength' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))';
+    const markerId = type === 'strength' ? 'arrowhead-strength' : 'arrowhead-weakness';
 
     return (
-        <line
-            x1={coords.x1}
-            y1={coords.y1}
-            x2={coords.x2}
-            y2={coords.y2}
-            stroke={type === 'strength' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))'}
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray={type === 'weakness' ? "5, 5" : undefined}
-        />
+        <g onClick={onClick} className="cursor-pointer group">
+            <line
+                x1={coords.x1}
+                y1={coords.y1}
+                x2={coords.x2}
+                y2={coords.y2}
+                stroke={color}
+                strokeWidth="2"
+                markerEnd={`url(#${markerId})`}
+                className="group-hover:stroke-[3px] transition-all"
+            />
+            {/* Invisible thicker line for easier clicking */}
+            <line
+                x1={coords.x1}
+                y1={coords.y1}
+                x2={coords.x2}
+                y2={coords.y2}
+                stroke="transparent"
+                strokeWidth="10"
+            />
+        </g>
     );
 };
+
 
 function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -187,6 +202,13 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
         }
     };
     
+    const handleArrowClick = (arrow: { name: string; description: string; }) => {
+        setDialogContent({
+            title: arrow.name,
+            description: <p className="whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+        });
+        setDialogOpen(true);
+    };
 
     return (
         <div className="p-1">
@@ -280,12 +302,20 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                             viewBox="0 0 100 100"
                                             preserveAspectRatio="none"
                                         >
+                                            <defs>
+                                                <marker id="arrowhead-strength" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                                    <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--primary))" />
+                                                </marker>
+                                                <marker id="arrowhead-weakness" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                                    <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--muted-foreground))" />
+                                                </marker>
+                                            </defs>
                                             {numerology.arrowsOfStrength.map(arrow => (
-                                                <LoShuArrow key={arrow.name} name={arrow.name} type="strength" />
+                                                <LoShuArrow key={arrow.name} name={arrow.name} type="strength" onClick={() => handleArrowClick(arrow)} />
                                             ))}
                                             {numerology.arrowsOfWeakness.map(arrow => {
                                                 const strengthArrowName = arrowWeaknessMap[arrow.name];
-                                                return <LoShuArrow key={arrow.name} name={strengthArrowName} type="weakness" />
+                                                return <LoShuArrow key={arrow.name} name={strengthArrowName} type="weakness" onClick={() => handleArrowClick(arrow)} />
                                             })}
                                         </svg>
                                         <table className="w-full h-full border-collapse relative bg-transparent">
@@ -581,3 +611,5 @@ export function ProfileGenerator() {
         </div>
     );
 }
+
+    
