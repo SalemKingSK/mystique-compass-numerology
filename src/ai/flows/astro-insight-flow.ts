@@ -22,6 +22,21 @@ const AstroInsightInputSchema = z.object({
 });
 export type AstroInsightInput = z.infer<typeof AstroInsightInputSchema>;
 
+// Define a Zod schema for the futures object
+const FuturePredictionSchema = z.object({
+  year: z.string(),
+  element: z.string(),
+  prediction: z.string(),
+});
+
+// Define a schema for the main sign data structure
+const SignDataSchema = z.object({
+    introduction: z.string(),
+    elements: z.record(z.string()),
+    compatibilities: z.string(),
+    futures: z.record(FuturePredictionSchema),
+});
+
 const AstroInsightOutputSchema = z.object({
   name: z.string().describe("The person's name."),
   western_sign: z.string().describe('The Western zodiac sign (e.g., "Aries").'),
@@ -31,7 +46,7 @@ const AstroInsightOutputSchema = z.object({
   reading: z.string().describe('A simple, AI-powered astrological reading for the person.'),
   luckyNumber: z.number().describe('A lucky number for the person.'),
   luckyColor: z.string().describe('A lucky color for the person.'),
-  new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
+  signData: SignDataSchema.describe("The detailed data object for the person's Chinese zodiac sign."),
 });
 export type AstroInsightOutput = z.infer<typeof AstroInsightOutputSchema>;
 
@@ -52,19 +67,17 @@ const CreativePromptOutputSchema = z.object({
     reading: z.string().describe('A simple, AI-powered astrological reading for the person.'),
     luckyNumber: z.number().describe('A lucky number for the person.'),
     luckyColor: z.string().describe('A lucky color for the person.'),
-    new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
 });
 
-// This prompt is now ONLY for generating creative content.
+// This prompt is ONLY for generating creative content.
 const creativePrompt = ai.definePrompt({
   name: 'astroCreativePrompt',
   input: {schema: CreativePromptInputSchema},
   output: {schema: CreativePromptOutputSchema},
   prompt: `You are an expert astrologer. For the person named {{{name}}}, who is a {{{new_astrology_sign}}} ({{{western_sign}}} and {{{element}}} {{{chinese_sign}}}), generate the following:
-1. A unique, personalized description for this combined "New Astrology" sign.
-2. A simple, AI-powered astrological reading.
-3. A lucky number.
-4. A lucky color.`,
+1. A simple, AI-powered astrological reading.
+2. A lucky number.
+3. A lucky color.`,
 });
 
 const astroInsightFlow = ai.defineFlow(
@@ -76,12 +89,19 @@ const astroInsightFlow = ai.defineFlow(
   async (input) => {
     const { year, month, day, name } = input;
     
-    // Determine Zodiac signs
+    // 1. Determine Zodiac signs
     const western_sign = getWesternZodiacSign(day, month);
     const { sign, element } = getChineseZodiacSign(year);
     const new_astrology_sign = `${western_sign}/${sign}`;
+
+    // 2. Get the entire data object for that sign
+    // The type assertion is safe because our zodiac_data is statically typed.
+    const signData = (zodiac_data as any)[sign];
+    if (!signData) {
+      throw new Error(`No zodiac data found for sign: ${sign}`);
+    }
     
-    // Generate creative content in parallel.
+    // 3. Generate creative content in parallel.
     const creativeResult = await creativePrompt({
         name,
         western_sign,
@@ -95,7 +115,7 @@ const astroInsightFlow = ai.defineFlow(
         throw new Error('Failed to generate creative content from the AI model.');
     }
 
-    // Combine AI-generated data with determined signs and return.
+    // 4. Combine deterministic data, zodiac data, and AI-generated creative data.
     return {
         name,
         western_sign,
@@ -105,7 +125,7 @@ const astroInsightFlow = ai.defineFlow(
         reading: creativeData.reading,
         luckyNumber: creativeData.luckyNumber,
         luckyColor: creativeData.luckyColor,
-        new_astrology_desc: creativeData.new_astrology_desc,
+        signData: signData,
     };
   }
 );

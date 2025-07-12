@@ -10,35 +10,81 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function ResultsDisplay({ insight, onReset }: { insight: AstroInsightOutput, onReset: () => void }) {
+    const currentYear = new Date().getFullYear();
+    const futureYears = Object.entries(insight.signData.futures)
+      .filter(([year]) => parseInt(year) >= currentYear)
+      .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
+      
     return (
-        <div className="p-6">
-            <header className="text-center mb-10 pb-6 border-b">
+        <div className="p-6 bg-secondary/30">
+            <header className="text-center mb-10 pb-6 border-b-2 border-primary/20">
                 <h1 className="font-headline text-5xl text-gray-800">{insight.name}</h1>
                 <h2 className="text-2xl text-primary font-bold mt-2">{insight.new_astrology_sign}</h2>
                 <p className="text-muted-foreground text-lg mt-1">(A {insight.western_sign} born in the year of the {insight.element} {insight.sign})</p>
             </header>
 
-            <div className="space-y-6">
-                <Card>
-                    <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">Your Combined Sign: {insight.new_astrology_sign}</CardTitle></CardHeader>
-                    <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.new_astrology_desc}</p></CardContent>
-                </Card>
-                <Card>
-                    <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">AI Generated Reading</CardTitle></CardHeader>
-                    <CardContent className="pt-4">
-                        <p className="whitespace-pre-wrap leading-relaxed">{insight.reading}</p>
-                        <div className="flex justify-around mt-4 text-center">
-                            <div><span className="text-muted-foreground">Lucky Number</span><br/><span className="font-bold text-primary text-xl">{insight.luckyNumber}</span></div>
-                            <div><span className="text-muted-foreground">Lucky Color</span><br/><span className="font-bold text-primary text-xl">{insight.luckyColor}</span></div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+            <Tabs defaultValue="introduction" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+                    <TabsTrigger value="introduction" className="flex items-center gap-2"><BookOpen /> Introduction</TabsTrigger>
+                    <TabsTrigger value="element" className="flex items-center gap-2"><Star /> Element</TabsTrigger>
+                    <TabsTrigger value="compatibilities" className="flex items-center gap-2"><Users /> Compatibility</TabsTrigger>
+                    <TabsTrigger value="future" className="flex items-center gap-2"><Calendar /> Future</TabsTrigger>
+                </TabsList>
+                
+                <ScrollArea className="h-[450px] mt-4">
+                    <div className="pr-4">
+                        <TabsContent value="introduction">
+                            <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl">Your Animal Sign: The {insight.sign}</CardTitle></CardHeader>
+                                <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.signData.introduction}</p></CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="element">
+                            <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl">The Influence of the {insight.element} Element</CardTitle></CardHeader>
+                                <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.signData.elements[insight.element]}</p></CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="compatibilities">
+                             <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl">Compatibility</CardTitle></CardHeader>
+                                <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.signData.compatibilities}</p></CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="future">
+                            <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl">Your Future Years</CardTitle></CardHeader>
+                                <CardContent className="pt-4 space-y-4">
+                                {futureYears.map(([year, futureData]) => (
+                                    <div key={year}>
+                                        <h5 className="font-bold text-lg text-primary">{year} - The {futureData.element} {futureData.year} Year</h5>
+                                        <p className="whitespace-pre-wrap text-sm text-muted-foreground mt-1">{futureData.prediction}</p>
+                                    </div>
+                                ))}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </div>
+                </ScrollArea>
+            </Tabs>
+            
+            <Card className="mt-6">
+                <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">AI Generated Reading</CardTitle></CardHeader>
+                <CardContent className="pt-4">
+                    <p className="whitespace-pre-wrap leading-relaxed">{insight.reading}</p>
+                    <div className="flex justify-around mt-4 text-center">
+                        <div><span className="text-muted-foreground">Lucky Number</span><br/><span className="font-bold text-primary text-xl">{insight.luckyNumber}</span></div>
+                        <div><span className="text-muted-foreground">Lucky Color</span><br/><span className="font-bold text-primary text-xl">{insight.luckyColor}</span></div>
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="text-center mt-12">
                  <Button onClick={onReset} variant="link" className="text-primary text-lg">← Create a New Profile</Button>
