@@ -17,7 +17,29 @@ import { generateLoShuData } from '@/lib/numerology';
 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
 
+const numberMeanings: { [key: number]: { name: string, meaning: string } } = {
+    1: { name: 'Ambition', meaning: 'Represents leadership, independence, and a pioneering spirit. You are a self-starter.' },
+    2: { name: 'Intuition', meaning: 'Signifies sensitivity, cooperation, and diplomacy. You are a natural peacemaker.' },
+    3: { name: 'Creativity', meaning: 'Relates to self-expression, communication, and artistry. You have a joyful, charismatic presence.' },
+    4: { name: 'Diligence', meaning: 'Stands for stability, hard work, and practicality. You are reliable and build lasting foundations.' },
+    5: { name: 'Freedom', meaning: 'Represents adventure, versatility, and a love for freedom. You thrive on change and new experiences.' },
+    6: { name: 'Responsibility', meaning: 'Signifies nurturing, community, and domestic harmony. You are a caring and protective figure.' },
+    7: { name: 'Wisdom', meaning: 'Relates to introspection, analysis, and spiritual understanding. You are a deep thinker and a seeker of truth.' },
+    8: { name: 'Power', meaning: 'Stands for abundance, authority, and material success. You have strong executive and organizational skills.' },
+    9: { name: 'Humanitarianism', meaning: 'Represents compassion, generosity, and a broad, idealistic vision. You care deeply about the world.' },
+};
+
 function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
+    const presentNumbers = React.useMemo(() => {
+        const numbers = new Set<number>();
+        numerology.loShuGrid.flat().forEach(cell => {
+            if (cell) {
+                numbers.add(parseInt(cell[0]));
+            }
+        });
+        return Array.from(numbers).sort((a,b) => a - b);
+    }, [numerology.loShuGrid]);
+    
     return (
         <div className="p-6 bg-background rounded-lg">
             <div className="text-center mb-6 pb-4 border-b">
@@ -87,6 +109,19 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                         <div>Lucky Number: <span className="font-bold text-accent">{insight.luckyNumber}</span></div>
                                         <div>Lucky Color: <span className="font-bold text-accent">{insight.luckyColor}</span></div>
                                     </div>
+                                </CardContent>
+                            </Card>
+                             <Card>
+                                <CardHeader><CardTitle>Number Meanings</CardTitle></CardHeader>
+                                <CardContent className="space-y-4 text-sm">
+                                    {presentNumbers.length > 0 ? presentNumbers.map(num => (
+                                        <div key={num}>
+                                            <p className="font-bold text-primary">{num} - {numberMeanings[num as keyof typeof numberMeanings].name}</p>
+                                            <p className="text-muted-foreground">{numberMeanings[num as keyof typeof numberMeanings].meaning}</p>
+                                        </div>
+                                    )) : (
+                                        <p className="text-muted-foreground">No numbers present in the grid to analyze.</p>
+                                    )}
                                 </CardContent>
                             </Card>
                         </main>
