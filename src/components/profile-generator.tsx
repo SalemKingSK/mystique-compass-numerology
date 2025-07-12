@@ -142,7 +142,7 @@ const LoShuArrow = ({ name, type, onClick }: { name: string, type: 'strength' | 
     const markerId = type === 'strength' ? 'arrowhead-strength' : 'arrowhead-weakness';
 
     return (
-        <g onClick={onClick} className="cursor-pointer group">
+        <g onClick={onClick} className="cursor-pointer group opacity-60 hover:opacity-100 transition-opacity">
             <line
                 x1={coords.x1}
                 y1={coords.y1}
@@ -484,7 +484,7 @@ export function ProfileGenerator() {
     };
 
     const handleSelectChange = (value: string) => {
-        setFormData(prev => ({ ...prev, gender: value }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
     
     const handleReset = () => {
@@ -611,5 +611,7 @@ export function ProfileGenerator() {
         </div>
     );
 }
+
+    
 
     
