@@ -484,7 +484,7 @@ export function ProfileGenerator() {
     };
 
     const handleSelectChange = (value: string) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, gender: value }));
     };
     
     const handleReset = () => {
@@ -611,5 +611,3 @@ export function ProfileGenerator() {
         </div>
     );
 }
-
-    
