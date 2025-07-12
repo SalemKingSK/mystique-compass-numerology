@@ -52,11 +52,16 @@ Name: {{{name}}}
 Date of Birth: {{{day}}}/{{{month}}}/{{{year}}}
 Gender: {{{gender}}}
 
-First, determine the correct Western Zodiac sign, Chinese Animal sign, and Chinese Element.
-
-Then, using the provided data, fill in the descriptions for the Chinese Astrology portion. The descriptions for 'general_desc', 'elemental_desc', and 'compatibilities' MUST come from the data provided below. Do NOT invent new descriptions for these fields.
-
-Finally, generate the rest of the profile, including the combined "New Astrology" sign and its description, a simple reading, a lucky number, and a lucky color.
+Your task is to:
+1.  Determine the correct Western Zodiac sign.
+2.  Determine the correct Chinese Animal sign and its associated Element based on the year of birth.
+3.  Using the provided **Zodiac Data**, find the matching animal sign.
+4.  From that animal's data, extract the exact text for 'general', 'compatibilities', and the specific 'elemental_desc' that matches the determined element. You MUST use the text from the provided data for these fields. Do NOT summarize or create new descriptions for these.
+5.  Generate the rest of the profile:
+    - Create a combined "New Astrology" sign name (e.g., "Aries/Dragon").
+    - Write a unique, personalized description for this combined "New Astrology" sign.
+    - Generate a simple, AI-powered reading.
+    - Provide a lucky number and a lucky color.
 
 **Zodiac Data:**
 ${JSON.stringify(zodiac_data, null, 2)}
@@ -74,4 +79,3 @@ const astroInsightFlow = ai.defineFlow(
     return output!;
   }
 );
-
