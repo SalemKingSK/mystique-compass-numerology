@@ -76,7 +76,7 @@ const astroInsightFlow = ai.defineFlow(
     outputSchema: AstroInsightOutputSchema,
   },
   async (input) => {
-    const { year, month, day, name, gender } = input;
+    const { year, month, day, name } = input;
     
     // Determine Zodiac signs and data
     const western_sign = getWesternZodiacSign(day, month);
