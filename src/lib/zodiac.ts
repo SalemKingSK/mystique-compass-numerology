@@ -164,7 +164,15 @@ Tiger with Pig: The basic characters here are vastly different. Pigs are scrupul
         }
     },
     "Rabbit": {
-        "general": "PENDING_RABBIT_INTRODUCTION",
+        "general": `Ah, Virtuous Cat/Rabbit, you seek harmony. You are careful and practice discretion in all things. When you sense a conflict lurching your way, you skitter off and hide.
+
+Distinguished, diplomatic, and well-mannered, you are also as nervous as a cat. Culture and refinement comfort you. You don't hate money either: you know instinctively how to earn and keep your fortune without flash or flaunt. You favor traditional antique furnishings over chrome and glass contemporary. You're a soft-stepping go-getter... ambitious but never aggressive, strong but never rough.
+
+Your brand of wisdom says, “He who fights and runs away lives to fight another day.” You are hypersensitive—squeamish, even. You are a bit of a hypochondriac: an innocent hangnail on your big toe alarms you. "Call an ambulance, get me to the emergency room!" Chronic illnesses—migraine, asthma, hay fever, lower back pain, warts, hives—you've tried them all.
+
+Choose a partner from among gentle Goats, scrupulous Pigs, or loyal Dogs. If you're feeling lavish, remember that Snakes are delighted to languish on your velvet divans. Avoid Tigers, Roosters, and Dragons. Their unrelenting panache threatens your tranquil existence. You plan your life to run smoothly. And usually it does.
+
+But should spontaneity enter the picture and events go awry, you freak out. Take my advice and lighten up. Not only on yourself but, more especially, on the rest of us.`,
         "elements": {
             "Wood": "PENDING_RABBIT_WOOD",
             "Fire": "PENDING_RABBIT_FIRE",
@@ -272,8 +280,4 @@ Tiger with Pig: The basic characters here are vastly different. Pigs are scrupul
         "futures": "PENDING_PIG_FUTURES",
     },
 };
-
-    
-
-    
 
