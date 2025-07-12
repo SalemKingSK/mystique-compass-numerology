@@ -12,7 +12,7 @@ import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { generateLoShuData } from '@/numerology';
+import { generateLoShuData } from '@/lib/numerology';
 
 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
@@ -176,7 +176,6 @@ export function ProfileGenerator() {
                 gender,
             });
             
-            // This is now synchronous and doesn't need a promise
             const numerologyData = generateLoShuData({
                 day: parseInt(day),
                 month: parseInt(month),
