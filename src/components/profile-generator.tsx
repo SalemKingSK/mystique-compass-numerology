@@ -15,6 +15,8 @@ import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateLoShuData } from '@/lib/numerology';
 import { Skeleton } from './ui/skeleton';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@/components/ui/alert-dialog';
+
 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
 
@@ -108,6 +110,9 @@ function PersonalizedMeaning({ text, allDigits }: { text: string, allDigits: str
 
 
 function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [dialogContent, setDialogContent] = React.useState<{ title: string; description: React.ReactNode } | null>(null);
+    
     const numberCounts = React.useMemo(() => {
         const counts: { [key: number]: number } = {};
         for (let i = 1; i <= 9; i++) {
@@ -115,16 +120,30 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
         }
         numerology.allDigitsForGrid.forEach(digit => {
             const num = parseInt(digit, 10);
-            if (num > 0) { // Exclude 0
+            if (num > 0) {
                 counts[num]++;
             }
         });
         return counts;
     }, [numerology.allDigitsForGrid]);
+
+    const handleGridClick = (cellContent: string) => {
+        if (!cellContent) return;
+
+        const num = cellContent[0];
+        const count = cellContent.length;
+        const key = `${num}_${Math.min(count, 5)}`;
+        const meaning = repeatedNumberMeanings[key];
+
+        if (meaning) {
+            setDialogContent({
+                title: `Meaning of Number ${num} (x${count})`,
+                description: <PersonalizedMeaning text={meaning} allDigits={numerology.allDigitsForGrid} />
+            });
+            setDialogOpen(true);
+        }
+    };
     
-    const uniqueDigits = React.useMemo(() => {
-        return [...new Set(numerology.allDigitsForGrid)].map(d => parseInt(d, 10));
-    }, [numerology.allDigitsForGrid]);
 
     return (
         <div className="p-6 bg-background rounded-lg">
@@ -208,6 +227,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                              <Card>
                                 <CardHeader>
                                     <CardTitle>Lo Shu Grid</CardTitle>
+                                    <CardDescription>Click a number to see its meaning.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <table className="w-full border-collapse">
@@ -215,8 +235,18 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                             {numerology.loShuGrid.map((row, i) => (
                                                 <tr key={i}>
                                                     {row.map((cell, j) => (
-                                                        <td key={j} className="border text-center h-16 w-16 text-2xl font-bold text-primary">
-                                                            {cell || ''}
+                                                        <td key={j} className="border text-center h-16 w-16 text-2xl font-bold p-0">
+                                                            {cell ? (
+                                                                <button 
+                                                                    onClick={() => handleGridClick(cell)}
+                                                                    className="w-full h-full flex items-center justify-center text-primary hover:bg-accent/20 transition-colors duration-200 disabled:hover:bg-transparent disabled:cursor-default"
+                                                                    aria-label={`Meaning for number ${cell[0]}`}
+                                                                >
+                                                                    {cell}
+                                                                </button>
+                                                            ) : (
+                                                                <div className="w-full h-full"></div>
+                                                            )}
                                                         </td>
                                                     ))}
                                                 </tr>
@@ -321,6 +351,22 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
             <div className="text-center mt-8">
                  <Button onClick={onReset} variant="outline">← Create a New Profile</Button>
             </div>
+
+            <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{dialogContent?.title}</AlertDialogTitle>
+                        <AlertDialogDescription asChild>
+                           <div className="max-h-[60vh] overflow-y-auto pr-4">
+                            {dialogContent?.description}
+                           </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction onClick={() => setDialogOpen(false)}>Close</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
