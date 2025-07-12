@@ -2,17 +2,12 @@
 
 /**
  * Reduces a number to a single digit by summing its digits repeatedly.
- * Handles master numbers (11, 22, 33) by not reducing them in contexts where they are relevant.
  * @param n - The number to reduce.
- * @returns The single-digit number or a master number.
+ * @returns The single-digit number.
  */
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
-    // For Kua, master numbers are not preserved in the same way, but this handles other contexts.
-    if (num === 11 || num === 22 || num === 33) {
-      return num;
-    }
     num = String(num)
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -20,23 +15,10 @@ const reduceToSingleDigit = (n: number): number => {
   return num;
 };
 
-/**
- * A stricter reducer for the Kua calculation that always goes to a single digit.
- * @param n - The number to reduce.
- * @returns The single-digit number.
- */
-const reduceToSingleDigitStrict = (n: number): number => {
-  let num = n;
-  while (num > 9) {
-    num = String(num)
-      .split('')
-      .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-  }
-  return num;
-};
 
 /**
  * Calculates the Psyche Number from the day of birth.
+ * This function does not preserve master numbers.
  * @param day - The day of birth (1-31).
  */
 export const calculatePsyche = (day: number): number => {
@@ -45,6 +27,7 @@ export const calculatePsyche = (day: number): number => {
 
 /**
  * Calculates the Destiny (Life Path) Number from the full date of birth.
+ * This function does not preserve master numbers.
  * @param day
  * @param month
  * @param year
@@ -58,7 +41,7 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
 };
 
 /**
- * CORRECTED: Calculates the Kua Number based on year and gender using the new rules.
+ * Calculates the Kua Number based on year and gender.
  * @param year - The four-digit year of birth.
  * @param gender - 'male' or 'female'.
  * @returns The Kua Number.
@@ -68,7 +51,7 @@ export const calculateKua = (year: number, gender: string): number => {
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-  const reducedYearSum = reduceToSingleDigitStrict(yearSum);
+  const reducedYearSum = reduceToSingleDigit(yearSum);
   
   let kuaResult: number;
 
@@ -76,12 +59,11 @@ export const calculateKua = (year: number, gender: string): number => {
   if (year < 2000) {
     kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
   } else {
-    // Corrected post-2000 rules
     kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
   }
 
   // Step 4: Perform a final reduction on the result of the formula.
-  const finalKua = reduceToSingleDigitStrict(kuaResult);
+  const finalKua = reduceToSingleDigit(kuaResult);
   
   // Step 5: Apply the Kua 5 exception.
   if (finalKua === 5) {
@@ -148,5 +130,6 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     destinyNum,
     kuaNum,
     loShuGrid: gridLayout,
+    allDigitsForGrid: allDigitsForGrid, // Pass this to the component
   };
 };
