@@ -98,7 +98,7 @@ Ox with Dog: Don't expect the loyal Dog to bay at the moon out of blind love for
 
 Ox with Pig: Indeed, you two get on famously. The good-natured Pig is so malleable that you will end up thinking you really are boss. Let’s say that at the summit of a beautiful hill, you and the Pig own a home. This home is so well-cared-for that it sparkles. Pig loves to cook and doesn’t mind cleaning up. Before bedtime, you, the careful Ox, turn off all the lights and put out the garbage and the cat. Then this cuddly combo springs into bed. It’s ideal. You are well-matched. Sex between you two country folk is lusty and satisfying. The Ox is a bit square and rude at first, but the Pig’s rich sensuality soon takes over, and you enjoy making a lovely, languorous lifetime of love.`,
         "futures": {
-            2025: {"year": "Snake", "element": "Wood", "prediction": `You and the Snake get along like a set of fraternal twins. You don’t look anything alike, yet you are inseparable pals. Snakes always carry their weight in attraction and are not afraid of assuming power. Your styles do not interfere with each other. You plod, Snakes slither. But you are both rather slow and deep-thinking. Hence, your wave lengths match and you truly appreciate each other. You will be granted all manner of successes in this year. Kudos, prizes, and honors will come your way because the Snake admires you Ox people and the feeling is mutual.`},
+            2025: {"year": "Snake", "element": "Wood", "prediction": `You and the Snake get along like a set of fraternal twins. You don’t look anything alike, yet you are inseparable pals. Snakes always carry their weight in attraction and are not afraid of assuming power. Your styles do not interfere with each other. You plod, Snakes slither. But you are both rather slow and deep-thinking. Hence, your wave lengths match and you truly appreciate each other. You will be granted all manner of successes in this year. Kudos, prizes, and honors will come your way because the Snake admires you Oxen and the feeling is mutual.`},
             2026: {"year": "Horse", "element": "Fire", "prediction": `Because of the general ambiance of diligent labor which characterizes all Horse years, this year will be fortuitous for you. It’s no secret that you Oxen love to work and work hard. You enjoy an exceptional capacity for exertion – both physical and mental. Work energizes you. So when Horse years come around, you are favored and applauded and praised for your unparalleled work ethic. The results will be precisely what you were after because the Horse’s influence protects and preserves The Ox.`},
             2027: {"year": "Goat", "element": "Fire", "prediction": `Goats get your goat. There is friction between you and the Goat because the Goat puts more emphasis on the lighter side of life and is frequently not a self-starter. They don’t have the kind of kick-ass presence and plodding spirit that you have. You want more equilibrium in your day-to-day. In this Goat year, I suggest you take to the hills. But don’t try to compete for prizes or honors. Steer all contests a wide berth. Enjoy your love life now. When you’re not busy making love, why not plan your next business coup?`},
             2028: {"year": "Monkey", "element": "Earth", "prediction": `This year bodes plenty of activity and a speeding up of the pace for you Oxen. I know you don’t adore hurrying and hate to be told to go faster. But Monkeys have no time to waste standing around tapping their feet whilst you ponder and plod through mountains of useless details. You will have to drop the spread sheets, abandon your precious red tape, and learn to hurry. This hectic cadence, however, may take its toll on your health. Be sure to get regular checkups. Bottom line? You will thrive in a Monkey year because the Monkey is cleverer than all of us and knows when they have found a sane, safe ally: you.`},
@@ -174,14 +174,14 @@ Choose a partner from among gentle Goats, scrupulous Pigs, or loyal Dogs. If you
 
 But should spontaneity enter the picture and events go awry, you freak out. Take my advice and lighten up. Not only on yourself but, more especially, on the rest of us.`,
         "elements": {
-            "Wood": "PENDING_RABBIT_WOOD",
-            "Fire": "PENDING_RABBIT_FIRE",
-            "Earth": "PENDING_RABBIT_EARTH",
-            "Metal": "PENDING_RABBIT_METAL",
-            "Water": "PENDING_RABBIT_WATER",
+            "Wood": `A Wood year birth confers extra stability, sagacity, generosity, and altruism on your already solid-citizen Cat/Rabbit nature. You can work your little paws to the bone and never show a second's fatigue or nervousness. This steadiness and strength of purpose is often evidenced by your uncanny endurance and sangfroid when helping care for old or sick people. You are that well-recognized good Samaritan whom everybody praises, saying, “You were such a brick during your mother's long illness.” You are also meticulous about having things done your way. You can be demanding and even hard-hearted, especially if contradicted. You cannot take any teasing or even gentle criticism. You are hard to get along with when harmony is disrupted, which poses a real challenge for those who live with you. Creating full-time fair weather around the house is no mean task, and yet that is what you want and even insist upon. You will do almost anything to maintain equilibrium, keep the peace, or avoid making waves. You cannot be perfectly honest for fear of disrupting the prevailing serenity. Though not dishonest, you are devious and shrewd about camouflaging feelings.`,
+            "Fire": `Fire often brings instability to your staid Cat/Rabbit nature yet also adds verve to your prissy, over-correct self. You cannot be called aggressive, but as a Fire Cat/Rabbit, you are generally somewhat feistier than your fellow felines. Genius thrives in you. Many great writers and musicians, painters, and poets were born in Fire Cat/Rabbit years. Emotionally intuitive, you can pick up extra-sensory messages in others and frequently know how to transform them into poignant works of art. You will also have an incisive sense of humor and know how to charm people with it. Others usually enjoy your company and find your wit intelligent and easily applicable to real-life situations. You are the least shy of all Cat/Rabbits. You can handle fame and deal competently with the public without needing to flee the spotlight. However, you are no altruist. You are supremely self-centered and want your way in most relationships. You can be strong in the face of opposition - if you need to, you will bare your claws and hiss loudly to warn off attackers - but you would prefer to play a waiting game, using devious tactics to avoid confrontation. The anguish you experience during a waiting period can cause serious health problems, as you are not naturally well-equipped for dealing with inner conflict.`,
+            "Earth": `Observation and a keen sense of style characterize your Earth Cat/Rabbit nature. You are inventive, too, capable of impressive creative feats and often responsible for the planning and execution of esthetic projects of vast scope. The keenest intelligence lives in you and you always know how to use your sharp brain to good advantage. In leadership positions, your style is passive and low-key. You nonetheless rule with an iron paw. You are both critical and conservative. You are meticulous about your surroundings and choose your friends and cohorts with the utmost care. Socially, you are a bit awkward too. Because you feel different from your peers, you often travel to far-away places to work and may even become an expatriate. You are always seeking to transplant yourself, to go to a new location or society more suitable to your personal tastes and sensitivities. You depend on maintaining a realistic approach to life and don't enjoy any pursuit that is not clear-cut. You are candid in speech and action, not mincing your words or shying from confrontation the way most other Cats/Rabbits do.`,
+            "Metal": `Metal confers a steely strength of purpose and more courage than is normally seen in Cat/Rabbit behavior. You're no world-beater in the confrontation department but, unlike some less feisty Cats/Rabbits who flee, you can hold your ground if and when you meet with an obstacle. Due to this ability to defend your point of view, you are more optimistic than other Cats/Rabbits. You are even a tad aggressive. Still, you remain cautious. You do not take great big scary risks. You rarely act on impulse, thinking every detail through. Until each element is crystal clear, you will avoid investment, commitment, marriage, and intimacy - even with loved ones. You need your life to be orderly and prefer to stay out of the muddy waters of indecision. If your projects don't work out, you may not only stumble and fall but face ruin. You are a great believer in sticking to your ideals. You have fine taste and may well become famous in a profession such as decoration or architecture, art history, or even painting or drawing. You are an avid collector of objets d'art.`,
+            "Water": `You are a more “female” sort than most other Cats/Rabbits. Your sense of taste and love of refinement for its own sake is exaggerated by the gentling water's influence. You are also more squeamish than other Cats/Rabbits and will shy and turn your head away from all physical illness, disability, emotional, and mental instability. You cannot tolerate the sight of blood and indeed nearly pass out at the idea of an injection. You, no matter if you protest a preference for the joys of living on the edge, live solely for security. You require luxury to survive. You cannot bear squalor, and must have the right bath and toilet facilities complete with all the properly appointed cupboards and shelves to keep your finery safely housed. Without a well-established plan and a rigorous infrastructure, you grow soon afraid. Order comforts you. You fear everything from poverty to your own idleness. You are a daydreamer. Aloof and seemingly above it all, you frequently abide in a dream kingdom wherein you are master and monarch of the entire realm. You long for excitement but don't dare indulge in adventure. Underneath, you prefer the safety of material gain to the danger of passionate or romantic endeavor.`
         },
         "compatibilities": "PENDING_RABBIT_COMPATIBILITIES",
-        "futures": "PENDING_RABBIT_FUTURES",
+        "futures": "PENDING_RABBIT_FUTURES"
     },
     "Dragon": {
         "general": "PENDING_DRAGON_INTRODUCTION",
@@ -190,10 +190,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_DRAGON_FIRE",
             "Earth": "PENDING_DRAGON_EARTH",
             "Metal": "PENDING_DRAGON_METAL",
-            "Water": "PENDING_DRAGON_WATER",
+            "Water": "PENDING_DRAGON_WATER"
         },
         "compatibilities": "PENDING_DRAGON_COMPATIBILITIES",
-        "futures": "PENDING_DRAGON_FUTURES",
+        "futures": "PENDING_DRAGON_FUTURES"
     },
     "Snake": {
         "general": "PENDING_SNAKE_INTRODUCTION",
@@ -202,10 +202,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_SNAKE_FIRE",
             "Earth": "PENDING_SNAKE_EARTH",
             "Metal": "PENDING_SNAKE_METAL",
-            "Water": "PENDING_SNAKE_WATER",
+            "Water": "PENDING_SNAKE_WATER"
         },
         "compatibilities": "PENDING_SNAKE_COMPATIBILITIES",
-        "futures": "PENDING_SNAKE_FUTURES",
+        "futures": "PENDING_SNAKE_FUTURES"
     },
     "Horse": {
         "general": "PENDING_HORSE_INTRODUCTION",
@@ -214,10 +214,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_HORSE_FIRE",
             "Earth": "PENDING_HORSE_EARTH",
             "Metal": "PENDING_HORSE_METAL",
-            "Water": "PENDING_HORSE_WATER",
+            "Water": "PENDING_HORSE_WATER"
         },
         "compatibilities": "PENDING_HORSE_COMPATIBILITIES",
-        "futures": "PENDING_HORSE_FUTURES",
+        "futures": "PENDING_HORSE_FUTURES"
     },
     "Goat": {
         "general": "PENDING_GOAT_INTRODUCTION",
@@ -226,10 +226,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_GOAT_FIRE",
             "Earth": "PENDING_GOAT_EARTH",
             "Metal": "PENDING_GOAT_METAL",
-            "Water": "PENDING_GOAT_WATER",
+            "Water": "PENDING_GOAT_WATER"
         },
         "compatibilities": "PENDING_GOAT_COMPATIBILITIES",
-        "futures": "PENDING_GOAT_FUTURES",
+        "futures": "PENDING_GOAT_FUTURES"
     },
     "Monkey": {
         "general": "PENDING_MONKEY_INTRODUCTION",
@@ -238,10 +238,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_MONKEY_FIRE",
             "Earth": "PENDING_MONKEY_EARTH",
             "Metal": "PENDING_MONKEY_METAL",
-            "Water": "PENDING_MONKEY_WATER",
+            "Water": "PENDING_MONKEY_WATER"
         },
         "compatibilities": "PENDING_MONKEY_COMPATIBILITIES",
-        "futures": "PENDING_MONKEY_FUTURES",
+        "futures": "PENDING_MONKEY_FUTURES"
     },
     "Rooster": {
         "general": "PENDING_ROOSTER_INTRODUCTION",
@@ -250,10 +250,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_ROOSTER_FIRE",
             "Earth": "PENDING_ROOSTER_EARTH",
             "Metal": "PENDING_ROOSTER_METAL",
-            "Water": "PENDING_ROOSTER_WATER",
+            "Water": "PENDING_ROOSTER_WATER"
         },
         "compatibilities": "PENDING_ROOSTER_COMPATIBILITIES",
-        "futures": "PENDING_ROOSTER_FUTURES",
+        "futures": "PENDING_ROOSTER_FUTURES"
     },
     "Dog": {
         "general": "PENDING_DOG_INTRODUCTION",
@@ -262,10 +262,10 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_DOG_FIRE",
             "Earth": "PENDING_DOG_EARTH",
             "Metal": "PENDING_DOG_METAL",
-            "Water": "PENDING_DOG_WATER",
+            "Water": "PENDING_DOG_WATER"
         },
         "compatibilities": "PENDING_DOG_COMPATIBILITIES",
-        "futures": "PENDING_DOG_FUTURES",
+        "futures": "PENDING_DOG_FUTURES"
     },
     "Pig": {
         "general": "PENDING_PIG_INTRODUCTION",
@@ -274,10 +274,9 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Fire": "PENDING_PIG_FIRE",
             "Earth": "PENDING_PIG_EARTH",
             "Metal": "PENDING_PIG_METAL",
-            "Water": "PENDING_PIG_WATER",
+            "Water": "PENDING_PIG_WATER"
         },
         "compatibilities": "PENDING_PIG_COMPATIBILITIES",
-        "futures": "PENDING_PIG_FUTURES",
+        "futures": "PENDING_PIG_FUTURES"
     },
 };
-
