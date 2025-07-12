@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { zodiac_data } from '@/lib/zodiac';
+import {getChineseZodiacSign, getWesternZodiacSign} from '@/lib/astrology';
 
 const AstroInsightInputSchema = z.object({
   name: z.string().describe('The full name of the person.'),
@@ -23,7 +24,7 @@ export type AstroInsightInput = z.infer<typeof AstroInsightInputSchema>;
 
 const AstroInsightOutputSchema = z.object({
   name: z.string().describe("The person's name."),
-  reading: z.string().describe('A detailed astrological reading for the person.'),
+  reading: z.string().describe('A simple, AI-powered astrological reading for the person.'),
   luckyNumber: z.number().describe('A lucky number for the person.'),
   luckyColor: z.string().describe('A lucky color for the person.'),
   new_astrology_sign: z.string().describe('The combined New Astrology sign (e.g., "Aries/Dragon").'),
@@ -33,7 +34,7 @@ const AstroInsightOutputSchema = z.object({
   general_desc: z.string().describe('A general description of the Chinese animal sign.'),
   elemental_desc: z.string().describe("A description of the element's influence on the sign."),
   compatibilities: z.string().describe("A description of the sign's compatibilities."),
-  new_astrology_desc: z.string().describe('A description of the combined New Astrology sign.'),
+  new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
 });
 export type AstroInsightOutput = z.infer<typeof AstroInsightOutputSchema>;
 
@@ -41,31 +42,31 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
   return astroInsightFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'astroInsightPrompt',
-  input: {schema: AstroInsightInputSchema},
-  output: {schema: AstroInsightOutputSchema},
-  prompt: `You are an expert astrologer. You combine Western and Chinese astrology to provide a comprehensive "New Astrology" profile.
+const CreativePromptInputSchema = z.object({
+    name: z.string(),
+    western_sign: z.string(),
+    chinese_sign: z.string(),
+    element: z.string(),
+    new_astrology_sign: z.string(),
+});
 
-For the person with the following details:
-Name: {{{name}}}
-Date of Birth: {{{day}}}/{{{month}}}/{{{year}}}
-Gender: {{{gender}}}
+const CreativePromptOutputSchema = z.object({
+    reading: z.string().describe('A simple, AI-powered astrological reading for the person.'),
+    luckyNumber: z.number().describe('A lucky number for the person.'),
+    luckyColor: z.string().describe('A lucky color for the person.'),
+    new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
+});
 
-Your task is to:
-1.  Determine the correct Western Zodiac sign.
-2.  Determine the correct Chinese Animal sign and its associated Element based on the year of birth.
-3.  Using the provided **Zodiac Data**, find the matching animal sign.
-4.  From that animal's data, extract the exact text for 'general', 'compatibilities', and the specific 'elemental_desc' that matches the determined element. You MUST use the text from the provided data for these fields. Do NOT summarize or create new descriptions for these.
-5.  Generate the rest of the profile:
-    - Create a combined "New Astrology" sign name (e.g., "Aries/Dragon").
-    - Write a unique, personalized description for this combined "New Astrology" sign.
-    - Generate a simple, AI-powered reading.
-    - Provide a lucky number and a lucky color.
 
-**Zodiac Data:**
-${JSON.stringify(zodiac_data, null, 2)}
-  `,
+const creativePrompt = ai.definePrompt({
+  name: 'astroCreativePrompt',
+  input: {schema: CreativePromptInputSchema},
+  output: {schema: CreativePromptOutputSchema},
+  prompt: `You are an expert astrologer. For the person named {{{name}}}, who is a {{{new_astrology_sign}}} ({{{western_sign}}} and {{{element}}} {{{chinese_sign}}}), generate the following:
+1. A unique, personalized description for this combined "New Astrology" sign.
+2. A simple, AI-powered astrological reading.
+3. A lucky number.
+4. A lucky color.`,
 });
 
 const astroInsightFlow = ai.defineFlow(
@@ -74,8 +75,48 @@ const astroInsightFlow = ai.defineFlow(
     inputSchema: AstroInsightInputSchema,
     outputSchema: AstroInsightOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    const { year, month, day, name, gender } = input;
+    
+    // Determine Zodiac signs and data
+    const western_sign = getWesternZodiacSign(day, month);
+    const { sign, element } = getChineseZodiacSign(year);
+    const new_astrology_sign = `${western_sign}/${sign}`;
+    const signData = zodiac_data[sign as keyof typeof zodiac_data];
+
+    // Check for missing data
+    if (!signData || !signData.general || signData.general.startsWith('PENDING')) {
+        throw new Error(`Zodiac data for "${sign}" is incomplete. Please add it to zodiac.ts.`);
+    }
+
+    // Generate creative content
+    const creativeResult = await creativePrompt({
+        name,
+        western_sign,
+        chinese_sign: sign,
+        element,
+        new_astrology_sign,
+    });
+    const { output: creativeData } = creativeResult;
+
+    if (!creativeData) {
+        throw new Error('Failed to generate creative content from the AI model.');
+    }
+
+    // Combine generated and static data
+    return {
+        name,
+        reading: creativeData.reading,
+        luckyNumber: creativeData.luckyNumber,
+        luckyColor: creativeData.luckyColor,
+        new_astrology_sign,
+        western_sign,
+        element,
+        sign,
+        general_desc: signData.general,
+        elemental_desc: signData.elements[element as keyof typeof signData.elements],
+        compatibilities: signData.compatibilities,
+        new_astrology_desc: creativeData.new_astrology_desc,
+    };
   }
 );

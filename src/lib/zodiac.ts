@@ -8,6 +8,7 @@
 
 
 
+
       
 export const zodiac_data = {
     "Rat": {
@@ -153,7 +154,7 @@ Tiger with Horse: Auspicious, to say the least. Both of you have unruly natures.
 
 Tiger with Goat: This union is among the worst possible known to Chinese astrologers. Although you may make a fabulous start (in bed), from there on it's all downhill. The practicalities just don't work out. The Goat is charming, beautifully seductive, and loving. You are passion and mettle. But who will bring home the bacon? In this family, nobody wants the job. No concessions are made. The Goat remains laid back while you, the ambitious Tiger, bombast a hole in the kitchen ceiling. What was a great passion ends in lifelong misunderstanding and acrimony. Affairs? Yes. Marriage? Abstinence is advised.
 
-Tiger with Monkey: You two make eager lovers. Initially, you will leap frequently on each other’s bones, accomplishing astonishing feats of extreme passion, but in the long run, the ardor may die a natural death, because you hate to be clung to— and innately neurotic Monkeys don’t know how not to cling. The strong intellectual tug between you frequently keeps you together, anyway. You admire the Monkey’s keen eye for strategy, and the Monkey enjoys and applauds your feisty wit and temerity. You have an easy, common viewpoint, and, even if you cannot keep the love flame burning, will go far together as lifelong pals. Except… the Chinese say that you should beware. Traditionally, the Monkey is the Tiger’s natural enemy. Marriage is not advised.
+Tiger with Monkey: You two make eager lovers. Initially, you will leap frequently on each other’s bones, accomplishing astonishing feats of extreme passion, but in the long run, the ardor may die a natural death, because you hate to be clung to— and innately neurotic Monkeys don’t know how not to cling. The strong intellectual tug between you frequently keeps you together, anyway. You admire the Monkey’s keen eye for strategy, and the Monkey enjoys and applauds your feisty wit and temerity. You have an easy, common viewpoint, and, even if you cannot keep the love flame burning, will go far together as lifelong pals. Except… the Chinese say that you should beware. Traditionally, a Monkey is the Tiger’s natural enemy. Marriage is not advised.
 
 Tiger with Dog: Harmony incarnate. You and the Dog just plain get along. You have common causes and common philosophies. But you are very different. You are overly optimistic, the Dog pessimistic. Each helps the other to understand these basic character differences. The Chinese call this pairing a happy alliance of muscle and heart. You have the strength to put the Dog’s ideals across to the public. The disquiet Dog keeps watch and prevents you from leaping into the wrong frays. You are, simply, a great couple. Harmony reigns right from the start.
 
@@ -190,7 +191,7 @@ But should spontaneity enter the picture and events go awry, you freak out. Take
             "Metal": `Metal confers a steely strength of purpose and more courage than is normally seen in Cat/Rabbit behavior. You're no world-beater in the confrontation department but, unlike some less feisty Cats/Rabbits who flee, you can hold your ground if and when you meet with an obstacle. Due to this ability to defend your point of view, you are more optimistic than other Cats/Rabbits. You are even a tad aggressive. Still, you remain cautious. You do not take great big scary risks. You rarely act on impulse, thinking every detail through. Until each element is crystal clear, you will avoid investment, commitment, marriage, and intimacy - even with loved ones. You need your life to be orderly and prefer to stay out of the muddy waters of indecision. If your projects don't work out, you may not only stumble and fall but face ruin. You are a great believer in sticking to your ideals. You have fine taste and may well become famous in a profession such as decoration or architecture, art history, or even painting or drawing. You are an avid collector of objets d'art.`,
             "Water": `You are a more “female” sort than most other Cats/Rabbits. Your sense of taste and love of refinement for its own sake is exaggerated by the gentling water's influence. You are also more squeamish than other Cats/Rabbits and will shy and turn your head away from all physical illness, disability, emotional, and mental instability. You cannot tolerate the sight of blood and indeed nearly pass out at the idea of an injection. You, no matter if you protest a preference for the joys of living on the edge, live solely for security. You require luxury to survive. You cannot bear squalor, and must have the right bath and toilet facilities complete with all the properly appointed cupboards and shelves to keep your finery safely housed. Without a well-established plan and a rigorous infrastructure, you grow soon afraid. Order comforts you. You fear everything from poverty to your own idleness. You are a daydreamer. Aloof and seemingly above it all, you frequently abide in a dream kingdom wherein you are master and monarch of the entire realm. You long for excitement but don't dare indulge in adventure. Underneath, you prefer the safety of material gain to the danger of passionate or romantic endeavor.`
         },
-        "compatibilities": `Rabbit/Cat with Rat: See Rat with Rabbit/Cat. This is a game of Cat and Mouse you should resist playing. You are not very compatible, and the testy relationship grows pickier and pettier by the day.
+        "compatibilities": `Rabbit/Cat with Rat: See Rat with Rabbit/Cat. This game of Cat and Mouse is one you should resist playing. You are not very compatible, and the testy relationship grows pickier and pettier by the day.
 
 Rabbit/Cat with Ox: See Ox with Rabbit/Cat. A cozy union. You will have plenty to purr about, as the Ox brings you security, allowing you to focus on creative activities without fretting over money.
 
@@ -198,9 +199,9 @@ Rabbit/Cat with Tiger: See Tiger with Rabbit/Cat. A style clash. You live for pe
 
 Rabbit/Cat with Rabbit/Cat: Two of you together will form an idyll of tranquility, a perfect refuge from the storm of worldly woes. You will live a pleasant, peaceful existence, a tad on the dull side, but so what? You are not thrill seekers. Domestic bliss will reign. The only tiny glitch in your otherwise perfect picture of felicity will be a tendency to become a bit lazy. Neither of you will want to get up and go to the supermarket. Nobody will feel like cooking dinner or even setting the table.
 
-Rabbit/Cat with Dragon: See Dragon with Rabbit/Cat. This marriage usually proves unfulfilling. The Dragon's flamboyant and exaggerated pizzazz does not suit your need for discretion.
+Rabbit/Cat with Dragon: This marriage usually proves unfulfilling. Your flamboyant and exaggerated pizzazz does not suit your need for discretion. Your pyrotechnic displays are deemed vulgar by the classy Rabbit, who would rather be at home polishing the silver.
 
-Rabbit/Cat with Snake: See Snake with Rabbit/Cat. A reciprocally interesting relationship. Both of you have keen minds and are deep thinkers. Should you run into trouble, you can rely on your mutual innate wisdom to steer yourselves out of difficulties.
+Rabbit/Cat with Snake: A reciprocally interesting relationship. Both of you have keen minds and are deep thinkers. Should you run into trouble, you can rely on your mutual innate wisdom to steer yourselves out of difficulties.
 
 Rabbit/Cat with Horse: You two are so different that any long-term liaison is almost out of the question. You can be friends, but you cannot be lovers for long. Your timidity is viewed by the self-possessed Horse as weakness. The Horse’s brusque impatience makes you nervous and edgy. You two are so basically mismatched that the least little row can set you off on one of your famous sulking jags, and the Horse will not tolerate that for a second.
 
@@ -251,7 +252,7 @@ Dragon with Ox: See Ox with Dragon. Not a good match. Be prepared for late-night
 
 Dragon with Tiger: See Tiger with Dragon. A relationship that bears serious consideration. Your combined strength is almost excessive, and your energy is enough to fuel several large power plants. You both get along well.
 
-Dragon with Rabbit/Cat: See Rabbit with Cat. This marriage usually proves unfulfilling. Your flamboyant and exaggerated pizzazz does not suit the Rabbit's need for discretion. Your pyrotechnic displays are deemed vulgar by the classy Rabbit, who would rather be at home polishing the silver.
+Dragon with Rabbit/Cat: This marriage usually proves unfulfilling. Your flamboyant and exaggerated pizzazz does not suit the Rabbit's need for discretion. Your pyrotechnic displays are deemed vulgar by the classy Rabbit, who would rather be at home polishing the silver.
 
 Dragon with Dragon: This relationship is almost too volatile for any long-term good to come of it. You have here a lifetime battle royal for supremacy. In competitive situations, neither of you can allow the other’s gigantic ego to prevail. Whether it’s a pitched combat over who gets to manage the TV remote or a tussle about who drives the car, the air will always be full of strife. At first, this emotional power play may seem like a love storm of glorious emotion. You are not ill-suited sexually and may have some of the most exciting sex of your lives together. Yet, day-to-day living threatens to be so highly charged and fraught with shouting that one wonders if a few moments of occasional earth-shaking sex is worth it. Two giant, uncompromising, fire-breathing beasts may well be doomed to set each other’s hearts ablaze.
 
@@ -306,7 +307,7 @@ Snake with Ox: See Ox with Snake. A very good union. You feel cozy in the Ox’s
 
 Snake with Tiger: See Tiger with Snake. A disastrous alliance. You are as different as black and white. Your slow-moving nature will inflict tremendous frustration on the peppy Tiger’s psyche.
 
-Snake with Rabbit/Cat: See Rabbit with Cat. A reciprocally interesting relationship. Both of you have keen minds and are deep thinkers. Should you run into trouble, you can rely on your mutual innate wisdom to steer yourselves out of difficulties.
+Snake with Rabbit/Cat: See Rabbit/Cat. A reciprocally interesting relationship. Both of you have keen minds and are deep thinkers. Should you run into trouble, you can rely on a mutual innate wisdom to steer yourselves out of difficulties.
 
 Snake with Dragon: See Dragon with Snake. A harmonious union. In Chinese astrological parlance, you are considered 'kissin’ cousins.' The Dragon adores sporting a gorgeous partner like you, and you, the quiet and subtle Snake, admire the Dragon’s world-beating flamboyance and style.
 
@@ -339,7 +340,7 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         }
     },
     "Horse": {
-        "general": `PENDING_HORSE_INTRODUCTION`,
+        "general": "PENDING_HORSE_INTRODUCTION",
         "elements": {
             "Wood": `PENDING_HORSE_WOOD`,
             "Fire": `PENDING_HORSE_FIRE`,
@@ -422,4 +423,5 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
     
 
     
+
 
