@@ -21,12 +21,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogHeader, 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
 
 const repeatedNumberMeanings: { [key: string]: string } = {
-    "1_1": "You face difficulty in communication & expression (verbal). You can communicate by other means, through art, craft, design, sculpturing, cartoons, graffiti, painting, writing, dancing etc. But you are never able to soak yourself into anything; you touch the crust but never reach the core. You find it difficult to understand others' point of view. You have a good financial level, as 6 & 8 are also in this plane.",
+    "1_1": "You face difficulty in communication & expression (verbal). You can communicate by other means, through art, craft, design, sculpturing, cartoons, graffiti, painting, writing, dancing etc. But you are never able to soak yourself into anything; you touch the crust but never reach the core. You find it difficult to understand others' point of view. You have a good financial level, if 6 & 8 are also in this plane.",
     "1_2": "You are good in Expression & Communication. You have an impartial & balanced outlook towards everyone in life. Your way of living life is very neutral. You understand others' point of view as well as your own. You are good in financial matters. This is a perfect placement of this pair in a chart.",
     "1_3": "You are good in Expression, very sensitive & caring. This can indicate a number of extra-marital relations (the concept of 'Pati, Patni & Wo'). Sometimes you are too much talkative and never stop talking, but at other times you can be very quiet & introvert, as you have both extremes in your behavior. You keep on changing your behavior according to time & situations. You will have materialistic growth if other two numbers are supporting. Generally, you are happy and a good entertainer in life. You love going out of the house.",
     "1_4": "You have a blockage at the Vishuddha or Throat chakra, hence it is extremely difficult for you to open your heart out verbally. You are very sensitive & caring by nature but are mostly misunderstood. You are always on your toes, anxious, and overly energetic, taking rest or getting relaxed very rarely; you are always hyperactive. Only materialistic desires will be found & you have more focus on wealth accumulation than anything else in your life.",
     "1_5": "You face too many difficulties in expressing your emotions out verbally. You are a very much misunderstood personality. You direct your energy of expression into other forms, like writing, painting, dancing, art, sculpture, and creativity. You may have a tendency to over-indulge in alcoholism, drugs, food, many relationships, or any other types of addictions.",
-    "2_1": "You are caring & intelligent by nature and are easily hurt by others. You easily understand & gauge people just by looking at them. You can easily distinguish between sincere & insincere people. If only the number 2 is present in the plane, you have an average mindset, but if the other two numbers are also there, you have high intellect. You do well in the philosophical, judicial & literary fields.",
+    "2_1": "You are caring & intelligent by nature and are easily hurt by others. You easily understand & gauge people just by looking at them. You can easily distinguish between sincere & insincere people. If only the number 2 is present in the plane, you have an average mindset, but if the other two numbers (4 and 9) are also there, you have high intellect. You do well in the philosophical, judicial & literary fields.",
     "2_2": "You are high in Intelligence, Sensitivity & have a double Intuition Level (as 2 appears 2 times). You have an innate ability to get into someone's Mind & Soul. You can easily scan the Mind & Soul of someone & find out about their feelings, motive & purpose. If you only have two 2s in the plane without 4 & 9, it makes you highly skeptical & very negative. This also makes you deprived of positive energy and enthusiasm; the level of Chi or Life Driving Force in you is very weak, which will eventually affect both your physical & mental health. If 4 & 9 are present along with 2, then you will be good at memorizing things & highly intellectual.",
     "2_3": "Having more 2s in your chart makes you more intuitive & sensitive. But sensitivity & intuitiveness are good up to a limit; after a point, these two properties can make a person maniacal. You become too vulnerable or defenseless & are hence easily hurt & affected by others. As a result, you prefer to be alone & aloof, away from the public, to protect yourself from being hurt. You lock yourself in your own mental world as you don't find the people around you in the physical world capable enough to understand you. You become an introvert regardless of your basic behavior and tendencies.",
     "2_4": "Your patience level is very low. You have a tendency to overreact over issues which are irrelevant & meaningless. Extreme behavioral sensitivity is observed which can lead to self-hurting behavior.",
@@ -108,6 +108,49 @@ function PersonalizedMeaning({ text, allDigits }: { text: string, allDigits: str
     return <p className="text-muted-foreground">{personalizedText}</p>
 }
 
+const arrowCoordinates: { [key: string]: { x1: string; y1: string; x2: string; y2: string } } = {
+    // Horizontal
+    "Arrow of Intellect":   { x1: "16.67%", y1: "16.67%", x2: "83.33%", y2: "16.67%" },
+    "Arrow of Spirituality":{ x1: "16.67%", y1: "50%",    x2: "83.33%", y2: "50%" },
+    "Arrow of Prosperity":  { x1: "16.67%", y1: "83.33%", x2: "83.33%", y2: "83.33%" },
+    // Vertical
+    "Arrow of Planning":    { x1: "16.67%", y1: "16.67%", x2: "16.67%", y2: "83.33%" },
+    "Arrow of Willpower":   { x1: "50%",    y1: "16.67%", x2: "50%",    y2: "83.33%" },
+    "Arrow of Action":      { x1: "83.33%", y1: "16.67%", x2: "83.33%", y2: "83.33%" },
+    // Diagonal
+    "Arrow of Emotional Balance": { x1: "16.67%", y1: "16.67%", x2: "83.33%", y2: "83.33%" },
+    "Arrow of Determination": { x1: "83.33%", y1: "16.67%", x2: "16.67%", y2: "83.33%" },
+};
+
+// These map to the ARROWS_OF_WEAKNESS names
+const arrowWeaknessMap: { [key: string]: string } = {
+    "Arrow of Confusion": "Arrow of Intellect",
+    "Arrow of Scepticism": "Arrow of Spirituality",
+    "Arrow of Frustration": "Arrow of Prosperity",
+    "Arrow of Indecision": "Arrow of Planning",
+    "Arrow of Suspicion": "Arrow of Willpower",
+    "Arrow of Apathy": "Arrow of Action",
+    "Arrow of Disappointment": "Arrow of Emotional Balance",
+    "Arrow of Doubt": "Arrow of Determination",
+};
+
+const LoShuArrow = ({ name, type }: { name: string, type: 'strength' | 'weakness' }) => {
+    const coords = arrowCoordinates[name];
+    if (!coords) return null;
+
+    return (
+        <line
+            x1={coords.x1}
+            y1={coords.y1}
+            x2={coords.x2}
+            y2={coords.y2}
+            stroke={type === 'strength' ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))'}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray={type === 'weakness' ? "5, 5" : undefined}
+        />
+    );
+};
 
 function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -230,29 +273,44 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                     <CardDescription>Click a number to see its meaning.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <table className="w-full border-collapse">
-                                        <tbody>
-                                            {numerology.loShuGrid.map((row, i) => (
-                                                <tr key={i}>
-                                                    {row.map((cell, j) => (
-                                                        <td key={j} className="border text-center h-16 w-16 text-2xl font-bold p-0">
-                                                            {cell ? (
-                                                                <button 
-                                                                    onClick={() => handleGridClick(cell)}
-                                                                    className="w-full h-full flex items-center justify-center text-primary hover:bg-accent/20 transition-colors duration-200 disabled:hover:bg-transparent disabled:cursor-default"
-                                                                    aria-label={`Meaning for number ${cell[0]}`}
-                                                                >
-                                                                    {cell}
-                                                                </button>
-                                                            ) : (
-                                                                <div className="w-full h-full"></div>
-                                                            )}
-                                                        </td>
-                                                    ))}
-                                                </tr>
+                                    <div className="relative aspect-square">
+                                        <svg
+                                            className="absolute top-0 left-0 w-full h-full"
+                                            viewBox="0 0 100 100"
+                                            preserveAspectRatio="none"
+                                        >
+                                            {numerology.arrowsOfStrength.map(arrow => (
+                                                <LoShuArrow key={arrow.name} name={arrow.name} type="strength" />
                                             ))}
-                                        </tbody>
-                                    </table>
+                                            {numerology.arrowsOfWeakness.map(arrow => {
+                                                const strengthArrowName = arrowWeaknessMap[arrow.name];
+                                                return <LoShuArrow key={arrow.name} name={strengthArrowName} type="weakness" />
+                                            })}
+                                        </svg>
+                                        <table className="w-full h-full border-collapse relative">
+                                            <tbody>
+                                                {numerology.loShuGrid.map((row, i) => (
+                                                    <tr key={i}>
+                                                        {row.map((cell, j) => (
+                                                            <td key={j} className="border text-center h-1/3 w-1/3 text-2xl font-bold p-0">
+                                                                {cell ? (
+                                                                    <button 
+                                                                        onClick={() => handleGridClick(cell)}
+                                                                        className="w-full h-full flex items-center justify-center text-primary hover:bg-accent/20 transition-colors duration-200 disabled:hover:bg-transparent disabled:cursor-default"
+                                                                        aria-label={`Meaning for number ${cell[0]}`}
+                                                                    >
+                                                                        {cell}
+                                                                    </button>
+                                                                ) : (
+                                                                    <div className="w-full h-full"></div>
+                                                                )}
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </CardContent>
                             </Card>
                         </aside>
