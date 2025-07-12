@@ -12,7 +12,7 @@ import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { generateLoShuData } from '@/lib/numerology';
+import { generateLoShuData } from '@/lib/numerology';
 
 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
@@ -168,24 +168,33 @@ export function ProfileGenerator() {
         }
 
         startTransition(async () => {
-            const result = await getAstroInsightAction({
+            const insightPromise = getAstroInsightAction({
                 name,
                 day: parseInt(day),
                 month: parseInt(month),
                 year: parseInt(year),
                 gender,
             });
-            if (result.success && result.insight && result.numerology) {
-                setInsight(result.insight);
-                setNumerology(result.numerology);
+            const numerologyPromise = Promise.resolve(generateLoShuData({
+                day: parseInt(day),
+                month: parseInt(month),
+                year: parseInt(year),
+                gender,
+            }));
+
+            const [insightResult, numerologyData] = await Promise.all([insightPromise, numerologyPromise]);
+            
+            if (insightResult.success && insightResult.insight && numerologyData) {
+                setInsight(insightResult.insight);
+                setNumerology(numerologyData);
             } else {
                 setInsight(null);
                 setNumerology(null);
-                setError(result.error || 'An unexpected error occurred.');
+                setError(insightResult.error || 'An unexpected error occurred.');
                 toast({
                   variant: 'destructive',
                   title: 'Error Generating Profile',
-                  description: result.error || 'An unexpected error occurred while fetching insights. Please try again.',
+                  description: insightResult.error || 'An unexpected error occurred while fetching insights. Please try again.',
                 });
             }
         });
