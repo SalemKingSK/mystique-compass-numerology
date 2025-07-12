@@ -23,7 +23,7 @@ export const KUA_DIRECTIONS: { [key: number]: any } = {
     Success: 'N',
     Health: 'S',
     Family: 'E',
-    'Personal Growth': 'SE', // Doc says SE, East group.
+    'Personal Growth': 'SE', 
   },
   5: { // Kua 5 is special and splits by gender
     male: { // Defaults to Kua 2
@@ -63,6 +63,18 @@ export const KUA_DIRECTIONS: { [key: number]: any } = {
     Family: 'N',
     'Personal Growth': 'S',
   },
+};
+
+export const KUA_ATTRIBUTES: { [key: number]: any } = {
+  1: { element: 'Water', colors: 'Blue, Black, Grey', season: 'Winter' },
+  2: { element: 'Earth', colors: 'Red, Pink, Maroon', season: 'Late Summer' },
+  3: { element: 'Wood', colors: 'Green, Brown', season: 'Spring' },
+  4: { element: 'Wood', colors: 'Green, Brown', season: 'Spring' },
+  // Kua 5 defaults to 2 for males and 8 for females, which are handled in the generation function.
+  6: { element: 'Metal', colors: 'White, Gold, Silver', season: 'Autumn' },
+  7: { element: 'Metal', colors: 'White, Gold, Silver', season: 'Autumn' },
+  8: { element: 'Earth', colors: 'Yellow, Beige, Brown', season: 'Late Summer' },
+  9: { element: 'Fire', colors: 'Red, Purple, Orange', season: 'Summer' },
 };
 
 
@@ -118,19 +130,20 @@ export const calculateKua = (year: number, gender: string): number => {
   const reducedYearSum = reduceToSingleDigit(yearSum);
   
   let kuaResult: number;
+  let isCenturyAfter2000 = year >= 2000;
 
-  if (year < 2000) {
-    kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
-  } else {
-    kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
+  if (gender.toLowerCase() === 'male') {
+      kuaResult = isCenturyAfter2000 ? 9 - reducedYearSum : 11 - reducedYearSum;
+  } else { // female
+      kuaResult = isCenturyAfter2000 ? reducedYearSum + 6 : reducedYearSum + 4;
   }
 
-  const finalKua = reduceToSingleDigit(kuaResult);
+  let finalKua = reduceToSingleDigit(kuaResult);
   
   // As per original document, for Kua 5, males default to 2 and females to 8
-  // This logic is now handled inside the `generateLoShuData` function when accessing directions.
-  // Here, we can just return the Kua number, even if it's 5.
-  // The special direction handling is what matters.
+  if (finalKua === 5) {
+      finalKua = gender.toLowerCase() === 'male' ? 2 : 8;
+  }
   
   return finalKua;
 };
@@ -238,21 +251,28 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   // 1. Calculate all core numbers
   const psycheNum = calculatePsyche(day);
   const destinyNum = calculateDestiny(day, month, year);
+  // We need the original Kua calculation before it's adjusted for '5' to handle special cases
+  const rawKua = reduceToSingleDigit(
+    gender.toLowerCase() === 'male' 
+      ? (year >= 2000 ? 9 : 11) - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0))
+      : (year >= 2000 ? 6 : 4) + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0))
+  );
   const kuaNum = calculateKua(year, gender);
 
   // 2. Get Kua Directions
   let auspiciousDirections;
-  let finalKuaForDirections = kuaNum;
-
-  // The document states that for Kua 5, males are treated as Kua 2 and females as Kua 8.
-  if (kuaNum === 5) {
+  // Use the raw, pre-adjustment Kua for Kua 5 gender split
+  if (rawKua === 5) {
       auspiciousDirections = KUA_DIRECTIONS[5][gender.toLowerCase() as 'male' | 'female'];
   } else {
       auspiciousDirections = KUA_DIRECTIONS[kuaNum];
   }
+  
+  // 3. Get Kua Attributes
+  const kuaAttributes = KUA_ATTRIBUTES[kuaNum] || { element: 'N/A', colors: 'N/A', season: 'N/A' };
 
 
-  // 3. Aggregate ALL digits for the grid
+  // 4. Aggregate ALL digits for the grid
   const birthDigits = (String(day) + String(month) + String(year))
     .split('')
     .filter(d => d !== '0');
@@ -266,7 +286,7 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   
   const presentDigits = new Set(allDigitsForGrid.map(d => parseInt(d, 10)));
 
-  // 4. Count frequencies and create grid data
+  // 5. Count frequencies and create grid data
   const counts: { [key: string]: number } = {};
   for (const digit of allDigitsForGrid) {
     counts[digit] = (counts[digit] || 0) + 1;
@@ -278,24 +298,24 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     gridContent[digitStr] = counts[digitStr] ? digitStr.repeat(counts[digitStr]) : '';
   }
 
-  // 5. Arrange data into a 2D array for rendering
+  // 6. Arrange data into a 2D array for rendering
   const gridLayout = [
     [gridContent['4'], gridContent['9'], gridContent['2']],
     [gridContent['3'], gridContent['5'], gridContent['7']],
     [gridContent['8'], gridContent['1'], gridContent['6']],
   ];
 
-  // 6. Determine present arrows of strength
+  // 7. Determine present arrows of strength
   const arrowsOfStrength = ARROWS_OF_STRENGTH.filter(arrow => 
     arrow.numbers.every(num => presentDigits.has(num))
   );
 
-  // 7. Determine present arrows of weakness
+  // 8. Determine present arrows of weakness
   const arrowsOfWeakness = ARROWS_OF_WEAKNESS.filter(arrow =>
     arrow.numbers.every(num => !presentDigits.has(num))
   );
   
-  // 8. Return all calculated data
+  // 9. Return all calculated data
   return {
     psycheNum,
     destinyNum,
@@ -305,5 +325,6 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     arrowsOfStrength,
     arrowsOfWeakness,
     auspiciousDirections,
+    kuaAttributes,
   };
 };

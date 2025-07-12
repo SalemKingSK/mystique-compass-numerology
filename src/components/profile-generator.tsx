@@ -46,7 +46,7 @@ const repeatedNumberMeanings: { [key: string]: string } = {
     "6_2": "You are highly creative, but lack self-confidence & believe less in your work & their abilities. You take unnecessary tension for your family & family members, which makes your energy drained/exhausted & hence you feel tired most of the time. You are too stressed all the time because of your thinking style. You are overprotective by nature, hence you keep interfering in the lives of your family members (especially towards your kids). You can provide an obstruction to your children in becoming self-dependent. Your life is filled with creativity, activeness & beauty. You require constant support & encouragement from your family & friends.",
     "6_3": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "6_4": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
-    "6_5": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
+    "6_5": "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in their behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
     "7_1": "You learn the lessons of your life through RELATIONAL LOSS or LOSS OF LOVED ONES, LOSS OF BELONGINGS, or on the COST of HEALTH & WELL-BEING. With the lessons you learn throughout your life & losses, you become more inclined towards the spiritual field & spiritual practices. If supported by 3 & 5, you start your quest for the ultimate reality of life & precision or perfection in the journey of life. Your career can be in a spiritual or humanitarian field. If 3 & 5 are there, your behavior is rigid.",
     "7_2": "You gain your knowledge & wisdom at the cost of your loved ones, your health, or your monetary losses. This push will eventually take you to the path of occultism, spirituality & meditation. You have a technical (IT & Computers) & analytical (Mathematical & Reasoning) brain. You are good at minute, odd & baseless criticism. You are spiritual but have a tendency for show-off & bragging by nature. You have the potential to bring finance & prosperity into your life.",
     "7_3": "Your life is filled with disappointments, setbacks & sadness. Your love life, well-being, along with finance & prosperity are affected. These affects & complications make you a stronger human & help you in your growth & development. You can be a fortunate, ideal citizen of a state & work hard in goal accomplishment. If 4, 5 & 6 are missing in your chart then you can be unfortunate & disheartened due to the name, fame & beliefs you have earned in your life.",
@@ -178,6 +178,29 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                                     <strong className="text-accent">{direction}</strong>
                                                 </li>
                                             ))}
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            )}
+                             {numerology.kuaAttributes && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Your Kua Attributes</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-sm">
+                                        <ul className="space-y-2">
+                                            <li className="flex justify-between">
+                                                <span>Guiding Element</span>
+                                                <strong className="text-accent">{numerology.kuaAttributes.element}</strong>
+                                            </li>
+                                            <li className="flex justify-between">
+                                                <span>Lucky Colours</span>
+                                                <strong className="text-accent">{numerology.kuaAttributes.colors}</strong>
+                                            </li>
+                                             <li className="flex justify-between">
+                                                <span>Lucky Season</span>
+                                                <strong className="text-accent">{numerology.kuaAttributes.season}</strong>
+                                            </li>
                                         </ul>
                                     </CardContent>
                                 </Card>
