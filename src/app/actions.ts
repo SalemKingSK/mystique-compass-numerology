@@ -1,7 +1,7 @@
 'use server';
 
 import { getAstroInsight, type AstroInsightInput } from '@/ai/flows/astro-insight-flow';
-import { generateLoShuData } from '@/lib/numerology';
+import { generateLoShuData } from '@/numerology';
 
 export async function getAstroInsightAction(formData: AstroInsightInput) {
   try {
@@ -9,13 +9,12 @@ export async function getAstroInsightAction(formData: AstroInsightInput) {
       return { success: false, error: 'Please fill out all fields.' };
     }
     
-    // Perform AI and numerology calculations in parallel
-    const [insightResult, numerologyData] = await Promise.all([
-        getAstroInsight(formData),
-        generateLoShuData(formData)
-    ]);
+    const insightResult = await getAstroInsight(formData);
 
-    return { success: true, insight: insightResult, numerology: numerologyData };
+    // Numerology data is no longer part of the AI call, so we don't need Promise.all here.
+    // It will be calculated on the client side.
+
+    return { success: true, insight: insightResult };
   } catch (error) {
     console.error('Error getting insight:', error);
     return { success: false, error: 'An error occurred while fetching insights. Please try again.' };
