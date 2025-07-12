@@ -1,18 +1,8 @@
 
-
-
-
-
-
-
-
-
-
-
       
 export const zodiac_data = {
     "Rat": {
-        "general": `Illustrious Rat, you are a lucky one indeed. In China, your sign is very highly prized (and not just for supper). You are power-hungry and know how to 'go for it.' Once you get your claws firmly around an honored position, you hold on for dear life. Leadership becomes you. You are fun-loving and sociable, but your private self is often fidgety and nervous. You feel a need to talk problems through, as getting anxiety off your chest is as good as putting it out of your mind.
+        "introduction": `Illustrious Rat, you are a lucky one indeed. In China, your sign is very highly prized (and not just for supper). You are power-hungry and know how to 'go for it.' Once you get your claws firmly around an honored position, you hold on for dear life. Leadership becomes you. You are fun-loving and sociable, but your private self is often fidgety and nervous. You feel a need to talk problems through, as getting anxiety off your chest is as good as putting it out of your mind.
 
 Some may accuse you of being too communicative; let's just say you talk a lot. You are not a willing idler. You are quick-witted. You speed through work so you can have plenty of time left to meddle in what others are up to. When dealing in delicate matters, you instinctively know how to keep your whiskers clean. Yet, you are not a born straight arrow. You would always rather zigzag your way to fame and fortune than trot the straight and narrow path.
 
@@ -67,7 +57,7 @@ Rat with Pig: Indeed, you two make marvelous mates. In China, the Pig symbolizes
         }
     },
     "Ox": {
-        "general": `Hail, Diligent Ox. You are a veritable Gibraltar, an indomitable fortress. Your sign might have been called Bulldozer instead of Ox. You are an essentially temperate person who cares greatly for rigor, labor, strength of character, and... results!
+        "introduction": `Hail, Diligent Ox. You are a veritable Gibraltar, an indomitable fortress. Your sign might have been called Bulldozer instead of Ox. You are an essentially temperate person who cares greatly for rigor, labor, strength of character, and... results!
 
 You can stick at a task longer and go at it harder than anybody else. You spare no elbow grease. You hate to be beaten, so you simply never give up. Some may call you slow, while others complain that you are clumsy. In fact, you move at your own sweet pace and refuse to be pushed or prodded by hotheaded fly-by-nights. You believe in simplicity and achievement, and levity in business exasperates you.
 
@@ -124,7 +114,7 @@ Ox with Pig: Indeed, you two get on famously. The good-natured Pig is so malleab
         }
     },
     "Tiger": {
-        "general": `Honorable Tiger, you are noble and fearless. You are respected for your courage and dreaded for your ferocity and incessant intemperance. Like a raging torrent, you constantly overflow your banks. Where are you going in such a hurry? Can't you take just one teensy peek before you pounce? Try to slow down, practice a little moderation. Stop going around being so heartbreakingly attractive. It's exhausting.
+        "introduction": `Honorable Tiger, you are noble and fearless. You are respected for your courage and dreaded for your ferocity and incessant intemperance. Like a raging torrent, you constantly overflow your banks. Where are you going in such a hurry? Can't you take just one teensy peek before you pounce? Try to slow down, practice a little moderation. Stop going around being so heartbreakingly attractive. It's exhausting.
 
 Of course, some people find you so dashing and plucky that they want to climb aboard and go along for the ride. But you, Tiger dear, are a swashbuckling loner. The top is the only place you want to be. You court danger. The fiercer the enemy, the more dramatic and calamitous the situation, the broader grows your Tigerish grin. Your changeability, disdain for rules, self-sufficiency and devil-may-care jauntiness could be your undoing.
 
@@ -167,7 +157,7 @@ Tiger with Pig: The basic characters here are vastly different. Pigs are scrupul
             2029: {"year": "Rooster", "element": "Earth", "prediction": `Let the Rooster run the show. Or at least give them the impression they are in a position of leadership. Roosters like to move quickly into action and have their fun, and (unlike yourself) prefer not to leave a trail of dead bodies behind. Your nose needs some application to the grindstone this year. Roosters want to see people busy at work on their various projects and are not amused by stragglers. So keep a high profile. When you are laboring in the hot sun or mining coal deep underground, groan a lot and sweat profusely to let your superiors know just how tough Tiger life can be.`},
             2030: {"year": "Dog", "element": "Metal", "prediction": `Phew! There is relatively little that can go plumb wrong for a Tiger in Dog years. You and Dogs get on well together because you have similar beliefs and take a world view of even the minorest events. Differences of opinion arise when you sense the Dog’s innate paranoia rise to the surface. My advice to you in this otherwise somewhat thorny year is to enjoy the goodwill that the Dog offers you as a protective companion. Bask a bit. Let up on the accelerator at work. Spend some enriching down time just hanging out with friends or family. Go see the Pyramids or visit Niagara Falls. Do something wonderful for yourself, but leave the Dog and their paranoia at home.`},
             2031: {"year": "Pig", "element": "Metal", "prediction": `Pigs confess to a certain gaping awe when confronted by you gadabout Tiger people. Pigs are strong and knowledgeable, but they do not understand your exaggerated need for change. You are forever buzzing about, never lighting long enough to accumulate capital or amass riches. Nevertheless, you and the Pig can be bosom buddies. You admire the Pig’s purity and authenticity of spirit. What they don’t understand about you is what will get in your way this year. The air of plenty will lead you to assume you can spend and give and squander your money and so – you overspend. So tighten your stripes, Tiger.`},
-            2032: {"year": "Rat", "element": "Water", "prediction": `As you no doubt already know, the Rat always wants power. For you Tigers, this peculiar Rat character trait is both un-nerving and irritating in the extreme. You don’t necessarily want to be in control of much of anything. But the Rat does not necessarily know this about you. You appear so strong and so sure of yourself that the nervous Rat feels threatened. Hence your life in the Rat year can prove to be less than delightful. The Rat may try to thwart even your most innocent of desires for leadership. Advice? Plan to travel this year and stay out of public view. If you don’t menace the Rat in any way, they will do you the favor of ignoring you completely.`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `As you no doubt already know, the Rat always wants power. For you Tigers, this peculiar Rat character trait is both un-nerving and irritating in the extreme. You don’t necessarily want to be in control of much of anything. But the Rat does not necessarily know this about you. You appear so strong and so sure of yourself that the nervous Rat feels threatened. Hence your life in the Rat year can prove to be less than delightful. The Rat may try to thwart even your most innocent of desires for leadership. Advice? Plan to travel this year and stay out of public view. If you don’t menace the Rat in any way, they will do the favor of ignoring you completely.`},
             2033: {"year": "Ox", "element": "Water", "prediction": `You must warn yourself off trying to make a lot of money or landing a prime job in an Ox year. Your speedy, catch-as-catch-can methods drive the Ox to distraction. You are well-advised in advance to remove at least one of your jet engines so as not to appear threatening or to confuse the ponderous, drudgery-loving Ox. You won’t have to bow and scrape to get ahead, but you will need to do some “yessing” to those in power. You need all the approval and affection you can garner from those who love and admire your saucy style.`},
             2034: {"year": "Tiger", "element": "Wood", "prediction": `After a couple of slow, but not disastrous years, you will take wing and soar over all you survey. This is your year to rule. You will no doubt adore the power, but you probably will not abuse it as you will be using your superior position to further an ideal – something you are proud of. Do also remember that this year you must plan the next 12 years of your existence. Don’t let the months slip by without sitting down with yourself somewhere quiet and thinking hard about where you want to be in 12 years. Then decide how you want and need to behave in order to reach that goal.`},
             2035: {"year": "Rabbit", "element": "Wood", "prediction": `Cat/Rabbit years are rife with elegance, keen on security, and skittish about conflict. Your naturally hurried style and incorrigible taste for change doesn’t always sit well with the Rabbit’s taste for refinement, which means you will meet with opposition if you attempt to bully your way into anything at all. My advice? Keep your elbows to yourself. Don’t plunge ahead into new adventures without doing some serious planning and plotting beforehand. Romance with a capital “R” will present itself a few times this year. Love will bloom in unexpected places and times.`},
@@ -175,7 +165,7 @@ Tiger with Pig: The basic characters here are vastly different. Pigs are scrupul
         }
     },
     "Rabbit": {
-        "general": `Ah, Virtuous Cat/Rabbit, you seek harmony. You are careful and practice discretion in all things. When you sense a conflict lurching your way, you skitter off and hide.
+        "introduction": `Ah, Virtuous Cat/Rabbit, you seek harmony. You are careful and practice discretion in all things. When you sense a conflict lurching your way, you skitter off and hide.
 
 Distinguished, diplomatic, and well-mannered, you are also as nervous as a cat. Culture and refinement comfort you. You don't hate money either: you know instinctively how to earn and keep your fortune without flash or flaunt. You favor traditional antique furnishings over chrome and glass contemporary. You're a soft-stepping go-getter... ambitious but never aggressive, strong but never rough.
 
@@ -224,13 +214,13 @@ Rabbit/Cat with Pig: This is one of the best possible unions. You and the Pig ar
             2031: {"year": "Pig", "element": "Metal", "prediction": `The Pig admires your discretion and tact. Nonetheless, the year may bring emotional upsets. These will have to do with family and (of course) money. In late Spring, there will either be an inheritance or a gift bestowed on a single family member. If you are the recipient of this good fortune, keep it under your mustache. Boasting by someone less discreet will engender serious fireworks. You hate scenes and will no doubt suffer a panic attack. Excuse yourself and stay gone until tempers have cooled. This year is one of plenty, so you will feel like investing some money. In matters of the heart, the Pig will bless you with a highly-charged, passionate romance with someone you have always known.`},
             2032: {"year": "Rat", "element": "Water", "prediction": `Not the most encouraging of years for you. Why? Because the Rat is jealous of your settled, secure lifestyle and would not in the least mind turning it on its head. Rats love drama and excitement. You prefer safety and time for quiet pursuits. You prefer not to have to fight to get what you want. Rats seek power. Don’t perform any public stunts which will attract attention to you during this sharp-edged year. Your finances could come under some scrutiny from the tax authorities. Better to lie low and while away weekends listening to classical music or polishing your antique clocks.`},
             2033: {"year": "Ox", "element": "Water", "prediction": `In Ox years you Cat/Rabbit people tend to feel out of place. You are not one for slaving. You despise the very notion of toting barges down muddy river banks or lifting bales of cotton. That you might not want to soil your hands or muss your finery in the name of toil gets on the Ox’s nerves. So this year you will have to hide from the taskmaster and expect to be heavily criticized for any unnecessary expressions of snobbism or couth. Your home life should not be seriously affected by the adverse atmosphere. Stay close to family. Putter in your wood shop. Teach yourself to knit or tat or do needlepoint.`},
-            2034: {"year": "Tiger", "element": "Wood", "prediction": `Tiger years are full of hasty, rash moves and risky changes of direction. In the early part of the year, you might still be reeling from what the last couple of adverse years have done to your gentle spirit. Once you are back up on your bunny feet and feeling hippity hop tip-top, you will be pleasantly surprised at how clement, easygoing, and devil-may-care the atmosphere is in this Tiger year. Many of the major events happening this year will affect you directly. A person or people whom you didn’t know till now will approach you at several different times for your assistance or engagement in their projects.`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `Tiger years are full of hasty, rash moves and risky changes of direction. In the early part of the year, you might still be reeling from what the last couple of adverse years have done to your gentle spirit. Once you are back up on your bunny feet and feeling hippity hop tip-top, you will be pleasantly surprised at how clement, easygoing, and devil-may-care the atmosphere is in this Tiger year. Many of the major events happening this year will affect you directly. A person or people whom you didn’t know till now will approach you at several different times for their assistance or engagement in their projects.`},
             2035: {"year": "Rabbit", "element": "Wood", "prediction": `Some details of your romantic life need dealing with. Either you or your significant other is unhappy with certain aspects of your relationship. Are you bored? Is one of you suspicious of the other’s extra-curricular activities? More than likely you have let too many issues be swept under the carpet and now they are oozing out around the fringes. If you (who hate confrontation) cannot discuss the problems at hand, get thee to a counselor and take your sweetheart along for the ride. Financially, you are in better shape than you have been in eons. This is your own very year in which to plan the next dozen years of your life.`},
             2036: {"year": "Dragon", "element": "Fire", "prediction": `The Dragon atmosphere of rambunctious parties and spirited conversation doesn’t do much for you discreet Cat/Rabbit folks. You are always better off in the quiet of your own comfortable home or at a cultural event. The Dragon harbors no grudges against you, but their demands are not few. Dragons want everybody to pay attention to them. Generally, you are too busy thinking up quiet ways to take over a giant corporation or buy a winery in Bordeaux to bother attending all the Dragonesque festivities. This year is yet another good reason to have bought yourself that country retreat. Go there as often as you can.`}
         }
     },
     "Dragon": {
-        "general": `Magnificent Dragon, you are sure of yourself, dynamic, and rarely inconspicuous. You are a born master of ceremonies. Be it fireworks, parties, festivals, holidays, or rallies, you know how to get things started and keep them moving. You're feisty and gifted with power and luck.
+        "introduction": `Magnificent Dragon, you are sure of yourself, dynamic, and rarely inconspicuous. You are a born master of ceremonies. Be it fireworks, parties, festivals, holidays, or rallies, you know how to get things started and keep them moving. You're feisty and gifted with power and luck.
 
 People look up to you. You can be flamboyant—and a bit of a braggart. When you think you are right, you are inflexible. In business, you appear tough. You are canny and not easily duped. But even you, dauntless Dragon, are not invincible. All those flames are mere camouflage. Underneath, you are a soft touch, a pushover. You faint at the sight of a weeping willow. Sentimentality is right under the surface of that scaly green coat, and you cannot resist its maudlin tug.
 
@@ -252,7 +242,7 @@ Dragon with Ox: See Ox with Dragon. Not a good match. Be prepared for late-night
 
 Dragon with Tiger: See Tiger with Dragon. A relationship that bears serious consideration. Your combined strength is almost excessive, and your energy is enough to fuel several large power plants. You both get along well.
 
-Dragon with Rabbit/Cat: This marriage usually proves unfulfilling. Your flamboyant and exaggerated pizzazz does not suit the Rabbit's need for discretion. Your pyrotechnic displays are deemed vulgar by the classy Rabbit, who would rather be at home polishing the silver.
+Dragon with Rabbit/Cat: See Rabbit/Cat. This marriage usually proves unfulfilling. Your flamboyant and exaggerated pizzazz does not suit the Rabbit's need for discretion. Your pyrotechnic displays are deemed vulgar by the classy Rabbit, who would rather be at home polishing the silver.
 
 Dragon with Dragon: This relationship is almost too volatile for any long-term good to come of it. You have here a lifetime battle royal for supremacy. In competitive situations, neither of you can allow the other’s gigantic ego to prevail. Whether it’s a pitched combat over who gets to manage the TV remote or a tussle about who drives the car, the air will always be full of strife. At first, this emotional power play may seem like a love storm of glorious emotion. You are not ill-suited sexually and may have some of the most exciting sex of your lives together. Yet, day-to-day living threatens to be so highly charged and fraught with shouting that one wonders if a few moments of occasional earth-shaking sex is worth it. Two giant, uncompromising, fire-breathing beasts may well be doomed to set each other’s hearts ablaze.
 
@@ -285,7 +275,7 @@ Dragon with Pig: Most Dragon/Pig marriages last forever. You two have just enoug
         }
     },
     "Snake": {
-        "general": `Oh Tempting Snake, how does it feel to be irresistible? It must be super to know that the whole world is intoxicated by you with your bewitching perfume, your silken scarves, and your glamorous accessories. Everybody is in awe of your appearance. And you, in turn, are in awe of how adoring your admirers are. You do so love to please.
+        "introduction": `Oh Tempting Snake, how does it feel to be irresistible? It must be super to know that the whole world is intoxicated by you with your bewitching perfume, your silken scarves, and your glamorous accessories. Everybody is in awe of your appearance. And you, in turn, are in awe of how adoring your admirers are. You do so love to please.
 
 Some think of you as the silent type. But you can be very talkative when there is something important to say. People cherish your sagacious advice. Those seeking peace of mind are drawn to you for counseling and wisdom. You can always tell what's about to happen before it does. One wonders if you receive messages from other realms. If you do, don't fight it. Listen to the spirits and learn.
 
@@ -307,7 +297,7 @@ Snake with Ox: See Ox with Snake. A very good union. You feel cozy in the Ox’s
 
 Snake with Tiger: See Tiger with Snake. A disastrous alliance. You are as different as black and white. Your slow-moving nature will inflict tremendous frustration on the peppy Tiger’s psyche.
 
-Snake with Rabbit/Cat: See Rabbit/Cat. A reciprocally interesting relationship. Both of you have keen minds and are deep thinkers. Should you run into trouble, you can rely on a mutual innate wisdom to steer yourselves out of difficulties.
+Snake with Rabbit/Cat: See Rabbit with Cat. A reciprocally interesting relationship. Both of you have keen minds and are deep thinkers. Should you run into trouble, you can rely on your mutual innate wisdom to steer yourselves out of difficulties.
 
 Snake with Dragon: See Dragon with Snake. A harmonious union. In Chinese astrological parlance, you are considered 'kissin’ cousins.' The Dragon adores sporting a gorgeous partner like you, and you, the quiet and subtle Snake, admire the Dragon’s world-beating flamboyance and style.
 
@@ -340,19 +330,27 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         }
     },
     "Horse": {
-        "general": "PENDING_HORSE_INTRODUCTION",
+        "introduction": `Distinguished Horse, high style is your style. Self-possessed and proud, you dream of cutting your own sweet swath through life, moving mountains and changing the shape of things. You are active and energetic. Yet, unless you feel like it, you may stubbornly refuse to do anything at all. Nobody can make you budge an inch. You're not lazy; you simply do precisely as you please.
+
+Nonetheless, as a Horse person, you are a doer. You are a resolute achiever who cherishes your goals. You fear failure and will slave to save your career. Money is important to you, and you never let sentimentality get in your way. You are even willing to prance over a few cadavers to get what you want out of life.
+
+Passion is the only emotion that can turn your ruthlessness to mush. It may even cause you to give up the keys to your innermost soul, turn your back on family, desert friends, and eradicate your past for the sake of pursuing an idyllic future with the object of your affection. Beware! Such exclusive devotion can be the ruination of your otherwise hardy and practical nature.
+
+Underneath a façade of near dandyism, you are oddly conservative. Your regulation-striped ties may boast a shocking pink background, but they are still regulation-striped ties. Your basic black dress may sport a sexy off-the-shoulder neckline, but it is still basic black. You think of yourself as a solid-citizen straight-arrow person. But verbally, you are outrageous, outspoken, and often out of line. To belong (and despite your rebellious streak, you long to belong) you will spend much of your life learning to control your outbursts. You're snappish and arrogant when riled - and you are frequently riled.
+
+Childhood is easy for you, as kids are expected to be feisty and turbulent. Young adulthood will be a stormy, foot-dragging period. Although fitting in attracts you, responsibility dampens your high spirits. Maturity comes late to you. But once you have your common sense under control, you progress smoothly. Here's a piece of advice: don't break rules. Crime is not your strong suit. Your happiness is in your work.`,
         "elements": {
-            "Wood": `PENDING_HORSE_WOOD`,
-            "Fire": `PENDING_HORSE_FIRE`,
-            "Earth": `PENDING_HORSE_EARTH`,
-            "Metal": `PENDING_HORSE_METAL`,
-            "Water": `PENDING_HORSE_WATER`
+            "Wood": `Perhaps you are the most opinionated of all Horses. Although a sociable, convivial person, you give little quarter to weakness, either in others or in yourself. Governed by the verdant Wood element, you have a tendency to judge others by your own standards, making you intolerant, harsh, and, at times, impossible to get along with. Although you can hardly be considered as giving as Mother Theresa, you are capable of great altruism. You are often known for your generosity towards those less fortunate—but only those you deem worthy of your gifts. You thrive on influencing others and enjoy watching people pull themselves up by their bootstraps. You will gladly help the strong grow stronger but are not apt to sponsor fragile souls who want to depend on you for life. So you are charitable, but not philanthropic. You may suffer from the blinding light of your own brilliance. From birth, you feel different and special. At home and then at school, you are applauded for your fine intelligence and hailed by teachers as more willing to take chances than the other kids. Once out in the world, as a sociable and likeable person, you are again encouraged by the praise of bosses and superiors. You seem to know instinctively how to rise to the top without half trying.`,
+            "Fire": `Oh, la la! You are the hardest sign of all to define. Whatever has previously been said about Horses in general (brilliant, rebellious, attractive, hard-headed, self-centered, socially obsessed, etc.) can now be multiplied tenfold in strength and applied directly to your mystifyingly irascible and lovable personality. You don't do anything by halves. You are a walking magnifying-glass for ordinary experience. In your mind's eye, every tiny gesture is a world-class event, every sigh a howl, every friendly kiss a meaningful experience. You turn every tear into an ocean of sorrow and transform every titter into an uproarious belly laugh. In getting along with you, one can't win for losing. If someone makes any attempt to get close to you, this adorable monster of temperamental behavior, they will end up confused and bewildered. When it comes to talking about yourself, you are a sealed tomb. You are a past master at putting off interlocutors with sullen glares and arch remarks. You place sticks in the spokes of all probing intercourse and stop the wheel before it starts. You are unable to engage in normal discussion or argument.`,
+            "Earth": `In you, the Horse born in an Earth year, we encounter a better-natured and easier-going Horse than the rest. The Earth gives a solid base to your otherwise skittish and nervous Horse nature. You are less impetuous, more level-headed than your brothers. You are a straight-arrow person with sound ideas that you put into practice either alone or under the guidance of some serious higher-ups. You work well in groups and are able to add an aspect of fantasy to even the most mundane work situations. For a Horse, you accept authority graciously. As an employee, you know instinctively how to be innovative and competitive without committing juvenile acts of insubordination. Although you may be excitable, and even inconsistent, generally your work style is positive. Just as you are willing to take orders, you are also able to give them. You handle people well, are never too bossy or critical and, as you have a congenial nature, you are usually well liked. You have fewer problems with relationships than your fellow Horses as you are perhaps the most compassionate and altruistic of them. You are often an artistically talented person whose special gifts preclude the necessity for routine jobs. You would much prefer to be a film director than vice president of a bank. You'd rather do cabaret than work in an office.`,
+            "Metal": `You have outstanding talent and a knack for basking in the spotlight without developing a swelled head. You are adroit, forceful, and combative in your driving ambition to get somewhere in life. People usually think of you as a real “scrapper”, someone who is definitely out there, fists up, armed with a strong personal sense of faith in self. Though not truly pugnacious, you like to remain on the qui vive and rarely let down your guard. You walk tall, which discourages others who might try to get in their way. You might think that this bravura is but a defense to hide sensitivity or lack of confidence, but it is not. You keep a tight rein on your emotions. You must hold yourself in check in order to sustain a dignified and respectable public image. You are always well dressed in a conservative, tasteful manner. You live in the “right” neighborhoods, keeping a swish pied-à-terre in the snootier quarters of the best cities worldwide. You are careful to engage in acceptable, noble, sports activities: tennis, golf, sailing, or fencing. You usually marry people from “good” families, join the poshest clubs, send your kids to the “right” schools, and eat at the “in” restaurants recommended by the “best” critics. Yes, you are a bit of a snob. But you have a solid reason to look down your nose at poor fare and proletarian sports.`,
+            "Water": `Here you are, the most generous of Horses who dotes unconditionally, doles out fabulous gifts, and smothers loved ones with old-fashioned practical favors. You're hospitable, full of good Horsesensical advice, and bubbling with energetic attention. You are superbly intelligent and talented. But you, the Water Horse, are different—mellower, cooler, and more socially inclined than the others. You like to belong, but you don't care if it's the country club; you can settle for belonging to your family or a group of good friends. Because your days are madly busy, you have neither time nor talent for mulling or analysis. Thanks to the Water element, you are not as neurotic, self-involved, nor as angry as other Horses. In fact, you are a real winner. Every young Horse is drawn toward adulthood by a beacon of ambition. Early awareness of the desire to stand out and rise above your environment spurs you to leave your family to make your own way. You are slightly modified. Like other Horses, you also leave home early but you tend to return before the age of thirty, bearing the fruits of your adventures to share your good fortune with the family you left behind.`
         },
-        "compatibilities": `PENDING_HORSE_COMPATIBILITIES`,
-        "futures": `PENDING_HORSE_FUTURES`
+        "compatibilities": "PENDING_HORSE_COMPATIBILITIES",
+        "futures": "PENDING_HORSE_FUTURES"
     },
     "Goat": {
-        "general": `PENDING_GOAT_INTRODUCTION`,
+        "introduction": `PENDING_GOAT_INTRODUCTION`,
         "elements": {
             "Wood": `PENDING_GOAT_WOOD`,
             "Fire": `PENDING_GOAT_FIRE`,
@@ -364,7 +362,7 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         "futures": `PENDING_GOAT_FUTURES`
     },
     "Monkey": {
-        "general": `PENDING_MONKEY_INTRODUCTION`,
+        "introduction": `PENDING_MONKEY_INTRODUCTION`,
         "elements": {
             "Wood": `PENDING_MONKEY_WOOD`,
             "Fire": `PENDING_MONKEY_FIRE`,
@@ -376,7 +374,7 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         "futures": `PENDING_MONKEY_FUTURES`
     },
     "Rooster": {
-        "general": `PENDING_ROOSTER_INTRODUCTION`,
+        "introduction": `PENDING_ROOSTER_INTRODUCTION`,
         "elements": {
             "Wood": `PENDING_ROOSTER_WOOD`,
             "Fire": `PENDING_ROOSTER_FIRE`,
@@ -388,7 +386,7 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         "futures": `PENDING_ROOSTER_FUTURES`
     },
     "Dog": {
-        "general": `PENDING_DOG_INTRODUCTION`,
+        "introduction": `PENDING_DOG_INTRODUCTION`,
         "elements": {
             "Wood": `PENDING_DOG_WOOD`,
             "Fire": `PENDING_DOG_FIRE`,
@@ -400,7 +398,7 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         "futures": `PENDING_DOG_FUTURES`
     },
     "Pig": {
-        "general": `PENDING_PIG_INTRODUCTION`,
+        "introduction": `PENDING_PIG_INTRODUCTION`,
         "elements": {
             "Wood": `PENDING_PIG_WOOD`,
             "Fire": `PENDING_PIG_FIRE`,
@@ -423,5 +421,6 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
     
 
     
+
 
 

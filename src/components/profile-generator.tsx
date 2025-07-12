@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -410,7 +411,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                 <TabsContent value="chinese_zodiac" className="space-y-6">
                      <Card>
                         <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">Your Animal Sign: The {insight.sign}</CardTitle></CardHeader>
-                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.general_desc}</p></CardContent>
+                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.introduction}</p></CardContent>
                     </Card>
                      <Card>
                         <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">The Influence of the {insight.element} Element</CardTitle></CardHeader>

@@ -31,7 +31,7 @@ const AstroInsightOutputSchema = z.object({
   western_sign: z.string().describe('The Western zodiac sign (e.g., "Aries").'),
   element: z.string().describe('The Chinese zodiac element (e.g., "Wood").'),
   sign: z.string().describe('The Chinese zodiac animal sign (e.g., "Dragon").'),
-  general_desc: z.string().describe('A general description of the Chinese animal sign.'),
+  introduction: z.string().describe('A general description of the Chinese animal sign.'),
   elemental_desc: z.string().describe("A description of the element's influence on the sign."),
   compatibilities: z.string().describe("A description of the sign's compatibilities."),
   new_astrology_desc: z.string().describe('A unique, personalized description for the combined New Astrology sign.'),
@@ -85,7 +85,7 @@ const astroInsightFlow = ai.defineFlow(
     const signData = zodiac_data[sign as keyof typeof zodiac_data];
 
     // Check for missing data
-    if (!signData || !signData.general || signData.general.startsWith('PENDING')) {
+    if (!signData || !signData.introduction || signData.introduction.startsWith('PENDING')) {
         throw new Error(`Zodiac data for "${sign}" is incomplete. Please add it to zodiac.ts.`);
     }
 
@@ -113,7 +113,7 @@ const astroInsightFlow = ai.defineFlow(
         western_sign,
         element,
         sign,
-        general_desc: signData.general,
+        introduction: signData.introduction,
         elemental_desc: signData.elements[element as keyof typeof signData.elements],
         compatibilities: signData.compatibilities,
         new_astrology_desc: creativeData.new_astrology_desc,
