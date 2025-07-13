@@ -157,6 +157,11 @@ export const calculateKua = (year: number, gender: string): number => {
       finalKua = gender.toLowerCase() === 'male' ? 2 : 8;
   }
   
+  // Kua can be 0, which should be 9
+  if (finalKua === 0) {
+    finalKua = 9;
+  }
+  
   return finalKua;
 };
 
@@ -247,12 +252,14 @@ export const ARROWS_OF_WEAKNESS = [
 ];
 
 // Defines the shape of the user data object
-interface UserData {
+export interface UserData {
   day: number;
   month: number;
   year: number;
   gender: string;
 }
+
+export type NumerologyData = ReturnType<typeof generateLoShuData>;
 
 /**
  * Generates all numerology data including the Lo Shu Grid and arrows.

@@ -12,14 +12,13 @@ import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass
 import { getAstroInsightAction, personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import { generateLoShuData, ARROWS_OF_STRENGTH, NUMBER_MEANINGS } from '@/lib/numerology';
+import type { NumerologyData } from '@/lib/numerology';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-
-type NumerologyData = ReturnType<typeof generateLoShuData>;
 
 function PersonalizedReading({ reading, numbers }: { reading: string, numbers: number[] }) {
     const [personalizedText, setPersonalizedText] = React.useState('');
@@ -59,29 +58,27 @@ function PersonalizedReading({ reading, numbers }: { reading: string, numbers: n
 const ArrowLine = ({ arrow, present }: { arrow: { name: string; numbers: number[] }; present: boolean }) => {
     if (!present) return null;
   
-    const positions: { [key: number]: string } = {
-      4: 'top-0 left-0', 9: 'top-0 left-1/2', 2: 'top-0 left-full',
-      3: 'top-1/2 left-0', 5: 'top-1/2 left-1/2', 7: 'top-1/2 left-full',
-      8: 'bottom-0 left-0', 1: 'bottom-0 left-1/2', 6: 'bottom-0 left-full'
+    // Grid positions for numbers 1-9 laid out visually
+    const positions: { [key: number]: { x: number; y: number } } = {
+        4: { x: 0, y: 0 }, 9: { x: 1, y: 0 }, 2: { x: 2, y: 0 },
+        3: { x: 0, y: 1 }, 5: { x: 1, y: 1 }, 7: { x: 2, y: 1 },
+        8: { x: 0, y: 2 }, 1: { x: 1, y: 2 }, 6: { x: 2, y: 2 },
     };
 
-    // Special handling for diagonal vs straight lines
-    const start = arrow.numbers[0];
-    const end = arrow.numbers[2];
-
     const getCoords = (num: number) => {
-        const row = Math.floor(Object.keys(positions).indexOf(String(num)) / 3);
-        const col = Object.keys(positions).indexOf(String(num)) % 3;
-        const x = col * 50 + 25;
-        const y = row * 50 + 25;
+        const pos = positions[num];
+        // Center of the cell (cell is 1/3 of viewbox width/height)
+        const cellWidth = 100 / 3;
+        const x = pos.x * cellWidth + cellWidth / 2;
+        const y = pos.y * cellWidth + cellWidth / 2;
         return { x, y };
     }
 
-    const startCoords = getCoords(start);
-    const endCoords = getCoords(end);
+    const startCoords = getCoords(arrow.numbers[0]);
+    const endCoords = getCoords(arrow.numbers[2]);
 
     return (
-        <svg className="absolute top-0 left-0 w-full h-full" style={{ opacity: 0.15 }} viewBox="0 0 100 100" preserveAspectRatio="none">
+        <svg className="absolute top-0 left-0 w-full h-full" style={{ opacity: 0.25 }} viewBox="0 0 100 100" preserveAspectRatio="none">
             <line x1={`${startCoords.x}%`} y1={`${startCoords.y}%`} x2={`${endCoords.x}%`} y2={`${endCoords.y}%`} stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" />
         </svg>
     );
@@ -118,20 +115,21 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                             <div className="grid grid-cols-3 gap-2 size-full">
                                 {numerology.loShuGrid.flat().map((cell, index) => {
                                     const num = [4,9,2,3,5,7,8,1,6][index];
+                                    const numMeaning = NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS];
                                     return(
                                     <Popover key={index}>
                                         <PopoverTrigger asChild disabled={!cell}>
-                                            <div key={index} className={`flex items-center justify-center bg-secondary/50 rounded-md text-xl font-bold text-foreground ${cell ? 'cursor-pointer hover:bg-secondary' : 'cursor-default'}`}>
+                                            <div key={index} className={`flex items-center justify-center bg-secondary/50 rounded-md text-xl font-bold text-foreground aspect-square ${cell ? 'cursor-pointer hover:bg-secondary' : 'cursor-default'}`}>
                                                 {cell || <span className="text-muted-foreground/20">-</span>}
                                             </div>
                                         </PopoverTrigger>
-                                        {cell && (
+                                        {cell && numMeaning && (
                                             <PopoverContent className="w-80">
                                                 <div className="grid gap-4">
                                                 <div className="space-y-2">
-                                                    <h4 className="font-medium leading-none text-primary">Number {num}: {NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS]?.title}</h4>
+                                                    <h4 className="font-medium leading-none text-primary">Number {num}: {numMeaning.title}</h4>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS]?.description}
+                                                        {numMeaning.description}
                                                     </p>
                                                 </div>
                                                 </div>
@@ -214,13 +212,13 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
 }
 
 
-function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData, onReset: () => void }) {
+function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsightOutput, numerology: NumerologyData | null, onReset: () => void }) {
     const currentYear = new Date().getFullYear();
     const futureYears = Object.entries(insight.signData.futures)
       .filter(([year]) => parseInt(year) >= currentYear)
       .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
       
-    const allNumerologyNumbers = numerology.allDigitsForGrid.map(d => parseInt(d));
+    const allNumerologyNumbers = numerology ? numerology.allDigitsForGrid.map(d => parseInt(d)) : [];
 
     return (
         <div className="p-6 bg-secondary/30">
@@ -233,7 +231,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
             <Tabs defaultValue="astro" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
                     <TabsTrigger value="astro" className="py-2"><Sparkles className="mr-2" />Astro Insights</TabsTrigger>
-                    <TabsTrigger value="numerology" className="py-2"><Gem className="mr-2" />Numerology Report</TabsTrigger>
+                    <TabsTrigger value="numerology" className="py-2" disabled={!numerology}><Gem className="mr-2" />Numerology Report</TabsTrigger>
                 </TabsList>
                 <TabsContent value="astro">
                      <Tabs defaultValue="introduction" className="w-full">
@@ -296,7 +294,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                 <TabsContent value="numerology">
                     <ScrollArea className="h-[550px]">
                         <div className="pr-4">
-                            <NumerologyDisplay numerology={numerology} allNumbers={allNumerologyNumbers} />
+                            {numerology && <NumerologyDisplay numerology={numerology} allNumbers={allNumerologyNumbers} />}
                         </div>
                     </ScrollArea>
                 </TabsContent>
@@ -380,7 +378,7 @@ export function ProfileGenerator() {
     return (
         <div>
             <AnimatePresence mode="wait">
-                {insight && numerology ? (
+                {insight ? (
                     <motion.div
                         key="result"
                         initial={{ opacity: 0, y: 20 }}
