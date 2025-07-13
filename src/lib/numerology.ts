@@ -125,10 +125,11 @@ export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string 
         5: "You can be bossy, uncontrollable, and tough to deal with. You may engage in brainless talking which in turn can hurt you & your family members. You are filled with too much energy & joy, but you need to have control over it. You have too much of a desire for enjoyment, exploration, enthusiasm, and a persistent want for change, and you take avoidable risks. Four or five 5s is a very dangerous, accidental combination. You need to slow down in your approach & lifestyle; you should talk through your head, not your hat. Brainless talking can hurt others, willingly or unwillingly."
     },
     6: {
-        1: "Placeholder for one 6",
-        2: "Placeholder for two 6s",
-        3: "Placeholder for three 6s",
-        4: "Placeholder for four 6s",
+        1: "You show love, regard & care for your family, relations & loved ones. You enjoy your home duties & have creative or innovative abilities. You are a DECENT PARENT and provide suggestions in family matters when required. You can be insecure, worried & afraid about being left alone in life (e.g., death of a life partner). You are a lucky person but with narrow-mindedness. You will have financial stability, a good lifestyle with fewer discomforts, if 8 & 1 are also in your chart. If 8 & 1 are not there, then only financial security will be there. You are family-oriented & love to work in an enjoyable & friendly environment.",
+        2: "You are highly creative, but lack self-confidence & believe less in your work & your abilities. You take unnecessary tension for your family & family members, which makes your energy drained/exhausted & hence you feel tired most of the time. You are too stressed all the time because of your thinking style. You are overprotective by nature, hence you keep interfering in the lives of your family members (especially towards your kids). You can provide an obstruction to your children in becoming self-dependent. Your life is filled with creativity, activeness & beauty. You require constant support & encouragement from your family & friends.",
+        3: "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
+        4: "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
+        5: "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen)."
     },
     7: {
         1: "Placeholder for one 7",
@@ -408,4 +409,5 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     kuaAttributes,
   };
 };
+
 
