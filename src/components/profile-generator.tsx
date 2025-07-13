@@ -11,13 +11,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem } from 'lucide-react';
 import { getAstroInsightAction, personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
-import { generateLoShuData, ARROWS_OF_STRENGTH, NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
+import { generateLoShuData } from '@/lib/numerology';
 import type { NumerologyData } from '@/lib/numerology';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 
 function PersonalizedReading({ reading, numbers }: { reading: string, numbers: number[] }) {
@@ -55,39 +54,9 @@ function PersonalizedReading({ reading, numbers }: { reading: string, numbers: n
     );
 }
 
-const ArrowLine = ({ arrow, present }: { arrow: { name: string; numbers: number[] }; present: boolean }) => {
-    if (!present) return null;
-  
-    // Grid positions for numbers 1-9 laid out visually
-    const positions: { [key: number]: { x: number; y: number } } = {
-        4: { x: 0, y: 0 }, 9: { x: 1, y: 0 }, 2: { x: 2, y: 0 },
-        3: { x: 0, y: 1 }, 5: { x: 1, y: 1 }, 7: { x: 2, y: 1 },
-        8: { x: 0, y: 2 }, 1: { x: 1, y: 2 }, 6: { x: 2, y: 2 },
-    };
-
-    const getCoords = (num: number) => {
-        const pos = positions[num];
-        // Center of the cell (cell is 1/3 of viewbox width/height)
-        const cellWidth = 100 / 3;
-        const x = pos.x * cellWidth + cellWidth / 2;
-        const y = pos.y * cellWidth + cellWidth / 2;
-        return { x, y };
-    }
-
-    const startCoords = getCoords(arrow.numbers[0]);
-    const endCoords = getCoords(arrow.numbers[2]);
-
-    return (
-        <svg className="absolute top-0 left-0 w-full h-full" style={{ opacity: 0.25 }} viewBox="0 0 100 100" preserveAspectRatio="none">
-            <line x1={`${startCoords.x}%`} y1={`${startCoords.y}%`} x2={`${endCoords.x}%`} y2={`${endCoords.y}%`} stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" />
-        </svg>
-    );
-};
-
 
 function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyData, allNumbers: number[] }) {
-    const presentArrowNames = numerology.arrowsOfStrength.map(a => a.name);
-
+    
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -113,41 +82,12 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                     <div className="grid grid-cols-1 justify-center">
                         <div className="relative aspect-square w-full max-w-xs mx-auto">
                             <div className="grid grid-cols-3 gap-2 size-full">
-                                {numerology.loShuGrid.flat().map((cell, index) => {
-                                    const num = [4,9,2,3,5,7,8,1,6][index];
-                                    const numMeaning = NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS];
-                                    const count = numerology.numberCounts[num] || 0;
-                                    const repeatedMeaning = REPEATED_NUMBER_MEANINGS[num as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count as keyof typeof REPEATED_NUMBER_MEANINGS[keyof typeof REPEATED_NUMBER_MEANINGS]];
-
-                                    return(
-                                    <Popover key={index}>
-                                        <PopoverTrigger asChild disabled={!cell}>
-                                            <div key={index} className={`flex items-center justify-center bg-secondary/50 rounded-md text-xl font-bold text-foreground aspect-square ${cell ? 'cursor-pointer hover:bg-secondary' : 'cursor-default'}`}>
-                                                {cell || <span className="text-muted-foreground/20">-</span>}
-                                            </div>
-                                        </PopoverTrigger>
-                                        {cell && (numMeaning || repeatedMeaning) && (
-                                            <PopoverContent className="w-80">
-                                                <div className="grid gap-4">
-                                                <div className="space-y-2">
-                                                    {numMeaning && <h4 className="font-medium leading-none text-primary">Number {num}: {numMeaning.title}</h4>}
-                                                    {numMeaning && <p className="text-sm text-muted-foreground">{numMeaning.description}</p>}
-                                                    {repeatedMeaning && (
-                                                        <div className='mt-4'>
-                                                            <h5 className="font-semibold text-primary">Meaning in your chart ({count}x):</h5>
-                                                            <p className="text-sm text-muted-foreground">{repeatedMeaning}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                </div>
-                                            </PopoverContent>
-                                        )}
-                                    </Popover>
-                                )})}
+                                {numerology.loShuGrid.flat().map((cell, index) => (
+                                    <div key={index} className="flex items-center justify-center bg-secondary/50 rounded-md text-xl font-bold text-foreground aspect-square">
+                                        {cell || <span className="text-muted-foreground/20">-</span>}
+                                    </div>
+                                ))}
                             </div>
-                             {ARROWS_OF_STRENGTH.map(arrow => (
-                                <ArrowLine key={arrow.name} arrow={arrow} present={presentArrowNames.includes(arrow.name)} />
-                            ))}
                         </div>
                     </div>
                 </CardContent>
