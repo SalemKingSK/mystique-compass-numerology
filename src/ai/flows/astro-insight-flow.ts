@@ -92,7 +92,7 @@ const astroInsightFlow = ai.defineFlow(
     
     // 1. Determine Zodiac signs
     const western_sign = getWesternZodiacSign(day, month);
-    const { sign, element } = getChineseZodiacSign(year);
+    const { sign, element } = getChineseZodiacSign(day, month, year);
     const new_astrology_sign = `${western_sign}/${sign}`;
 
     // 2. Get the entire data object for that sign
