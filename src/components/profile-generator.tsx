@@ -11,11 +11,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem } from 'lucide-react';
 import { getAstroInsightAction, personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
-import type { generateLoShuData } from '@/lib/numerology';
+import { generateLoShuData, ARROWS_OF_STRENGTH, NUMBER_MEANINGS } from '@/lib/numerology';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 
 type NumerologyData = ReturnType<typeof generateLoShuData>;
 
@@ -28,7 +30,7 @@ function PersonalizedReading({ reading, numbers }: { reading: string, numbers: n
         setIsPersonalizing(true);
         setError('');
         const result = await personalizeReadingAction({ reading, numbers });
-        if (result.success) {
+        if (result.success && result.personalizedReading) {
             setPersonalizedText(result.personalizedReading);
         } else {
             setError(result.error || 'Failed to personalize reading.');
@@ -54,7 +56,41 @@ function PersonalizedReading({ reading, numbers }: { reading: string, numbers: n
     );
 }
 
+const ArrowLine = ({ arrow, present }: { arrow: { name: string; numbers: number[] }; present: boolean }) => {
+    if (!present) return null;
+  
+    const positions: { [key: number]: string } = {
+      4: 'top-0 left-0', 9: 'top-0 left-1/2', 2: 'top-0 left-full',
+      3: 'top-1/2 left-0', 5: 'top-1/2 left-1/2', 7: 'top-1/2 left-full',
+      8: 'bottom-0 left-0', 1: 'bottom-0 left-1/2', 6: 'bottom-0 left-full'
+    };
+
+    // Special handling for diagonal vs straight lines
+    const start = arrow.numbers[0];
+    const end = arrow.numbers[2];
+
+    const getCoords = (num: number) => {
+        const row = Math.floor(Object.keys(positions).indexOf(String(num)) / 3);
+        const col = Object.keys(positions).indexOf(String(num)) % 3;
+        const x = col * 50 + 25;
+        const y = row * 50 + 25;
+        return { x, y };
+    }
+
+    const startCoords = getCoords(start);
+    const endCoords = getCoords(end);
+
+    return (
+        <svg className="absolute top-0 left-0 w-full h-full" style={{ opacity: 0.15 }} viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1={`${startCoords.x}%`} y1={`${startCoords.y}%`} x2={`${endCoords.x}%`} y2={`${endCoords.y}%`} stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" />
+        </svg>
+    );
+};
+
+
 function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyData, allNumbers: number[] }) {
+    const presentArrowNames = numerology.arrowsOfStrength.map(a => a.name);
+
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -77,12 +113,37 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                     <CardTitle className="font-headline text-2xl flex items-center gap-2"><Grid3x3 /> Lo Shu Grid</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
-                        {numerology.loShuGrid.flat().map((cell, index) => (
-                            <div key={index} className="flex items-center justify-center h-20 bg-secondary/50 rounded-md text-xl font-bold text-foreground">
-                                {cell || <span className="text-muted-foreground/20">-</span>}
+                    <div className="grid grid-cols-1 justify-center">
+                        <div className="relative aspect-square w-full max-w-xs mx-auto">
+                            <div className="grid grid-cols-3 gap-2 size-full">
+                                {numerology.loShuGrid.flat().map((cell, index) => {
+                                    const num = [4,9,2,3,5,7,8,1,6][index];
+                                    return(
+                                    <Popover key={index}>
+                                        <PopoverTrigger asChild disabled={!cell}>
+                                            <div key={index} className={`flex items-center justify-center bg-secondary/50 rounded-md text-xl font-bold text-foreground ${cell ? 'cursor-pointer hover:bg-secondary' : 'cursor-default'}`}>
+                                                {cell || <span className="text-muted-foreground/20">-</span>}
+                                            </div>
+                                        </PopoverTrigger>
+                                        {cell && (
+                                            <PopoverContent className="w-80">
+                                                <div className="grid gap-4">
+                                                <div className="space-y-2">
+                                                    <h4 className="font-medium leading-none text-primary">Number {num}: {NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS]?.title}</h4>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS]?.description}
+                                                    </p>
+                                                </div>
+                                                </div>
+                                            </PopoverContent>
+                                        )}
+                                    </Popover>
+                                )})}
                             </div>
-                        ))}
+                             {ARROWS_OF_STRENGTH.map(arrow => (
+                                <ArrowLine key={arrow.name} arrow={arrow} present={presentArrowNames.includes(arrow.name)} />
+                            ))}
+                        </div>
                     </div>
                 </CardContent>
             </Card>
