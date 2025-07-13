@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import type { NumerologyData } from '@/lib/numerology';
@@ -16,9 +16,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
+import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 
 
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
+
+    const numberEntries = Object.entries(numerology.numberCounts)
+        .map(([digit, count]) => ({ digit: parseInt(digit), count }))
+        .filter(item => item.count > 0)
+        .sort((a, b) => a.digit - b.digit);
+        
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -54,6 +61,40 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     </div>
                 </CardContent>
             </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl flex items-center gap-2"><Hash /> Number Meanings</CardTitle>
+                    <CardDescription>Based on the numbers in your Lo Shu Grid.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Accordion type="multiple" className="w-full">
+                        {numberEntries.map(({ digit, count }) => {
+                            const meaningKey = digit as keyof typeof NUMBER_MEANINGS;
+                            const repetitionKey = digit as keyof typeof REPEATED_NUMBER_MEANINGS;
+                            const countKey = Math.min(count, 5) as keyof typeof REPEATED_NUMBER_MEANINGS[typeof repetitionKey];
+
+                            const meaning = NUMBER_MEANINGS[meaningKey];
+                            const repetitionMeaning = REPEATED_NUMBER_MEANINGS[repetitionKey]?.[countKey] || "No specific meaning for this count.";
+                            
+                            return (
+                                <AccordionItem value={`item-${digit}`} key={digit}>
+                                    <AccordionTrigger>
+                                        <div className='flex items-center gap-2'>
+                                            <Badge variant="outline" className='text-base'>{digit}</Badge>
+                                            <span className='font-semibold text-left'>{meaning.title} (appears {count}x)</span>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                       <p className="whitespace-pre-wrap leading-relaxed">{repetitionMeaning}</p>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            )
+                        })}
+                    </Accordion>
+                </CardContent>
+            </Card>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
