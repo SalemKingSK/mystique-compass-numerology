@@ -9,9 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem } from 'lucide-react';
-import { getAstroInsightAction, personalizeReadingAction } from '@/app/actions';
+import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
-import { generateLoShuData } from '@/lib/numerology';
 import type { NumerologyData } from '@/lib/numerology';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,44 +18,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from '@/components/ui/badge';
 
 
-function PersonalizedReading({ reading, numbers }: { reading: string, numbers: number[] }) {
-    const [personalizedText, setPersonalizedText] = React.useState('');
-    const [isPersonalizing, setIsPersonalizing] = React.useState(false);
-    const [error, setError] = React.useState('');
-
-    const handlePersonalize = async () => {
-        setIsPersonalizing(true);
-        setError('');
-        const result = await personalizeReadingAction({ reading, numbers });
-        if (result.success && result.personalizedReading) {
-            setPersonalizedText(result.personalizedReading);
-        } else {
-            setError(result.error || 'Failed to personalize reading.');
-        }
-        setIsPersonalizing(false);
-    };
-
-    return (
-        <div className="mt-2 p-4 border rounded-md bg-secondary/30">
-            <p className="italic text-muted-foreground text-sm">{reading}</p>
-            {personalizedText ? (
-                 <p className="mt-4 font-semibold text-primary">{personalizedText}</p>
-            ) : (
-                <div className="text-center mt-4">
-                    <Button onClick={handlePersonalize} disabled={isPersonalizing} size="sm">
-                        {isPersonalizing ? <Loader2 className="animate-spin" /> : <Sparkles className="mr-2" />}
-                        Personalize this reading for me
-                    </Button>
-                </div>
-            )}
-            {error && <p className="text-destructive text-sm mt-2">{error}</p>}
-        </div>
-    );
-}
-
-
-function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyData, allNumbers: number[] }) {
-    
+function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -103,7 +65,7 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                           <PersonalizedReading reading={arrow.description} numbers={allNumbers} />
+                                           <p className="italic text-muted-foreground text-sm">{arrow.description}</p>
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -165,8 +127,6 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
       .filter(([year]) => parseInt(year) >= currentYear)
       .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
       
-    const allNumerologyNumbers = numerology ? numerology.allDigitsForGrid.map(d => parseInt(d)) : [];
-
     return (
         <div className="p-6 bg-secondary/30">
             <header className="text-center mb-10 pb-6 border-b-2 border-primary/20">
@@ -241,7 +201,7 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                 <TabsContent value="numerology">
                     <ScrollArea className="h-[550px]">
                         <div className="pr-4">
-                            {numerology && <NumerologyDisplay numerology={numerology} allNumbers={allNumerologyNumbers} />}
+                            {numerology && <NumerologyDisplay numerology={numerology} />}
                         </div>
                     </ScrollArea>
                 </TabsContent>
