@@ -209,9 +209,9 @@ export const calculateKua = (year: number, gender: string): number => {
   let isCenturyAfter2000 = year >= 2000;
 
   if (gender.toLowerCase() === 'male') {
-      kuaResult = isCenturyAfter2000 ? 9 - reducedYearSum : 11 - reducedYearSum;
+      kuaResult = isCenturyAfter2000 ? 9 - reducedYearSum : 10 - reducedYearSum;
   } else { // female
-      kuaResult = isCenturyAfter2000 ? reducedYearSum + 6 : reducedYearSum + 4;
+      kuaResult = isCenturyAfter2000 ? reducedYearSum + 6 : reducedYearSum + 5;
   }
 
   let finalKua = reduceToSingleDigit(kuaResult);
@@ -334,14 +334,15 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   // 1. Calculate all core numbers
   const psycheNum = calculatePsyche(day);
   const destinyNum = calculateDestiny(day, month, year);
+  const kuaNum = calculateKua(year, gender);
+
   // We need the original Kua calculation before it's adjusted for '5' to handle special cases
   const rawKua = reduceToSingleDigit(
     gender.toLowerCase() === 'male' 
-      ? (year >= 2000 ? 9 : 11) - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0))
-      : (year >= 2000 ? 6 : 4) + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0))
+      ? (year >= 2000 ? 9 - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)) : 10 - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)))
+      : (year >= 2000 ? 6 + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)) : 5 + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)))
   );
-  const kuaNum = calculateKua(year, gender);
-
+  
   // 2. Get Kua Directions
   let auspiciousDirections;
   // Use the raw, pre-adjustment Kua for Kua 5 gender split
@@ -412,6 +413,7 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     kuaAttributes,
   };
 };
+
 
 
 
