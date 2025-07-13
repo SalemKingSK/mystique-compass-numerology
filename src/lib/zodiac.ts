@@ -1,6 +1,7 @@
 
 
 
+
       
 export const zodiac_data = {
     "Rat": {
@@ -332,7 +333,17 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
         }
     },
     "Horse": {
-        "introduction": `PENDING_HORSE_INTRODUCTION`,
+        "introduction": `Distinguished Horse, high style is your style. Self-possessed and proud, you dream of cutting your own sweet swath through life, moving mountains and changing the shape of things. You are active and energetic. Yet, unless you feel like it, you may stubbornly refuse to do anything at all. Nobody can make you budge an inch. You're not lazy; you simply do precisely as you please.
+
+Nonetheless, as a Horse person, you are a doer. You are a resolute achiever who cherishes your goals. You fear failure and will slave to save your career. Money is important to you, and you never let sentimentality get in your way. You are even willing to prance over a few cadavers to get what you want out of life.
+
+Passion is the only emotion that can turn your ruthlessness to mush. It may even cause you to give up the keys to your innermost soul, turn your back on family, desert friends, and eradicate your past for the sake of pursuing an idyllic future with the object of your affection. Beware! Such exclusive devotion can be the ruination of your otherwise hardy and practical nature.
+
+Underneath a façade of near dandyism, you are oddly conservative. Your regulation-striped ties may boast a shocking pink background, but they are still regulation-striped ties. Your basic black dress may sport a sexy off-the-shoulder neckline, but it is still basic black. You think of yourself as a solid-citizen straight-arrow person. But verbally, you are outrageous, outspoken, and often out of line. To belong (and despite your rebellious streak, you long to belong) you will spend much of your life learning to control your outbursts. You're snappish and arrogant when riled - and you are frequently riled.
+
+Your best mates are devoted Dogs, independent fellow Horses, or complicitous Dragons. You can also be charmed by Goats. Monkeys admire you, but remember—Monkeys can be tricky.
+
+Childhood is easy for you, as kids are expected to be feisty and turbulent. Young adulthood will be a stormy, foot-dragging period. Although fitting in attracts you, responsibility dampens your high spirits. Maturity comes late to you. But once you have your common sense under control, you progress smoothly. Here's a piece of advice: don't break rules. Crime is not your strong suit. Your happiness is in your work.`,
         "elements": {
             "Wood": `PENDING_HORSE_WOOD`,
             "Fire": `PENDING_HORSE_FIRE`,
@@ -341,7 +352,20 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
             "Water": `PENDING_HORSE_WATER`
         },
         "compatibilities": `PENDING_HORSE_COMPATIBILITIES`,
-        "futures": `PENDING_HORSE_FUTURES`
+        "futures": {
+            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_HORSE_FUTURE_SNAKE`},
+            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_HORSE_FUTURE_HORSE`},
+            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_HORSE_FUTURE_GOAT`},
+            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_HORSE_FUTURE_MONKEY`},
+            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_HORSE_FUTURE_ROOSTER`},
+            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_HORSE_FUTURE_DOG`},
+            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_HORSE_FUTURE_PIG`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_HORSE_FUTURE_RAT`},
+            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_HORSE_FUTURE_OX`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_HORSE_FUTURE_TIGER`},
+            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_HORSE_FUTURE_RABBIT`},
+            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_HORSE_FUTURE_DRAGON`}
+        }
     },
     "Goat": {
         "introduction": `PENDING_GOAT_INTRODUCTION`,
@@ -353,7 +377,20 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
             "Water": `PENDING_GOAT_WATER`
         },
         "compatibilities": `PENDING_GOAT_COMPATIBILITIES`,
-        "futures": `PENDING_GOAT_FUTURES`
+        "futures": {
+            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_GOAT_FUTURE_SNAKE`},
+            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_GOAT_FUTURE_HORSE`},
+            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_GOAT_FUTURE_GOAT`},
+            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_GOAT_FUTURE_MONKEY`},
+            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_GOAT_FUTURE_ROOSTER`},
+            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_GOAT_FUTURE_DOG`},
+            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_GOAT_FUTURE_PIG`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_GOAT_FUTURE_RAT`},
+            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_GOAT_FUTURE_OX`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_GOAT_FUTURE_TIGER`},
+            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_GOAT_FUTURE_RABBIT`},
+            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_GOAT_FUTURE_DRAGON`}
+        }
     },
     "Monkey": {
         "introduction": `PENDING_MONKEY_INTRODUCTION`,
@@ -365,7 +402,20 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
             "Water": `PENDING_MONKEY_WATER`
         },
         "compatibilities": `PENDING_MONKEY_COMPATIBILITIES`,
-        "futures": `PENDING_MONKEY_FUTURES`
+        "futures": {
+            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_MONKEY_FUTURE_SNAKE`},
+            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_MONKEY_FUTURE_HORSE`},
+            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_MONKEY_FUTURE_GOAT`},
+            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_MONKEY_FUTURE_MONKEY`},
+            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_MONKEY_FUTURE_ROOSTER`},
+            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_MONKEY_FUTURE_DOG`},
+            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_MONKEY_FUTURE_PIG`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_MONKEY_FUTURE_RAT`},
+            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_MONKEY_FUTURE_OX`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_MONKEY_FUTURE_TIGER`},
+            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_MONKEY_FUTURE_RABBIT`},
+            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_MONKEY_FUTURE_DRAGON`}
+        }
     },
     "Rooster": {
         "introduction": `PENDING_ROOSTER_INTRODUCTION`,
@@ -377,7 +427,20 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
             "Water": `PENDING_ROOSTER_WATER`
         },
         "compatibilities": `PENDING_ROOSTER_COMPATIBILITIES`,
-        "futures": `PENDING_ROOSTER_FUTURES`
+        "futures": {
+            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_SNAKE`},
+            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_HORSE`},
+            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_GOAT`},
+            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_ROOSTER_FUTURE_MONKEY`},
+            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_ROOSTER_FUTURE_ROOSTER`},
+            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_ROOSTER_FUTURE_DOG`},
+            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_ROOSTER_FUTURE_PIG`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_ROOSTER_FUTURE_RAT`},
+            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_ROOSTER_FUTURE_OX`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_TIGER`},
+            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_RABBIT`},
+            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_DRAGON`}
+        }
     },
     "Dog": {
         "introduction": `PENDING_DOG_INTRODUCTION`,
@@ -389,7 +452,20 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
             "Water": `PENDING_DOG_WATER`
         },
         "compatibilities": `PENDING_DOG_COMPATIBILITIES`,
-        "futures": `PENDING_DOG_FUTURES`
+        "futures": {
+            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_DOG_FUTURE_SNAKE`},
+            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_DOG_FUTURE_HORSE`},
+            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_DOG_FUTURE_GOAT`},
+            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_DOG_FUTURE_MONKEY`},
+            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_DOG_FUTURE_ROOSTER`},
+            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_DOG_FUTURE_DOG`},
+            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_DOG_FUTURE_PIG`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_DOG_FUTURE_RAT`},
+            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_DOG_FUTURE_OX`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_DOG_FUTURE_TIGER`},
+            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_DOG_FUTURE_RABBIT`},
+            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_DOG_FUTURE_DRAGON`}
+        }
     },
     "Pig": {
         "introduction": `PENDING_PIG_INTRODUCTION`,
@@ -401,7 +477,20 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
             "Water": `PENDING_PIG_WATER`
         },
         "compatibilities": `PENDING_PIG_COMPATIBILITIES`,
-        "futures": `PENDING_PIG_FUTURES`
+        "futures": {
+            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_PIG_FUTURE_SNAKE`},
+            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_PIG_FUTURE_HORSE`},
+            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_PIG_FUTURE_GOAT`},
+            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_PIG_FUTURE_MONKEY`},
+            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_PIG_FUTURE_ROOSTER`},
+            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_PIG_FUTURE_DOG`},
+            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_PIG_FUTURE_PIG`},
+            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_PIG_FUTURE_RAT`},
+            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_PIG_FUTURE_OX`},
+            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_PIG_FUTURE_TIGER`},
+            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_PIG_FUTURE_RABBIT`},
+            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_PIG_FUTURE_DRAGON`}
+        }
     },
 };
 
@@ -415,6 +504,7 @@ Snake with Pig: The Pig’s nemesis. Chinese sages always advise against this re
     
 
     
+
 
 
 
