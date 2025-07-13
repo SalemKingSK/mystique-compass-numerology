@@ -2,6 +2,7 @@
 
 
 
+
       
 export const zodiac_data = {
     "Rat": {
@@ -345,7 +346,7 @@ Your best mates are devoted Dogs, independent fellow Horses, or complicitous Dra
 
 Childhood is easy for you, as kids are expected to be feisty and turbulent. Young adulthood will be a stormy, foot-dragging period. Although fitting in attracts you, responsibility dampens your high spirits. Maturity comes late to you. But once you have your common sense under control, you progress smoothly. Here's a piece of advice: don't break rules. Crime is not your strong suit. Your happiness is in your work.`,
         "elements": {
-            "Wood": `PENDING_HORSE_WOOD`,
+            "Wood": `Perhaps you are the most opinionated of all Horses. Although a sociable, convivial person, you give little quarter to weakness, either in others or in yourself. Governed by the verdant Wood element, you have a tendency to judge others by your own standards, making you intolerant, harsh, and, at times, impossible to get along with. Although you can hardly be considered as giving as Mother Theresa, you are capable of great altruism. You are often known for your generosity towards those less fortunate—but only those you deem worthy of your gifts. You thrive on influencing others and enjoy watching people pull themselves up by their bootstraps. You will gladly help the strong grow stronger but are not apt to sponsor fragile souls who want to depend on you for life. So you are charitable, but not philanthropic. You may suffer from the blinding light of your own brilliance. From birth, you feel different and special. At home and then at school, you are applauded for your fine intelligence and hailed by teachers as more willing to take chances than the other kids. Once out in the world, as a sociable and likeable person, you are again encouraged by the praise of bosses and superiors. You seem to know instinctively how to rise to the top without half trying.`,
             "Fire": `PENDING_HORSE_FIRE`,
             "Earth": `PENDING_HORSE_EARTH`,
             "Metal": `PENDING_HORSE_METAL`,
@@ -504,6 +505,7 @@ Childhood is easy for you, as kids are expected to be feisty and turbulent. Youn
     
 
     
+
 
 
 
