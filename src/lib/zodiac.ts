@@ -363,7 +363,7 @@ Horse with Horse: Not a perfectly harmonious couple. You are self-centered. Two 
         
 Horse with Goat: This apparently odd combination sometimes works extremely well. You are a strong-minded hard worker. Goats are languorous, creative, and oh-so-dependent. You will always feel protective of the Goat mate. You like to feel superior and Goats know exactly how to inflate your egos. The Goat’s romantic side appeals to your stodgy need to learn about love. Even though your sensitivities are not too similar, you find ethereal Goats decidedly sexy. You complement each other.
         
-Horse with Monkey: A mutual desire to stay abreast of events and mingle in society will constitute the initial attraction between you two. Monkeys are so versatile, imaginative, and amusing that you have trouble resisting their charms. You feel that serious Horses need cheering up and are inspired to make them laugh. You also appreciate the Monkey’s strict sense of duty and ability to endure hard work. Communication may not be your strongest suit. You are guarded and conservative about speaking up on your own behalf. Much tension may build.
+Horse with Monkey: A mutual desire to stay abreast of events and mingle in society will constitute the initial attraction between you two. You are so versatile, imaginative, and amusing that the Horse has trouble resisting your charms. You feel that serious Horses need cheering up and are inspired to make them laugh. The Horse also appreciates your strict sense of duty and ability to endure hard work. Communication may not be your strongest suit. The Horse is guarded and conservative about speaking up on their own behalf. Much tension may build.
         
 Horse with Rooster: Unless stimulated by the right partner, both of you can become stodgy and work-obsessed. This couple would need a professional or family connection in order to be thrown together in the first place. Once together, you will be flattered by the Rooster’s possessive streak, but in time will resent it and dissension will set in. You want to go out and play and the Rooster wants you both safely at home – even if it’s only to share the Sunday crossword puzzle. For this relationship to succeed, you must learn to be less outgoing and the Rooster more tolerant of your need for social interaction.
         
@@ -664,7 +664,7 @@ Rooster with Rabbit/Cat: This couple should think twice before taking the lifelo
 
 Rooster with Dragon: Both passion and glamour are missing from this otherwise well-balanced relationship. It is workable. The Dragon protects with gusto and you obey with a serious intent to do the right thing. Neither of you is ecstatic in this arrangement but, then, neither is blatantly unhappy. You recognize and respect the Dragon's need to shine and to assert superiority over others. Despite your sometimes flamboyant outward appearances, you are a rank conservative. With a brave and daring Dragon partner, you can carry on being quietly cocky while the Dragon plays the conspicuous role. The Dragon’s exorbitant sexual needs, however, may prove overwhelming to your less sensual nature.
 
-Rooster with Snake: A love match if ever I saw one! You are rather bourgeois and conventional. The Snake is esthetic and long to appear attractive at all times. Although, at first glance, it may seem that the Snake is too sophisticated and elegant for your plain-living self, the opposite is true. You and Snakes form some of the best couples. You are both quite secretive and like to keep to yourselves. Yet, when together, you are forever locked in intense discussion and consideration of every detail. Sex should definitely be left up to the seductive Snake. They know how to turn on hesitant Roosters like you and make your bodies sing.
+Rooster with Snake: A love match if ever I saw one! You are rather bourgeois and conventional. The Snake is esthetic and longs to appear attractive at all times. Although, at first glance, it may seem that the Snake is too sophisticated and elegant for your plain-living self, the opposite is true. You and Snakes form some of the best couples. You are both quite secretive and like to keep to yourselves. Yet, when together, you are forever locked in intense discussion and consideration of every detail. Sex should definitely be left up to the seductive Snake. They know how to turn on hesitant Roosters like you and make your bodies sing.
 
 Rooster with Horse: Unless stimulated by the right partner, both of you can become stodgy and work-obsessed. This couple would need a professional or family connection in order to be thrown together in the first place. Once together, the Horse will be flattered by your possessive streak, but in time will resent it and dissension will set in. The Horse wants to go out and play and you want you both safely at home – even if it’s only to share the Sunday crossword puzzle. For this relationship to succeed, the Horse must learn to be less outgoing and you more tolerant of their need for social interaction.
 
@@ -678,22 +678,76 @@ Rooster with Dog: A relationship with potential for deep misunderstanding. You a
 
 Rooster with Pig: A very good and stable match. You, the Rooster, bring organization and practicality to the good-natured but sometimes disorganized Pig. The Pig, in turn, brings warmth, generosity, and sensual pleasure into your life. The Pig is not bothered by your critical nature and appreciates your ability to manage finances and practical affairs. You are charmed by the Pig's sincerity and love for comfort and family. This is a complementary pairing where each partner provides what the other lacks, leading to a harmonious and prosperous household.`,
         "futures": {
-            2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_SNAKE`},
-            2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_HORSE`},
-            2027: {"year": "Goat", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_GOAT`},
-            2028: {"year": "Monkey", "element": "Earth", "prediction": `PENDING_ROOSTER_FUTURE_MONKEY`},
-            2029: {"year": "Rooster", "element": "Earth", "prediction": `PENDING_ROOSTER_FUTURE_ROOSTER`},
-            2030: {"year": "Dog", "element": "Metal", "prediction": `PENDING_ROOSTER_FUTURE_DOG`},
-            2031: {"year": "Pig", "element": "Metal", "prediction": `PENDING_ROOSTER_FUTURE_PIG`},
-            2032: {"year": "Rat", "element": "Water", "prediction": `PENDING_ROOSTER_FUTURE_RAT`},
-            2033: {"year": "Ox", "element": "Water", "prediction": `PENDING_ROOSTER_FUTURE_OX`},
-            2034: {"year": "Tiger", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_TIGER`},
-            2035: {"year": "Rabbit", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_RABBIT`},
-            2036: {"year": "Dragon", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_DRAGON`}
+            2025: {
+                year: "Snake",
+                element: "Wood",
+                prediction: `A fantastic year for you! The Snake is one of your best allies. You will feel understood and appreciated. This is a time for intellectual pursuits, strategic planning, and financial success. Your wisdom and analytical skills will be highly valued. It's a great year to form powerful partnerships and to see your long-term plans come to fruition. Romance is also favored, as you and the Snake share a deep intellectual connection.`
+            },
+            2026: {
+                year: "Horse",
+                element: "Fire",
+                prediction: `A challenging year that requires you to be more flexible. The independent and fast-paced Horse will find your need for order and control to be restrictive. You will feel that events are moving too quickly and chaotically. It's not a good time to be overly critical or rigid. Your challenge is to adapt to the changing circumstances without getting flustered. Focus on your work and try to go with the flow.`
+            },
+            2027: {
+                year: "Goat",
+                element: "Fire",
+                prediction: `This will be a frustrating year. The dreamy and disorganized Goat will test your patience. You will feel that you are surrounded by incompetence and a lack of practicality. Your attempts to bring order will be met with passive resistance. It's a year to focus on your own projects and not expect much from others. Financial matters require your strict attention, as others may be careless with your resources.`
+            },
+            2028: {
+                year: "Monkey",
+                element: "Earth",
+                prediction: `A stimulating and productive year. You and the Monkey can form a powerful team. The Monkey's brilliant ideas combined with your organizational skills can lead to great success. Be prepared for a fast pace and lots of activity. It's an excellent year for business and for launching innovative projects. However, be wary of the Monkey's tendency to cut corners; your attention to detail will be crucial.`
+            },
+            2029: {
+                year: "Rooster",
+                element: "Earth",
+                prediction: `This is your own year, a time of power but also responsibility. Your leadership skills will be in the spotlight. It's a time to take charge and implement your plans. However, you must be careful not to become overly dictatorial or critical of others. It is a year to plan for your long-term future and to build a solid foundation. Your hard work will be recognized, but you must lead with confidence, not arrogance.`
+            },
+            2030: {
+                year: "Dog",
+                element: "Metal",
+                prediction: `A year of potential conflict. The idealistic Dog may find you to be too pragmatic and critical. You will clash over principles and methods. The Dog's focus on justice can seem impractical to you, while your focus on efficiency can seem cold to the Dog. It's a time to practice tolerance and try to understand different points of view. Avoid arguments over small details.`
+            },
+            2031: {
+                year: "Pig",
+                element: "Metal",
+                prediction: `A pleasant and prosperous year. The good-natured Pig appreciates your hard work and organizational skills. You will feel valued and supported. It's a great year for finances and for enjoying the fruits of your labor. The Pig's influence brings warmth and joy to your home life. It's a good time to relax a little and enjoy a more comfortable and leisurely pace.`
+            },
+            2032: {
+                year: "Rat",
+                element: "Water",
+                prediction: `A difficult year that will test your patience. The ambitious Rat will see you as a competitor. There will be power struggles and arguments over money and control. The Rat's clever schemes will irritate your sense of order and honesty. It is crucial to be on your guard in business dealings and not let the Rat take advantage of you. You will feel your authority is being challenged at every turn.`
+            },
+            2033: {
+                year: "Ox",
+                element: "Water",
+                prediction: `An excellent year for you. The hardworking and reliable Ox is your best ally. Your shared values of diligence, order, and practicality will create a very productive and harmonious environment. It's a fantastic time for career advancement and financial stability. Your efforts will be rewarded, and you will find great satisfaction in your work. A very solid and successful year.`
+            },
+            2034: {
+                year: "Tiger",
+                element: "Wood",
+                prediction: `A year of tension. The powerful Tiger does not like your critical nature and will not tolerate being managed. You, in turn, will find the Tiger's rebellious streak to be irresponsible and chaotic. It's best to keep a low profile and avoid direct confrontation. Focus on your own responsibilities and don't try to control the Tiger's actions. It's a time for careful navigation, not for making bold moves.`
+            },
+            2035: {
+                year: "Rabbit",
+                element: "Wood",
+                prediction: `This is your opposite sign, and the year will be very challenging. The sensitive Rabbit will be deeply wounded by your direct and critical nature. You will find the Rabbit to be impractical and indecisive. Expect conflicts at home and at work. It is a year that will demand a great deal of patience and tolerance from you. Avoid making any major life changes or financial commitments.`
+            },
+            2036: {
+                year: "Dragon",
+                element: "Fire",
+                prediction: `A good year for partnership. The magnificent Dragon appreciates your practical skills and ability to manage details, which allows the Dragon to focus on the big picture. You, in turn, can benefit from the Dragon's power and influence. It's a great year for collaboration and achieving shared goals. While you are not the one in the spotlight, you will be the essential power behind the throne.`
+            }
         }
     },
     "Dog": {
-        "introduction": `PENDING_DOG_INTRODUCTION`,
+        "introduction": `Honorable Dog, you are the conscience of the zodiac. You are loyal, faithful, and true. You have a deep sense of justice and are always on the side of the underdog. You are an honest and straightforward person, and you expect the same from others. You are not materialistic; you are motivated by ideals and a desire to make the world a better place.
+
+You are a natural worrier. You are prone to anxiety and can see the negative side of any situation. This pessimism, however, is what makes you such a keen observer and a brilliant critic. Nothing escapes your sharp eye. You are an intellectual with a deep, philosophical mind.
+
+In love, you are a devoted and protective partner. You need a mate who can provide you with the emotional security you crave and who understands your need for a quiet, stable home life. You are most compatible with the independent Horse and the powerful Tiger. The gentle Rabbit/Cat also makes an excellent companion. Avoid the magnificent Dragon and the artistic Goat.
+
+Your life will be one of constant struggle, as you are always fighting for a cause. But your integrity and loyalty will earn you the respect and admiration of many. You will find your greatest happiness in service to others. My advice? Learn to worry a little less and trust a little more. The world is not as bad as you sometimes think it is.`,
         "elements": {
             "Wood": `PENDING_DOG_WOOD`,
             "Fire": `PENDING_DOG_FIRE`,
@@ -749,3 +803,4 @@ Rooster with Pig: A very good and stable match. You, the Rooster, bring organiza
 
 
     
+
