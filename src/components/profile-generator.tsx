@@ -186,17 +186,6 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                         </ScrollArea>
                     </Tabs>
 
-                    <Card className="mt-6">
-                        <CardHeader><CardTitle className="font-headline text-2xl border-b pb-3">AI Generated Reading</CardTitle></CardHeader>
-                        <CardContent className="pt-4">
-                            <p className="whitespace-pre-wrap leading-relaxed">{insight.reading}</p>
-                            <div className="flex justify-around mt-4 text-center">
-                                <div><span className="text-muted-foreground">Lucky Number</span><br/><span className="font-bold text-primary text-xl">{insight.luckyNumber}</span></div>
-                                <div><span className="text-muted-foreground">Lucky Color</span><br/><span className="font-bold text-primary text-xl">{insight.luckyColor}</span></div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
                 </TabsContent>
                 <TabsContent value="numerology">
                     <ScrollArea className="h-[550px]">

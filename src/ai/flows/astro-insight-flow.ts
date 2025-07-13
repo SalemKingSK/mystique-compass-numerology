@@ -8,10 +8,9 @@
  * - AstroInsightOutput - The return type for the getAstroInsight function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { z } from 'genkit';
 import { zodiac_data } from '@/lib/zodiac';
-import {getChineseZodiacSign, getWesternZodiacSign} from '@/lib/astrology';
+import { getChineseZodiacSign, getWesternZodiacSign } from '@/lib/astrology';
 
 const AstroInsightInputSchema = z.object({
   name: z.string().describe('The full name of the person.'),
@@ -51,43 +50,6 @@ const AstroInsightOutputSchema = z.object({
 export type AstroInsightOutput = z.infer<typeof AstroInsightOutputSchema>;
 
 export async function getAstroInsight(input: AstroInsightInput): Promise<AstroInsightOutput> {
-  return astroInsightFlow(input);
-}
-
-// This is the schema for the AI prompt, which only generates the creative parts.
-const CreativePromptInputSchema = z.object({
-    name: z.string(),
-    western_sign: z.string(),
-    chinese_sign: z.string(),
-    element: z.string(),
-    new_astrology_sign: z.string(),
-});
-
-const CreativePromptOutputSchema = z.object({
-    reading: z.string().describe('A simple, AI-powered astrological reading for the person.'),
-    luckyNumber: z.number().describe('A lucky number for the person.'),
-    luckyColor: z.string().describe('A lucky color for the person.'),
-});
-
-// This prompt is ONLY for generating creative content.
-const creativePrompt = ai.definePrompt({
-  name: 'astroCreativePrompt',
-  input: {schema: CreativePromptInputSchema},
-  output: {schema: CreativePromptOutputSchema},
-  model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are an expert astrologer. For the person named {{{name}}}, who is a {{{new_astrology_sign}}} ({{{western_sign}}} and {{{element}}} {{{chinese_sign}}}), generate the following:
-1. A simple, AI-powered astrological reading.
-2. A lucky number.
-3. A lucky color.`,
-});
-
-const astroInsightFlow = ai.defineFlow(
-  {
-    name: 'astroInsightFlow',
-    inputSchema: AstroInsightInputSchema,
-    outputSchema: AstroInsightOutputSchema,
-  },
-  async (input) => {
     const { year, month, day, name } = input;
     
     // 1. Determine Zodiac signs
@@ -102,31 +64,17 @@ const astroInsightFlow = ai.defineFlow(
       throw new Error(`No zodiac data found for sign: ${sign}`);
     }
     
-    // 3. Generate creative content in parallel.
-    const creativeResult = await creativePrompt({
-        name,
-        western_sign,
-        chinese_sign: sign,
-        element,
-        new_astrology_sign,
-    });
-    const { output: creativeData } = creativeResult;
-
-    if (!creativeData) {
-        throw new Error('Failed to generate creative content from the AI model.');
-    }
-
-    // 4. Combine deterministic data, zodiac data, and AI-generated creative data.
+    // 3. Return combined data without AI generation.
     return {
         name,
         western_sign,
         new_astrology_sign,
         sign,
         element,
-        reading: creativeData.reading,
-        luckyNumber: creativeData.luckyNumber,
-        luckyColor: creativeData.luckyColor,
+        // Provide empty values for the removed AI fields
+        reading: '',
+        luckyNumber: 0,
+        luckyColor: '',
         signData: signData,
     };
-  }
-);
+}
