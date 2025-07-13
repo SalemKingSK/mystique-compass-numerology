@@ -8,7 +8,7 @@
  * - AstroInsightOutput - The return type for the getAstroInsight function.
  */
 
-import { z } from 'genkit';
+import { z } from 'zod';
 import { zodiac_data } from '@/lib/zodiac';
 import { getChineseZodiacSign, getWesternZodiacSign } from '@/lib/astrology';
 
