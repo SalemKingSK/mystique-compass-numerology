@@ -127,33 +127,38 @@ export const CHINESE_CALENDAR = [
     { year: 2025, 'sign': 'Snake', 'element': 'Wood', start: [1, 29] },
 ];
 
-// Now also replace the old zodiac calculation function with this new, simpler one.
+// The new, corrected, and simple calculation function.
+// This replaces the old getChineseZodiacSign function.
 export const getChineseZodiacSign = (day: number, month: number, year: number) => {
-  let zodiacYear = year;
+  // Find the Chinese New Year (CNY) date for the user's birth year.
+  const cnyEntryForBirthYear = CHINESE_CALENDAR.find(entry => entry.year === year);
 
-  // Find the entry for the birth year
-  const yearEntry = CHINESE_CALENDAR.find(entry => entry.year === year);
-  
-  if (yearEntry) {
-    const cnyMonth = yearEntry.start[0];
-    const cnyDay = yearEntry.start[1];
-    
-    // If born before the Chinese New Year of that year, use the previous year's sign
+  let effectiveZodiacYear = year;
+
+  // If we have an entry for the birth year, check if the birth date is before that year's CNY.
+  if (cnyEntryForBirthYear) {
+    const cnyMonth = cnyEntryForBirthYear.start[0];
+    const cnyDay = cnyEntryForBirthYear.start[1];
+
+    // If born before this year's CNY, the effective zodiac year is the previous year.
     if (month < cnyMonth || (month === cnyMonth && day < cnyDay)) {
-      zodiacYear = year - 1;
+      effectiveZodiacYear = year - 1;
     }
-  } else if (year < 1920) {
-    // If the year isn't in the list and it's before our calendar, we can't be sure
-    // For this app's scope, we'll treat it as an unknown for years before 1920
+  } else {
+    // If the year is not in our calendar (out of range), we cannot determine the sign.
     return { sign: 'Unknown', element: 'Unknown' };
   }
-  
-  // Find the final zodiac year in the calendar
-  const finalEntry = CHINESE_CALENDAR.find(entry => entry.year === zodiacYear);
-  
-  if (finalEntry) {
-    return { sign: finalEntry.sign, element: finalEntry.element };
+
+  // Now, find the zodiac sign and element for the determined effective year.
+  const finalZodiacEntry = CHINESE_CALENDAR.find(entry => entry.year === effectiveZodiacYear);
+
+  if (finalZodiacEntry) {
+    return {
+      sign: finalZodiacEntry.sign,
+      element: finalZodiacEntry.element,
+    };
   }
   
+  // Fallback if the effective year is somehow still not found (e.g., trying 1919).
   return { sign: 'Unknown', element: 'Unknown' };
 };
