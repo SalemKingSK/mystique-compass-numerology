@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem } from 'lucide-react';
 import { getAstroInsightAction, personalizeReadingAction } from '@/app/actions';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
-import { generateLoShuData, ARROWS_OF_STRENGTH, NUMBER_MEANINGS } from '@/lib/numerology';
+import { generateLoShuData, ARROWS_OF_STRENGTH, NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 import type { NumerologyData } from '@/lib/numerology';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -116,6 +116,9 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                                 {numerology.loShuGrid.flat().map((cell, index) => {
                                     const num = [4,9,2,3,5,7,8,1,6][index];
                                     const numMeaning = NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS];
+                                    const count = numerology.numberCounts[num] || 0;
+                                    const repeatedMeaning = REPEATED_NUMBER_MEANINGS[num]?.[count];
+
                                     return(
                                     <Popover key={index}>
                                         <PopoverTrigger asChild disabled={!cell}>
@@ -123,14 +126,18 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                                                 {cell || <span className="text-muted-foreground/20">-</span>}
                                             </div>
                                         </PopoverTrigger>
-                                        {cell && numMeaning && (
+                                        {cell && (numMeaning || repeatedMeaning) && (
                                             <PopoverContent className="w-80">
                                                 <div className="grid gap-4">
                                                 <div className="space-y-2">
-                                                    <h4 className="font-medium leading-none text-primary">Number {num}: {numMeaning.title}</h4>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {numMeaning.description}
-                                                    </p>
+                                                    {numMeaning && <h4 className="font-medium leading-none text-primary">Number {num}: {numMeaning.title}</h4>}
+                                                    {numMeaning && <p className="text-sm text-muted-foreground">{numMeaning.description}</p>}
+                                                    {repeatedMeaning && (
+                                                        <div className='mt-4'>
+                                                            <h5 className="font-semibold text-primary">Meaning in your chart ({count}x):</h5>
+                                                            <p className="text-sm text-muted-foreground">{repeatedMeaning}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 </div>
                                             </PopoverContent>

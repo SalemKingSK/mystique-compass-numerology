@@ -17,7 +17,7 @@ export const KUA_DIRECTIONS: { [key: number]: any } = {
     Success: 'S',
     Health: 'N',
     Family: 'SE',
-    'Personal Growth': 'E',
+    'Personal-Growth': 'E', 
   },
   4: {
     Success: 'N',
@@ -88,6 +88,63 @@ export const NUMBER_MEANINGS = {
   7: { title: "Spirituality & Learning", description: "Relates to spirituality, learning, and analysis. It signifies a quest for deeper meaning and truth." },
   8: { title: "Material Success", description: "Associated with material success, power, and finance. It represents ambition, organization, and worldly achievement." },
   9: { title: "Humanitarianism", description: "The number of humanitarianism, idealism, and completion. It represents a love for all mankind and a global consciousness." },
+};
+
+export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string } } = {
+    1: {
+        1: "You find it hard to express your feelings and are often misunderstood. You are an introvert.",
+        2: "You are sharp, patient, and have a good understanding of others' character. You can read people well.",
+        3: "You are talkative, creative, cheerful, and an extrovert. You are full of life.",
+        4: "You are very creative but find it hard to put your ideas into practice. You are a dreamer.",
+    },
+    2: {
+        1: "You have good intuition and are sensitive. You can easily get hurt by others' comments.",
+        2: "You are highly intuitive, sensitive, and intelligent. You possess a sixth sense.",
+        3: "You are a highly sensitive person who often lives in a world of dreams and imagination.",
+        4: "You are often misunderstood and can react unpredictably. You are prone to emotional outbursts.",
+    },
+    3: {
+        1: "You are very creative and have a sharp mind. You have a positive outlook on life.",
+        2: "You have a powerful imagination and a sharp intellect. You are very good at planning.",
+        3: "You are intelligent and have a great imagination, but can be impractical and build castles in the air.",
+        4: "You are over-imaginative and impractical, often living in a fantasy world. You can be naive.",
+    },
+    4: {
+        1: "You are practical, organized, and good with your hands. You prefer action over words.",
+        2: "You are very active and can excel in business. You are good at managing material affairs.",
+        3: "You are a person of action and can be a good artist or technician. You are a hard worker.",
+        4: "You can get involved in too many physical activities, leading to exhaustion. You need to balance work and rest.",
+    },
+    5: {
+        1: "You are determined and have strong willpower. You are emotionally balanced.",
+        2: "You are persistent, daring, and will do anything to achieve your goals. You are a risk-taker.",
+        3: "You are a daredevil and often take risks without thinking. You need to be more cautious.",
+        4: "You are prone to accidents and need to be careful. You often act impulsively.",
+    },
+    6: {
+        1: "You are very creative and have a deep love for your family. You are a natural nurturer.",
+        2: "You are creative but can be very demanding and possessive of your loved ones. You worry a lot.",
+        3: "You are highly creative but also very nervous and anxious about your family. You can be overprotective.",
+        4: "You have a great creative talent but are often worried and insecure. You may face many domestic problems.",
+    },
+    7: {
+        1: "You tend to believe anything you are told and can suffer losses because of it. You are trusting.",
+        2: "You are interested in spirituality and metaphysics. You learn a lot from personal experiences.",
+        3: "You can be deceived by others. You need to be more discerning and less naive.",
+        4: "You may suffer great losses in love, health, and finances. You need to be very careful in your dealings.",
+    },
+    8: {
+        1: "You are very particular about details and have a sharp mind. You are a perfectionist.",
+        2: "You are very observant and have a good memory. You are meticulous in your work.",
+        3: "You are very materialistic and can be cunning. You are always looking for opportunities.",
+        4: "You are restless and always on the move. You find it hard to settle down.",
+    },
+    9: {
+        1: "You are intelligent, idealistic, and have a good memory. You are a humanitarian.",
+        2: "You are very brainy but can be critical of others. You have high standards.",
+        3: "You are very intelligent but can be lost in your own world. You are a deep thinker.",
+        4: "You are a brilliant person but can be impractical and misunderstood by others. You are a visionary.",
+    }
 };
 
 /**
@@ -341,6 +398,7 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     kuaNum,
     loShuGrid: gridLayout,
     allDigitsForGrid: allDigitsForGrid,
+    numberCounts: counts,
     arrowsOfStrength,
     arrowsOfWeakness,
     auspiciousDirections,
