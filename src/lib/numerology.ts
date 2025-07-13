@@ -102,7 +102,7 @@ export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string 
         1: "You are caring & intelligent by nature and are easily hurt by others. You easily understand & gauge people just by looking at them. You can easily distinguish between sincere & insincere people. If only the number 2 is present in the plane, you have an average mindset, but if the other two numbers are also there, you have high intellect. You do well in the philosophical, judicial & literary fields.",
         2: "You are high in Intelligence, Sensitivity & have a double Intuition Level (as 2 appears 2 times). You have an innate ability to get into someone's Mind & Soul. You can easily scan the Mind & Soul of someone & find out about their feelings, motive & purpose. If you only have two 2s in the plane without 4 & 9, it makes you highly skeptical & very negative. This also makes you deprived of positive energy and enthusiasm; the level of Chi or Life Driving Force in you is very weak, which will eventually affect both your physical & mental health. If 4 & 9 are present along with 2, then you will be good at memorizing things & highly intellectual.",
         3: "Having more 2s in your chart makes you more intuitive & sensitive. But sensitivity & intuitiveness are good up to a limit; after a point, these two properties can make a person maniacal. You become too vulnerable or defenseless & are hence easily hurt & affected by others. As a result, you prefer to be alone & aloof, away from the public, to protect yourself from being hurt. You lock yourself in your own mental world as you don't find the people around you in the physical world capable enough to understand you. You become an introvert regardless of your basic behavior and tendencies.",
-        4: "Your patience level is very low. You have a tendency to overreact over issues which are irrelevant & meaningless. Extreme behavioral sensitivity is observed which can lead to self-hurting behavior.",
+        4: "Your patience level is very low. You have a tendency to overreact over issues which are irrelevant & meaningless. Extreme behavioral sensitivity is seen which can lead to self-hurting behavior.",
         5: "This is a rarely found set in a grid. If you have 5, 6, or more 2s with no support from 4 & 9, then the condition will be unfortunate, making your life very difficult to live and adjust to. Too much arrogance in your behavior is seen, along with sarcasm & rudeness. Self-doubt & lack of confidence are also seen. In this century, people can have six 2s in their chart (e.g., 22 Feb 2022).",
     },
     3: {
@@ -193,37 +193,34 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
   return reduceToSingleDigit(sum);
 };
 
-/**
- * Calculates the Kua Number based on year and gender.
- * @param year - The four-digit year of birth.
- * @param gender - 'male' or 'female'.
- * @returns The Kua Number.
- */
+// The corrected function to calculate the Kua Number.
 export const calculateKua = (year: number, gender: string): number => {
+  // Step 1 & 2: Sum the year's digits and reduce to a single digit.
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   const reducedYearSum = reduceToSingleDigit(yearSum);
   
   let kuaResult: number;
-  let isCenturyAfter2000 = year >= 2000;
 
-  if (gender.toLowerCase() === 'male') {
-      kuaResult = isCenturyAfter2000 ? 9 - reducedYearSum : 10 - reducedYearSum;
-  } else { // female
-      kuaResult = isCenturyAfter2000 ? reducedYearSum + 6 : reducedYearSum + 5;
+  // Step 3: Apply the correct formula based on birth century and gender.
+  if (year < 2000) {
+    kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
+  } else {
+    kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
   }
 
+  // Step 4: Perform a final reduction on the result of the formula.
   let finalKua = reduceToSingleDigit(kuaResult);
-  
-  // As per original document, for Kua 5, males default to 2 and females to 8
-  if (finalKua === 5) {
-      finalKua = gender.toLowerCase() === 'male' ? 2 : 8;
-  }
-  
-  // Kua can be 0, which should be 9
+
+  // Kua can be 0 for males born in 2009, 2018 etc which should be 9
   if (finalKua === 0) {
     finalKua = 9;
+  }
+  
+  // Step 5: Apply the Kua 5 exception.
+  if (finalKua === 5) {
+    return gender.toLowerCase() === 'male' ? 2 : 8;
   }
   
   return finalKua;
@@ -337,11 +334,13 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   const kuaNum = calculateKua(year, gender);
 
   // We need the original Kua calculation before it's adjusted for '5' to handle special cases
-  const rawKua = reduceToSingleDigit(
+  let rawKua = reduceToSingleDigit(
     gender.toLowerCase() === 'male' 
-      ? (year >= 2000 ? 9 - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)) : 10 - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)))
-      : (year >= 2000 ? 6 + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)) : 5 + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)))
+      ? (year < 2000 ? 11 - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)) : 9 - reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)))
+      : (year < 2000 ? 4 + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)) : 6 + reduceToSingleDigit(String(year).split('').reduce((acc, d) => acc + parseInt(d, 10), 0)))
   );
+
+  if (rawKua === 0) rawKua = 9;
   
   // 2. Get Kua Directions
   let auspiciousDirections;
@@ -413,6 +412,7 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     kuaAttributes,
   };
 };
+
 
 
 
