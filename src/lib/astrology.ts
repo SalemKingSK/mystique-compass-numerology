@@ -117,7 +117,7 @@ export const CHINESE_CALENDAR = [
     { year: 2015, 'sign': 'Goat', 'element': 'Wood', start: [2, 19] },
     { year: 2016, 'sign': 'Monkey', 'element': 'Fire', start: [2, 8] },
     { year: 2017, 'sign': 'Rooster', 'element': 'Fire', start: [1, 28] },
-    { year: 2018, sign: 'Dog', element: 'Earth', start: [2, 16] }, // Corrected entry
+    { year: 2018, sign: 'Dog', element: 'Earth', start: [2, 16] },
     { year: 2019, 'sign': 'Pig', 'element': 'Earth', start: [2, 5] },
     { year: 2020, 'sign': 'Rat', 'element': 'Metal', start: [1, 25] },
     { year: 2021, 'sign': 'Ox', 'element': 'Metal', start: [2, 12] },
@@ -127,12 +127,10 @@ export const CHINESE_CALENDAR = [
     { year: 2025, 'sign': 'Snake', 'element': 'Wood', start: [1, 29] },
 ];
 
-// The new, corrected, and simple calculation function.
-// This replaces the old getChineseZodiacSign function.
 export const getChineseZodiacSign = (day: number, month: number, year: number) => {
   // Find the Chinese New Year (CNY) date for the user's birth year.
   const cnyEntryForBirthYear = CHINESE_CALENDAR.find(entry => entry.year === year);
-
+  
   let effectiveZodiacYear = year;
 
   // If we have an entry for the birth year, check if the birth date is before that year's CNY.
@@ -145,12 +143,11 @@ export const getChineseZodiacSign = (day: number, month: number, year: number) =
       effectiveZodiacYear = year - 1;
     }
   } else {
-    // If the year is not in our calendar (out of range), we cannot determine the sign.
-    // However, if the birth date is before Feb 4, it's safe to assume it's the previous year's sign.
-    // This is a fallback for edge cases like the missing 2019 start date.
-    if (month === 1 || (month === 2 && day < 4)) {
-        effectiveZodiacYear = year - 1;
-    }
+      // This is a fallback for edge cases like years missing from the calendar
+      // or dates very early in the year before the typical CNY range.
+      if (month === 1 || (month === 2 && day < 4)) {
+          effectiveZodiacYear = year - 1;
+      }
   }
 
   // Now, find the zodiac sign and element for the determined effective year.
@@ -163,6 +160,6 @@ export const getChineseZodiacSign = (day: number, month: number, year: number) =
     };
   }
   
-  // Fallback if the effective year is somehow still not found (e.g., trying 1919).
+  // Fallback if the effective year is somehow still not found (e.g., trying a year before 1920).
   return { sign: 'Unknown', element: 'Unknown' };
 };
