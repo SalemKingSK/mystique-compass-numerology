@@ -286,7 +286,7 @@ Some advice? Be generous with your glory. Try to decline the spotlight when some
         "elements": {
             "Wood": `As a Wood Snake, you are a public speaker, an actor, a skillful communicator, and a presenter of grand-scale ideas. Your exquisite laying out of information guarantees you success. You know instinctively what place in society you want to carve out for yourself. Although you suffer from more than your share of reversals, you will make a million comebacks, returning valiantly to the front lines to begin again. Like all Snakes, you have to fight a tendency to laziness and an exaggerated love of luxury for its own sake, but because of your intense will to reap applause, renown, and great wealth, you will always overcome your negative penchant for sloth. You are a dreamer and often have to force yourself to be practical. But unlike some Snakes who are incapable of disciplining themselves, when it comes to making money, you can be downright pragmatic.`,
             "Fire": `As a deep-thinking Fire Snake, you are not only brilliant; you are power-hungry. When you want to succeed, you are capable of gigantic, masterful strokes which will propel you into the public eye and wipe out the competition. Your will is stronger than that of your fellow Snakes. You can glide in and out of social gatherings with panache, sidling up to important people and turning them to putty with your inimitably slippery charm. You are ruthless, glamorous, and profoundly learned. One drawback to your charm is your unquenchable thirst for sex. Your overactive sensuality is so forceful and directive that you are almost handicapped by it. Sex is omnipresent in your thoughts. Your propensity for promiscuity is so great as to constitute a danger for your personal safety.`,
-            "Earth": `Here, in you, the Earth Snake, is the very lightest of Snakes. The Earth element lends frivolity to your already delicately constructed nature and gives you an extra dose of feminine charm. More than any other, you feed on dreams. You are often lost in reverie and seem to be floating above the clouds. The baser parts of life, such as violence, raw sex, dirt, and poverty, upset you so much that, to survive, you must always remain at a safe remove. Your cozy swarm of illusion serves as a cocoon for your fragile creature's sensitivities and protects you from harsh reality. You are, nevertheless, an intelligent person, full of wild ideas and heady plans. But, no matter how you work, you are not always able to carry through with your plans because of your curious, defeating habit of self-deception. You are a potentially marvelous magician who knows how to twist and turn facts and create your own version of the truth but you often fail to apply this talent to the outside world.`,
+            "Earth": `Here, in you, the Earth Snake, is the very lightest of Snakes. The Earth element lends frivolity to your already delicately constructed nature and gives you an extra dose of feminine charm. More than any other, you feed on dreams. You are often lost in reverie and seem to be floating above the clouds. The baser parts of life, such as violence, raw sex, dirt, and poverty, upset you so much that, to survive, you must always remain at a safe remove. Your cozy swarm of illusion serves as a cocoon for your fragile creature's sensitivities and protects you from harsh reality. You are, nevertheless, an an intelligent person, full of wild ideas and heady plans. But, no matter how you work, you are not always able to carry through with your plans because of your curious, defeating habit of self-deception. You are a potentially marvelous magician who knows how to twist and turn facts and create your own version of the truth but you often fail to apply this talent to the outside world.`,
             "Metal": `You, a Metal Snake, lust after a grand life and an even grander wealth. You are a person with grandiose ideas—you might even say, delusions of grandeur. You are ambitious and want notoriety. You seek to show off your talents to get the attention of the entire world. Because of your searing need for public acclaim, you often succeed at becoming something of a star. The life of a hyper-talented Metal Snake like you is marked by difficulty. You often suffer giant reversals, losing fortunes or loved ones, falling into excesses or cultivating religious foolishness, both of which lead to disaster. But you always pull yourself together and start your quest again. Like all Snakes, because of your deep desire to please and be accepted, you are vulnerable, but you are even more so because you don't hesitate to wear your heart on your sleeve. You melt with joy at the thunderous applause but are unwary of the fickleness behind it.`,
             "Water": `Your claim to fame is your skill at using your intuition. Of course, all Snakes are sensitive and pick up easily on feelings—but Water confers a special talent for intuiting the flavor and tone of even the most subtle of life's situations. Where hints of danger, twinges of fear, or suggestions of sexuality may pass unnoticed under the noses of less perceptive folk, every nuance is picked up by you. You seem able to understand without learning and to know certain things instinctively. Although compassion is the emotion that can be most profoundly felt by you, you are oddly egocentric and quite unable to escape from your golden bubble of preoccupation with yourself long enough to relate to those you might feel sorry for. You are neither a natural care provider nor are you very altruistic. Rather, you sense the way things are moving, then zigzag through the loaded minefields of life, relying solely on your inner radar to guide you. You are wildly imaginative and spend much of your time meditating on new ways to solve old problems.`
         },
@@ -577,67 +577,67 @@ Monkey with Dog: A relationship built on mutual respect. The loyal and idealisti
 
 Monkey with Pig: An interesting and often successful pairing. The good-natured Pig is completely entertained by your antics and is forgiving of your mischievous ways. You are attracted to the Pig's sincerity, generosity, and sensual nature. The Pig provides a comfortable and loving home base from which you can launch your many schemes and adventures. The only danger is that you might take advantage of the Pig's trusting nature. If you can treat the scrupulous Pig with the respect and honesty they deserve, this can be a very happy, fun-loving, and supportive union.`,
         "futures": {
-            2025: {
-                "year": "Snake",
-                "element": "Wood",
-                "prediction": `This is a year for caution. The wise Snake can be a good partner, but their secretive nature may make you suspicious. You will be tempted by many schemes and opportunities, but you must look before you leap. The Snake's influence encourages careful planning, not your usual impulsive action. Be wary of financial deals that seem too good to be true. In love, passion is high, but so is the potential for jealousy and misunderstanding.`
-            },
-            2026: {
-                "year": "Horse",
-                "element": "Fire",
-                "prediction": `A fast-paced and exciting year. You and the Horse share a love for action and society. However, the Horse's straightforwardness can clash with your more complex nature. You will be very busy, with many projects and social events. It's a good year for your career, but be careful not to burn out. Your relationship life may be a bit turbulent, as you'll have to balance your desire for fun with your partner's needs.`
-            },
-            2027: {
-                "year": "Goat",
-                "element": "Fire",
-                "prediction": `A relatively calm and pleasant year. The gentle Goat's influence soothes your restless spirit. It's a wonderful time for creative pursuits, artistic endeavors, and spending quality time with family. Your financial situation should be stable. You may find yourself feeling more domestic than usual. It's a good time to tend to your home and relationships, but you might find the slow pace a little boring at times.`
-            },
-            2028: {
-                "year": "Monkey",
-                "element": "Earth",
-                "prediction": `This is your year! You are in your element, and your natural talents will shine. It's a time of great opportunity, innovation, and success. Your cleverness and strategic thinking will be in high demand. Start new projects, make bold moves, and trust your instincts. It's a year to plan your long-term future. Socially, you will be the life of the party. A fantastic year for both career and personal life, but don't let your confidence turn into arrogance.`
-            },
-            2029: {
-                "year": "Rooster",
-                "element": "Earth",
-                "prediction": `A productive year if you can handle the Rooster's critical eye. The Rooster's practicality and organization can help you turn your brilliant ideas into tangible results. However, you will have to be more disciplined and less mischievous than usual. Expect some criticism, but if you take it constructively, you can achieve a great deal. It's a good year for finances and career advancement through diligence.`
-            },
-            2030: {
-                "year": "Dog",
-                "element": "Metal",
-                "prediction": `This year requires you to be more sincere and less tricky. The idealistic Dog values honesty above all, and your usual schemes will not be well-received. You may feel constrained by the serious atmosphere. It's a good time to get involved in a cause you believe in and use your problem-solving skills for the greater good. Relationships will require more transparency and emotional honesty from you.`
-            },
-            2031: {
-                "year": "Pig",
-                "element": "Metal",
-                "prediction": `A very happy and prosperous year for you! The good-natured Pig finds you endlessly entertaining and is very forgiving of your pranks. It's a time of joy, social success, and good fortune. You will feel loved and appreciated. It's an excellent year for partnerships, both in business and in love. Your financial luck is strong, but try not to take advantage of the Pig's generosity.`
-            },
-            2032: {
-                "year": "Rat",
-                "element": "Water",
-                "prediction": `A fantastic year! The Rat is your best ally, and together you are an unbeatable team. This is a year for success, power, and achieving your goals. Your intelligence and strategic skills will be at their peak. It's a great time to start a business, make investments, and take the lead on important projects. Your social life will be sparkling, and your partnership with a Rat will be especially fruitful.`
-            },
-            2033: {
-                "year": "Ox",
-                "element": "Water",
-                "prediction": `This year will require patience. The hardworking and serious Ox can provide stability, but you will find the pace incredibly slow. Your brilliant ideas may be met with the Ox's stubborn resistance to change. It's a time to focus on steady progress rather than clever shortcuts. If you can respect the Ox's need for order and prove your reliability, you can build a solid foundation for future success.`
-            },
-            2034: {
-                "year": "Tiger",
-                "element": "Wood",
-                "prediction": `A year of high energy and potential conflict. The powerful Tiger is your natural rival. While there is mutual admiration for each other's strengths, there will also be a constant power struggle. You must be very careful not to outsmart or trick the Tiger, as their reaction can be fierce. It's an exciting year full of challenges that will test your cleverness. Avoid direct confrontation and use your strategic skills to navigate carefully.`
-            },
-            2035: {
-                "year": "Rabbit",
-                "element": "Wood",
-                "prediction": `A pleasant but potentially unfulfilling year. The calm and diplomatic Rabbit may find your energy to be too chaotic. You might feel bored by the lack of drama and excitement. It's a good year to focus on your finances and enjoy a more peaceful social life. Your challenge will be to find stimulation in quieter pursuits without disrupting the harmony that the Rabbit cherishes.`
-            },
-            2036: {
-                "year": "Dragon",
-                "element": "Fire",
-                "prediction": `A spectacular year for you! The magnificent Dragon is your other best ally. You admire the Dragon's power and showmanship, and the Dragon adores your brilliant mind. Together, you can achieve incredible things. It's a year for grand projects, public success, and financial gain. You will be in your element, surrounded by excitement and opportunity. A fantastic time for collaboration and partnership.`
-            }
-        }
+    2025: {
+        year: "Snake",
+        element: "Wood",
+        prediction: `This is a year for caution. The wise Snake can be a good partner, but their secretive nature may make you suspicious. You will be tempted by many schemes and opportunities, but you must look before you leap. The Snake's influence encourages careful planning, not your usual impulsive action. Be wary of financial deals that seem too good to be true. In love, passion is high, but so is the potential for jealousy and misunderstanding.`
+    },
+    2026: {
+        year: "Horse",
+        element: "Fire",
+        prediction: `A fast-paced and exciting year. You and the Horse share a love for action and society. However, the Horse's straightforwardness can clash with your more complex nature. You will be very busy, with many projects and social events. It's a good year for your career, but be careful not to burn out. Your relationship life may be a bit turbulent, as you'll have to balance your desire for fun with your partner's needs.`
+    },
+    2027: {
+        year: "Goat",
+        element: "Fire",
+        prediction: `A relatively calm and pleasant year. The gentle Goat's influence soothes your restless spirit. It's a wonderful time for creative pursuits, artistic endeavors, and spending quality time with family. Your financial situation should be stable. You may find yourself feeling more domestic than usual. It's a good time to tend to your home and relationships, but you might find the slow pace a little boring at times.`
+    },
+    2028: {
+        year: "Monkey",
+        element: "Earth",
+        prediction: `This is your year! You are in your element, and your natural talents will shine. It's a time of great opportunity, innovation, and success. Your cleverness and strategic thinking will be in high demand. Start new projects, make bold moves, and trust your instincts. It's a year to plan your long-term future. Socially, you will be the life of the party. A fantastic year for both career and personal life, but don't let your confidence turn into arrogance.`
+    },
+    2029: {
+        year: "Rooster",
+        element: "Earth",
+        prediction: `A productive year if you can handle the Rooster's critical eye. The Rooster's practicality and organization can help you turn your brilliant ideas into tangible results. However, you will have to be more disciplined and less mischievous than usual. Expect some criticism, but if you take it constructively, you can achieve a great deal. It's a good year for finances and career advancement through diligence.`
+    },
+    2030: {
+        year: "Dog",
+        element: "Metal",
+        prediction: `This year requires you to be more sincere and less tricky. The idealistic Dog values honesty above all, and your usual schemes will not be well-received. You may feel constrained by the serious atmosphere. It's a good time to get involved in a cause you believe in and use your problem-solving skills for the greater good. Relationships will require more transparency and emotional honesty from you.`
+    },
+    2031: {
+        year: "Pig",
+        element: "Metal",
+        prediction: `A very happy and prosperous year for you! The good-natured Pig finds you endlessly entertaining and is very forgiving of your pranks. It's a time of joy, social success, and good fortune. You will feel loved and appreciated. It's an excellent year for partnerships, both in business and in love. Your financial luck is strong, but try not to take advantage of the Pig's generosity.`
+    },
+    2032: {
+        year: "Rat",
+        element: "Water",
+        prediction: `A fantastic year! The Rat is your best ally, and together you are an unbeatable team. This is a year for success, power, and achieving your goals. Your intelligence and strategic skills will be at their peak. It's a great time to start a business, make investments, and take the lead on important projects. Your social life will be sparkling, and your partnership with a Rat will be especially fruitful.`
+    },
+    2033: {
+        year: "Ox",
+        element: "Water",
+        prediction: `This year will require patience. The hardworking and serious Ox can provide stability, but you will find the pace incredibly slow. Your brilliant ideas may be met with the Ox's stubborn resistance to change. It's a time to focus on steady progress rather than clever shortcuts. If you can respect the Ox's need for order and prove your reliability, you can build a solid foundation for future success.`
+    },
+    2034: {
+        year: "Tiger",
+        element: "Wood",
+        prediction: `A year of high energy and potential conflict. The powerful Tiger is your natural rival. While there is mutual admiration for each other's strengths, there will also be a constant power struggle. You must be very careful not to outsmart or trick the Tiger, as their reaction can be fierce. It's an exciting year full of challenges that will test your cleverness. Avoid direct confrontation and use your strategic skills to navigate carefully.`
+    },
+    2035: {
+        year: "Rabbit",
+        element: "Wood",
+        prediction: `A pleasant but potentially unfulfilling year. The calm and diplomatic Rabbit may find your energy to be too chaotic. You might feel bored by the lack of drama and excitement. It's a good year to focus on your finances and enjoy a more peaceful social life. Your challenge will be to find stimulation in quieter pursuits without disrupting the harmony that the Rabbit cherishes.`
+    },
+    2036: {
+        year: "Dragon",
+        element: "Fire",
+        prediction: `A spectacular year for you! The magnificent Dragon is your other best ally. You admire the Dragon's power and showmanship, and the Dragon adores your brilliant mind. Together, you can achieve incredible things. It's a year for grand projects, public success, and financial gain. You will be in your element, surrounded by excitement and opportunity. A fantastic time for collaboration and partnership.`
+    }
+},
     },
     "Rooster": {
         "introduction": `Courageous Rooster, you are a born leader. You're cocky and self-assured, and you love to be the center of attention. You are a sharp-witted, well-organized, and meticulous person. You are also a stickler for detail. You believe you know best—and you often do. But you can be a bit of a tyrant. You are outspoken and brutally frank, and you don't suffer fools gladly.
@@ -648,13 +648,35 @@ In love, you are a loyal and devoted partner, though not an overtly romantic one
 
 Your early life will be filled with ups and downs. You will have to work hard to achieve your goals. But your persistence will pay off. Your later years will be blessed with comfort and the respect of your family and community. My advice? Try to be a little less critical of others. A spoonful of sugar helps the medicine go down.`,
         "elements": {
-            "Wood": `PENDING_ROOSTER_WOOD`,
-            "Fire": `PENDING_ROOSTER_FIRE`,
-            "Earth": `PENDING_ROOSTER_EARTH`,
-            "Metal": `PENDING_ROOSTER_METAL`,
-            "Water": `PENDING_ROOSTER_WATER`
-        },
-        "compatibilities": `PENDING_ROOSTER_COMPATIBILITIES`,
+    "Wood": `You, the Wood Rooster, are less rigid and stubborn than your fellow Roosters. The Wood element gives you a more flexible and cooperative nature. You are more open to teamwork and more willing to consider the opinions of others. You are exceptionally honest and have a strong sense of integrity. You thrive in social situations where you can use your excellent communication skills. You have a great desire to do good in the world and may be drawn to professions in social work, education, or public service. You are a reliable and hardworking individual, but you have a tendency to take on too much at once, which can lead to stress and burnout. You need to learn to delegate and not try to solve everyone's problems by yourself.`,
+    "Fire": `As a Fire Rooster, you are the most dynamic, energetic, and dramatic of your kind. You have a powerful personality and a natural flair for leadership. You are highly organized, efficient, and have a talent for managing large-scale projects. The Fire element fuels your ambition and gives you an intense, competitive drive. You are a charismatic public speaker and can inspire others with your passion and confidence. However, you can also be quite high-strung, nervous, and overly dramatic. You have a tendency to be a bit of a perfectionist and can be overly critical of both yourself and others when things don't go exactly according to your plan.`,
+    "Earth": `You are the most practical, efficient, and down-to-earth of all Roosters. The Earth element grounds your natural tendency towards showmanship, making you a meticulous and systematic worker. You are a born administrator and have an extraordinary ability to see a project through from start to finish with great precision. You are an excellent researcher and a stickler for details. You are not a flashy person; you are motivated by a desire to do a job well and earn the respect of your peers. You are persistent and will work tirelessly towards your goals. You are a pillar of the community, known for your reliability and unwavering dedication to the causes you believe in.`,
+    "Metal": `You, the Metal Rooster, are a true workhorse. You are ambitious, analytical, and highly industrious. The Metal element sharpens your already keen mind and gives you a powerful rational and scientific bent. You are a brilliant problem-solver and excel in fields that require detailed analysis and logical reasoning, such as science, medicine, or engineering. You are eloquent and persuasive, but your arguments are always backed by hard facts and data. You can be quite stubborn and opinionated, convinced of the rightness of your own logical conclusions. You are passionate about your work and can be a bit of a perfectionist, holding both yourself and others to very high standards.`,
+    "Water": `The Water element softens your sometimes-abrasive Rooster nature, making you the most intellectual and quietly charming of your sign. You are a brilliant communicator and have a great talent for writing and public speaking. Unlike other Roosters who rely on force, you rely on subtle persuasion and intellectual prowess. You are incredibly energetic and can work tirelessly on projects that capture your imagination, often to the point of exhaustion. You have a keen eye for detail and an obsessive need to root out errors and inconsistencies. This makes you a fantastic editor, scientist, or detective. You are less concerned with appearances than other Roosters and are more focused on intellectual and cultural pursuits.`,
+},
+        "compatibilities": `Rooster with Rat: You and the Rat incessantly peck away at each other. You are equally jealous and possessive, as well as anxious about your combined future. You both want freedom from burdensome responsibility and are forever arguing over money. A racy Rat with an active social calendar turns a possessive Rooster like you green. Crushed by the Rat's frequent absences, you grow insecure and look for new ways to imprison them. Using sex as a weapon, you each deprive the other when you quarrel. The union is shaky, at best.
+
+Rooster with Ox: Should you be lucky enough to have found each other, stay put. Astrologers in China recommend this as one of the best unions ever! Together, your lives will be enhanced by a mixture of easy conviviality and hard-line security. Independently, you can both be equally fussy, nervous, and perfectionist. One might expect this match to come together and self-destruct. But, for some reason, you find peace. This traditional couple lives by the book. You do everything right and you, the Rooster, follow. Not known for passion or folly, your sex life reflects your down-to-earth lifestyle.
+
+Rooster with Tiger: This can be a challenging but ultimately rewarding partnership. You are drawn to the Tiger's power and charisma, and the Tiger respects your sharp mind and organizational skills. However, your critical nature and need for order can clash with the Tiger's rebellious and freedom-loving spirit. You may find the Tiger reckless, while the Tiger finds you too conservative and controlling. If you can learn to appreciate the Tiger's adventurous side and the Tiger can value the stability you provide, you can form a dynamic and successful team.
+
+Rooster with Rabbit/Cat: This couple should think twice before taking the lifelong plunge into matrimony. The sex is mediocre at best. Although you are initially attracted by the haughty Rooster’s natural nobility and aura of reserve, the Rabbit may be misinterpreting your real methods and motives. Basically, you want to be free to roam and race about. The Rabbit likes to stay at home, work long and hard at quiet jobs, and get and stay rich. Lifestyle would quickly become a problem for this pair.
+
+Rooster with Dragon: Both passion and glamour are missing from this otherwise well-balanced relationship. It is workable. The Dragon protects with gusto and you obey with a serious intent to do the right thing. Neither of you is ecstatic in this arrangement but, then, neither is blatantly unhappy. You recognize and respect the Dragon's need to shine and to assert superiority over others. Despite your sometimes flamboyant outward appearances, you are a rank conservative. With a brave and daring Dragon partner, you can carry on being quietly cocky while the Dragon plays the conspicuous role. The Dragon’s exorbitant sexual needs, however, may prove overwhelming to your less sensual nature.
+
+Rooster with Snake: A love match if ever I saw one! You are rather bourgeois and conventional. The Snake is esthetic and long to appear attractive at all times. Although, at first glance, it may seem that the Snake is too sophisticated and elegant for your plain-living self, the opposite is true. You and Snakes form some of the best couples. You are both quite secretive and like to keep to yourselves. Yet, when together, you are forever locked in intense discussion and consideration of every detail. Sex should definitely be left up to the seductive Snake. They know how to turn on hesitant Roosters like you and make your bodies sing.
+
+Rooster with Horse: Unless stimulated by the right partner, both of you can become stodgy and work-obsessed. This couple would need a professional or family connection in order to be thrown together in the first place. Once together, the Horse will be flattered by your possessive streak, but in time will resent it and dissension will set in. The Horse wants to go out and play and you want you both safely at home – even if it’s only to share the Sunday crossword puzzle. For this relationship to succeed, the Horse must learn to be less outgoing and you more tolerant of their need for social interaction.
+
+Rooster with Goat: Not a good match. You are critical, practical, and highly organized. The Goat is a free-spirited dreamer who dislikes schedules and criticism. You will try to organize the Goat's life, which they will resent deeply. The Goat's perceived laziness and emotional sensitivity will irritate your direct and hardworking self. You will find the Goat to be flighty and unreliable, while they will find you to be bossy and insensitive.
+
+Rooster with Monkey: This can be a surprisingly good match. You are organized, practical, and hardworking, which can provide a stable foundation for the Monkey's brilliant but sometimes chaotic energy. The Monkey, in turn, can lighten up your serious nature and introduce you to new ideas and adventures. You admire the Monkey's sharp mind, and the Monkey is impressed by your cleverness. The main challenge will be the Monkey's mischievous nature clashing with your need for order and honesty. If you can respect the Monkey's rules and the Monkey can learn to appreciate your playful spirit, you can form a powerful and successful team.
+
+Rooster with Rooster: A difficult pairing. Two Roosters together can be a case of too many chiefs and not enough Indians. Both of you are opinionated, critical, and convinced that you are right. This can lead to constant arguments and power struggles. You both have high standards and can be very critical of each other's perceived flaws. On the plus side, you share a love for order, hard work, and intellectual pursuits. If you can establish clear boundaries and learn to respect each other's territory, this can be a productive, if not always peaceful, partnership.
+
+Rooster with Dog: A relationship with potential for deep misunderstanding. You are practical and focused on details, while the Dog is idealistic and focused on the big picture. You may see the Dog as an impractical dreamer, while the Dog may see you as a materialistic nitpicker. Your sharp criticism can deeply wound the sensitive Dog. You both have a strong sense of duty, but you apply it in very different areas of life. This can work if you both agree to appreciate your differences and not try to change each other.
+
+Rooster with Pig: A very good and stable match. You, the Rooster, bring organization and practicality to the good-natured but sometimes disorganized Pig. The Pig, in turn, brings warmth, generosity, and sensual pleasure into your life. The Pig is not bothered by your critical nature and appreciates your ability to manage finances and practical affairs. You are charmed by the Pig's sincerity and love for comfort and family. This is a complementary pairing where each partner provides what the other lacks, leading to a harmonious and prosperous household.`,
         "futures": {
             2025: {"year": "Snake", "element": "Wood", "prediction": `PENDING_ROOSTER_FUTURE_SNAKE`},
             2026: {"year": "Horse", "element": "Fire", "prediction": `PENDING_ROOSTER_FUTURE_HORSE`},
