@@ -117,7 +117,7 @@ function NumerologyDisplay({ numerology, allNumbers }: { numerology: NumerologyD
                                     const num = [4,9,2,3,5,7,8,1,6][index];
                                     const numMeaning = NUMBER_MEANINGS[num as keyof typeof NUMBER_MEANINGS];
                                     const count = numerology.numberCounts[num] || 0;
-                                    const repeatedMeaning = REPEATED_NUMBER_MEANINGS[num]?.[count];
+                                    const repeatedMeaning = REPEATED_NUMBER_MEANINGS[num as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count as keyof typeof REPEATED_NUMBER_MEANINGS[keyof typeof REPEATED_NUMBER_MEANINGS]];
 
                                     return(
                                     <Popover key={index}>
