@@ -21,13 +21,15 @@ export const getWesternZodiacSign = (day: number, month: number): string => {
 export const getChineseZodiacSign = (year: number): { sign: string, element: string } => {
   const animals = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
   const elements = ["Wood", "Fire", "Earth", "Metal", "Water"];
-  const epoch = 1924; // A Rat year
+  const epoch = 1924; // A Rat year and a Wood year
   
   const yearDiff = year - epoch;
+
   const signIndex = yearDiff % 12;
   const sign = animals[signIndex >= 0 ? signIndex : signIndex + 12];
   
-  const elementIndex = Math.floor(Math.abs(yearDiff) / 2) % 5;
+  // This formula correctly handles years before and after the epoch.
+  const elementIndex = Math.floor(yearDiff / 2) % 5;
   const element = elements[elementIndex >= 0 ? elementIndex : elementIndex + 5];
 
   return { sign, element };
