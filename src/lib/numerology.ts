@@ -106,10 +106,10 @@ export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string 
         5: "This is a rarely found set in a grid. If you have 5, 6, or more 2s with no support from 4 & 9, then the condition will be unfortunate, making your life very difficult to live and adjust to. Too much arrogance in your behavior is seen, along with sarcasm & rudeness. Self-doubt & lack of confidence are also seen. In this century, people can have six 2s in their chart (e.g., 22 Feb 2022).",
     },
     3: {
-        1: "Placeholder for one 3",
-        2: "Placeholder for two 3s",
-        3: "Placeholder for three 3s",
-        4: "Placeholder for four 3s",
+        1: "You experience STRESS & HURT if there is only one 3. You have a good creative brain with an excellent memory. You are DOWN TO EARTH in your approach towards life and have a POSITIVE MINDSET in achieving any task or goal. You keep inspiring others with your honesty & optimism. You are totally focused on your growth and your goals. You find it DIFFICULT TO DEAL WITH COMPETITIONS.",
+        2: "Intelligence, sensitiveness & intuitiveness are the qualities associated with you. You have a balanced mentality & strong personality. You have good compatibility & an adjusting nature, hence you emerge as a good friend. You can easily sense the motive of other people around you. You develop a concept of life & evolve spiritually with faith & devotion when there is support of 5 & 7. You have an active, imaginative & very creative brain. You enjoy breaking rules or contracts & are strange or unconventional in nature. You can emerge as a path breaker or trend maker. Your power of creativity makes you a trendsetter. You know very well how to control your innovative mind and have the power of projecting expression through words, so you excel professionally as a writer, artist, actor, etc.",
+        3: "You live in an IMAGINARY BUBBLE OR DAYDREAMING STATE. You often find it hard to relate with others and are not a good listener. You can appear self-engaged & isolated. You have brilliant mental ability, but you spend your life in the world of dreams. You can be quarrelsome & unimportant at times. You have potential for clairvoyance & spiritualism.",
+        4: "You can be unrealistic, fearful & over-imaginative (an illusionist). These qualities make it hard for you to function well in everyday life. This combination is rare to find in charts. You are sensitive, imaginative & intuitive in nature, a daydreamer who loves to stick in that world. High intelligence, high intellect, high spirituality & high intuitive abilities are seen if 3 is supported by 5 & 7 in this plane. You can also be intolerant, irresponsible & thoughtless. Other supportive numbers are not of much help in the case of too many 3s."
     },
     4: {
         1: "Placeholder for one 4",
