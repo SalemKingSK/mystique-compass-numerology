@@ -1,3 +1,4 @@
+
 export const zodiac_data = {
     "Rat": {
         "introduction": `Illustrious Rat, you are a lucky one indeed. In China, your sign is very highly prized (and not just for supper). You are power-hungry and know how to 'go for it.' Once you get your claws firmly around an honored position, you hold on for dear life. Leadership becomes you. You are fun-loving and sociable, but your private self is often fidgety and nervous. You feel a need to talk problems through, as getting anxiety off your chest is as good as putting it out of your mind.
@@ -116,7 +117,7 @@ Ox with Pig: Indeed, you two get on famously. The good-natured Pig is so malleab
 
 Of course, some people find you so dashing and plucky that they want to climb aboard and go along for the ride. But you, Tiger dear, are a swashbuckling loner. The top is the only place you want to be. You court danger. The fiercer the enemy, the more dramatic and calamitous the situation, the broader grows your Tigerish grin. Your changeability, disdain for rules, self-sufficiency and devil-may-care jauntiness could be your undoing.
 
-In matters of the heart, you are too demanding. But you certainly aren't boring. You get on best with devoted Dogs, who espouse your causes. Independent Horses will stay off your case and complicitous Dragons find loving you quite scrumptious as well. Monkeys admire you, but remember—Monkeys can be tricky. Whatever you do, don't take up with a tempestuous Tiger like yourself. You are lucky, but not that lucky.
+In matters of the heart, you are too demanding. But you certainly aren't boring. You get on best with devoted Dogs, independent fellow Horses, or complicitous Dragons. You can also be charmed by Goats. Monkeys admire you, but remember—Monkeys can be tricky. Whatever you do, don't take up with a tempestuous Tiger like yourself. You are lucky, but not that lucky.
 
 You'll breeze through your youth. But by the age of thirty-five, half a lifetime's excesses may start to catch up with you. Call yourself to order by forty, and by the time you reach fifty you'll be young again, ready for a productive old age. A piece of advice? Go ahead and take the job as a five-star general, but choose your lieutenants wisely—you’ll be needing lots of loyal counsel.`,
         "elements": {
@@ -370,22 +371,76 @@ Horse with Dog: This is a potentially happy marriage. Providing the cards are pl
         
 Horse with Pig: Poor Piggy! You Horses are notoriously headstrong and willful. The Pig simply cannot say “no” to your winning ways. And even though a right-thinking Horsey like you knows better than to walk all over an acquiescent mate, you cannot help yourself. Because you are often very striking, you attract Pigs in droves. In their turn, Pigs win your heart because they are so willing, generous, and tantalizingly compliant. Sexually, you two are well matched. You find the Pig’s overt sensuality liberating, while Pigs like the forceful side of your sexual nature. This couple can create a sound basis for a felicitous and prosperous family.`,
         "futures": {
-            2025: {"year": "Snake", "element": "Wood", "prediction": `This year is all about quiet contemplation. The Snake's influence encourages you to slow down and look inward. It's a great time for introspection, planning, and finishing projects you've already started. Avoid making any rash decisions, especially in financial matters. Romance might take a backseat to personal growth, but a deeper connection with your current partner is possible if you focus on understanding and communication.`},
-            2026: {"year": "Horse", "element": "Fire", "prediction": `Your year to shine! Energy will be at an all-time high, and opportunities will seem to appear out of nowhere. It's a fantastic time for career advancement, starting new ventures, and taking calculated risks. Your social life will be bustling, and your natural charisma will be irresistible. Be mindful not to burn out; channel your energy wisely. A passionate new romance could begin, or an existing one could be reignited with fiery intensity.`},
-            2027: {"year": "Goat", "element": "Fire", "prediction": `A year of creative flourishing and social harmony. The Goat's gentle energy soothes your restless spirit, making this a wonderful time for artistic pursuits and strengthening bonds with family and friends. You may find yourself more patient and understanding. Financially, it's a stable year, but not one for risky investments. Your love life will be sweet and tender, focusing on emotional connection and shared creativity.`},
-            2028: {"year": "Monkey", "element": "Earth", "prediction": `Expect the unexpected! The Monkey's clever and mischievous energy will bring a whirlwind of activity and new challenges. It's a year to be adaptable and think on your feet. Problem-solving skills will be in high demand, and you could make significant progress by finding unconventional solutions. Be wary of get-rich-quick schemes. Your love life will be playful and exciting, but guard against misunderstandings caused by a lack of clear communication.`},
-            2029: {"year": "Rooster", "element": "Earth", "prediction": `A year to focus on details and organization. The Rooster's meticulous nature will reward hard work and discipline. It's a good time to get your finances in order and to tackle tasks that require precision. You may feel more critical of yourself and others, so practice patience. Your social circle might shrink as you prefer more meaningful interactions. In love, demonstrating your commitment through practical actions will be more important than grand gestures.`},
-            2030: {"year": "Dog", "element": "Metal", "prediction": `A year of loyalty and integrity. The Dog's influence brings a focus on fairness and helping others. You may find yourself drawn to a cause or taking on a protective role for your loved ones. Business partnerships built on trust will thrive. It’s a year for steady progress rather than dramatic leaps. Your love life will be marked by devotion and a deep sense of security. Honesty and open communication are the keys to a happy heart.`},
-            2031: {"year": "Pig", "element": "Metal", "prediction": `A prosperous and sociable year is in store. The Pig's influence brings good fortune and a desire to enjoy the finer things in life. Business can be very successful, and social invitations will abound. It's a time for generosity and celebration. Be mindful of overindulgence. Your relationships will be filled with warmth and good humor. It's a great year to connect with loved ones and make new friends.`},
-            2032: {"year": "Rat", "element": "Water", "prediction": `A challenging year that requires careful navigation. The Rat's competitive energy can clash with your independent spirit, leading to conflicts over control and finances. It's a time to be cautious and avoid power struggles. Lying low and focusing on your own work is the best strategy. A new romantic interest could be tempting but may come with complications. Be wary of letting your passions override your good judgment.`},
-            2033: {"year": "Ox", "element": "Water", "prediction": `Patience is your key to success this year. The Ox's steady, plodding pace will feel slow, but it's a time for building strong foundations. Hard, consistent work will pay off in the long run. Avoid shortcuts and be thorough in all your dealings. Family matters will take precedence, and you'll find comfort in domestic routines. A relationship built on stability and shared values can deepen significantly.`},
-            2034: {"year": "Tiger", "element": "Wood", "prediction": `An exciting and dynamic year lies ahead. The Tiger is a natural ally, and their adventurous spirit will fuel your own. It's a time for bold moves, travel, and taking on new challenges. Your natural leadership will shine, and you can make great strides in your career. Your personal life will be full of passion and excitement. This is a year for living life to the fullest.`},
-            2035: {"year": "Rabbit", "element": "Wood", "prediction": `A peaceful and welcome respite after a hectic year. The Rabbit's calm energy encourages you to slow down and enjoy a more tranquil pace. It's an excellent time for creative pursuits and for cultivating harmony in your home life. Your social life will be more refined and intimate. Financially, it's a stable period for conservative growth. Romance will be gentle and sweet, focused on emotional security.`},
-            2036: {"year": "Dragon", "element": "Fire", "prediction": `A year of high energy and drama. The Dragon's flamboyant style will push you into the spotlight. It's a time for ambitious projects and public recognition. However, you may clash with the Dragon's need to be the center of attention. Avoid ego battles and focus on collaboration. Your love life will be passionate and intense, but be prepared for a few dramatic ups and downs.`}
+            2025: {
+                "year": "Snake",
+                "element": "Wood",
+                "prediction": "The sensuous Snake can be one of your most trusted allies—as long as you can manage to remain faithful. In Snake years, you feel at ease. The political scene is calmer and so you thrive. You are freer to invest your time in travel and even in love. You do not always feel at ease with the Snake’s sometimes shady business dealings, but because you are never directly involved, you feel no need to protest. You benefit from the generally tranquil ambiance of this year and can go on being a hardworking Horsey without being hassled."
+            },
+            2026: {
+                "year": "Horse",
+                "element": "Fire",
+                "prediction": "This is your year to plan for the next dozen years. Take some time off from the racetrack and get out your charts. Decide what you want out of your life and how you can manage to achieve these goals without trampling on every Tom, Dick, and Harry you meet along the way. Your romantic life has probably suffered some setbacks lately. In this, your own year, you can mend fences and perhaps even decide to make a more serious commitment. In any event, the ball is in your court. Play it for all its worth and you will be a happier Horse for it."
+            },
+            2027: {
+                "year": "Goat",
+                "element": "Fire",
+                "prediction": "Goats need you. You need them. The relationship you Horses have with Goat people is based on mutual respect and admiration. You will have a wonderful year. In this period, you may meet someone who can really give your life a positive boost. Your career will profit from the general well-being that permeates your personal life. Everything looks peachy for you in a Goat year."
+            },
+            2028: {
+                "year": "Monkey",
+                "element": "Earth",
+                "prediction": "The Monkey’s influence this year is salutary for you. Monkeys are never at a loss for brilliant new ideas and, in their years, the atmosphere is charged with excitement. You thrive in this heady ambiance and often profit from the Monkey’s sagacity. Do be careful, however, about being taken for a ride. Monkeys are notorious tricksters. So if a “deal” seems too good to be true, it likely is."
+            },
+            2029: {
+                "year": "Rooster",
+                "element": "Earth",
+                "prediction": "Although you feel an affinity for the Rooster's hard-working nature, you resent being told what to do. Roosters always want to run the show. They need order and discipline and find your freewheeling style irresponsible. The tension which reigns in a Rooster year may get on your nerves, but it can also be a fine lesson in self-control. Let me suggest that you just give in. Obey. Do as you are told. Let the Rooster think he or she is in charge. It can’t hurt you and it may help you grow up."
+            },
+            2030: {
+                "year": "Dog",
+                "element": "Metal",
+                "prediction": "One of your most compatible signs is the Dog. You admire each other’s qualities and can get along famously. This Dog year, as a result, will be a fine one for you. There is little you cannot accomplish. The Dog is behind you all the way, helping you to make sound decisions and encouraging your projects. In your love life, the Dog’s influence brings a quieting harmony to what might otherwise be a tempestuous relationship."
+            },
+            2031: {
+                "year": "Pig",
+                "element": "Metal",
+                "prediction": "The Pig and you can make a fine pair. The Pig's sensual nature brings out your romantic side, and your strength gives the Pig a sense of security. This year, expect financial opportunities to present themselves, but be careful not to be overly extravagant. The Pig's influence encourages generosity, but your practical side must keep spending in check. It's a good year for family life and strengthening bonds."
+            },
+            2032: {
+                "year": "Rat",
+                "element": "Water",
+                "prediction": "Be cautious this year. You and the Rat are opposites, and this year will be full of conflict. The Rat's desire for control will clash with your independent spirit. Avoid major financial risks and power struggles at work. It is a year to lie low, focus on personal projects, and not get drawn into the Rat's drama. Your love life may be turbulent as well, as your need for freedom will be tested."
+            },
+            2033: {
+                "year": "Ox",
+                "element": "Water",
+                "prediction": "This will be a trying year. The steady, plodding Ox finds your frantic pace and need for excitement to be disruptive and irresponsible. You will feel hemmed in and criticized. Progress at work may be slow, and you will have to exercise immense patience. Do not try to force change. Instead, use this year to build a solid foundation. Focus on details and prove your reliability. It's a year for diligence, not for galloping ahead."
+            },
+            2034: {
+                "year": "Tiger",
+                "element": "Wood",
+                "prediction": "A fantastic year for you! The Tiger is one of your best allies. The energy is high, adventurous, and full of opportunities. Your creativity will be at a peak, and projects you start now have a high chance of success. It's an excellent time for travel, starting a new business, or taking on a leadership role. Your confidence will be high, and your social life will be vibrant. Romance is also favored."
+            },
+            2035: {
+                "year": "Rabbit",
+                "element": "Wood",
+                "prediction": "This year will be a challenge. The quiet, harmony-seeking Rabbit finds your boisterous nature to be abrasive. You will feel misunderstood and constrained. It is a time for diplomacy, not for bluntness. Your plans may meet with unexpected, quiet resistance. In your finances, be conservative. In your relationships, try to be more sensitive and less demanding. It's a year to practice tact and patience."
+            },
+            2036: {
+                "year": "Dragon",
+                "element": "Fire",
+                "prediction": "An exciting but volatile year. Both you and the Dragon have large egos and a desire to lead. While there is mutual attraction, there will also be power struggles. Be prepared for a year of high drama and intense experiences. Financially, it's a time for bold moves, but the risks are equally high. Your love life will be passionate but expect fireworks and arguments. It’s a year of living large, for better or worse."
+            }
         }
     },
     "Goat": {
-        "introduction": `PENDING_GOAT_INTRODUCTION`,
+        "introduction": `Gentle Goat, you are a veritable gift from the heavens. You are artistic and elegant. Good taste is your middle name. You adore beauty and are a worshiper of harmony. Some say you are too sensitive for your own good, and it’s true that you sometimes give in to bouts of pessimism and self-pity. But underneath that fragile exterior, you are a survivor. You are tenacious and resilient, and you always manage to land on your feet.
+
+You are not, however, what one would call “practical.” You are a dreamer, a visionary. You'd rather be composing a sonata or embroidering a tapestry than balancing a checkbook. Responsibility is not your favorite word. You tend to be a dependent person. You long for a strong, wealthy patron to take care of you, love you, and leave you in peace to pursue your creative endeavors. When you can’t have that, you get moody.
+
+In love, you are a hopeless romantic. You require a partner who is patient, kind, and willing to cater to your whims. You are extremely seductive and know how to get your way. You get along famously with scrupulous Pigs and independent Horses. Your compatibility with the Rabbit/Cat is also excellent. Avoid taking up with a practical Ox or a judgmental Dog.
+
+Your childhood and youth may be fraught with emotional upheaval. Your dependent nature will be tested, and you may suffer heartbreak. But fear not. After thirty, your life will stabilize. You will find your calling and a loving companion who understands your need for both freedom and security. My advice? Stop whining. And for heaven’s sake, learn to change a lightbulb.`,
         "elements": {
             "Wood": `PENDING_GOAT_WOOD`,
             "Fire": `PENDING_GOAT_FIRE`,
