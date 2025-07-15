@@ -9,7 +9,7 @@
  */
 
 import { z } from 'zod';
-import { zodiac_data } from '@/lib/zodiac';
+import { zodiacData } from '@/lib/zodiac';
 import { getChineseZodiacSign, getWesternZodiacSign } from '@/lib/astrology';
 
 const AstroInsightInputSchema = z.object({
@@ -58,8 +58,8 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
     const new_astrology_sign = `${western_sign}/${sign}`;
 
     // 2. Get the entire data object for that sign
-    // The type assertion is safe because our zodiac_data is statically typed.
-    const signData = (zodiac_data as any)[sign];
+    // The type assertion is safe because our zodiacData is statically typed.
+    const signData = (zodiacData as any)[sign];
     if (!signData) {
       throw new Error(`No zodiac data found for sign: ${sign}`);
     }
