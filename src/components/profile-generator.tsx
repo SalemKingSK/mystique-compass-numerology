@@ -228,15 +228,24 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                     </Card>
                                 </TabsContent>
                                 <TabsContent value="future">
-                                    <Card>
-                                        <CardHeader><CardTitle className="font-headline text-2xl">Your Future Years</CardTitle></CardHeader>
-                                        <CardContent className="pt-4 space-y-4">
-                                        {futureYears.map(([year, futureData]) => (
-                                            <div key={year}>
-                                                <h5 className="font-bold text-lg text-primary">{year} - The {futureData.element} {futureData.year} Year</h5>
-                                                <p className="whitespace-pre-wrap text-sm text-muted-foreground mt-1">{futureData.prediction}</p>
-                                            </div>
-                                        ))}
+                                     <Card>
+                                        <CardHeader>
+                                            <CardTitle className="font-headline text-2xl">Your Future Years</CardTitle>
+                                            <CardDescription>Click on a year to see what it holds for you.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="pt-4">
+                                            <Accordion type="single" collapsible className="w-full">
+                                                {futureYears.map(([year, futureData]) => (
+                                                    <AccordionItem value={year} key={year}>
+                                                        <AccordionTrigger>
+                                                            {year} - The {futureData.element} {futureData.year}
+                                                        </AccordionTrigger>
+                                                        <AccordionContent>
+                                                            <p className="whitespace-pre-wrap leading-relaxed">{futureData.prediction}</p>
+                                                        </AccordionContent>
+                                                    </AccordionItem>
+                                                ))}
+                                            </Accordion>
                                         </CardContent>
                                     </Card>
                                 </TabsContent>
@@ -291,7 +300,7 @@ export function ProfileGenerator() {
         setFormData({ name: '', day: '', month: '', year: '', gender: '' });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         const { name, day, month, year, gender } = formData;
