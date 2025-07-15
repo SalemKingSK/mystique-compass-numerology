@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -168,6 +169,8 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
       .filter(([year]) => parseInt(year) >= currentYear)
       .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
       
+    const compatibilitySigns = Object.keys(insight.signData.compatibilities);
+
     return (
         <div className="p-6 bg-secondary/30">
             <header className="text-center mb-10 pb-6 border-b-2 border-primary/20">
@@ -201,13 +204,27 @@ function ResultsDisplay({ insight, numerology, onReset }: { insight: AstroInsigh
                                 <TabsContent value="element">
                                     <Card>
                                         <CardHeader><CardTitle className="font-headline text-2xl">The Influence of the {insight.element} Element</CardTitle></CardHeader>
-                                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.signData.elements[insight.element]}</p></CardContent>
+                                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.signData.elements[insight.element as keyof typeof insight.signData.elements]}</p></CardContent>
                                     </Card>
                                 </TabsContent>
                                 <TabsContent value="compatibilities">
                                     <Card>
-                                        <CardHeader><CardTitle className="font-headline text-2xl">Compatibility</CardTitle></CardHeader>
-                                        <CardContent className="pt-4"><p className="whitespace-pre-wrap leading-relaxed">{insight.signData.compatibilities}</p></CardContent>
+                                        <CardHeader>
+                                            <CardTitle className="font-headline text-2xl">Compatibility with other signs</CardTitle>
+                                            <CardDescription>Click on a sign to see your compatibility report.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Accordion type="single" collapsible className="w-full">
+                                                {compatibilitySigns.map(sign => (
+                                                    <AccordionItem value={sign} key={sign}>
+                                                        <AccordionTrigger>With the {sign}</AccordionTrigger>
+                                                        <AccordionContent>
+                                                            <p className="whitespace-pre-wrap leading-relaxed">{insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]}</p>
+                                                        </AccordionContent>
+                                                    </AccordionItem>
+                                                ))}
+                                            </Accordion>
+                                        </CardContent>
                                     </Card>
                                 </TabsContent>
                                 <TabsContent value="future">
