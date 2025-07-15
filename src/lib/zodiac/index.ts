@@ -25,3 +25,5 @@ export const zodiacData = {
     "Dog": dog,
     "Pig": pig,
 };
+
+  
