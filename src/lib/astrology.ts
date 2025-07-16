@@ -1,3 +1,4 @@
+
 // src/lib/astrology.ts
 
 // Helper function to get the Western Zodiac sign
@@ -17,149 +18,151 @@ export const getWesternZodiacSign = (day: number, month: number): string => {
   return "Capricorn";
 };
 
-// The complete Chinese Calendar data from 1920 to 2025
+// The complete Chinese Calendar data from 1915 to 2036
 export const CHINESE_CALENDAR = [
-    { year: 1920, sign: 'Monkey', element: 'Metal', start: [2, 20] },
-    { year: 1921, sign: 'Rooster', element: 'Metal', start: [2, 8] },
-    { year: 1922, sign: 'Dog', element: 'Water', start: [1, 28] },
-    { year: 1923, sign: 'Pig', element: 'Water', start: [2, 16] },
-    { year: 1924, sign: 'Rat', element: 'Wood', start: [2, 5] },
-    { year: 1925, sign: 'Ox', element: 'Wood', start: [1, 25] },
-    { year: 1926, sign: 'Tiger', element: 'Fire', start: [2, 13] },
-    { year: 1927, sign: 'Rabbit', element: 'Fire', start: [2, 2] },
-    { year: 1928, sign: 'Dragon', element: 'Earth', start: [1, 23] },
-    { year: 1929, sign: 'Snake', element: 'Earth', start: [2, 10] },
-    { year: 1930, sign: 'Horse', element: 'Metal', start: [1, 30] },
-    { year: 1931, sign: 'Goat', element: 'Metal', start: [2, 17] },
-    { year: 1932, sign: 'Monkey', element: 'Water', start: [2, 6] },
-    { year: 1933, sign: 'Rooster', element: 'Water', start: [1, 26] },
-    { year: 1934, sign: 'Dog', element: 'Wood', start: [2, 14] },
-    { year: 1935, sign: 'Pig', element: 'Wood', start: [2, 4] },
-    { year: 1936, sign: 'Rat', element: 'Fire', start: [1, 24] },
-    { year: 1937, sign: 'Ox', element: 'Fire', start: [2, 11] },
-    { year: 1938, sign: 'Tiger', element: 'Earth', start: [1, 31] },
-    { year: 1939, sign: 'Rabbit', element: 'Earth', start: [2, 19] },
-    { year: 1940, sign: 'Dragon', element: 'Metal', start: [2, 8] },
-    { year: 1941, sign: 'Snake', element: 'Metal', start: [1, 27] },
-    { year: 1942, sign: 'Horse', element: 'Water', start: [2, 15] },
-    { year: 1943, sign: 'Goat', element: 'Water', start: [2, 5] },
-    { year: 1944, sign: 'Monkey', element: 'Wood', start: [1, 25] },
-    { year: 1945, sign: 'Rooster', element: 'Wood', start: [2, 13] },
-    { year: 1946, sign: 'Dog', element: 'Fire', start: [2, 2] },
-    { year: 1947, sign: 'Pig', element: 'Fire', start: [1, 22] },
-    { year: 1948, sign: 'Rat', element: 'Earth', start: [2, 10] },
-    { year: 1949, sign: 'Ox', element: 'Earth', start: [1, 29] },
-    { year: 1950, sign: 'Tiger', element: 'Metal', start: [2, 17] },
-    { year: 1951, sign: 'Rabbit', element: 'Metal', start: [2, 6] },
-    { year: 1952, sign: 'Dragon', element: 'Water', start: [1, 27] },
-    { year: 1953, sign: 'Snake', element: 'Water', start: [2, 14] },
-    { year: 1954, sign: 'Horse', element: 'Wood', start: [2, 3] },
-    { year: 1955, sign: 'Goat', element: 'Wood', start: [1, 24] },
-    { year: 1956, sign: 'Monkey', element: 'Fire', start: [2, 12] },
-    { year: 1957, sign: 'Rooster', element: 'Fire', start: [1, 31] },
-    { year: 1958, sign: 'Dog', element: 'Earth', start: [2, 18] },
-    { year: 1959, sign: 'Pig', element: 'Earth', start: [2, 8] },
-    { year: 1960, sign: 'Rat', element: 'Metal', start: [1, 28] },
-    { year: 1961, sign: 'Ox', element: 'Metal', start: [2, 15] },
-    { year: 1962, sign: 'Tiger', element: 'Water', start: [2, 5] },
-    { year: 1963, sign: 'Rabbit', element: 'Water', start: [1, 25] },
-    { year: 1964, sign: 'Dragon', element: 'Wood', start: [2, 13] },
-    { year: 1965, sign: 'Snake', element: 'Wood', start: [2, 2] },
-    { year: 1966, sign: 'Horse', element: 'Fire', start: [1, 21] },
-    { year: 1967, sign: 'Goat', element: 'Fire', start: [2, 9] },
-    { year: 1968, sign: 'Monkey', element: 'Earth', start: [1, 30] },
-    { year: 1969, sign: 'Rooster', element: 'Earth', start: [2, 17] },
-    { year: 1970, sign: 'Dog', element: 'Metal', start: [2, 6] },
-    { year: 1971, sign: 'Pig', element: 'Metal', start: [1, 27] },
-    { year: 1972, sign: 'Rat', element: 'Water', start: [2, 15] },
-    { year: 1973, sign: 'Ox', element: 'Water', start: [2, 3] },
-    { year: 1974, sign: 'Tiger', element: 'Wood', start: [1, 23] },
-    { year: 1975, sign: 'Rabbit', element: 'Wood', start: [2, 11] },
-    { year: 1976, sign: 'Dragon', element: 'Fire', start: [1, 31] },
-    { year: 1977, sign: 'Snake', element: 'Fire', start: [2, 18] },
-    { year: 1978, sign: 'Horse', element: 'Earth', start: [2, 7] },
-    { year: 1979, sign: 'Goat', element: 'Earth', start: [1, 28] },
-    { year: 1980, 'sign': 'Monkey', 'element': 'Metal', start: [2, 16] },
-    { year: 1981, 'sign': 'Rooster', 'element': 'Metal', start: [2, 5] },
-    { year: 1982, 'sign': 'Dog', 'element': 'Water', start: [1, 25] },
-    { year: 1983, 'sign': 'Pig', 'element': 'Water', start: [2, 13] },
-    { year: 1984, 'sign': 'Rat', 'element': 'Wood', start: [2, 2] },
-    { year: 1985, 'sign': 'Ox', 'element': 'Wood', start: [2, 20] },
-    { year: 1986, 'sign': 'Tiger', 'element': 'Fire', start: [2, 9] },
-    { year: 1987, 'sign': 'Rabbit', 'element': 'Fire', start: [1, 29] },
-    { year: 1988, 'sign': 'Dragon', 'element': 'Earth', start: [2, 17] },
-    { year: 1989, 'sign': 'Snake', 'element': 'Earth', start: [2, 6] },
-    { year: 1990, 'sign': 'Horse', 'element': 'Metal', start: [1, 27] },
-    { year: 1991, 'sign': 'Goat', 'element': 'Metal', start: [2, 15] },
-    { year: 1992, 'sign': 'Monkey', 'element': 'Water', start: [2, 4] },
-    { year: 1993, 'sign': 'Rooster', 'element': 'Water', start: [1, 23] },
-    { year: 1994, 'sign': 'Dog', 'element': 'Wood', start: [2, 10] },
-    { year: 1995, 'sign': 'Pig', 'element': 'Wood', start: [1, 31] },
-    { year: 1996, 'sign': 'Rat', 'element': 'Fire', start: [2, 19] },
-    { year: 1997, 'sign': 'Ox', 'element': 'Fire', start: [2, 7] },
-    { year: 1998, 'sign': 'Tiger', 'element': 'Earth', start: [1, 28] },
-    { year: 1999, 'sign': 'Rabbit', 'element': 'Earth', start: [2, 16] },
-    { year: 2000, 'sign': 'Dragon', 'element': 'Metal', start: [2, 5] },
-    { year: 2001, 'sign': 'Snake', 'element': 'Metal', start: [1, 24] },
-    { year: 2002, 'sign': 'Horse', 'element': 'Water', start: [2, 12] },
-    { year: 2003, 'sign': 'Goat', 'element': 'Water', start: [2, 1] },
-    { year: 2004, 'sign': 'Monkey', 'element': 'Wood', start: [1, 22] },
-    { year: 2005, 'sign': 'Rooster', 'element': 'Wood', start: [2, 9] },
-    { year: 2006, 'sign': 'Dog', 'element': 'Fire', start: [1, 29] },
-    { year: 2007, 'sign': 'Pig', 'element': 'Fire', start: [2, 18] },
-    { year: 2008, 'sign': 'Rat', 'element': 'Earth', start: [2, 7] },
-    { year: 2009, 'sign': 'Ox', 'element': 'Earth', start: [1, 26] },
-    { year: 2010, 'sign': 'Tiger', 'element': 'Metal', start: [2, 14] },
-    { year: 2011, 'sign': 'Rabbit', 'element': 'Metal', start: [2, 3] },
-    { year: 2012, 'sign': 'Dragon', 'element': 'Water', start: [1, 23] },
-    { year: 2013, 'sign': 'Snake', 'element': 'Water', start: [2, 10] },
-    { year: 2014, 'sign': 'Horse', 'element': 'Wood', start: [1, 31] },
-    { year: 2015, 'sign': 'Goat', 'element': 'Wood', start: [2, 19] },
-    { year: 2016, 'sign': 'Monkey', 'element': 'Fire', start: [2, 8] },
-    { year: 2017, 'sign': 'Rooster', 'element': 'Fire', start: [1, 28] },
-    { year: 2018, sign: 'Dog', element: 'Earth', start: [2, 16] },
-    { year: 2019, 'sign': 'Pig', 'element': 'Earth', start: [2, 5] },
-    { year: 2020, 'sign': 'Rat', 'element': 'Metal', start: [1, 25] },
-    { year: 2021, 'sign': 'Ox', 'element': 'Metal', start: [2, 12] },
-    { year: 2022, 'sign': 'Tiger', 'element': 'Water', start: [2, 1] },
-    { year: 2023, 'sign': 'Rabbit', 'element': 'Water', start: [1, 22] },
-    { year: 2024, 'sign': 'Dragon', 'element': 'Wood', start: [2, 10] },
-    { year: 2025, 'sign': 'Snake', 'element': 'Wood', start: [1, 29] },
+    { "year": 1915, "title": "Wood Rabbit", "start": "1915-02-14", "end": "1916-02-02" },
+    { "year": 1916, "title": "Fire Dragon", "start": "1916-02-03", "end": "1917-01-22" },
+    { "year": 1917, "title": "Fire Snake", "start": "1917-01-23", "end": "1918-02-10" },
+    { "year": 1918, "title": "Earth Horse", "start": "1918-02-11", "end": "1919-01-31" },
+    { "year": 1919, "title": "Earth Goat", "start": "1919-02-01", "end": "1920-02-19" },
+    { "year": 1920, "title": "Metal Monkey", "start": "1920-02-20", "end": "1921-02-07" },
+    { "year": 1921, "title": "Metal Rooster", "start": "1921-02-08", "end": "1922-01-27" },
+    { "year": 1922, "title": "Water Dog", "start": "1922-01-28", "end": "1923-02-15" },
+    { "year": 1923, "title": "Water Pig", "start": "1923-02-16", "end": "1924-02-04" },
+    { "year": 1924, "title": "Wood Rat", "start": "1924-02-05", "end": "1925-01-24" },
+    { "year": 1925, "title": "Wood Ox", "start": "1925-01-25", "end": "1926-02-12" },
+    { "year": 1926, "title": "Fire Tiger", "start": "1926-02-13", "end": "1927-02-01" },
+    { "year": 1927, "title": "Fire Rabbit", "start": "1927-02-02", "end": "1928-01-22" },
+    { "year": 1928, "title": "Earth Dragon", "start": "1928-01-23", "end": "1929-02-09" },
+    { "year": 1929, "title": "Earth Snake", "start": "1929-02-10", "end": "1930-01-29" },
+    { "year": 1930, "title": "Metal Horse", "start": "1930-01-30", "end": "1931-02-16" },
+    { "year": 1931, "title": "Metal Goat", "start": "1931-02-17", "end": "1932-02-05" },
+    { "year": 1932, "title": "Water Monkey", "start": "1932-02-06", "end": "1933-01-25" },
+    { "year": 1933, "title": "Water Rooster", "start": "1933-01-26", "end": "1934-02-13" },
+    { "year": 1934, "title": "Wood Dog", "start": "1934-02-14", "end": "1935-02-03" },
+    { "year": 1935, "title": "Wood Pig", "start": "1935-02-04", "end": "1936-01-23" },
+    { "year": 1936, "title": "Fire Rat", "start": "1936-01-24", "end": "1937-02-10" },
+    { "year": 1937, "title": "Fire Ox", "start": "1937-02-11", "end": "1938-01-30" },
+    { "year": 1938, "title": "Earth Tiger", "start": "1938-01-31", "end": "1939-02-18" },
+    { "year": 1939, "title": "Earth Rabbit", "start": "1939-02-19", "end": "1940-02-07" },
+    { "year": 1940, "title": "Metal Dragon", "start": "1940-02-08", "end": "1941-01-26" },
+    { "year": 1941, "title": "Metal Snake", "start": "1941-01-27", "end": "1942-02-14" },
+    { "year": 1942, "title": "Water Horse", "start": "1942-02-15", "end": "1943-02-04" },
+    { "year": 1943, "title": "Water Goat", "start": "1943-02-05", "end": "1944-01-24" },
+    { "year": 1944, "title": "Wood Monkey", "start": "1944-01-25", "end": "1945-02-12" },
+    { "year": 1945, "title": "Wood Rooster", "start": "1945-02-13", "end": "1946-02-01" },
+    { "year": 1946, "title": "Fire Dog", "start": "1946-02-02", "end": "1947-01-21" },
+    { "year": 1947, "title": "Fire Pig", "start": "1947-01-22", "end": "1948-02-09" },
+    { "year": 1948, "title": "Earth Rat", "start": "1948-02-10", "end": "1949-01-28" },
+    { "year": 1949, "title": "Earth Ox", "start": "1949-01-29", "end": "1950-02-16" },
+    { "year": 1950, "title": "Metal Tiger", "start": "1950-02-17", "end": "1951-02-05" },
+    { "year": 1951, "title": "Metal Rabbit", "start": "1951-02-06", "end": "1952-01-26" },
+    { "year": 1952, "title": "Water Dragon", "start": "1952-01-27", "end": "1953-02-13" },
+    { "year": 1953, "title": "Water Snake", "start": "1953-02-14", "end": "1954-02-02" },
+    { "year": 1954, "title": "Wood Horse", "start": "1954-02-03", "end": "1955-01-23" },
+    { "year": 1955, "title": "Wood Goat", "start": "1955-01-24", "end": "1956-02-11" },
+    { "year": 1956, "title": "Fire Monkey", "start": "1956-02-12", "end": "1957-01-30" },
+    { "year": 1957, "title": "Fire Rooster", "start": "1957-01-31", "end": "1958-02-17" },
+    { "year": 1958, "title": "Earth Dog", "start": "1958-02-18", "end": "1959-02-07" },
+    { "year": 1959, "title": "Earth Pig", "start": "1959-02-08", "end": "1960-01-27" },
+    { "year": 1960, "title": "Metal Rat", "start": "1960-01-28", "end": "1961-02-14" },
+    { "year": 1961, "title": "Metal Ox", "start": "1961-02-15", "end": "1962-02-04" },
+    { "year": 1962, "title": "Water Tiger", "start": "1962-02-05", "end": "1963-01-24" },
+    { "year": 1963, "title": "Water Rabbit", "start": "1963-01-25", "end": "1964-02-12" },
+    { "year": 1964, "title": "Wood Dragon", "start": "1964-02-13", "end": "1965-02-01" },
+    { "year": 1965, "title": "Wood Snake", "start": "1965-02-02", "end": "1966-01-20" },
+    { "year": 1966, "title": "Fire Horse", "start": "1966-01-21", "end": "1967-02-08" },
+    { "year": 1967, "title": "Fire Goat", "start": "1967-02-09", "end": "1968-01-29" },
+    { "year": 1968, "title": "Earth Monkey", "start": "1968-01-30", "end": "1969-02-16" },
+    { "year": 1969, "title": "Earth Rooster", "start": "1969-02-17", "end": "1970-02-05" },
+    { "year": 1970, "title": "Metal Dog", "start": "1970-02-06", "end": "1971-01-26" },
+    { "year": 1971, "title": "Metal Pig", "start": "1971-01-27", "end": "1972-02-14" },
+    { "year": 1972, "title": "Water Rat", "start": "1972-02-15", "end": "1973-02-02" },
+    { "year": 1973, "title": "Water Ox", "start": "1973-02-03", "end": "1974-01-22" },
+    { "year": 1974, "title": "Wood Tiger", "start": "1974-01-23", "end": "1975-02-10" },
+    { "year": 1975, "title": "Wood Rabbit", "start": "1975-02-11", "end": "1976-01-30" },
+    { "year": 1976, "title": "Fire Dragon", "start": "1976-01-31", "end": "1977-02-17" },
+    { "year": 1977, "title": "Fire Snake", "start": "1977-02-18", "end": "1978-02-06" },
+    { "year": 1978, "title": "Earth Horse", "start": "1978-02-07", "end": "1979-01-27" },
+    { "year": 1979, "title": "Earth Goat", "start": "1979-01-28", "end": "1980-02-15" },
+    { "year": 1980, "title": "Metal Monkey", "start": "1980-02-16", "end": "1981-02-04" },
+    { "year": 1981, "title": "Metal Rooster", "start": "1981-02-05", "end": "1982-01-24" },
+    { "year": 1982, "title": "Water Dog", "start": "1982-01-25", "end": "1983-02-12" },
+    { "year": 1983, "title": "Water Pig", "start": "1983-02-13", "end": "1984-02-01" },
+    { "year": 1984, "title": "Wood Rat", "start": "1984-02-02", "end": "1985-02-19" },
+    { "year": 1985, "title": "Wood Ox", "start": "1985-02-20", "end": "1986-02-08" },
+    { "year": 1986, "title": "Fire Tiger", "start": "1986-02-09", "end": "1987-01-28" },
+    { "year": 1987, "title": "Fire Rabbit", "start": "1987-01-29", "end": "1988-02-16" },
+    { "year": 1988, "title": "Earth Dragon", "start": "1988-02-17", "end": "1989-02-05" },
+    { "year": 1989, "title": "Earth Snake", "start": "1989-02-06", "end": "1990-01-26" },
+    { "year": 1990, "title": "Metal Horse", "start": "1990-01-27", "end": "1991-02-14" },
+    { "year": 1991, "title": "Metal Goat", "start": "1991-02-15", "end": "1992-02-03" },
+    { "year": 1992, "title": "Water Monkey", "start": "1992-02-04", "end": "1993-01-22" },
+    { "year": 1993, "title": "Water Rooster", "start": "1993-01-23", "end": "1994-02-09" },
+    { "year": 1994, "title": "Wood Dog", "start": "1994-02-10", "end": "1995-01-30" },
+    { "year": 1995, "title": "Wood Pig", "start": "1995-01-31", "end": "1996-02-18" },
+    { "year": 1996, "title": "Fire Rat", "start": "1996-02-19", "end": "1997-02-06" },
+    { "year": 1997, "title": "Fire Ox", "start": "1997-02-07", "end": "1998-01-27" },
+    { "year": 1998, "title": "Earth Tiger", "start": "1998-01-28", "end": "1999-02-15" },
+    { "year": 1999, "title": "Earth Rabbit", "start": "1999-02-16", "end": "2000-02-04" },
+    { "year": 2000, "title": "Metal Dragon", "start": "2000-02-05", "end": "2001-01-23" },
+    { "year": 2001, "title": "Metal Snake", "start": "2001-01-24", "end": "2002-02-11" },
+    { "year": 2002, "title": "Water Horse", "start": "2002-02-12", "end": "2003-01-31" },
+    { "year": 2003, "title": "Water Goat", "start": "2003-02-01", "end": "2004-01-21" },
+    { "year": 2004, "title": "Wood Monkey", "start": "2004-01-22", "end": "2005-02-08" },
+    { "year": 2005, "title": "Wood Rooster", "start": "2005-02-09", "end": "2006-01-28" },
+    { "year": 2006, "title": "Fire Dog", "start": "2006-01-29", "end": "2007-02-17" },
+    { "year": 2007, "title": "Fire Pig", "start": "2007-02-18", "end": "2008-02-06" },
+    { "year": 2008, "title": "Earth Rat", "start": "2008-02-07", "end": "2009-01-25" },
+    { "year": 2009, "title": "Earth Ox", "start": "2009-01-26", "end": "2010-02-13" },
+    { "year": 2010, "title": "Metal Tiger", "start": "2010-02-14", "end": "2011-02-02" },
+    { "year": 2011, "title": "Metal Rabbit", "start": "2011-02-03", "end": "2012-01-22" },
+    { "year": 2012, "title": "Water Dragon", "start": "2012-01-23", "end": "2013-02-09" },
+    { "year": 2013, "title": "Water Snake", "start": "2013-02-10", "end": "2014-01-30" },
+    { "year": 2014, "title": "Wood Horse", "start": "2014-01-31", "end": "2015-02-18" },
+    { "year": 2015, "title": "Wood Goat", "start": "2015-02-19", "end": "2016-02-07" },
+    { "year": 2016, "title": "Fire Monkey", "start": "2016-02-08", "end": "2017-01-27" },
+    { "year": 2017, "title": "Fire Rooster", "start": "2017-01-28", "end": "2018-02-15" },
+    { "year": 2018, "title": "Earth Dog", "start": "2018-02-16", "end": "2019-02-04" },
+    { "year": 2019, "title": "Earth Pig", "start": "2019-02-05", "end": "2020-01-24" },
+    { "year": 2020, "title": "Metal Rat", "start": "2020-01-25", "end": "2021-02-11" },
+    { "year": 2021, "title": "Metal Ox", "start": "2021-02-12", "end": "2022-01-31" },
+    { "year": 2022, "title": "Water Tiger", "start": "2022-02-01", "end": "2023-01-21" },
+    { "year": 2023, "title": "Water Rabbit", "start": "2023-01-22", "end": "2024-02-09" },
+    { "year": 2024, "title": "Wood Dragon", "start": "2024-02-10", "end": "2025-01-28" },
+    { "year": 2025, "title": "Wood Snake", "start": "2025-01-29", "end": "2026-02-16" },
+    { "year": 2026, "title": "Fire Horse", "start": "2026-02-17", "end": "2027-02-05" },
+    { "year": 2027, "title": "Fire Goat", "start": "2027-02-06", "end": "2028-01-25" },
+    { "year": 2028, "title": "Earth Monkey", "start": "2028-01-26", "end": "2029-02-12" },
+    { "year": 2029, "title": "Earth Rooster", "start": "2029-02-13", "end": "2030-02-02" },
+    { "year": 2030, "title": "Metal Dog", "start": "2030-02-03", "end": "2031-01-22" },
+    { "year": 2031, "title": "Metal Pig", "start": "2031-01-23", "end": "2032-02-10" },
+    { "year": 2032, "title": "Water Rat", "start": "2032-02-11", "end": "2033-01-30" },
+    { "year": 2033, "title": "Water Ox", "start": "2033-01-31", "end": "2034-02-18" },
+    { "year": 2034, "title": "Wood Tiger", "start": "2034-02-19", "end": "2035-02-07" },
+    { "year": 2035, "title": "Wood Rabbit", "start": "2035-02-08", "end": "2036-01-27" },
+    { "year": 2036, "title": "Fire Dragon", "start": "2036-01-28", "end": "2037-02-14" },
 ];
 
+
 export const getChineseZodiacSign = (day: number, month: number, year: number) => {
-  // Find the Chinese New Year (CNY) date for the user's birth year.
-  const cnyEntryForBirthYear = CHINESE_CALENDAR.find(entry => entry.year === year);
-  
-  let effectiveZodiacYear = year;
+  const date = new Date(year, month - 1, day);
 
-  // If we have an entry for the birth year, check if the birth date is before that year's CNY.
-  if (cnyEntryForBirthYear && cnyEntryForBirthYear.start) {
-    const cnyMonth = cnyEntryForBirthYear.start[0];
-    const cnyDay = cnyEntryForBirthYear.start[1];
+  for (const zodiacYear of CHINESE_CALENDAR) {
+    const startDate = new Date(zodiacYear.start);
+    const endDate = new Date(zodiacYear.end);
+    
+    // Set hours to 0 to compare dates only
+    date.setHours(0,0,0,0);
+    startDate.setHours(0,0,0,0);
+    endDate.setHours(0,0,0,0);
 
-    // If born before this year's CNY, the effective zodiac year is the previous year.
-    if (month < cnyMonth || (month === cnyMonth && day < cnyDay)) {
-      effectiveZodiacYear = year - 1;
+    if (date >= startDate && date <= endDate) {
+      const [element, sign] = zodiacYear.title.split(' ');
+      return { sign, element };
     }
-  } else {
-      // This is a fallback for edge cases like years missing from the calendar
-      // or dates very early in the year before the typical CNY range.
-      if (month === 1 || (month === 2 && day < 4)) {
-          effectiveZodiacYear = year - 1;
-      }
   }
 
-  // Now, find the zodiac sign and element for the determined effective year.
-  const finalZodiacEntry = CHINESE_CALENDAR.find(entry => entry.year === effectiveZodiacYear);
-
-  if (finalZodiacEntry) {
-    return {
-      sign: finalZodiacEntry.sign,
-      element: finalZodiacEntry.element,
-    };
-  }
-  
-  // Fallback if the effective year is somehow still not found (e.g., trying a year before 1920).
+  // Fallback for dates outside the defined range
   return { sign: 'Unknown', element: 'Unknown' };
 };
