@@ -9,8 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck } from 'lucide-react';
-import { getAstroInsightAction } from '@/app/actions';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2 } from 'lucide-react';
+import { getAstroInsightAction, textToSpeechAction } from '@/app/actions';
 import type { AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import type { NumerologyData } from '@/lib/numerology';
@@ -163,6 +163,49 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
         </div>
     );
 }
+
+function ListenButton({ text }: { text: string }) {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [isPending, startTransition] = React.useTransition();
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
+
+  const handleListen = () => {
+    if (isPlaying) {
+      audioRef.current?.pause();
+      audioRef.current = null;
+      setIsPlaying(false);
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await textToSpeechAction(text);
+      if (result.success && result.audioUrl) {
+        audioRef.current = new Audio(result.audioUrl);
+        audioRef.current.play();
+        setIsPlaying(true);
+        audioRef.current.onended = () => {
+          setIsPlaying(false);
+          audioRef.current = null;
+        };
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Audio Generation Failed',
+          description: result.error || 'Could not generate audio for this text.',
+        });
+      }
+    });
+  };
+
+  return (
+    <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto" disabled={isPending}>
+      {isPending ? <Loader2 className="animate-spin" /> : <Volume2 />}
+      <span className="sr-only">Listen</span>
+    </Button>
+  );
+}
+
 
 function ResultsDisplay({
   insight,
@@ -341,8 +384,9 @@ function ResultsDisplay({
               <div className="pr-4">
                 <TabsContent value="introduction">
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="flex-row items-center">
                       <CardTitle className="font-headline text-2xl">Your Animal Sign: The {insight.sign}</CardTitle>
+                      <ListenButton text={insight.signData.introduction} />
                     </CardHeader>
                     <CardContent className="pt-4">
                       <p className="whitespace-pre-wrap leading-relaxed">{insight.signData.introduction}</p>
@@ -351,8 +395,9 @@ function ResultsDisplay({
                 </TabsContent>
                 <TabsContent value="element">
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="flex-row items-center">
                       <CardTitle className="font-headline text-2xl">The Influence of the {insight.element} Element</CardTitle>
+                       <ListenButton text={insight.signData.elements[insight.element as keyof typeof insight.signData.elements]} />
                     </CardHeader>
                     <CardContent className="pt-4">
                       <p className="whitespace-pre-wrap leading-relaxed">{insight.signData.elements[insight.element as keyof typeof insight.signData.elements]}</p>
@@ -371,7 +416,10 @@ function ResultsDisplay({
                           <AccordionItem value={sign} key={sign}>
                             <AccordionTrigger>With the {sign}</AccordionTrigger>
                             <AccordionContent>
-                              <p className="whitespace-pre-wrap leading-relaxed">{insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]}</p>
+                               <div className="flex items-start">
+                                <p className="whitespace-pre-wrap leading-relaxed flex-1">{insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]}</p>
+                                <ListenButton text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} />
+                               </div>
                             </AccordionContent>
                           </AccordionItem>
                         ))}
@@ -393,7 +441,10 @@ function ResultsDisplay({
                               {year} - The {futureData.element} {futureData.year}
                             </AccordionTrigger>
                             <AccordionContent>
-                              <p className="whitespace-pre-wrap leading-relaxed">{futureData.prediction}</p>
+                              <div className="flex items-start">
+                               <p className="whitespace-pre-wrap leading-relaxed flex-1">{futureData.prediction}</p>
+                               <ListenButton text={futureData.prediction} />
+                              </div>
                             </AccordionContent>
                           </AccordionItem>
                         ))}
@@ -595,4 +646,4 @@ export function ProfileGenerator() {
   );
 }
 
-      
+  

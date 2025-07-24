@@ -118,4 +118,4 @@ My advice? Structure. Discipline. Focus.`,
     }
 };
 
-    
+  
