@@ -165,57 +165,79 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
 }
 
 function ListenButton({ text }: { text: string }) {
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [isAvailable, setIsAvailable] = React.useState(false);
+    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
-  React.useEffect(() => {
-    const handleEnd = () => {
-      setIsPlaying(false);
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            setIsAvailable(true);
+        }
+
+        const handleEnd = () => setIsPlaying(false);
+        const synth = window.speechSynthesis;
+
+        // Ensure voices are loaded
+        const voices = synth.getVoices();
+        if (voices.length === 0) {
+            synth.onvoiceschanged = () => {
+                // Voices loaded, can proceed
+            };
+        }
+        
+        // This effect manages the speech synthesis lifecycle
+        const currentUtterance = utteranceRef.current;
+        if (currentUtterance) {
+            currentUtterance.addEventListener('end', handleEnd);
+        }
+
+        return () => {
+            if (currentUtterance) {
+                currentUtterance.removeEventListener('end', handleEnd);
+            }
+            // Cancel any ongoing speech when the component unmounts or text changes
+            if (synth.speaking) {
+                synth.cancel();
+            }
+        };
+    }, [text]); // Re-run effect if text changes to manage utterance listeners correctly
+
+    const handleListen = () => {
+        if (!isAvailable) return;
+        const synth = window.speechSynthesis;
+
+        if (isPlaying) {
+            synth.cancel();
+            setIsPlaying(false);
+            return;
+        }
+
+        // Cancel any previous speech
+        if (synth.speaking) {
+            synth.cancel();
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance; // Store utterance to manage it across renders
+
+        // Optional: select a specific voice if available
+        const voices = synth.getVoices();
+        if (voices.length > 0) {
+            utterance.voice = voices[0];
+        }
+
+        synth.speak(utterance);
+        setIsPlaying(true);
     };
 
-    const synth = window.speechSynthesis;
-    const utterance = utteranceRef.current;
-    if (utterance) {
-      utterance.addEventListener('end', handleEnd);
-    }
-    
-    // Cleanup on component unmount
-    return () => {
-      if (utterance) {
-        utterance.removeEventListener('end', handleEnd);
-      }
-      if (synth.speaking) {
-        synth.cancel();
-      }
-    };
-  }, [utteranceRef.current]);
+    if (!isAvailable) return null;
 
-  const handleListen = () => {
-    const synth = window.speechSynthesis;
-    
-    if (isPlaying) {
-      synth.cancel();
-      setIsPlaying(false);
-      return;
-    }
-
-    // Cancel any previous speech before starting a new one
-    if (synth.speaking) {
-      synth.cancel();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
-    synth.speak(utterance);
-    setIsPlaying(true);
-  };
-  
-  return (
-    <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto">
-      {isPlaying ? <StopCircle /> : <Volume2 />}
-      <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
-    </Button>
-  );
+    return (
+        <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto shrink-0">
+            {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
+        </Button>
+    );
 }
 
 
@@ -397,7 +419,7 @@ function ResultsDisplay({
                 <TabsContent value="introduction">
                   <Card>
                     <CardHeader className="flex-row items-center">
-                      <CardTitle className="font-headline text-2xl">Your Animal Sign: The {insight.sign}</CardTitle>
+                      <CardTitle className="font-headline text-2xl flex-1">Your Animal Sign: The {insight.sign}</CardTitle>
                       <ListenButton text={insight.signData.introduction} />
                     </CardHeader>
                     <CardContent className="pt-4">
@@ -408,7 +430,7 @@ function ResultsDisplay({
                 <TabsContent value="element">
                   <Card>
                     <CardHeader className="flex-row items-center">
-                      <CardTitle className="font-headline text-2xl">The Influence of the {insight.element} Element</CardTitle>
+                      <CardTitle className="font-headline text-2xl flex-1">The Influence of the {insight.element} Element</CardTitle>
                        <ListenButton text={insight.signData.elements[insight.element as keyof typeof insight.signData.elements]} />
                     </CardHeader>
                     <CardContent className="pt-4">
