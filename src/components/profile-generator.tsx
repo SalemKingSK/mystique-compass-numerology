@@ -9,8 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2 } from 'lucide-react';
-import { getAstroInsightAction, textToSpeechAction } from '@/app/actions';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle } from 'lucide-react';
+import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
 import type { NumerologyData } from '@/lib/numerology';
@@ -166,42 +166,54 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
 
 function ListenButton({ text }: { text: string }) {
   const [isPlaying, setIsPlaying] = React.useState(false);
-  const [isPending, startTransition] = React.useTransition();
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
-  const { toast } = useToast();
+  const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+
+  React.useEffect(() => {
+    const handleEnd = () => {
+      setIsPlaying(false);
+    };
+
+    const synth = window.speechSynthesis;
+    const utterance = utteranceRef.current;
+    if (utterance) {
+      utterance.addEventListener('end', handleEnd);
+    }
+    
+    // Cleanup on component unmount
+    return () => {
+      if (utterance) {
+        utterance.removeEventListener('end', handleEnd);
+      }
+      if (synth.speaking) {
+        synth.cancel();
+      }
+    };
+  }, [utteranceRef.current]);
 
   const handleListen = () => {
+    const synth = window.speechSynthesis;
+    
     if (isPlaying) {
-      audioRef.current?.pause();
-      audioRef.current = null;
+      synth.cancel();
       setIsPlaying(false);
       return;
     }
 
-    startTransition(async () => {
-      const result = await textToSpeechAction(text);
-      if (result.success && result.audioUrl) {
-        audioRef.current = new Audio(result.audioUrl);
-        audioRef.current.play();
-        setIsPlaying(true);
-        audioRef.current.onended = () => {
-          setIsPlaying(false);
-          audioRef.current = null;
-        };
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Audio Generation Failed',
-          description: result.error || 'Could not generate audio for this text.',
-        });
-      }
-    });
+    // Cancel any previous speech before starting a new one
+    if (synth.speaking) {
+      synth.cancel();
+    }
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utteranceRef.current = utterance;
+    synth.speak(utterance);
+    setIsPlaying(true);
   };
-
+  
   return (
-    <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto" disabled={isPending}>
-      {isPending ? <Loader2 className="animate-spin" /> : <Volume2 />}
-      <span className="sr-only">Listen</span>
+    <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto">
+      {isPlaying ? <StopCircle /> : <Volume2 />}
+      <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
     </Button>
   );
 }
@@ -645,5 +657,3 @@ export function ProfileGenerator() {
     </div>
   );
 }
-
-  
