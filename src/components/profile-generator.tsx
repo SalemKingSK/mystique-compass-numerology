@@ -22,6 +22,84 @@ import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+function ListenButton({ text }: { text: string }) {
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [isAvailable, setIsAvailable] = React.useState(false);
+    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            setIsAvailable(true);
+        }
+
+        const handleEnd = () => setIsPlaying(false);
+        const synth = window.speechSynthesis;
+
+        // Ensure voices are loaded
+        const voices = synth.getVoices();
+        if (voices.length === 0) {
+            synth.onvoiceschanged = () => {
+                // Voices loaded, can proceed
+            };
+        }
+        
+        // This effect manages the speech synthesis lifecycle
+        const currentUtterance = utteranceRef.current;
+        if (currentUtterance) {
+            currentUtterance.addEventListener('end', handleEnd);
+        }
+
+        return () => {
+            if (currentUtterance) {
+                currentUtterance.removeEventListener('end', handleEnd);
+            }
+            // Cancel any ongoing speech when the component unmounts or text changes
+            if (synth.speaking) {
+                synth.cancel();
+            }
+        };
+    }, [text]); // Re-run effect if text changes to manage utterance listeners correctly
+
+    const handleListen = () => {
+        if (!isAvailable) return;
+        const synth = window.speechSynthesis;
+
+        if (isPlaying) {
+            synth.cancel();
+            setIsPlaying(false);
+            return;
+        }
+
+        // Cancel any previous speech
+        if (synth.speaking) {
+            synth.cancel();
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance; // Store utterance to manage it across renders
+
+        // Optional: select a specific voice if available
+        const voices = synth.getVoices();
+        // A simple selection logic, you might want something more robust
+        const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+        }
+
+        synth.speak(utterance);
+        setIsPlaying(true);
+    };
+
+    if (!isAvailable) return null;
+
+    return (
+        <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto shrink-0">
+            {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
+        </Button>
+    );
+}
+
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
 
     const numberEntries = Object.entries(numerology.numberCounts)
@@ -29,6 +107,8 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
         .filter(item => item.count > 0)
         .sort((a, b) => a.digit - b.digit);
         
+    const kuaAttributesText = `Your Kua Attributes are: Element is ${numerology.kuaAttributes.element}. Lucky colors are ${numerology.kuaAttributes.colors}. Auspicious season is ${numerology.kuaAttributes.season}.`;
+    
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -89,7 +169,10 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                       <p className="whitespace-pre-wrap leading-relaxed">{repetitionMeaning}</p>
+                                       <div className="flex items-start">
+                                            <p className="whitespace-pre-wrap leading-relaxed flex-1">{repetitionMeaning}</p>
+                                            <ListenButton text={repetitionMeaning} />
+                                       </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             )
@@ -109,7 +192,10 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                           <p className="italic text-muted-foreground text-sm">{arrow.description}</p>
+                                           <div className="flex items-start">
+                                                <p className="italic text-muted-foreground text-sm flex-1">{arrow.description}</p>
+                                                <ListenButton text={arrow.description} />
+                                           </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -126,7 +212,10 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                            <p className="italic text-muted-foreground">{arrow.description}</p>
+                                            <div className="flex items-start">
+                                                <p className="italic text-muted-foreground flex-1">{arrow.description}</p>
+                                                <ListenButton text={arrow.description} />
+                                            </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -142,7 +231,10 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                      <div>
-                        <h4 className="font-bold text-lg">Your Kua Attributes</h4>
+                        <div className="flex items-center">
+                            <h4 className="font-bold text-lg flex-1">Your Kua Attributes</h4>
+                            <ListenButton text={kuaAttributesText} />
+                        </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                              <Badge variant="secondary">Element: {numerology.kuaAttributes.element}</Badge>
                              <Badge variant="secondary">Colors: {numerology.kuaAttributes.colors}</Badge>
@@ -163,83 +255,6 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
         </div>
     );
 }
-
-function ListenButton({ text }: { text: string }) {
-    const [isPlaying, setIsPlaying] = React.useState(false);
-    const [isAvailable, setIsAvailable] = React.useState(false);
-    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
-
-    React.useEffect(() => {
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            setIsAvailable(true);
-        }
-
-        const handleEnd = () => setIsPlaying(false);
-        const synth = window.speechSynthesis;
-
-        // Ensure voices are loaded
-        const voices = synth.getVoices();
-        if (voices.length === 0) {
-            synth.onvoiceschanged = () => {
-                // Voices loaded, can proceed
-            };
-        }
-        
-        // This effect manages the speech synthesis lifecycle
-        const currentUtterance = utteranceRef.current;
-        if (currentUtterance) {
-            currentUtterance.addEventListener('end', handleEnd);
-        }
-
-        return () => {
-            if (currentUtterance) {
-                currentUtterance.removeEventListener('end', handleEnd);
-            }
-            // Cancel any ongoing speech when the component unmounts or text changes
-            if (synth.speaking) {
-                synth.cancel();
-            }
-        };
-    }, [text]); // Re-run effect if text changes to manage utterance listeners correctly
-
-    const handleListen = () => {
-        if (!isAvailable) return;
-        const synth = window.speechSynthesis;
-
-        if (isPlaying) {
-            synth.cancel();
-            setIsPlaying(false);
-            return;
-        }
-
-        // Cancel any previous speech
-        if (synth.speaking) {
-            synth.cancel();
-        }
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance; // Store utterance to manage it across renders
-
-        // Optional: select a specific voice if available
-        const voices = synth.getVoices();
-        if (voices.length > 0) {
-            utterance.voice = voices[0];
-        }
-
-        synth.speak(utterance);
-        setIsPlaying(true);
-    };
-
-    if (!isAvailable) return null;
-
-    return (
-        <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto shrink-0">
-            {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-            <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
-        </Button>
-    );
-}
-
 
 function ResultsDisplay({
   insight,
