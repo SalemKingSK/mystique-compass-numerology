@@ -26,6 +26,7 @@ function SpeechPlayer({ text }: { text: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
     const wasManuallyStopped = React.useRef(false);
 
     const sentences = React.useMemo(() => {
@@ -34,6 +35,7 @@ function SpeechPlayer({ text }: { text: string }) {
     }, [text]);
 
     React.useEffect(() => {
+        // Cleanup function to cancel speech when the component unmounts
         return () => {
             if (window.speechSynthesis?.speaking) {
                 wasManuallyStopped.current = true;
@@ -60,19 +62,16 @@ function SpeechPlayer({ text }: { text: string }) {
         const synth = window.speechSynthesis;
 
         if (synth.speaking) {
-            wasManuallyStopped.current = true;
-            synth.cancel();
-            setIsPlaying(false);
-            setCurrentSentenceIndex(-1);
+            handleStop();
             return;
         }
-        
+
         wasManuallyStopped.current = false;
         setIsPlaying(true);
         let utteranceIndex = 0;
 
         const speakSentences = () => {
-            if (utteranceIndex >= sentences.length) {
+            if (wasManuallyStopped.current || utteranceIndex >= sentences.length) {
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
                 return;
@@ -80,54 +79,56 @@ function SpeechPlayer({ text }: { text: string }) {
 
             const sentence = sentences[utteranceIndex];
             const utterance = new SpeechSynthesisUtterance(sentence);
-            
+            utteranceRef.current = utterance; // Store reference to the utterance
+
             const voices = synth.getVoices();
             if (voices.length > 0) {
-                 const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-                 if (preferredVoice) utterance.voice = preferredVoice;
+                const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+                if (preferredVoice) utterance.voice = preferredVoice;
             }
 
             utterance.onstart = () => {
                 setCurrentSentenceIndex(utteranceIndex);
             };
-            
+
             utterance.onend = () => {
                 if (!wasManuallyStopped.current) {
                     utteranceIndex++;
                     speakSentences();
                 }
             };
-
+            
             utterance.onerror = (event) => {
-                if (event.error !== 'cancelled' && !wasManuallyStopped.current) {
+                if (event.error !== 'cancelled' && event.error !== 'interrupted' && !wasManuallyStopped.current) {
                     console.error("SpeechSynthesisUtterance.onerror", event);
                 }
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
             };
 
+
             synth.speak(utterance);
         };
-        
+
         if (synth.getVoices().length > 0) {
             speakSentences();
         } else {
-             synth.onvoiceschanged = speakSentences;
+            synth.onvoiceschanged = speakSentences;
         }
     };
-    
+
     const handleStop = () => {
-        if (window.speechSynthesis?.speaking) {
-            wasManuallyStopped.current = true;
-            window.speechSynthesis.cancel();
+        wasManuallyStopped.current = true;
+        if (window.speechSynthesis) {
+             window.speechSynthesis.cancel();
         }
         setIsPlaying(false);
         setCurrentSentenceIndex(-1);
-    }
-    
+    };
+
     return (
         <div className="flex items-start gap-4">
-             <div className="whitespace-pre-wrap leading-relaxed flex-1">
+            <div className="whitespace-pre-wrap leading-relaxed flex-1">
                 {sentences.map((sentence, index) => (
                     <span
                         key={index}
@@ -576,7 +577,7 @@ export function ProfileGenerator() {
 
   const addToHistory = (newItem: AstroInsightInput) => {
     setHistory(prevHistory => {
-        const newHistory = [newItem, ...prevHistory.filter(item => item.name !== newItem.name)].slice(0, 10);
+        const newHistory = [newItem, ...prevHistory.filter(item => item.name !== newItem.name)].slice(0, 21);
         try {
             localStorage.setItem('astroInsightHistory', JSON.stringify(newHistory));
         } catch (e) {
