@@ -30,43 +30,35 @@ function SpeechPlayer({ text }: { text: string }) {
 
     const sentences = React.useMemo(() => {
         if (!text) return [];
-        const cleanedText = text.replace(/([.!?])\s*(?=[A-Z])/g, "$1|").split('|');
-        return cleanedText.filter(sentence => sentence.trim().length > 0);
+        // This regex splits text into sentences more reliably.
+        const cleanedText = text.match(/[^.!?]+[.!?]+/g) || [text];
+        return cleanedText.map(s => s.trim()).filter(Boolean);
     }, [text]);
 
     React.useEffect(() => {
-        const handleEnd = () => {
-            setIsPlaying(false);
-            setCurrentSentenceIndex(-1);
-        };
-        
-        const utterance = utteranceRef.current;
-        if (utterance) {
-            utterance.addEventListener('end', handleEnd);
-        }
-
+        // Cleanup function to stop speech when the component unmounts
         return () => {
-            if (utterance) {
-                utterance.removeEventListener('end', handleEnd);
-            }
             if (window.speechSynthesis?.speaking) {
                 window.speechSynthesis.cancel();
             }
         };
     }, []);
-
+    
     React.useEffect(() => {
-        if (currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
+        if (isPlaying && currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
             sentenceRefs.current[currentSentenceIndex]?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
                 inline: 'nearest'
             });
         }
-    }, [currentSentenceIndex]);
+    }, [currentSentenceIndex, isPlaying]);
 
     const handleListen = () => {
-        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+            console.error("Speech Synthesis not supported.");
+            return;
+        }
         
         const synth = window.speechSynthesis;
 
@@ -84,17 +76,21 @@ function SpeechPlayer({ text }: { text: string }) {
         const utterance = new SpeechSynthesisUtterance(text);
         utteranceRef.current = utterance;
 
+        utterance.onstart = () => {
+            setIsPlaying(true);
+            setCurrentSentenceIndex(0); // Start with the first sentence highlighted
+        };
+
         utterance.onboundary = (event) => {
              if (event.name === 'sentence') {
                 let charIndex = event.charIndex;
-                let sentenceBoundary = 0;
+                let accumulatedLength = 0;
                 for (let i = 0; i < sentences.length; i++) {
-                    const sentenceLength = sentences[i].length + 1; // +1 for the separator
-                    if (charIndex >= sentenceBoundary && charIndex < sentenceBoundary + sentenceLength) {
+                    if (charIndex < accumulatedLength + sentences[i].length) {
                         setCurrentSentenceIndex(i);
                         break;
                     }
-                    sentenceBoundary += sentenceLength;
+                    accumulatedLength += sentences[i].length + 1; // +1 for space
                 }
             }
         };
@@ -103,20 +99,25 @@ function SpeechPlayer({ text }: { text: string }) {
             setIsPlaying(false);
             setCurrentSentenceIndex(-1);
         };
+        
+        utterance.onerror = (event) => {
+            console.error('SpeechSynthesisUtterance.onerror', event);
+            setIsPlaying(false);
+            setCurrentSentenceIndex(-1);
+        };
 
-        const voices = synth.getVoices();
+        // Ensure voices are loaded before speaking
+        let voices = synth.getVoices();
         if (voices.length > 0) {
             const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
             if (preferredVoice) utterance.voice = preferredVoice;
             synth.speak(utterance);
-            setIsPlaying(true);
         } else {
             synth.onvoiceschanged = () => {
-                const voices = synth.getVoices();
+                voices = synth.getVoices();
                 const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
                 if (preferredVoice) utterance.voice = preferredVoice;
                 synth.speak(utterance);
-                setIsPlaying(true);
             };
         }
     };
@@ -130,11 +131,11 @@ function SpeechPlayer({ text }: { text: string }) {
                         ref={el => sentenceRefs.current[index] = el}
                         className={currentSentenceIndex === index ? "bg-primary/20 rounded transition-all duration-300" : ""}
                     >
-                        {sentence}
+                        {sentence}{' '}
                     </span>
                 ))}
             </div>
-            <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0">
+            <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0" disabled={!text}>
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                 <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
             </Button>
@@ -314,7 +315,8 @@ function ResultsDisplay({
     .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
   const compatibilitySigns = Object.keys(insight.signData.compatibilities);
 
-  const elementText = insight.signData.elements[insight.element as keyof typeof insight.signData.elements] || '';
+  const elementKey = insight.element as keyof typeof insight.signData.elements;
+  const elementText = insight.signData.elements[elementKey] || `No specific element text found for ${insight.element}.`;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -598,6 +600,10 @@ export function ProfileGenerator() {
   };
 
   const processSubmit = (data: AstroInsightInput) => {
+      // Cancel any ongoing speech before generating a new profile
+      if (window.speechSynthesis?.speaking) {
+        window.speechSynthesis.cancel();
+      }
       startTransition(async () => {
           const result = await getAstroInsightAction(data);
           
@@ -751,3 +757,5 @@ export function ProfileGenerator() {
     </div>
   );
 }
+
+    
