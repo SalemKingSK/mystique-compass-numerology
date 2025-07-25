@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info, Swords } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
@@ -94,7 +95,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             
             utterance.onerror = (event) => {
                 if (event.error !== 'cancelled' && event.error !== 'interrupted') {
-                    console.error("SpeechSynthesisUtterance.onerror", event);
+                     // console.error("SpeechSynthesisUtterance.onerror", event);
                 }
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
@@ -103,7 +104,6 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             window.speechSynthesis.speak(utterance);
         };
         
-        // Ensure voices are loaded before speaking
         if (window.speechSynthesis.getVoices().length === 0) {
              window.speechSynthesis.onvoiceschanged = speakSentences;
         } else {
@@ -181,30 +181,46 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                         </Card>
                     </PopoverTrigger>
                     <PopoverContent className="w-96">
-                        <div className="space-y-4">
-                            <div>
-                                <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
-                                  <Skull className="h-5 w-5" /> Compound Fate Number: {numerology.compoundNum}
-                                </h4>
-                                <ScrollArea className="h-48 mt-2 pr-4">
-                                     <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
-                                </ScrollArea>
-                            </div>
-
-                            {numerology.reducedCompoundNum && numerology.reducedCompoundMeaning && (
-                                <>
-                                <Separator />
+                        <ScrollArea className="h-96 pr-4">
+                            <div className="space-y-4">
                                 <div>
                                     <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
-                                        <Gem className="h-5 w-5" /> Inner Essence: {numerology.reducedCompoundNum}
+                                    <Skull className="h-5 w-5" /> Compound Fate Number: {numerology.compoundNum}
                                     </h4>
-                                     <ScrollArea className="h-48 mt-2 pr-4">
-                                         <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="reduced-compound-meaning-speech" />
-                                    </ScrollArea>
+                                    <div className="mt-2">
+                                        <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
+                                    </div>
                                 </div>
-                                </>
-                            )}
-                        </div>
+
+                                {numerology.reducedCompoundNum && numerology.reducedCompoundMeaning && (
+                                    <>
+                                    <Separator />
+                                    <div>
+                                        <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
+                                            <Gem className="h-5 w-5" /> Inner Essence: {numerology.reducedCompoundNum}
+                                        </h4>
+                                        <div className="mt-2">
+                                            <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="reduced-compound-meaning-speech" />
+                                        </div>
+                                    </div>
+                                    </>
+                                )}
+                                
+                                {numerology.karmicFateNum && numerology.karmicFateMeaning && (
+                                    <>
+                                    <Separator />
+                                    <div>
+                                        <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
+                                            <Swords className="h-5 w-5" /> Karmic Fate Number: {numerology.karmicFateNum}
+                                        </h4>
+                                        <div className="mt-2">
+                                            <SpeechPlayer text={numerology.karmicFateMeaning} elementId="karmic-fate-meaning-speech" />
+                                        </div>
+                                    </div>
+                                    </>
+                                )}
+                            </div>
+                        </ScrollArea>
                     </PopoverContent>
                 </Popover>
 
