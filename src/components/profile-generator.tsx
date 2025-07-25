@@ -314,6 +314,8 @@ function ResultsDisplay({
     .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
   const compatibilitySigns = Object.keys(insight.signData.compatibilities);
 
+  const elementText = insight.signData.elements[insight.element as keyof typeof insight.signData.elements] || '';
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -480,7 +482,7 @@ function ResultsDisplay({
                       <CardTitle className="font-headline text-2xl flex-1">The Influence of the {insight.element} Element</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
-                      <SpeechPlayer text={insight.signData.elements[insight.element as keyof typeof insight.signData.elements]} />
+                       <SpeechPlayer text={elementText} />
                     </CardContent>
                   </Card>
                 </TabsContent>
