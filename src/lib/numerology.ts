@@ -1,3 +1,4 @@
+
 // src/lib/numerology.ts
 
 export const KUA_DIRECTIONS: { [key: number]: any } = {
@@ -463,13 +464,27 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   // 9. Get Compound number meaning
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum] || "No specific meaning found for this compound number.";
 
-  // 10. Return all calculated data
+  // 10. Calculate Reduced Compound Number and its meaning
+  let reducedCompoundNum: number | null = null;
+  let reducedCompoundMeaning: string | null = null;
+  if (compoundNum >= 10) {
+      const reducedNum = String(compoundNum).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+      if (COMPOUND_NUMBER_MEANINGS[reducedNum]) {
+          reducedCompoundNum = reducedNum;
+          reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedNum];
+      }
+  }
+
+
+  // 11. Return all calculated data
   return {
     psycheNum,
     destinyNum,
     kuaNum,
     compoundNum,
     compoundMeaning,
+    reducedCompoundNum,
+    reducedCompoundMeaning,
     loShuGrid: gridLayout,
     allDigitsForGrid: allDigitsForGrid,
     numberCounts: counts,
@@ -479,13 +494,4 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     kuaAttributes,
   };
 };
-
-
-
-
-
-
-
-
-
 

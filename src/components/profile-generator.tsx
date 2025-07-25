@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from '@/components/ui/separator';
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
@@ -101,7 +102,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
 
             window.speechSynthesis.speak(utterance);
         };
-
+        
         // Ensure voices are loaded before speaking
         if (window.speechSynthesis.getVoices().length === 0) {
              window.speechSynthesis.onvoiceschanged = speakSentences;
@@ -168,10 +169,45 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     <CardHeader><CardTitle className="font-headline text-xl">Destiny Number</CardTitle></CardHeader>
                     <CardContent><p className="text-4xl font-bold text-primary">{numerology.destinyNum}</p></CardContent>
                 </Card>
-                 <Card>
-                    <CardHeader><CardTitle className="font-headline text-xl">Destiny/Fate</CardTitle></CardHeader>
-                    <CardContent><p className="text-4xl font-bold text-primary">{numerology.compoundNum}</p></CardContent>
-                </Card>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Card className="cursor-pointer hover:bg-secondary/50 transition-colors">
+                             <CardHeader>
+                                <CardTitle className="font-headline text-xl flex items-center justify-center gap-1">
+                                    Fate Number <Info className="h-4 w-4 text-muted-foreground"/>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent><p className="text-4xl font-bold text-primary">{numerology.compoundNum}</p></CardContent>
+                        </Card>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-96">
+                        <div className="space-y-4">
+                            <div>
+                                <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
+                                  <Skull className="h-5 w-5" /> Compound Fate Number: {numerology.compoundNum}
+                                </h4>
+                                <ScrollArea className="h-48 mt-2 pr-4">
+                                     <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
+                                </ScrollArea>
+                            </div>
+
+                            {numerology.reducedCompoundNum && numerology.reducedCompoundMeaning && (
+                                <>
+                                <Separator />
+                                <div>
+                                    <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
+                                        <Gem className="h-5 w-5" /> Inner Essence: {numerology.reducedCompoundNum}
+                                    </h4>
+                                     <ScrollArea className="h-48 mt-2 pr-4">
+                                         <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="reduced-compound-meaning-speech" />
+                                    </ScrollArea>
+                                </div>
+                                </>
+                            )}
+                        </div>
+                    </PopoverContent>
+                </Popover>
+
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-xl">Kua Number</CardTitle></CardHeader>
                     <CardContent><p className="text-4xl font-bold text-primary">{numerology.kuaNum}</p></CardContent>
@@ -179,27 +215,6 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
             </div>
 
             <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl flex items-center gap-2">
-                        <Skull className="h-6 w-6" /> Destiny/Fate Meaning
-                    </CardTitle>
-                     <CardDescription>The meaning of your compound number {numerology.compoundNum}.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="compound-meaning">
-                            <AccordionTrigger>
-                                <span className='font-semibold text-left'>Read about your Destiny/Fate Number</span>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                               <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                </CardContent>
-            </Card>
-            
-             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl flex items-center gap-2"><Grid3x3 /> Lo Shu Grid</CardTitle>
                 </CardHeader>
