@@ -169,7 +169,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     <CardHeader><CardTitle className="font-headline text-xl">Destiny Number</CardTitle></CardHeader>
                     <CardContent><p className="text-4xl font-bold text-primary">{numerology.destinyNum}</p></CardContent>
                 </Card>
-                <Popover>
+                 <Popover>
                     <PopoverTrigger asChild>
                         <Card className="cursor-pointer hover:bg-secondary/50 transition-colors">
                              <CardHeader>
@@ -180,22 +180,28 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                             <CardContent><p className="text-4xl font-bold text-primary">{numerology.compoundNum}</p></CardContent>
                         </Card>
                     </PopoverTrigger>
-                    <PopoverContent className="w-96">
-                        <ScrollArea className="h-96 pr-4">
-                            <div className="space-y-4">
-                                <div>
-                                    <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
-                                    <Skull className="h-5 w-5" /> Compound Fate Number: {numerology.compoundNum}
-                                    </h4>
-                                    <div className="mt-2">
-                                        <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
+                    <PopoverContent className="w-96 p-0">
+                        <Tabs defaultValue="compound" className="w-full">
+                           <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="compound">Compound</TabsTrigger>
+                                {numerology.reducedCompoundNum && <TabsTrigger value="essence">Inner Essence</TabsTrigger>}
+                                {numerology.karmicFateNum && <TabsTrigger value="karmic">Karmic</TabsTrigger>}
+                            </TabsList>
+                            <ScrollArea className="h-96">
+                               <div className="p-4">
+                                <TabsContent value="compound">
+                                    <div className="space-y-4">
+                                        <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
+                                            <Skull className="h-5 w-5" /> Compound Fate: {numerology.compoundNum}
+                                        </h4>
+                                        <div className="mt-2">
+                                            <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
+                                        </div>
                                     </div>
-                                </div>
-
+                                </TabsContent>
                                 {numerology.reducedCompoundNum && numerology.reducedCompoundMeaning && (
-                                    <>
-                                    <Separator />
-                                    <div>
+                                <TabsContent value="essence">
+                                    <div className="space-y-4">
                                         <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
                                             <Gem className="h-5 w-5" /> Inner Essence: {numerology.reducedCompoundNum}
                                         </h4>
@@ -203,24 +209,23 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                             <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="reduced-compound-meaning-speech" />
                                         </div>
                                     </div>
-                                    </>
+                                </TabsContent>
                                 )}
-                                
                                 {numerology.karmicFateNum && numerology.karmicFateMeaning && (
-                                    <>
-                                    <Separator />
-                                    <div>
+                                <TabsContent value="karmic">
+                                    <div className="space-y-4">
                                         <h4 className="font-headline text-lg font-semibold leading-none flex items-center gap-2">
-                                            <Swords className="h-5 w-5" /> Karmic Fate Number: {numerology.karmicFateNum}
+                                            <Swords className="h-5 w-5" /> Karmic Fate: {numerology.karmicFateNum}
                                         </h4>
                                         <div className="mt-2">
                                             <SpeechPlayer text={numerology.karmicFateMeaning} elementId="karmic-fate-meaning-speech" />
                                         </div>
                                     </div>
-                                    </>
+                                </TabsContent>
                                 )}
-                            </div>
-                        </ScrollArea>
+                               </div>
+                            </ScrollArea>
+                        </Tabs>
                     </PopoverContent>
                 </Popover>
 
