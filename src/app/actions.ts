@@ -9,7 +9,6 @@ export async function getAstroInsightAction(formData: AstroInsightInput) {
       return { success: false, error: 'Please fill out all fields.' };
     }
     
-    // Generate both results in parallel
     const [insightResult, numerologyResult] = await Promise.all([
         getAstroInsight(formData),
         generateLoShuData(formData)
