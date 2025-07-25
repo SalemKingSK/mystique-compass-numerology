@@ -5,61 +5,26 @@
 @layer base {
   :root {
     /* Google-inspired color palette from Aura Flow concept */
-    --color-primary: #8AB4F8; /* Blue */
-    --color-secondary: #FDD663; /* Yellow */
-    --color-tertiary: #A1C298; /* Green */
-    --color-quaternary: #E583A8; /* Pink */
+    --color-primary-hsl: 217 91% 72%;
+    --color-secondary-hsl: 47 98% 69%;
+    --color-tertiary-hsl: 108 27% 67%;
+    --color-quaternary-hsl: 337 69% 71%;
     
-    --bg-dark: #121212;
-    --glass-bg: rgba(30, 30, 30, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --bg-dark-hsl: 222 84% 4.9%;
     
-    --background: 222 84% 4.9%; /* --bg-dark */
-    --foreground: 210 40% 98%; /* --text-primary */
-
-    --card: 222 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 217 91% 72%; /* --color-primary */
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 47 98% 69%; /* --color-secondary */
-    --secondary-foreground: 340 10% 25%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%; /* --text-secondary */
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 217 91% 72%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    /* Same as root for a consistent dark theme */
-    --background: 222 84% 4.9%;
+    --background: var(--bg-dark-hsl);
     --foreground: 210 40% 98%;
 
-    --card: 222 84% 4.9%;
+    --card: var(--bg-dark-hsl);
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 84% 4.9%;
+    --popover: var(--bg-dark-hsl);
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 72%;
+    --primary: var(--color-primary-hsl);
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 47 98% 69%;
+    --secondary: var(--color-secondary-hsl);
     --secondary-foreground: 340 10% 25%;
 
     --muted: 217.2 32.6% 17.5%;
@@ -73,7 +38,32 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 217 91% 72%;
+    --ring: var(--color-primary-hsl);
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Same as root for a consistent dark theme */
+    --background: var(--bg-dark-hsl);
+    --foreground: 210 40% 98%;
+    --card: var(--bg-dark-hsl);
+    --card-foreground: 210 40% 98%;
+    --popover: var(--bg-dark-hsl);
+    --popover-foreground: 210 40% 98%;
+    --primary: var(--color-primary-hsl);
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: var(--color-secondary-hsl);
+    --secondary-foreground: 340 10% 25%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: var(--color-primary-hsl);
   }
 }
 
@@ -92,10 +82,11 @@
   100% { background-position: 0% 50%; }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 .5rem #8AB4F8, 0 0 1rem #E583A8, 0 0 1.5rem #FDD663, 0 0 2rem #A1C298, inset 0 0 1rem #8AB4F8; }
+  50% { box-shadow: 0 0 1rem #8AB4F8, 0 0 1.5rem #E583A8, 0 0 2rem #FDD663, 0 0 2.5rem #A1C298, inset 0 0 1.5rem #8AB4F8; }
 }
+
 
 .aura-background {
   position: fixed;
