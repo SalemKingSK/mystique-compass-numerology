@@ -23,20 +23,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 function SpeechPlayer({ text }: { text: string }) {
-    const [isAvailable, setIsAvailable] = React.useState(false);
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
     const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
 
     const sentences = React.useMemo(() => {
+        if (!text) return [];
         const cleanedText = text.replace(/([.!?])\s*(?=[A-Z])/g, "$1|").split('|');
         return cleanedText.filter(sentence => sentence.trim().length > 0);
     }, [text]);
 
     React.useEffect(() => {
-        setIsAvailable(typeof window !== 'undefined' && 'speechSynthesis' in window);
-
         const handleEnd = () => {
             setIsPlaying(false);
             setCurrentSentenceIndex(-1);
@@ -55,7 +53,7 @@ function SpeechPlayer({ text }: { text: string }) {
                 window.speechSynthesis.cancel();
             }
         };
-    }, [text]);
+    }, []);
 
     React.useEffect(() => {
         if (currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
@@ -68,7 +66,7 @@ function SpeechPlayer({ text }: { text: string }) {
     }, [currentSentenceIndex]);
 
     const handleListen = () => {
-        if (!isAvailable) return;
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
         
         const synth = window.speechSynthesis;
 
@@ -87,11 +85,11 @@ function SpeechPlayer({ text }: { text: string }) {
         utteranceRef.current = utterance;
 
         utterance.onboundary = (event) => {
-            if (event.name === 'sentence') {
+             if (event.name === 'sentence') {
                 let charIndex = event.charIndex;
                 let sentenceBoundary = 0;
                 for (let i = 0; i < sentences.length; i++) {
-                    const sentenceLength = sentences[i].length;
+                    const sentenceLength = sentences[i].length + 1; // +1 for the separator
                     if (charIndex >= sentenceBoundary && charIndex < sentenceBoundary + sentenceLength) {
                         setCurrentSentenceIndex(i);
                         break;
@@ -122,14 +120,10 @@ function SpeechPlayer({ text }: { text: string }) {
             };
         }
     };
-
-    if (!isAvailable) {
-        return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>;
-    }
     
     return (
         <div className="flex items-start gap-4">
-             <p className="whitespace-pre-wrap leading-relaxed flex-1">
+             <div className="whitespace-pre-wrap leading-relaxed flex-1">
                 {sentences.map((sentence, index) => (
                     <span
                         key={index}
@@ -139,7 +133,7 @@ function SpeechPlayer({ text }: { text: string }) {
                         {sentence}
                     </span>
                 ))}
-            </p>
+            </div>
             <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0">
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                 <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
@@ -755,5 +749,3 @@ export function ProfileGenerator() {
     </div>
   );
 }
-
-    
