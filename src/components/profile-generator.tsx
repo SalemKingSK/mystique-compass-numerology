@@ -25,29 +25,23 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 function SpeechPlayer({ text }: { text: string }) {
     const [isAvailable, setIsAvailable] = React.useState(false);
     const [isPlaying, setIsPlaying] = React.useState(false);
-    const [currentWordIndex, setCurrentWordIndex] = React.useState(-1);
+    const [highlightInfo, setHighlightInfo] = React.useState<{ start: number; end: number } | null>(null);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
     const highlightedWordRef = React.useRef<HTMLSpanElement>(null);
-    
-    // Split text into words and spaces to preserve them
-    const words = React.useMemo(() => text.split(/(\s+)/), [text]);
 
     React.useEffect(() => {
         if (typeof window !== 'undefined' && window.speechSynthesis) {
             setIsAvailable(true);
         }
-        
+
         const handleEnd = () => {
             setIsPlaying(false);
-            setCurrentWordIndex(-1);
+            setHighlightInfo(null);
         };
-        
-        const synth = window.speechSynthesis;
 
         const handleBoundary = (event: SpeechSynthesisEvent) => {
             if (event.name === 'word') {
-                const wordIndex = words.slice(0, (words.join('').substring(0, event.charIndex) + " ").split(/(\s+)/).length -1).filter(w => w.trim() !== "").length;
-                setCurrentWordIndex(wordIndex);
+                setHighlightInfo({ start: event.charIndex, end: event.charIndex + event.charLength });
             }
         };
 
@@ -56,27 +50,28 @@ function SpeechPlayer({ text }: { text: string }) {
             currentUtterance.addEventListener('end', handleEnd);
             currentUtterance.addEventListener('boundary', handleBoundary);
         }
-
+        
+        // Cleanup function
         return () => {
             if (currentUtterance) {
                 currentUtterance.removeEventListener('end', handleEnd);
                 currentUtterance.removeEventListener('boundary', handleBoundary);
             }
-            if (synth.speaking) {
-                synth.cancel();
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
             }
         };
-    }, [text, words]);
+    }, [text]);
 
     React.useEffect(() => {
         if (highlightedWordRef.current) {
             highlightedWordRef.current.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
+                inline: 'nearest'
             });
         }
-    }, [currentWordIndex]);
-
+    }, [highlightInfo]);
 
     const handleListen = () => {
         if (!isAvailable) return;
@@ -85,7 +80,7 @@ function SpeechPlayer({ text }: { text: string }) {
         if (isPlaying) {
             synth.cancel();
             setIsPlaying(false);
-            setCurrentWordIndex(-1);
+            setHighlightInfo(null);
             return;
         }
 
@@ -97,37 +92,47 @@ function SpeechPlayer({ text }: { text: string }) {
         utteranceRef.current = utterance;
         
         const voices = synth.getVoices();
-        const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
-        if (preferredVoice) {
-            utterance.voice = preferredVoice;
+        if (voices.length > 0) {
+            const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+            synth.speak(utterance);
+            setIsPlaying(true);
+        } else {
+             // Fallback for browsers where getVoices is async
+            synth.onvoiceschanged = () => {
+                const voices = synth.getVoices();
+                const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+                 if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                synth.speak(utterance);
+                setIsPlaying(true);
+            };
         }
-
-        synth.speak(utterance);
-        setIsPlaying(true);
     };
 
     if (!isAvailable) return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>;
+    
+    const preHighlight = highlightInfo ? text.substring(0, highlightInfo.start) : text;
+    const highlighted = highlightInfo ? text.substring(highlightInfo.start, highlightInfo.end) : '';
+    const postHighlight = highlightInfo ? text.substring(highlightInfo.end) : '';
 
-    let wordCounter = -1;
     return (
         <div className="flex items-start gap-4">
             <p className="whitespace-pre-wrap leading-relaxed flex-1">
-                {words.map((word, index) => {
-                     if (word.trim() !== "") {
-                        wordCounter++;
-                        const isCurrentWord = wordCounter === currentWordIndex;
-                        return (
-                           <span
-                              key={index}
-                              ref={isCurrentWord ? highlightedWordRef : null}
-                              className={isCurrentWord ? "bg-primary/20 rounded" : ""}
-                            >
-                               {word}
-                           </span>
-                        );
-                    }
-                    return <span key={index}>{word}</span>;
-                })}
+                 {highlightInfo ? (
+                    <>
+                        {preHighlight}
+                        <span ref={highlightedWordRef} className="bg-primary/20 rounded">
+                            {highlighted}
+                        </span>
+                        {postHighlight}
+                    </>
+                ) : (
+                    text
+                )}
             </p>
             <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0">
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
@@ -136,6 +141,7 @@ function SpeechPlayer({ text }: { text: string }) {
         </div>
     );
 }
+
 
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
 
