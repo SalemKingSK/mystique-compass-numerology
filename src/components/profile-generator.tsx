@@ -646,9 +646,39 @@ export function ProfileGenerator() {
             transition={{ duration: 0.5 }}
           >
             <form onSubmit={handleSubmit}>
-              <CardHeader className="p-6 text-center">
-                <CardTitle className="font-headline text-3xl">Generate Your Profile</CardTitle>
-                <CardDescription className="text-lg">Enter your details for a personalized reading.</CardDescription>
+              <CardHeader className="p-6">
+                 <div className="flex items-center justify-between">
+                    <div className="text-center flex-1">
+                        <CardTitle className="font-headline text-3xl">Generate Your Profile</CardTitle>
+                        <CardDescription className="text-lg">Enter your details for a personalized reading.</CardDescription>
+                    </div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon" disabled={history.length === 0}>
+                                <History className="h-5 w-5" />
+                                <span className="sr-only">View History</span>
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                             <div className="grid gap-4">
+                              <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Recent Checks</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  Select a profile to view it again.
+                                </p>
+                              </div>
+                              <div className="grid gap-2">
+                                {history.map((item, index) => (
+                                   <Button key={index} variant="ghost" className="justify-start" onClick={() => handleHistorySelect(item)}>
+                                     <UserCheck className="mr-2 h-4 w-4" />
+                                     {item.name} - {item.day}/{item.month}/{item.year}
+                                   </Button>
+                                ))}
+                              </div>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                 </div>
               </CardHeader>
               <CardContent className="p-6 pt-0 space-y-4">
                 <div className="space-y-2">
