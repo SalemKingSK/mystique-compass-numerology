@@ -22,43 +22,61 @@ import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-function ListenButton({ text }: { text: string }) {
-    const [isPlaying, setIsPlaying] = React.useState(false);
+function SpeechPlayer({ text }: { text: string }) {
     const [isAvailable, setIsAvailable] = React.useState(false);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [currentWordIndex, setCurrentWordIndex] = React.useState(-1);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+    const highlightedWordRef = React.useRef<HTMLSpanElement>(null);
+    
+    // Split text into words and spaces to preserve them
+    const words = React.useMemo(() => text.split(/(\s+)/), [text]);
 
     React.useEffect(() => {
         if (typeof window !== 'undefined' && window.speechSynthesis) {
             setIsAvailable(true);
         }
-
-        const handleEnd = () => setIsPlaying(false);
+        
+        const handleEnd = () => {
+            setIsPlaying(false);
+            setCurrentWordIndex(-1);
+        };
+        
         const synth = window.speechSynthesis;
 
-        // Ensure voices are loaded
-        const voices = synth.getVoices();
-        if (voices.length === 0) {
-            synth.onvoiceschanged = () => {
-                // Voices loaded, can proceed
-            };
-        }
-        
-        // This effect manages the speech synthesis lifecycle
+        const handleBoundary = (event: SpeechSynthesisEvent) => {
+            if (event.name === 'word') {
+                const wordIndex = words.slice(0, (words.join('').substring(0, event.charIndex) + " ").split(/(\s+)/).length -1).filter(w => w.trim() !== "").length;
+                setCurrentWordIndex(wordIndex);
+            }
+        };
+
         const currentUtterance = utteranceRef.current;
         if (currentUtterance) {
             currentUtterance.addEventListener('end', handleEnd);
+            currentUtterance.addEventListener('boundary', handleBoundary);
         }
 
         return () => {
             if (currentUtterance) {
                 currentUtterance.removeEventListener('end', handleEnd);
+                currentUtterance.removeEventListener('boundary', handleBoundary);
             }
-            // Cancel any ongoing speech when the component unmounts or text changes
             if (synth.speaking) {
                 synth.cancel();
             }
         };
-    }, [text]); // Re-run effect if text changes to manage utterance listeners correctly
+    }, [text, words]);
+
+    React.useEffect(() => {
+        if (highlightedWordRef.current) {
+            highlightedWordRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [currentWordIndex]);
+
 
     const handleListen = () => {
         if (!isAvailable) return;
@@ -67,20 +85,18 @@ function ListenButton({ text }: { text: string }) {
         if (isPlaying) {
             synth.cancel();
             setIsPlaying(false);
+            setCurrentWordIndex(-1);
             return;
         }
 
-        // Cancel any previous speech
         if (synth.speaking) {
             synth.cancel();
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance; // Store utterance to manage it across renders
-
-        // Optional: select a specific voice if available
+        utteranceRef.current = utterance;
+        
         const voices = synth.getVoices();
-        // A simple selection logic, you might want something more robust
         const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
         if (preferredVoice) {
             utterance.voice = preferredVoice;
@@ -90,13 +106,34 @@ function ListenButton({ text }: { text: string }) {
         setIsPlaying(true);
     };
 
-    if (!isAvailable) return null;
+    if (!isAvailable) return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>;
 
+    let wordCounter = -1;
     return (
-        <Button onClick={handleListen} size="icon" variant="ghost" className="ml-auto shrink-0">
-            {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-            <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
-        </Button>
+        <div className="flex items-start gap-4">
+            <p className="whitespace-pre-wrap leading-relaxed flex-1">
+                {words.map((word, index) => {
+                     if (word.trim() !== "") {
+                        wordCounter++;
+                        const isCurrentWord = wordCounter === currentWordIndex;
+                        return (
+                           <span
+                              key={index}
+                              ref={isCurrentWord ? highlightedWordRef : null}
+                              className={isCurrentWord ? "bg-primary/20 rounded" : ""}
+                            >
+                               {word}
+                           </span>
+                        );
+                    }
+                    return <span key={index}>{word}</span>;
+                })}
+            </p>
+            <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0">
+                {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
+            </Button>
+        </div>
     );
 }
 
@@ -169,10 +206,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                       <div className="flex items-start">
-                                            <p className="whitespace-pre-wrap leading-relaxed flex-1">{repetitionMeaning}</p>
-                                            <ListenButton text={repetitionMeaning} />
-                                       </div>
+                                       <SpeechPlayer text={repetitionMeaning} />
                                     </AccordionContent>
                                 </AccordionItem>
                             )
@@ -192,10 +226,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                           <div className="flex items-start">
-                                                <p className="italic text-muted-foreground text-sm flex-1">{arrow.description}</p>
-                                                <ListenButton text={arrow.description} />
-                                           </div>
+                                           <SpeechPlayer text={arrow.description} />
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -212,10 +243,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                            <div className="flex items-start">
-                                                <p className="italic text-muted-foreground flex-1">{arrow.description}</p>
-                                                <ListenButton text={arrow.description} />
-                                            </div>
+                                            <SpeechPlayer text={arrow.description} />
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -233,8 +261,8 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                      <div>
                         <div className="flex items-center">
                             <h4 className="font-bold text-lg flex-1">Your Kua Attributes</h4>
-                            <ListenButton text={kuaAttributesText} />
                         </div>
+                         <SpeechPlayer text={kuaAttributesText} />
                         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                              <Badge variant="secondary">Element: {numerology.kuaAttributes.element}</Badge>
                              <Badge variant="secondary">Colors: {numerology.kuaAttributes.colors}</Badge>
@@ -433,23 +461,21 @@ function ResultsDisplay({
               <div className="pr-4">
                 <TabsContent value="introduction">
                   <Card>
-                    <CardHeader className="flex-row items-center">
+                    <CardHeader>
                       <CardTitle className="font-headline text-2xl flex-1">Your Animal Sign: The {insight.sign}</CardTitle>
-                      <ListenButton text={insight.signData.introduction} />
                     </CardHeader>
                     <CardContent className="pt-4">
-                      <p className="whitespace-pre-wrap leading-relaxed">{insight.signData.introduction}</p>
+                      <SpeechPlayer text={insight.signData.introduction} />
                     </CardContent>
                   </Card>
                 </TabsContent>
                 <TabsContent value="element">
                   <Card>
-                    <CardHeader className="flex-row items-center">
+                    <CardHeader>
                       <CardTitle className="font-headline text-2xl flex-1">The Influence of the {insight.element} Element</CardTitle>
-                       <ListenButton text={insight.signData.elements[insight.element as keyof typeof insight.signData.elements]} />
                     </CardHeader>
                     <CardContent className="pt-4">
-                      <p className="whitespace-pre-wrap leading-relaxed">{insight.signData.elements[insight.element as keyof typeof insight.signData.elements]}</p>
+                      <SpeechPlayer text={insight.signData.elements[insight.element as keyof typeof insight.signData.elements]} />
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -465,10 +491,7 @@ function ResultsDisplay({
                           <AccordionItem value={sign} key={sign}>
                             <AccordionTrigger>With the {sign}</AccordionTrigger>
                             <AccordionContent>
-                               <div className="flex items-start">
-                                <p className="whitespace-pre-wrap leading-relaxed flex-1">{insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]}</p>
-                                <ListenButton text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} />
-                               </div>
+                               <SpeechPlayer text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} />
                             </AccordionContent>
                           </AccordionItem>
                         ))}
@@ -490,10 +513,7 @@ function ResultsDisplay({
                               {year} - The {futureData.element} {futureData.year}
                             </AccordionTrigger>
                             <AccordionContent>
-                              <div className="flex items-start">
-                               <p className="whitespace-pre-wrap leading-relaxed flex-1">{futureData.prediction}</p>
-                               <ListenButton text={futureData.prediction} />
-                              </div>
+                              <SpeechPlayer text={futureData.prediction} />
                             </AccordionContent>
                           </AccordionItem>
                         ))}
