@@ -25,114 +25,120 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 function SpeechPlayer({ text }: { text: string }) {
     const [isAvailable, setIsAvailable] = React.useState(false);
     const [isPlaying, setIsPlaying] = React.useState(false);
-    const [highlightInfo, setHighlightInfo] = React.useState<{ start: number; end: number } | null>(null);
+    const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
-    const highlightedWordRef = React.useRef<HTMLSpanElement>(null);
+    const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+
+    const sentences = React.useMemo(() => {
+        const cleanedText = text.replace(/([.!?])\s*(?=[A-Z])/g, "$1|").split('|');
+        return cleanedText.filter(sentence => sentence.trim().length > 0);
+    }, [text]);
 
     React.useEffect(() => {
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            setIsAvailable(true);
-        }
+        setIsAvailable(typeof window !== 'undefined' && 'speechSynthesis' in window);
 
         const handleEnd = () => {
             setIsPlaying(false);
-            setHighlightInfo(null);
+            setCurrentSentenceIndex(-1);
         };
-
-        const handleBoundary = (event: SpeechSynthesisEvent) => {
-            if (event.name === 'word') {
-                setHighlightInfo({ start: event.charIndex, end: event.charIndex + event.charLength });
-            }
-        };
-
-        const currentUtterance = utteranceRef.current;
-        if (currentUtterance) {
-            currentUtterance.addEventListener('end', handleEnd);
-            currentUtterance.addEventListener('boundary', handleBoundary);
-        }
         
-        // Cleanup function
+        const utterance = utteranceRef.current;
+        if (utterance) {
+            utterance.addEventListener('end', handleEnd);
+        }
+
         return () => {
-            if (currentUtterance) {
-                currentUtterance.removeEventListener('end', handleEnd);
-                currentUtterance.removeEventListener('boundary', handleBoundary);
+            if (utterance) {
+                utterance.removeEventListener('end', handleEnd);
             }
-            if (window.speechSynthesis.speaking) {
+            if (window.speechSynthesis?.speaking) {
                 window.speechSynthesis.cancel();
             }
         };
     }, [text]);
 
     React.useEffect(() => {
-        if (highlightedWordRef.current) {
-            highlightedWordRef.current.scrollIntoView({
+        if (currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
+            sentenceRefs.current[currentSentenceIndex]?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
                 inline: 'nearest'
             });
         }
-    }, [highlightInfo]);
+    }, [currentSentenceIndex]);
 
     const handleListen = () => {
         if (!isAvailable) return;
+        
         const synth = window.speechSynthesis;
 
         if (isPlaying) {
             synth.cancel();
             setIsPlaying(false);
-            setHighlightInfo(null);
+            setCurrentSentenceIndex(-1);
             return;
         }
 
         if (synth.speaking) {
             synth.cancel();
         }
-
+        
         const utterance = new SpeechSynthesisUtterance(text);
         utteranceRef.current = utterance;
-        
+
+        utterance.onboundary = (event) => {
+            if (event.name === 'sentence') {
+                let charIndex = event.charIndex;
+                let sentenceBoundary = 0;
+                for (let i = 0; i < sentences.length; i++) {
+                    const sentenceLength = sentences[i].length;
+                    if (charIndex >= sentenceBoundary && charIndex < sentenceBoundary + sentenceLength) {
+                        setCurrentSentenceIndex(i);
+                        break;
+                    }
+                    sentenceBoundary += sentenceLength;
+                }
+            }
+        };
+
+        utterance.onend = () => {
+            setIsPlaying(false);
+            setCurrentSentenceIndex(-1);
+        };
+
         const voices = synth.getVoices();
         if (voices.length > 0) {
             const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-            if (preferredVoice) {
-                utterance.voice = preferredVoice;
-            }
+            if (preferredVoice) utterance.voice = preferredVoice;
             synth.speak(utterance);
             setIsPlaying(true);
         } else {
-             // Fallback for browsers where getVoices is async
             synth.onvoiceschanged = () => {
                 const voices = synth.getVoices();
                 const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-                 if (preferredVoice) {
-                    utterance.voice = preferredVoice;
-                }
+                if (preferredVoice) utterance.voice = preferredVoice;
                 synth.speak(utterance);
                 setIsPlaying(true);
             };
         }
     };
 
-    if (!isAvailable) return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>;
+    if (!isAvailable) {
+        return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>;
+    }
     
-    const preHighlight = highlightInfo ? text.substring(0, highlightInfo.start) : text;
-    const highlighted = highlightInfo ? text.substring(highlightInfo.start, highlightInfo.end) : '';
-    const postHighlight = highlightInfo ? text.substring(highlightInfo.end) : '';
-
     return (
         <div className="flex items-start gap-4">
-            <p className="whitespace-pre-wrap leading-relaxed flex-1">
-                 {highlightInfo ? (
-                    <>
-                        {preHighlight}
-                        <span ref={highlightedWordRef} className="bg-primary/20 rounded">
-                            {highlighted}
-                        </span>
-                        {postHighlight}
-                    </>
-                ) : (
-                    text
-                )}
+             <p className="whitespace-pre-wrap leading-relaxed flex-1">
+                {sentences.map((sentence, index) => (
+                    <span
+                        key={index}
+                        ref={el => sentenceRefs.current[index] = el}
+                        className={currentSentenceIndex === index ? "bg-primary/20 rounded transition-all duration-300" : ""}
+                    >
+                        {sentence}
+                    </span>
+                ))}
             </p>
             <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0">
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
@@ -141,7 +147,6 @@ function SpeechPlayer({ text }: { text: string }) {
         </div>
     );
 }
-
 
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
 
@@ -750,3 +755,5 @@ export function ProfileGenerator() {
     </div>
   );
 }
+
+    
