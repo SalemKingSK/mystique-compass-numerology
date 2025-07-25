@@ -1,6 +1,6 @@
 'use server';
 
-import { getAstroInsight, type AstroInsightInput } from '@/ai/flows/astro-insight-flow';
+import { getAstroInsight, type AstroInsightInput } from '@/lib/astrology';
 import { generateLoShuData } from '@/lib/numerology';
 
 export async function getAstroInsightAction(formData: AstroInsightInput) {

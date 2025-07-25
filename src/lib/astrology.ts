@@ -1,5 +1,32 @@
-
 // src/lib/astrology.ts
+import { zodiacData } from '@/lib/zodiac';
+
+export interface AstroInsightInput {
+  name: string;
+  day: number;
+  month: number;
+  year: number;
+  gender: string;
+}
+
+const SignDataSchema = {
+    introduction: "",
+    elements: {},
+    compatibilities: {},
+    futures: {},
+};
+
+export interface AstroInsightOutput {
+  name: string;
+  western_sign: string;
+  new_astrology_sign: string;
+  sign: string;
+  element: string;
+  reading: string;
+  luckyNumber: number;
+  luckyColor: string;
+  signData: typeof SignDataSchema;
+}
 
 // Helper function to get the Western Zodiac sign
 export const getWesternZodiacSign = (day: number, month: number): string => {
@@ -14,7 +41,6 @@ export const getWesternZodiacSign = (day: number, month: number): string => {
   if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
   if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Scorpio";
   if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagittarius";
-  // Default to Capricorn for days outside the ranges (e.g., Dec 22 - Jan 19)
   return "Capricorn";
 };
 
@@ -152,7 +178,6 @@ export const getChineseZodiacSign = (day: number, month: number, year: number) =
     const startDate = new Date(zodiacYear.start);
     const endDate = new Date(zodiacYear.end);
     
-    // Set hours to 0 to compare dates only
     date.setHours(0,0,0,0);
     startDate.setHours(0,0,0,0);
     endDate.setHours(0,0,0,0);
@@ -163,6 +188,68 @@ export const getChineseZodiacSign = (day: number, month: number, year: number) =
     }
   }
 
-  // Fallback for dates outside the defined range
   return { sign: 'Unknown', element: 'Unknown' };
 };
+
+const reduceNumber = (num: number): number => {
+  let currentNum = num;
+  while (currentNum > 9) {
+    currentNum = currentNum.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+  }
+  return currentNum;
+};
+
+const generateReading = (name: string, sign: string, westernSign: string): string => {
+    const templates = [
+        `As a ${westernSign}/${sign}, ${name} possesses a unique blend of ambition and charm. Your path is one of building bridges between worlds, using your steadfast nature and dynamic energy to achieve remarkable things.`,
+        `${name}, your ${westernSign} fire combined with the ${sign}'s wisdom creates a powerful force. You are destined to lead and inspire, often finding success by trusting your sharp instincts and caring for your community.`,
+        `The stars suggest a journey of creativity and compassion for ${name}. Your ${westernSign} intuition and ${sign} practicality mean you can turn even the most ambitious dreams into tangible realities. Cherish your unique gifts.`
+    ];
+    const index = (name.length + sign.length) % templates.length;
+    return templates[index];
+}
+
+const generateLuckyColor = (element: string): string => {
+    const colorMap: { [key: string]: string } = {
+        "Wood": "Green",
+        "Fire": "Red",
+        "Earth": "Yellow",
+        "Metal": "White",
+        "Water": "Blue"
+    };
+    return colorMap[element] || "Silver";
+}
+
+
+export async function getAstroInsight(input: AstroInsightInput): Promise<AstroInsightOutput> {
+    const { year, month, day, name } = input;
+    
+    // 1. Determine Zodiac signs
+    const western_sign = getWesternZodiacSign(day, month);
+    const { sign, element } = getChineseZodiacSign(day, month, year);
+    const new_astrology_sign = `${western_sign}/${sign}`;
+
+    // 2. Get the entire data object for that sign
+    const signData = (zodiacData as any)[sign];
+    if (!signData) {
+      throw new Error(`No zodiac data found for sign: ${sign}`);
+    }
+
+    // 3. Generate deterministic reading
+    const reading = generateReading(name, sign, western_sign);
+    const luckyNumber = reduceNumber(day + month + year);
+    const luckyColor = generateLuckyColor(element);
+    
+    // 4. Return combined data
+    return {
+        name,
+        western_sign,
+        new_astrology_sign,
+        sign,
+        element,
+        reading,
+        luckyNumber,
+        luckyColor,
+        signData: signData,
+    };
+}
