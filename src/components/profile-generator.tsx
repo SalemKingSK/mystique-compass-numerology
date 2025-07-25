@@ -24,7 +24,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 function SpeechPlayer({ text }: { text: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
-    const [isPaused, setIsPaused] = React.useState(false);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
     const wasManuallyStopped = React.useRef(false);
@@ -44,13 +43,13 @@ function SpeechPlayer({ text }: { text: string }) {
     }, []);
 
     React.useEffect(() => {
-        if (isPlaying && !isPaused && currentSentenceIndex >= 0 && sentenceRefs.current[currentSentenceIndex]) {
+        if (isPlaying && currentSentenceIndex >= 0 && sentenceRefs.current[currentSentenceIndex]) {
             sentenceRefs.current[currentSentenceIndex]?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
             });
         }
-    }, [currentSentenceIndex, isPlaying, isPaused]);
+    }, [currentSentenceIndex, isPlaying]);
 
     const handleListen = () => {
         if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -93,8 +92,10 @@ function SpeechPlayer({ text }: { text: string }) {
             };
             
             utterance.onend = () => {
-                utteranceIndex++;
-                speakSentences();
+                if (!wasManuallyStopped.current) {
+                    utteranceIndex++;
+                    speakSentences();
+                }
             };
 
             utterance.onerror = (event) => {
