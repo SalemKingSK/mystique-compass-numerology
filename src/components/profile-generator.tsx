@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 import type { AstroInsightOutput } from '@/ai/flows/astro-insight-flow';
@@ -22,20 +22,20 @@ import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-function SpeechPlayer({ text }: { text: string }) {
+function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
-    const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+    const sentencesRef = React.useRef<string[]>([]);
+    const sentenceElementsRef = React.useRef<(HTMLSpanElement | null)[]>([]);
     const wasManuallyStopped = React.useRef(false);
 
-    const sentences = React.useMemo(() => {
-        if (!text) return [];
-        return text.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [text];
+    React.useEffect(() => {
+        sentencesRef.current = text ? text.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [text] : [];
+        sentenceElementsRef.current = new Array(sentencesRef.current.length).fill(null);
     }, [text]);
 
     React.useEffect(() => {
-        // Cleanup function to cancel speech when the component unmounts
         return () => {
             if (window.speechSynthesis?.speaking) {
                 wasManuallyStopped.current = true;
@@ -45,78 +45,71 @@ function SpeechPlayer({ text }: { text: string }) {
     }, []);
 
     React.useEffect(() => {
-        if (isPlaying && currentSentenceIndex >= 0 && sentenceRefs.current[currentSentenceIndex]) {
-            sentenceRefs.current[currentSentenceIndex]?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
+        if (isPlaying && currentSentenceIndex >= 0) {
+            const element = sentenceElementsRef.current[currentSentenceIndex];
+            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }, [currentSentenceIndex, isPlaying]);
 
     const handleListen = () => {
-        if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+        if (typeof window === 'undefined' || !window.speechSynthesis) {
             console.error("Speech Synthesis not supported.");
-            return;
-        }
-
-        const synth = window.speechSynthesis;
-
-        if (synth.speaking) {
-            handleStop();
             return;
         }
 
         wasManuallyStopped.current = false;
         setIsPlaying(true);
-        let utteranceIndex = 0;
+        let sentenceIndex = 0;
 
         const speakSentences = () => {
-            if (wasManuallyStopped.current || utteranceIndex >= sentences.length) {
+            if (wasManuallyStopped.current || sentenceIndex >= sentencesRef.current.length) {
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
+                if (utteranceRef.current) {
+                   utteranceRef.current.onend = null;
+                   utteranceRef.current.onerror = null;
+                   utteranceRef.current.onboundary = null;
+                }
                 return;
             }
+            
+            const utterance = new SpeechSynthesisUtterance(sentencesRef.current[sentenceIndex]);
+            utteranceRef.current = utterance;
 
-            const sentence = sentences[utteranceIndex];
-            const utterance = new SpeechSynthesisUtterance(sentence);
-            utteranceRef.current = utterance; // Store reference to the utterance
-
-            const voices = synth.getVoices();
+            const voices = window.speechSynthesis.getVoices();
             if (voices.length > 0) {
                 const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
                 if (preferredVoice) utterance.voice = preferredVoice;
             }
 
             utterance.onstart = () => {
-                setCurrentSentenceIndex(utteranceIndex);
+                setCurrentSentenceIndex(sentenceIndex);
             };
-
+            
             utterance.onend = () => {
-                if (!wasManuallyStopped.current) {
-                    utteranceIndex++;
-                    speakSentences();
-                }
+                sentenceIndex++;
+                speakSentences();
             };
             
             utterance.onerror = (event) => {
-                 if (event.error !== 'cancelled' && event.error !== 'interrupted' && !wasManuallyStopped.current) {
+                if (event.error !== 'cancelled' && event.error !== 'interrupted') {
                     console.error("SpeechSynthesisUtterance.onerror", event);
                 }
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
             };
 
-
-            synth.speak(utterance);
+            window.speechSynthesis.speak(utterance);
         };
 
-        if (synth.getVoices().length > 0) {
-            speakSentences();
+        // Ensure voices are loaded before speaking
+        if (window.speechSynthesis.getVoices().length === 0) {
+             window.speechSynthesis.onvoiceschanged = speakSentences;
         } else {
-            synth.onvoiceschanged = speakSentences;
+            speakSentences();
         }
     };
-
+    
     const handleStop = () => {
         wasManuallyStopped.current = true;
         if (window.speechSynthesis) {
@@ -126,20 +119,28 @@ function SpeechPlayer({ text }: { text: string }) {
         setCurrentSentenceIndex(-1);
     };
 
+    const handlePlayPause = () => {
+        if (isPlaying) {
+            handleStop();
+        } else {
+            handleListen();
+        }
+    };
+
     return (
         <div className="flex items-start gap-4">
             <div className="whitespace-pre-wrap leading-relaxed flex-1">
-                {sentences.map((sentence, index) => (
+                {sentencesRef.current.map((sentence, index) => (
                     <span
-                        key={index}
-                        ref={el => sentenceRefs.current[index] = el}
-                        className={currentSentenceIndex === index ? "bg-primary/20 rounded transition-all duration-300" : ""}
+                        key={`${elementId}-${index}`}
+                        ref={el => sentenceElementsRef.current[index] = el}
+                        className={currentSentenceIndex === index ? "bg-primary/20 rounded-md transition-all duration-300" : ""}
                     >
                         {sentence}
                     </span>
                 ))}
             </div>
-            <Button onClick={isPlaying ? handleStop : handleListen} size="icon" variant="ghost" className="shrink-0" disabled={!text}>
+            <Button onClick={handlePlayPause} size="icon" variant="ghost" className="shrink-0" disabled={!text}>
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                 <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
             </Button>
@@ -158,7 +159,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-xl">Psyche Number</CardTitle></CardHeader>
                     <CardContent><p className="text-4xl font-bold text-primary">{numerology.psycheNum}</p></CardContent>
@@ -167,11 +168,36 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     <CardHeader><CardTitle className="font-headline text-xl">Destiny Number</CardTitle></CardHeader>
                     <CardContent><p className="text-4xl font-bold text-primary">{numerology.destinyNum}</p></CardContent>
                 </Card>
+                 <Card>
+                    <CardHeader><CardTitle className="font-headline text-xl">Destiny/Fate</CardTitle></CardHeader>
+                    <CardContent><p className="text-4xl font-bold text-primary">{numerology.compoundNum}</p></CardContent>
+                </Card>
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-xl">Kua Number</CardTitle></CardHeader>
                     <CardContent><p className="text-4xl font-bold text-primary">{numerology.kuaNum}</p></CardContent>
                 </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                        <Skull className="h-6 w-6" /> Destiny/Fate Meaning
+                    </CardTitle>
+                     <CardDescription>The meaning of your compound number {numerology.compoundNum}.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="compound-meaning">
+                            <AccordionTrigger>
+                                <span className='font-semibold text-left'>Read about your Destiny/Fate Number</span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                               <SpeechPlayer text={numerology.compoundMeaning} elementId="compound-meaning-speech" />
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </CardContent>
+            </Card>
             
              <Card>
                 <CardHeader>
@@ -216,7 +242,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                       <SpeechPlayer text={repetitionMeaning} />
+                                       <SpeechPlayer text={repetitionMeaning} elementId={`number-meaning-${digit}-speech`} />
                                     </AccordionContent>
                                 </AccordionItem>
                             )
@@ -232,11 +258,11 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     <CardContent>
                         {numerology.arrowsOfStrength.length > 0 ? (
                             <Accordion type="single" collapsible className="w-full">
-                                {numerology.arrowsOfStrength.map(arrow => (
+                                {numerology.arrowsOfStrength.map((arrow, index) => (
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                           <SpeechPlayer text={arrow.description} />
+                                           <SpeechPlayer text={arrow.description} elementId={`strength-arrow-${index}-speech`} />
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -249,11 +275,11 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                      <CardContent>
                         {numerology.arrowsOfWeakness.length > 0 ? (
                            <Accordion type="single" collapsible className="w-full">
-                                {numerology.arrowsOfWeakness.map(arrow => (
+                                {numerology.arrowsOfWeakness.map((arrow, index) => (
                                     <AccordionItem value={arrow.name} key={arrow.name}>
                                         <AccordionTrigger>{arrow.name}</AccordionTrigger>
                                         <AccordionContent>
-                                            <SpeechPlayer text={arrow.description} />
+                                            <SpeechPlayer text={arrow.description} elementId={`weakness-arrow-${index}-speech`} />
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -272,7 +298,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                         <div className="flex items-center">
                             <h4 className="font-bold text-lg flex-1">Your Kua Attributes</h4>
                         </div>
-                         <SpeechPlayer text={kuaAttributesText} />
+                         <SpeechPlayer text={kuaAttributesText} elementId="kua-attributes-speech" />
                         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                              <Badge variant="secondary">Element: {numerology.kuaAttributes.element}</Badge>
                              <Badge variant="secondary">Colors: {numerology.kuaAttributes.colors}</Badge>
@@ -317,6 +343,7 @@ function ResultsDisplay({
   const futureYears = Object.entries(insight.signData.futures)
     .filter(([year]) => parseInt(year) >= currentYear)
     .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
+  
   const compatibilitySigns = Object.keys(insight.signData.compatibilities);
 
   const elementKey = insight.element as keyof typeof insight.signData.elements;
@@ -478,7 +505,7 @@ function ResultsDisplay({
                       <CardTitle className="font-headline text-2xl flex-1">Your Animal Sign: The {insight.sign}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
-                      <SpeechPlayer text={insight.signData.introduction} />
+                      <SpeechPlayer text={insight.signData.introduction} elementId="intro-speech" />
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -488,7 +515,7 @@ function ResultsDisplay({
                       <CardTitle className="font-headline text-2xl flex-1">The Influence of the {insight.element} Element</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
-                       <SpeechPlayer text={elementText} />
+                       <SpeechPlayer text={elementText} elementId="element-speech"/>
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -500,11 +527,11 @@ function ResultsDisplay({
                     </CardHeader>
                     <CardContent>
                       <Accordion type="single" collapsible className="w-full">
-                        {compatibilitySigns.map((sign) => (
+                        {compatibilitySigns.map((sign, index) => (
                           <AccordionItem value={sign} key={sign}>
                             <AccordionTrigger>With the {sign}</AccordionTrigger>
                             <AccordionContent>
-                               <SpeechPlayer text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} />
+                               <SpeechPlayer text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} elementId={`compat-speech-${index}`} />
                             </AccordionContent>
                           </AccordionItem>
                         ))}
@@ -520,13 +547,13 @@ function ResultsDisplay({
                     </CardHeader>
                     <CardContent className="pt-4">
                       <Accordion type="single" collapsible className="w-full">
-                        {futureYears.map(([year, futureData]) => (
+                        {futureYears.map(([year, futureData], index) => (
                           <AccordionItem value={year} key={year}>
                             <AccordionTrigger>
                               {year} - The {futureData.element} {futureData.year}
                             </AccordionTrigger>
                             <AccordionContent>
-                              <SpeechPlayer text={futureData.prediction} />
+                              <SpeechPlayer text={futureData.prediction} elementId={`future-speech-${index}`} />
                             </AccordionContent>
                           </AccordionItem>
                         ))}
@@ -597,6 +624,9 @@ export function ProfileGenerator() {
   };
   
   const handleReset = () => {
+    if (window.speechSynthesis?.speaking) {
+        window.speechSynthesis.cancel();
+    }
     setInsight(null);
     setNumerology(null);
     setError(null);
