@@ -25,31 +25,29 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 function SpeechPlayer({ text }: { text: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
-    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
     const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
 
+    // Split text into sentences. A more robust regex to handle various sentence endings.
     const sentences = React.useMemo(() => {
         if (!text) return [];
-        // This regex splits text into sentences more reliably.
-        const cleanedText = text.match(/[^.!?]+[.!?]+/g) || [text];
-        return cleanedText.map(s => s.trim()).filter(Boolean);
+        return text.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [text];
     }, [text]);
 
+    // Cleanup speech synthesis on component unmount
     React.useEffect(() => {
-        // Cleanup function to stop speech when the component unmounts
         return () => {
             if (window.speechSynthesis?.speaking) {
                 window.speechSynthesis.cancel();
             }
         };
     }, []);
-    
+
+    // Scroll to the currently spoken sentence
     React.useEffect(() => {
-        if (isPlaying && currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
+        if (isPlaying && currentSentenceIndex >= 0 && sentenceRefs.current[currentSentenceIndex]) {
             sentenceRefs.current[currentSentenceIndex]?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
-                inline: 'nearest'
             });
         }
     }, [currentSentenceIndex, isPlaying]);
@@ -59,68 +57,71 @@ function SpeechPlayer({ text }: { text: string }) {
             console.error("Speech Synthesis not supported.");
             return;
         }
-        
+
         const synth = window.speechSynthesis;
 
-        if (isPlaying) {
+        if (synth.speaking) {
             synth.cancel();
             setIsPlaying(false);
             setCurrentSentenceIndex(-1);
             return;
         }
-
-        if (synth.speaking) {
-            synth.cancel();
-        }
         
-        const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance;
+        setIsPlaying(true);
+        let utteranceIndex = 0;
+        let charIndex = 0;
 
-        utterance.onstart = () => {
-            setIsPlaying(true);
-            setCurrentSentenceIndex(0); // Start with the first sentence highlighted
-        };
-
-        utterance.onboundary = (event) => {
-             if (event.name === 'sentence') {
-                let charIndex = event.charIndex;
-                let accumulatedLength = 0;
-                for (let i = 0; i < sentences.length; i++) {
-                    if (charIndex < accumulatedLength + sentences[i].length) {
-                        setCurrentSentenceIndex(i);
-                        break;
-                    }
-                    accumulatedLength += sentences[i].length + 1; // +1 for space
-                }
+        const speakSentences = () => {
+            if (utteranceIndex >= sentences.length) {
+                setIsPlaying(false);
+                setCurrentSentenceIndex(-1);
+                return;
             }
-        };
 
-        utterance.onend = () => {
-            setIsPlaying(false);
-            setCurrentSentenceIndex(-1);
+            const sentence = sentences[utteranceIndex];
+            const utterance = new SpeechSynthesisUtterance(sentence);
+            
+            // Set a preferred voice if available
+            const voices = synth.getVoices();
+            if (voices.length > 0) {
+                 const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+                 if (preferredVoice) utterance.voice = preferredVoice;
+            }
+
+            utterance.onstart = () => {
+                setCurrentSentenceIndex(utteranceIndex);
+            };
+            
+            utterance.onend = () => {
+                charIndex += sentence.length;
+                utteranceIndex++;
+                speakSentences(); // Speak the next sentence
+            };
+
+            utterance.onerror = (event) => {
+                console.error("SpeechSynthesisUtterance.onerror", event);
+                setIsPlaying(false);
+                setCurrentSentenceIndex(-1);
+            };
+
+            synth.speak(utterance);
         };
         
-        utterance.onerror = (event) => {
-            console.error('SpeechSynthesisUtterance.onerror', event);
-            setIsPlaying(false);
-            setCurrentSentenceIndex(-1);
-        };
-
-        // Ensure voices are loaded before speaking
-        let voices = synth.getVoices();
-        if (voices.length > 0) {
-            const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-            if (preferredVoice) utterance.voice = preferredVoice;
-            synth.speak(utterance);
+        // Ensure voices are loaded
+        if (synth.getVoices().length > 0) {
+            speakSentences();
         } else {
-            synth.onvoiceschanged = () => {
-                voices = synth.getVoices();
-                const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-                if (preferredVoice) utterance.voice = preferredVoice;
-                synth.speak(utterance);
-            };
+             synth.onvoiceschanged = speakSentences;
         }
     };
+    
+    const handleStop = () => {
+        if (window.speechSynthesis?.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        setIsPlaying(false);
+        setCurrentSentenceIndex(-1);
+    }
     
     return (
         <div className="flex items-start gap-4">
@@ -131,11 +132,11 @@ function SpeechPlayer({ text }: { text: string }) {
                         ref={el => sentenceRefs.current[index] = el}
                         className={currentSentenceIndex === index ? "bg-primary/20 rounded transition-all duration-300" : ""}
                     >
-                        {sentence}{' '}
+                        {sentence}
                     </span>
                 ))}
             </div>
-            <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0" disabled={!text}>
+            <Button onClick={isPlaying ? handleStop : handleListen} size="icon" variant="ghost" className="shrink-0" disabled={!text}>
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                 <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
             </Button>
@@ -757,5 +758,3 @@ export function ProfileGenerator() {
     </div>
   );
 }
-
-    
