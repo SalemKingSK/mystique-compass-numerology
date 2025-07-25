@@ -1,4 +1,3 @@
-
 // src/lib/numerology.ts
 import type { AstroInsightInput } from '@/ai/flows/astro-insight-flow';
 
@@ -24,12 +23,13 @@ export interface NumerologyData {
   arrowsOfWeakness: { name: string; description: string }[];
 }
 
-// Helper function to reduce a number to a single digit
-const reduceToSingleDigit = (num: number): number => {
-  while (num > 9) {
-    num = num.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+// Helper function to reduce a number to a single digit or a compound number
+const reduceNumber = (num: number): number => {
+  let currentNum = num;
+  while (currentNum > 9) {
+    currentNum = currentNum.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   }
-  return num;
+  return currentNum;
 };
 
 // Main function to generate all numerology data
@@ -38,10 +38,10 @@ export async function generateLoShuData(input: AstroInsightInput): Promise<Numer
   const fullDob = `${day}${month}${year}`;
 
   // 1. Psyche Number
-  const psycheNum = reduceToSingleDigit(day);
+  const psycheNum = reduceNumber(day);
 
   // 2. Destiny Number
-  const destinyNum = reduceToSingleDigit(day + month + year);
+  const destinyNum = reduceNumber(day + month + year);
 
   // 3. Lo Shu Grid and Number Counts
   const dobDigits = fullDob.split('').map(Number);
@@ -57,15 +57,14 @@ export async function generateLoShuData(input: AstroInsightInput): Promise<Numer
   ];
 
   // 4. Kua Number
-  let kuaNum = reduceToSingleDigit(year);
+  let kuaNum = reduceNumber(year);
   if (gender === 'male') {
     kuaNum = 11 - kuaNum;
   } else {
     kuaNum = 4 + kuaNum;
   }
-  kuaNum = reduceToSingleDigit(kuaNum);
+  kuaNum = reduceNumber(kuaNum);
 
-  // Handle Kua number 5
   let effectiveKua = kuaNum;
   if (kuaNum === 5) {
     effectiveKua = gender === 'male' ? 2 : 8;
@@ -74,18 +73,17 @@ export async function generateLoShuData(input: AstroInsightInput): Promise<Numer
   const kuaAttributes = KUA_ATTRIBUTES[effectiveKua];
   const auspiciousDirections = KUA_DIRECTIONS[effectiveKua];
 
-
   // 5. Arrows of Strength and Weakness
   const arrows = calculateArrows(numberCounts);
 
-  // 6. Compound Fate Number (Tier 1)
-  const compoundNum = fullDob.split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+  // 6. Tier 1: Compound Fate Number
+  const compoundNum = fullDob.split('').map(Number).reduce((acc, digit) => acc + digit, 0);
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum] || "No specific meaning for this compound number.";
 
-  // 7. Reduced Compound Number (Tier 2)
+  // 7. Tier 2: Reduced Compound Number (Inner Essence)
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
-  if(compoundNum > 9) {
+  if (compoundNum > 9) {
     const reducedSum = compoundNum.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
     if (reducedSum >= 10 && COMPOUND_NUMBER_MEANINGS[reducedSum]) {
       reducedCompoundNum = reducedSum;
@@ -93,14 +91,17 @@ export async function generateLoShuData(input: AstroInsightInput): Promise<Numer
     }
   }
 
-  // 8. Karmic Fate Number (Tier 3)
-  const karmicSum = day + month + year;
-  const reducedKarmicSum = reduceToSingleDigit(karmicSum);
+  // 8. Tier 3: Karmic Fate Number
+  const karmicSumInitial = day + month + year;
+  let reducedKarmicSum = karmicSumInitial;
+   if (karmicSumInitial > 9) {
+    reducedKarmicSum = karmicSumInitial.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+  }
   const karmicMeaningText = KARMIC_FATE_MEANINGS[reducedKarmicSum] || null;
-  
+
   let karmicFateNum : number | null = null;
   let karmicFateMeaning : string | null = null;
-  
+
   if (karmicMeaningText) {
     karmicFateNum = reducedKarmicSum;
     karmicFateMeaning = karmicMeaningText;
@@ -125,6 +126,7 @@ export async function generateLoShuData(input: AstroInsightInput): Promise<Numer
     arrowsOfWeakness: arrows.weakness,
   };
 }
+
 
 const calculateArrows = (counts: { [key: number]: number }) => {
     const strength = [];
@@ -360,7 +362,7 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   50: "Number 50 has the same meaning as the number 32. Number 50 possesses a remarkable ability to influence large groups of people, similar to the 14 compound number. It also attracts support from those in high positions, much like the 23 compound number. Combined with a natural talent for captivating others through magnetic speech, it’s evident why 50 is sometimes referred to as “the politician’s vibration.” Fields such as advertising, writing, publishing, radio, and television are often easily navigable for those with the 50 compound number, though not always. They tend to thrive under pressure. However, a cautionary note accompanies this seemingly positive influence. The 50 compound number is highly fortunate if the individual remains steadfast in their own opinions and judgments, whether in artistic, intangible, or material matters. If they waver, their plans risk being undermined by the stubbornness or folly of others.",
   51: "Number 51 possesses a strong potency of its own. It's associated with the nature of the warrior, and promises sudden advancement in whatever one undertakes. It is especially favorable for those who need protection in military or naval life, and for the leaders of any 'cause' unrelated to war. Yet, it also brings the threat of dangerous enemies and the possibility of attempted assassination; therefore, it is clearly wise, should the name equal 51, to change the spelling to equal a safer Compound number — and forget the glory.",
   52: "Number 52 has the same meaning as the number 43. The ancients claim that this is an unfortunate number, and if the name equals a 43, the spelling should be changed to equal a more fortunate Compound number. It is symbolized by the tendency toward revolution, upheaval, strife, conflict, and war. It carries the vibration of repeated disappointment and failure."
-};
+}
 const KARMIC_FATE_MEANINGS: { [key: number]: string } = {
   10: "The Wheel of Fortune: Symbolized by Isis and Osiris, this number signifies rise and fall according to personal desire. It brings honor or dishonor, love or hate, with no middle ground. It contains the power for manifesting creative concepts into reality, but this must be used with wisdom and compassion to avoid destruction. Self-discipline must precede dominion. Those who fail to realize their potential may feel unfulfilled and act arrogantly to cover feelings of inferiority.",
   11: "A Lion Muzzled — A Clenched Fist: This is a number of hidden trials and treachery from others. It represents two opposing forces or situations that lack compatibility. To avoid frustration, these divided goals must be united. The source of this division must be identified, and compromise must be sought. Sometimes, the conflict is internal, reflecting two conflicting desires that need to be harmonized for happiness.",
@@ -373,11 +375,11 @@ const KARMIC_FATE_MEANINGS: { [key: number]: string } = {
   18: "Spiritual-Material Conflict: This number symbolizes materialism striving to destroy the spiritual side of nature. It's associated with bitter family quarrels, wars, and social upheaval. It warns of treachery, deception, and danger from the elements. The only way to dilute its negative effects is through spiritual means: meeting deception and hatred with generosity, love, and forgiveness. By returning good for evil, the tragedy of 18 can be turned into triumph and enlightenment.",
   19: "The Prince of Heaven: One of the most fortunate of all Compound numbers, symbolized as the Sun. It promises victory over all temporal failure and disappointment. It blesses the person with happiness, fulfillment, and success in all ventures, both personal and professional. It will smooth the path and greatly dilute any negative vibrations from other numbers in a person's chart.",
   20: "The Awakening: Also called 'The Judgment,' this number symbolizes a powerful awakening, bringing a new purpose, new plans, and a call to action for a great cause or ideal. There may be delays and obstacles, but they can be conquered through patience and faith. It brings vivid precognitive dreams and the ability to manifest positive outcomes. It is not a material number, so financial success is doubtful, but it provides enough for basic necessities.",
-  21: "The Crown of the Magi: Pictured as 'The Universe,' this number promises general success, advancement, honors, and awards. It indicates victory after a long struggle and many tests of determination. It is a most fortunate vibration and a number of karmic reward, ensuring final victory over all odds and opposition.",
+  21: "The Crown of the Magi: Pictured as 'The Universe,' this number promises general success, advancement, honors, and awards. It indicates victory after a long struggle and many tests of determination. It is a most fortunate vibration and a number of karmic reward, ensuring final victory over all odds and all opposition.",
   22: "Submission — and Caution: Symbolized as 'a Good Man, blinded by the folly of others, with a knapsack on his back, full of errors.' It is a warning number of illusion and delusion, indicating a good person living in a fool's paradise. It warns of mistakes in judgment and placing faith in the untrustworthy. The karmic obligation is to be more alert, curb spiritual laziness, and develop spiritual aggressiveness to control events and realize dreams.",
   23: "The Royal Star of the Lion: This is a karmic reward number. It bestows a promise of success in personal and career endeavors, guarantees help from superiors, and protection from those in high places. It is a most fortunate number, and its presence greatly blesses the person it represents, helping to overcome challenges from less fortunate numbers in their chart. No number can challenge the Lion's strength and win.",
   24: "Love — Money — Creativity: This is another most fortunate Compound number of karmic reward. It promises the assistance of those with power and a close association with people of high rank. It greatly increases financial success and the ability to achieve happiness in love. It denotes gain through romance, the law, or the arts. The only warning is against self-indulgence and arrogance, as everything comes so effortlessly.",
-  25: "Discrimination and Analysis: This number bestows spiritual wisdom gained through careful observation and worldly success by learning from experience. Its strength comes from overcoming disappointments in early life and learning from past mistakes. Judgment is excellent, but it is not a material number; therefore, substantial financial benefits must be gained through other numbers in one's chart.",
+  25: "Discrimination and Analysis: This number bestows spiritual wisdom gained through careful observation and worldly success by learning from experience. Its strength comes from overcoming disappointments in early life and learning from past mistakes. Judgment is excellent, but it is not a material number; therefore, financial benefits of a substantial nature must be gained through other numbers in one's chart.",
   26: "Partnerships: This number warns of dangers, disappointments, and failures, especially regarding ambitions, brought about through bad advice and unhappy partnerships. If this is your birth number, you are counseled to avoid partnerships and pursue your career alone, following only your own intuition. You should stabilize your income, save money, and not invest in others' ideas. It is crucial to build a solid foundation for your own future.",
   27: "The Sceptre: This is an excellent, harmonious, and fortunate number of courage and power with a touch of enchantment. It promises authority and command, guaranteeing great rewards from productive labors, intellect, and imagination. Those with this number should always carry out their own original ideas and not be influenced by others. It is a number of karmic reward earned in previous incarnations.",
   28: "The Trusting Lamb: This is a number of puzzling contradictions. It symbolizes a person of fine promise and great possibilities who often achieves success only to see it taken away due to misplaced trust. It indicates loss, powerful opposition from enemies, and the danger of serious losses in courts of law. The karmic lesson is to practice prudence, caution, and well-laid plans. The key is to look before you leap.",
@@ -389,11 +391,11 @@ const KARMIC_FATE_MEANINGS: { [key: number]: string } = {
   34: "Discrimination and Analysis: Has the same meaning as the number 25. This number bestows spiritual wisdom gained through careful observation and worldly success by learning from experience. Its strength comes from overcoming disappointments in early life and possessing the rare quality of learning from past mistakes. Judgment is excellent, but it's not a material number.",
   35: "Partnerships: Has the same meaning as the number 26. This number warns of dangers, disappointments, and failures, brought about through bad advice and unhappy partnerships. If this is your birth number, avoid partnerships and pursue your career alone. Follow your own intuition, save money, and invest only in your own future and ideas.",
   36: "The Sceptre: Has the same meaning as the number 27. This is an excellent, harmonious, and fortunate number of courage and power, promising authority and command. It guarantees great rewards from intellect and imagination. Always carry out your own original ideas and plans. It is a number of karmic reward earned in previous incarnations.",
-  37: "Sensitivity and Partnerships: This number has a distinct potency. It's associated with a highly sensitive nature, good friendships, and a strong public magnetism, often in the arts. It emphasizes love and romance, sometimes with unconventional attitudes toward sex. Happiness and success are more easily attained when in partnership with another rather than operating alone.",
+  37: "Sensitivity and Partnerships: This number has a distinct potency. It's associated with an extremely sensitive nature — good and fortunate friendships — a strong public magnetism, often in the arts. It emphasizes love and romance, sometimes with unconventional attitudes toward sex. Happiness and success are more easily attained when in partnership with another rather than operating alone as a single individual.",
   38: "A Lion Muzzled — A Clenched Fist / Grace Under Pressure: Has the same meaning as the numbers 11 and 29. It is a number of hidden trials and treachery (11) and also of the heaviest Karma, testing spiritual strength through tribulations (29). The life is filled with uncertainties, unreliable friends, and unexpected dangers. The karmic burden must be eased through faith, optimism, and taking responsibility.",
   39: "The Loner — Meditation: Has the same meaning as the number 30. This is a number of retrospection and mental superiority. Fulfillment is often found in retreating from the world to use one's mental gifts to develop something of value. It indicates a lonely yet frequently rewarding life pattern.",
   40: "The Recluse — the Hermit: Has the same meaning as the number 31. This person is self-contained, lonely, and isolated. Genius or high intelligence is often present. At some point, the world will be rejected for a more private existence. They are often opinionated and feel isolated even when in a crowd.",
-  41: "Communication: Has the same meaning as the number 32. This number has a magical power to sway masses and attracts help from those in high positions. It's very fortunate if the person holds inflexibly to their own judgment, otherwise, plans can be wrecked by the folly of others.",
+  41: "Communication: Has the same meaning as the number 32. It has a magical power to sway masses and attract help from those in high positions. Very fortunate if one holds to their own judgment, otherwise plans are wrecked by the folly of others.",
   42: "Love — Money — Creativity: Has the same meaning as the number 24. This is a most fortunate number of karmic reward, promising assistance from the powerful, financial success, and happiness in love. The only warning is against self-indulgence and arrogance, as everything comes so effortlessly.",
   43: "Revolution and Conflict: The ancients claim this is an unfortunate number. It is symbolized by the tendency toward revolution, upheaval, strife, conflict, and war. It carries the vibration of repeated disappointment and failure. If a name equals 43, it is advised to change the spelling.",
   44: "Partnerships: Has the same meaning as the number 26. This number warns of dangers, disappointments, and failures, especially regarding ambitions, brought about through bad advice and unhappy partnerships. If this is your birth number, you are counseled to avoid partnerships and pursue your career alone.",
