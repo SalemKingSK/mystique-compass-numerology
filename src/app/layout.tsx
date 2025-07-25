@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Astro Insights',
-  description: 'Get AI-powered insights about celestial objects.',
+  title: 'Mystique Compass Astrology & Numerology',
+  description: 'Giving your Life a meaning.',
 };
 
 export default function RootLayout({

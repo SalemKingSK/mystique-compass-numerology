@@ -99,7 +99,7 @@ function SpeechPlayer({ text }: { text: string }) {
             };
             
             utterance.onerror = (event) => {
-                if (event.error !== 'cancelled' && event.error !== 'interrupted' && !wasManuallyStopped.current) {
+                 if (event.error !== 'cancelled' && event.error !== 'interrupted' && !wasManuallyStopped.current) {
                     console.error("SpeechSynthesisUtterance.onerror", event);
                 }
                 setIsPlaying(false);
@@ -354,7 +354,7 @@ function ResultsDisplay({
   return (
     <div className="p-6 bg-secondary/30">
       <header className="text-center mb-6 pb-6 border-b-2 border-primary/20">
-        <h1 className="font-headline text-5xl text-gray-800">AstroInsights</h1>
+        <h1 className="font-headline text-5xl text-gray-800">Mystique Compass</h1>
       </header>
       
       <Collapsible className="mb-6">
