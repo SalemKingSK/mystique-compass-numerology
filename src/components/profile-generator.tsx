@@ -27,14 +27,15 @@ import { Separator } from '@/components/ui/separator';
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
+    const [sentences, setSentences] = React.useState<string[]>([]);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
-    const sentencesRef = React.useRef<string[]>([]);
     const sentenceElementsRef = React.useRef<(HTMLSpanElement | null)[]>([]);
     const wasManuallyStopped = React.useRef(false);
 
     React.useEffect(() => {
-        sentencesRef.current = text ? text.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [text] : [];
-        sentenceElementsRef.current = new Array(sentencesRef.current.length).fill(null);
+        const textSentences = text ? text.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [text] : [];
+        setSentences(textSentences);
+        sentenceElementsRef.current = new Array(textSentences.length).fill(null);
     }, [text]);
 
     React.useEffect(() => {
@@ -64,7 +65,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
         let sentenceIndex = 0;
 
         const speakSentences = () => {
-            if (wasManuallyStopped.current || sentenceIndex >= sentencesRef.current.length) {
+            if (wasManuallyStopped.current || sentenceIndex >= sentences.length) {
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
                 if (utteranceRef.current) {
@@ -75,7 +76,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
                 return;
             }
             
-            const utterance = new SpeechSynthesisUtterance(sentencesRef.current[sentenceIndex]);
+            const utterance = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
             utteranceRef.current = utterance;
 
             const voices = window.speechSynthesis.getVoices();
@@ -131,7 +132,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
     return (
         <div className="flex items-start gap-4">
             <div className="whitespace-pre-wrap leading-relaxed flex-1">
-                {sentencesRef.current.map((sentence, index) => (
+                {sentences.map((sentence, index) => (
                     <span
                         key={`${elementId}-${index}`}
                         ref={el => sentenceElementsRef.current[index] = el}
