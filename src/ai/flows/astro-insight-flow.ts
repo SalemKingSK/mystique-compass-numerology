@@ -7,7 +7,7 @@
  * - AstroInsightInput - The input type for the getAstroInsight function.
  * - AstroInsightOutput - The return type for the getAstroInsight function.
  */
-
+import {ai} from '@/ai/genkit';
 import { z } from 'zod';
 import { zodiacData } from '@/lib/zodiac';
 import { getChineseZodiacSign, getWesternZodiacSign } from '@/lib/astrology';
@@ -32,7 +32,7 @@ const FuturePredictionSchema = z.object({
 const SignDataSchema = z.object({
     introduction: z.string(),
     elements: z.record(z.string()),
-    compatibilities: z.string(),
+    compatibilities: z.record(z.string()),
     futures: z.record(FuturePredictionSchema),
 });
 
@@ -49,7 +49,29 @@ const AstroInsightOutputSchema = z.object({
 });
 export type AstroInsightOutput = z.infer<typeof AstroInsightOutputSchema>;
 
-export async function getAstroInsight(input: AstroInsightInput): Promise<AstroInsightOutput> {
+
+const insightPrompt = ai.definePrompt({
+    name: 'astroInsightPrompt',
+    input: { schema: z.object({ name: z.string(), new_astrology_sign: z.string(), western_sign: z.string(), sign: z.string(), element: z.string() }) },
+    output: { schema: z.object({ reading: z.string(), luckyNumber: z.number(), luckyColor: z.string() }) },
+    prompt: `You are an expert astrologer. Based on the following information, generate a short, insightful, and positive astrological reading (2-3 sentences) for {{name}}. Also, provide a lucky number and a lucky color.
+
+- Name: {{name}}
+- Western Zodiac Sign: {{western_sign}}
+- Chinese Zodiac Sign: {{sign}}
+- Chinese Zodiac Element: {{element}}
+- Combined New Astrology Sign: {{new_astrology_sign}}
+`,
+});
+
+
+const getAstroInsightFlow = ai.defineFlow(
+  {
+    name: 'getAstroInsightFlow',
+    inputSchema: AstroInsightInputSchema,
+    outputSchema: AstroInsightOutputSchema,
+  },
+  async (input) => {
     const { year, month, day, name } = input;
     
     // 1. Determine Zodiac signs
@@ -58,23 +80,33 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
     const new_astrology_sign = `${western_sign}/${sign}`;
 
     // 2. Get the entire data object for that sign
-    // The type assertion is safe because our zodiacData is statically typed.
     const signData = (zodiacData as any)[sign];
     if (!signData) {
       throw new Error(`No zodiac data found for sign: ${sign}`);
     }
+
+    // 3. Generate AI-powered reading
+    const { output } = await insightPrompt({ name, new_astrology_sign, western_sign, sign, element });
+    if (!output) {
+        throw new Error('Failed to generate AI insight.');
+    }
     
-    // 3. Return combined data without AI generation.
+    // 4. Return combined data
     return {
         name,
         western_sign,
         new_astrology_sign,
         sign,
         element,
-        // Provide empty values for the removed AI fields
-        reading: '',
-        luckyNumber: 0,
-        luckyColor: '',
+        reading: output.reading,
+        luckyNumber: output.luckyNumber,
+        luckyColor: output.luckyColor,
         signData: signData,
     };
+  }
+);
+
+
+export async function getAstroInsight(input: AstroInsightInput): Promise<AstroInsightOutput> {
+    return getAstroInsightFlow(input);
 }
