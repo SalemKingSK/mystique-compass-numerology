@@ -2,7 +2,7 @@
 import type { AstroInsightInput } from '@/lib/astrology';
 import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS } from './numerology/data';
 
-// --- HELPER FUNCTION ---
+// --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
@@ -15,6 +15,13 @@ const reduceToSingleDigit = (n: number): number => {
   }
   return num;
 };
+
+const reduceOnce = (n: number): number => {
+    if (n < 10) return n;
+    return String(n)
+        .split('')
+        .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+}
 
 
 // --- CORE NUMBER CALCULATIONS ---
@@ -53,6 +60,11 @@ export const calculateKua = (year: number, gender: string): number => {
   return finalKua;
 };
 
+export const calculateKarmicFate = (day: number, month: number, year: number): number => {
+    const sum = day + month + year;
+    return reduceOnce(sum);
+}
+
 // --- DATA INTERFACES ---
 export interface NumerologyData {
   psycheNum: number;
@@ -89,12 +101,13 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
       ...birthDigits.map(d => parseInt(d)),
       psycheNum,
       destinyNum,
-      kuaNum
   ];
 
   const numberCounts: { [key: string]: number } = {};
   for (const digit of allDigitsForGrid) {
-      numberCounts[digit] = (numberCounts[digit] || 0) + 1;
+      if (digit > 0) { // Ensure we don't count 0
+          numberCounts[digit] = (numberCounts[digit] || 0) + 1;
+      }
   }
 
   const gridContent: { [key: string]: string } = {};
@@ -118,18 +131,13 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
   if (compoundNum >= 10 && compoundNum <= 52) {
-      const reducedSum = String(compoundNum).split('').map(Number).reduce((a, b) => a + b, 0);
+      const reducedSum = reduceToSingleDigit(compoundNum);
       reducedCompoundNum = reducedSum;
       reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
   }
   
-  let karmicFateNum : number | null = null;
-  const karmicInitialSum = day + month + year;
-
-  if ([10, 13, 14, 16, 19].includes(karmicInitialSum)) {
-      karmicFateNum = karmicInitialSum;
-  }
-  const karmicFateMeaning = karmicFateNum ? (KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || null) : null;
+  const karmicFateNum = calculateKarmicFate(day, month, year);
+  const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || null;
 
   const calculateArrows = (grid: (string | null)[][]) => {
     const strength: { name: string; description: string }[] = [];

@@ -28,10 +28,9 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
     const sentenceElementsRef = React.useRef<(HTMLSpanElement | null)[]>([]);
-    const wasManuallyStopped = React.useRef(false);
 
     React.useEffect(() => {
-        const textSentences = text ? text.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [text] : [];
+        const textSentences = text ? text.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g) || [text] : [];
         setSentences(textSentences);
         sentenceElementsRef.current = new Array(textSentences.length).fill(null);
     }, [text]);
@@ -39,7 +38,6 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
     React.useEffect(() => {
         return () => {
             if (window.speechSynthesis?.speaking) {
-                wasManuallyStopped.current = true;
                 window.speechSynthesis.cancel();
             }
         };
@@ -58,25 +56,19 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             return;
         }
 
-        wasManuallyStopped.current = false;
         setIsPlaying(true);
         let sentenceIndex = 0;
-
-        const speakSentences = () => {
-            if (wasManuallyStopped.current || sentenceIndex >= sentences.length) {
+        
+        const speakNextSentence = () => {
+            if (sentenceIndex >= sentences.length) {
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
-                if (utteranceRef.current) {
-                   utteranceRef.current.onend = null;
-                   utteranceRef.current.onerror = null;
-                   utteranceRef.current.onboundary = null;
-                }
                 return;
             }
-            
+
             const utterance = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
             utteranceRef.current = utterance;
-
+            
             const voices = window.speechSynthesis.getVoices();
             if (voices.length > 0) {
                 const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
@@ -86,15 +78,15 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             utterance.onstart = () => {
                 setCurrentSentenceIndex(sentenceIndex);
             };
-            
+
             utterance.onend = () => {
                 sentenceIndex++;
-                speakSentences();
+                speakNextSentence();
             };
-            
+
             utterance.onerror = (event) => {
                 if (event.error !== 'cancelled' && event.error !== 'interrupted') {
-                     // console.error("SpeechSynthesisUtterance.onerror", event);
+                    // console.error("SpeechSynthesisUtterance.onerror", event);
                 }
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
@@ -103,15 +95,23 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             window.speechSynthesis.speak(utterance);
         };
         
+        const startSpeech = () => {
+            // Cancel any previous speech
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            // Use a timeout to ensure cancellation is processed before speaking
+            setTimeout(speakNextSentence, 100);
+        };
+
         if (window.speechSynthesis.getVoices().length === 0) {
-             window.speechSynthesis.onvoiceschanged = speakSentences;
+             window.speechSynthesis.onvoiceschanged = startSpeech;
         } else {
-            speakSentences();
+            startSpeech();
         }
     };
     
     const handleStop = () => {
-        wasManuallyStopped.current = true;
         if (window.speechSynthesis) {
              window.speechSynthesis.cancel();
         }
@@ -138,7 +138,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
                     <span
                         key={`${elementId}-${index}`}
                         ref={el => sentenceElementsRef.current[index] = el}
-                        className={currentSentenceIndex === index ? "bg-primary/20 rounded-md transition-all duration-300" : ""}
+                        className={cn("transition-all duration-300", currentSentenceIndex === index ? "bg-primary/20 rounded-md" : "")}
                     >
                         {sentence}
                     </span>
@@ -166,8 +166,8 @@ const InfoCard = ({ title, value, icon, popoverContent }: { title: string, value
               {cardContent}
             </div>
           </PopoverTrigger>
-          <PopoverContent className="w-96 max-h-[80vh] overflow-y-auto p-0" side="bottom" align="center">
-            <ScrollArea className="h-full">
+          <PopoverContent className="w-96 max-h-[80vh] p-0" side="bottom" align="center">
+            <ScrollArea className="h-full max-h-[calc(80vh-2rem)]">
               <div className="p-4">{popoverContent}</div>
             </ScrollArea>
           </PopoverContent>
@@ -196,10 +196,10 @@ function FatePopoverContent({ numerology }: { numerology: NumerologyData }) {
             <SpeechPlayer text={numerology.reducedCompoundMeaning || ''} elementId="fate-tier2-speech" />
           </TabsContent>
         )}
-        {numerology.karmicFateNum && (
+        {numerology.karmicFateNum && numerology.karmicFateMeaning && (
           <TabsContent value="karmic" className="mt-4 space-y-2">
             <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Swords className="h-5 w-5" /> {numerology.karmicFateNum}</h4>
-            <SpeechPlayer text={numerology.karmicFateMeaning || ''} elementId="fate-tier3-speech" />
+            <SpeechPlayer text={numerology.karmicFateMeaning} elementId="fate-tier3-speech" />
           </TabsContent>
         )}
       </Tabs>
@@ -259,7 +259,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
 
                     <div className="glass-card p-4">
                         <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye/> Number Insights</h3>
-                        <ScrollArea className="h-48">
+                        <ScrollArea className="h-48 pr-3">
                           <Accordion type="single" collapsible className="w-full">
                               {numberEntries.map(({ digit, count }) => {
                                   let meaning = "No specific meaning found.";
@@ -336,7 +336,7 @@ function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
         <TabsContent value="compatibility" className="mt-4">
           <div className="glass-card p-4">
             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Users /> Compatibility</h3>
-            <ScrollArea className="h-72">
+            <ScrollArea className="h-72 pr-3">
                 <Accordion type="single" collapsible className="w-full">
                     {compatibilitySigns.map((sign, index) => (
                         <AccordionItem value={sign} key={sign}>
@@ -353,7 +353,7 @@ function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
         <TabsContent value="future" className="mt-4">
            <div className="glass-card p-4">
             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Future Years</h3>
-            <ScrollArea className="h-72">
+            <ScrollArea className="h-72 pr-3">
                 <Accordion type="single" collapsible className="w-full">
                     {futureYears.map(([year, futureData], index) => (
                         <AccordionItem value={year} key={year}>
