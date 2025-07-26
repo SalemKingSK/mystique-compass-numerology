@@ -1,20 +1,13 @@
-
 // src/lib/numerology.ts
 import type { AstroInsightInput } from '@/lib/astrology';
-import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS, COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS } from './numerology/data';
+import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS } from './numerology/data';
 
 // --- HELPER FUNCTION ---
-
-/**
- * Reduces a number to a single digit by summing its digits repeatedly.
- * @param n - The number to reduce.
- * @returns The single-digit number.
- */
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
     if ([11, 22, 33].includes(num) && num !== n) { 
-        // This logic is simplified; for now, we reduce all to a single digit for core numbers.
+        // This logic is simplified for now; we reduce all to a single digit for core numbers.
     }
     num = String(num)
       .split('')
@@ -25,17 +18,10 @@ const reduceToSingleDigit = (n: number): number => {
 
 
 // --- CORE NUMBER CALCULATIONS ---
-
-/**
- * Calculates the Psyche Number from the day of birth.
- */
 export const calculatePsyche = (day: number): number => {
   return reduceToSingleDigit(day);
 };
 
-/**
- * Calculates the Destiny Number from the full date of birth.
- */
 export const calculateDestiny = (day: number, month: number, year: number): number => {
   const fullDateStr = String(day) + String(month) + String(year);
   const sum = fullDateStr
@@ -44,11 +30,7 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
   return reduceToSingleDigit(sum);
 };
 
-/**
- * Calculates the Kua Number based on year and gender, with century-specific rules.
- */
 export const calculateKua = (year: number, gender: string): number => {
-  // Rule A: Sum the year's digits and reduce to a single digit.
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -56,17 +38,14 @@ export const calculateKua = (year: number, gender: string): number => {
   
   let kuaResult: number;
 
-  // Rule B: Apply the correct formula based on birth century and gender.
   if (year < 2000) {
     kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
   } else {
     kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
   }
 
-  // Rule C: Perform a final reduction on the result of the formula.
   let finalKua = reduceToSingleDigit(kuaResult);
   
-  // Rule D: Apply the Kua 5 exception. This is the very last step.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
@@ -75,7 +54,6 @@ export const calculateKua = (year: number, gender: string): number => {
 };
 
 // --- DATA INTERFACES ---
-
 export interface NumerologyData {
   psycheNum: number;
   destinyNum: number;
@@ -99,7 +77,6 @@ export interface NumerologyData {
 }
 
 // --- MAIN GRID GENERATION FUNCTION ---
-
 export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const { day, month, year, gender } = input;
 
@@ -109,10 +86,10 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   const birthDigits = (String(day) + String(month) + String(year)).split('').filter(d => d !== '0');
   const allDigitsForGrid = [
-      ...birthDigits,
-      ...String(psycheNum).split(''),
-      ...String(destinyNum).split(''),
-      ...String(kuaNum).split('')
+      ...birthDigits.map(d => parseInt(d)),
+      psycheNum,
+      destinyNum,
+      kuaNum
   ];
 
   const numberCounts: { [key: string]: number } = {};
@@ -148,16 +125,11 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   
   let karmicFateNum : number | null = null;
   const karmicInitialSum = day + month + year;
-  const reducedKarmic = reduceToSingleDigit(karmicInitialSum);
 
   if ([10, 13, 14, 16, 19].includes(karmicInitialSum)) {
       karmicFateNum = karmicInitialSum;
-  } else if ([10, 13, 14, 16, 19].includes(reducedKarmic)) {
-      karmicFateNum = reducedKarmic;
   }
-
   const karmicFateMeaning = karmicFateNum ? (KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || null) : null;
-
 
   const calculateArrows = (grid: (string | null)[][]) => {
     const strength: { name: string; description: string }[] = [];
