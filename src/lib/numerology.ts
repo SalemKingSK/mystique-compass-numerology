@@ -6,25 +6,13 @@ import type { AstroInsightInput } from '@/lib/astrology';
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
+    if ([11, 22, 33].includes(num)) break; // Don't reduce master numbers in intermediate steps
     num = String(num)
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   }
   return num;
 };
-
-const reduceToCompound = (n: number): number => {
-    let numStr = String(n);
-    let sum = n;
-    while (sum > 9) {
-      sum = numStr
-        .split('')
-        .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-      numStr = String(sum);
-    }
-    return sum;
-};
-
 
 // --- CORE NUMBER CALCULATIONS ---
 
@@ -96,20 +84,21 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  const birthDigits = (String(day) + String(month) + String(year)).split('').map(Number).filter(d => d !== 0);
+  const birthDigits = (String(day) + String(month) + String(year)).split('').map(Number);
   
   const allDigitsForGrid = [
-    ...birthDigits,
+    ...String(day).split('').map(Number),
+    ...String(month).split('').map(Number),
+    ...String(year).split('').map(Number),
     psycheNum,
-    destinyNum,
-    kuaNum,
-  ];
+    destinyNum
+  ].filter(d => d !== 0);
 
   const numberCounts: { [key: number]: number } = {};
   for (const digit of allDigitsForGrid) {
     numberCounts[digit] = (numberCounts[digit] || 0) + 1;
   }
-
+  
   const gridContent: { [key: string]: string } = {};
   for (let i = 1; i <= 9; i++) {
     const digitStr = String(i);
@@ -125,24 +114,23 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   ];
 
   // Tier 1: Compound Fate
-  const compoundNum = (String(day) + String(month) + String(year)).split('').map(Number).reduce((a, b) => a + b, 0);
+  const compoundNum = birthDigits.reduce((a, b) => a + b, 0);
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || "No specific meaning for this compound number.";
 
   // Tier 2: Inner Essence
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
-  if (compoundNum > 9) {
+  if (compoundNum >= 10) {
       const reducedSum = String(compoundNum).split('').map(Number).reduce((a, b) => a + b, 0);
-      if (reducedSum > 9 || [11, 22, 33].includes(reducedSum)) { // Only if it results in a compound/master number
-          reducedCompoundNum = reducedSum;
-          reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || null;
-      }
+      reducedCompoundNum = reducedSum;
+      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
   }
 
   // Tier 3: Karmic Fate
   const karmicInitialSum = day + month + year;
-  const karmicFateNum = reduceToCompound(karmicInitialSum);
-  const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || null;
+  const karmicSumDigits = String(karmicInitialSum).split('').map(Number);
+  const karmicFateNum = karmicSumDigits.reduce((a,b) => a+b, 0);
+  const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || COMPOUND_NUMBER_MEANINGS[karmicFateNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || null;
 
   const calculateArrows = (counts: { [key: number]: number }) => {
     const strength = [];
@@ -150,29 +138,32 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     const hasNum = (n: number) => counts[n] > 0;
 
     const arrowDefs = {
-        "Arrow of Determination": { present: [4,5,6], absent: [4,5,6], desc: "You are determined, persistent, and stubborn. You never give up on your goals." },
+        "Arrow of Determination": { present: [4,5,6], absent: [], desc: "You are determined, persistent, and stubborn. You never give up on your goals." },
         "Arrow of Procrastination": { present: [], absent: [4,5,6], desc: "You have a tendency to put things off and lack the follow-through to see projects to completion." },
-        "Arrow of Intellect": { present: [4,3,8], absent: [4,3,8], desc: "You have a sharp, logical, and methodical mind. You are an excellent planner and thinker." },
+        "Arrow of Intellect": { present: [4,3,8], absent: [], desc: "You have a sharp, logical, and methodical mind. You are an excellent planner and thinker." },
         "Arrow of Poor Memory": { present: [], absent: [4,3,8], desc: "You may struggle with memory and details, preferring to think in broad strokes rather than getting bogged down in specifics." },
-        "Arrow of Practicality": { present: [8,1,6], absent: [8,1,6], desc: "You are grounded, practical, and have a talent for managing finances and material resources." },
+        "Arrow of Practicality": { present: [8,1,6], absent: [], desc: "You are grounded, practical, and have a talent for managing finances and material resources." },
         "Arrow of Disorder": { present: [], absent: [8,1,6], desc: "You may struggle with organization and financial matters, finding it hard to manage the practical details of life." },
-        "Arrow of Action": { present: [9,5,1], absent: [9,5,1], desc: "You are dynamic, energetic, and always ready to take action. You are a doer, not just a dreamer." },
+        "Arrow of Action": { present: [9,5,1], absent: [], desc: "You are dynamic, energetic, and always ready to take action. You are a doer, not just a dreamer." },
         "Arrow of Apathy": { present: [], absent: [9,5,1], desc: "You may lack drive and enthusiasm, often feeling passive or indifferent to the events around you." },
-        "Arrow of Spirituality": { present: [2,5,8], absent: [2,5,8], desc: "You are intuitive, sensitive, and have a deep connection to the spiritual or metaphysical realms." },
+        "Arrow of Spirituality": { present: [2,5,8], absent: [], desc: "You are intuitive, sensitive, and have a deep connection to the spiritual or metaphysical realms." },
         "Arrow of Scepticism": { present: [], absent: [2,5,8], desc: "You are an inquirer, often questioning and doubting things that cannot be proven by logic or science." },
-        "Arrow of Emotional Balance": { present: [2,7,6], absent: [2,7,6], desc: "You have a high degree of emotional intelligence, empathy, and compassion for others." },
+        "Arrow of Emotional Balance": { present: [2,7,6], absent: [], desc: "You have a high degree of emotional intelligence, empathy, and compassion for others." },
         "Arrow of Hypersensitivity": { present: [], absent: [2,7,6], desc: "You are extremely sensitive and easily hurt by the words and actions of others, often taking things too personally." },
-        "Arrow of Willpower": { present: [4,9,2], absent: [4,9,2], desc: "With a strong mind, ideals, and intuition, you have the willpower to see your ambitious plans through." },
+        "Arrow of Willpower": { present: [4,9,2], absent: [], desc: "With a strong mind, ideals, and intuition, you have the willpower to see your ambitious plans through." },
         "Arrow of Frustration": { present: [], absent: [4,9,2], desc: "You may feel easily frustrated when your high ideals clash with the practical realities of the world." },
-        "Arrow of Compassion": { present: [3,5,7], absent: [3,5,7], desc: "You have a deep love for humanity and a strong desire to serve others." },
-        "Arrow of Enquirer": { present: [], absent: [3,5,7], desc: "You are a seeker of truth, always asking questions and delving deep into the mysteries of life." }
+        "Arrow of Compassion": { present: [3,5,7], absent: [], desc: "You have a deep love for humanity and a strong desire to serve others." },
+        "Arrow of Enquirer": { present: [], absent: [3,5,7], desc: "You are a seeker of truth, always asking questions and delving deep into the mysteries of life." },
+        "Arrow of Disappointment": { present: [], absent: [4,5,6], desc: "The absence of all numbers in this diagonal row creates the Arrow of Disappointment. This means you may experience frequent setbacks and feel that life often lets you down. This can foster a pessimistic outlook and a sense of being unsupported in your endeavors. You may need to consciously work on building resilience and finding the silver lining in challenging situations to counteract this tendency." }
     };
+    
+    const gridNumbers = new Set(Object.keys(counts).map(Number));
 
     for (const [name, def] of Object.entries(arrowDefs)) {
-        if (def.present.length > 0 && def.present.every(hasNum)) {
+        if (def.present.length > 0 && def.present.every(n => gridNumbers.has(n))) {
             strength.push({ name, description: def.desc });
         }
-        if (def.absent.length > 0 && def.absent.every(n => !hasNum(n))) {
+        if (def.absent.length > 0 && def.absent.every(n => !gridNumbers.has(n))) {
             weakness.push({ name, description: def.desc });
         }
     }
@@ -286,15 +277,15 @@ export const KUA_ATTRIBUTES: { [key: number]: any } = {
 
 
 export const NUMBER_MEANINGS: { [key: number]: { title: string; description: string } } = {
-  1: { title: "Communication", description: "Represents communication, expression, and the flow of ideas. It's the number of origin and individuality." },
-  2: { title: "Intuition & Sensitivity", description: "This number governs intuition, sensitivity, and partnerships. It's a number of cooperation and diplomacy." },
-  3: { title: "Action & Intellect", description: "Signifies action, creativity, and intellectual pursuits. It's a dynamic number associated with planning and execution." },
-  4: { title: "Intellect & Wisdom", description: "Represents intelligence, order, and practicality. People with this number are often seen as builders and organizers." },
-  5: { title: "Emotional Balance", description: "This is the central number, representing emotional balance, freedom, and change. It connects the mind, heart, and body." },
-  6: { title: "Home & Family", description: "Governs home, family, and responsibility. It's a number of nurturing, creativity, and domestic harmony." },
-  7: { title: "Spirituality & Learning", description: "Relates to spirituality, learning, and analysis. It signifies a quest for deeper meaning and truth." },
-  8: { title: "Material Success", description: "Associated with material success, power, and finance. It represents ambition, organization, and worldly achievement." },
-  9: { title: "Humanitarianism", description: "The number of humanitarianism, idealism, and completion. It represents a love for all mankind and a global consciousness." },
+  1: { title: "Leadership & Individuality", description: "You are a leader, pioneer, and innovator. You possess a strong will and a desire for independence. You are good in Expression & Communication. You have an impartial & balanced outlook towards everyone in life. Your way of living life is very neutral." },
+  2: { title: "Intuition & Partnership", description: "You have a high in Intelligence, Sensitivity & have a double Intuition Level. You have an innate ability to get into someone's Mind & Soul. You can easily scan the Mind & Soul of someone & find out about their feelings, motive & purpose. You thrive on partnership and cooperation." },
+  3: { title: "Creativity & Expression", description: "Intelligence, sensitiveness & intuitiveness are the qualities associated with you. You have a balanced mentality & strong personality. You have good compatibility & an adjusting nature, hence you emerge as a good friend. You have an active, imaginative & very creative brain." },
+  4: { title: "Structure & Stability", description: "You have a tendency for OVERINDULGENCE in physical & materialistic actions at the cost of other deeds. You have good organizing skills. You are a good task initiator & fantastic as a completer. You are reliable, precise & organized. You are good in art & craft by hand." },
+  5: { title: "Freedom & Change", description: "This is the central number, representing emotional balance, freedom, and change. You can be uncontrollable, and governing & dealing with you is challenging. You are passionate, strong-minded, lively, impatient & flexible. You are a risk-taker, adventurous, self-confident, determined & a show-off." },
+  6: { title: "Harmony & Home", description: "You are highly creative, but lack self-confidence & believe less in your work & your abilities. You take unnecessary tension for your family & family members, which makes your energy drained/exhausted & hence you feel tired most of the time. You are overprotective by nature." },
+  7: { title: "Spirituality & Analysis", description: "You learn the lessons of your life through RELATIONAL LOSS or LOSS OF LOVED ONES, LOSS OF BELONGINGS, or on the COST of HEALTH & WELL-BEING. With the lessons you learn throughout your life and these losses, you become more inclined towards the spiritual field and spiritual practices. If your chart is supported by the numbers 3 & 5, you will start your quest for the ultimate reality of life and for precision or perfection in your journey. Your career can be in a spiritual or humanitarian field. If the numbers 3 & 5 are present, your behavior can also be rigid." },
+  8: { title: "Ambition & Material Success", description: "You are good in business & financial matters. You are entertaining, intellectual, clever & shrewd. You are good in analysis, evaluation & taking advantage of any opportunity. You have keen observation & are thorough in your approach. You love to have experiences by yourself and never count upon others' stories." },
+  9: { title: "Humanitarianism & Compassion", description: "You have a 'Master Number' impact, but the Master Number activation is required. You are idealistic & brainy in your life. You love to learn about everything around you. You can do too much criticism of others. You have a sympathetic attitude & you love to work in fields in which much use of the brain is required." },
 };
 
 export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string } } = {
@@ -352,7 +343,7 @@ export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string 
     }
 };
 
-export const COMPOUND_NUMBER_MEANINGS = {
+export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   10: "The Wheel of Fortune. This is a number of honor, of faith and self-confidence, of rise and fall; one's name will be known for good or evil, according to the Karmic debts. 10 is a fortunate number if the person it represents holds to their own convictions and ideals; if not, their life can be one of karmic retribution and failure.",
   11: "A Lion Muzzled or a Clenched Fist. 11 is a number of hidden trials and treachery from others. It represents two members of the same or opposite sex, or two opposing situations. In either case, the proper action is to be a master of the opposing force, and not allow it to master you. It is a number of great spiritual power, but it can also be a number of self-destruction if its power is not used for the good of mankind.",
   12: "The Sacrifice or The Victim. 12 is the number of the disciple, the one who must subordinate the self for the welfare of others. It represents the trained and disciplined mind, the individual who has learned to sacrifice the lesser for the greater. The mind is the weapon of the individual, and 12 is a number of great intellectual capacity.",
@@ -363,9 +354,30 @@ export const COMPOUND_NUMBER_MEANINGS = {
   17: "The Star of the Magi. 17 is a highly spiritual number and is expressed in symbolism as the 8-pointed Star of Venus. It is a number of immortality and is associated with the idea of rising above the trials and difficulties of everyday life. The person it represents will become famous after death and their name will live on for generations. It is a fortunate number, if the person it represents can live up to its high spiritual vibrations.",
   18: "Spiritual-Material Conflict. 18 is a number of strife and discord, of materialism striving to destroy the spiritual side of nature. It is a number of war, of social upheaval, and of revolution. It represents the man who has sold his soul for a mess of pottage. The person it represents will have a difficult life, and will have to fight for everything they get. They will be misunderstood by their family and friends and will have to stand alone against the world.",
   19: "The Prince of Heaven. 19 is a number of the Sun, and is therefore a number of success and happiness. It is a fortunate number and represents the victory of the spiritual over the material. The person it represents will have a happy life and will be successful in all their undertakings. They will be loved by their family and friends and will be a power for good in the world.",
+  20: "The Awakening. This number represents a new life and a new sense of purpose. It can indicate a spiritual awakening, but just as often, it can signify that a person is about to have a major breakthrough in their career or their most important relationship. It is an extremely fortunate number, but only if the person’s goals are not entirely selfish. If the goals are for the good of many, then this is a karmic reward number. If the goals are selfish, then the karmic reward will turn into a karmic lesson. There will be many delays and obstacles in this person’s path.",
+  21: "The Crown of the Magi. This number promises universal success. It is a number of advancement, honors, and general elevation in life and career. It is not a number that indicates that a person will be able to rest on their laurels, however. The person who has this number as one of their core numbers will have to work hard for everything they get, but the work will always be rewarded. It is a karmic reward number.",
+  22: "The Master Builder. This is one of the master numbers and indicates a person with the potential to do great things. It is a number of idealism, but it is a practical idealism that can be turned into reality. The person with this number can be a great leader and organizer, and has the ability to see the big picture. However, they can also be prone to stress and nervous tension, and must learn to delegate and not try to do everything themselves.",
+  23: "The Royal Star of the Lion. This is a number of success, especially in dealings with the public. It is a number of protection and promises help from superiors. The person with this number will have a magnetic personality and will be able to charm their way through any difficulties. They are often found in positions of authority and are respected by those they lead.",
+  24: "Love, Money, and Creativity. This number is associated with the planet Venus and promises success in all matters of the heart, as well as financial gain and artistic success. It is a number of harmony and cooperation, and the person with this number will be able to work well with others. They are often found in careers that involve art, music, or beauty.",
+  25: "Discernment and Analysis. This is a number of spiritual wisdom gained through careful observation and study. The person with this number has a keen and analytical mind and is able to see through deception. They are often drawn to scientific or spiritual pursuits and have a deep understanding of the mysteries of life. They must guard against becoming too critical or cynical.",
+  26: "The Diplomat. This number gives great tact and diplomacy. The person with this number is able to handle difficult situations with grace and charm. They are often found in positions of leadership and are respected for their ability to bring people together. They must be careful not to become too manipulative or to use their powers of persuasion for selfish ends.",
+  27: "The Scepter. This is a number of command and authority. It promises success and high honors, but these are gained through personal effort and merit. The person with this number is a natural leader and has the ability to inspire others. They are often found in positions of power and are respected for their integrity and wisdom.",
+  28: "The Contradictory Number. This number is full of contradictions. It can bring great success or great failure, depending on the karmic debts of the individual. The person with this number may be a great leader or a great tyrant. They may be a saint or a sinner. It is a number of extremes, and the person with this number must learn to balance the opposing forces in their nature.",
+  29: "The Unseen Protector. This number indicates a person who is protected by unseen forces. They may have a guardian angel or a spirit guide who looks after them. They are often drawn to spiritual pursuits and have a deep faith. They must learn to trust their intuition and to listen to the still, small voice within.",
+  30: "The Loner. This number is associated with solitude and introspection. The person with this number is a deep thinker and needs time alone to recharge their batteries. They are often found in professions that require a great deal of concentration, such as writing, research, or computer programming. They must guard against becoming too isolated or withdrawn.",
+  31: "The Actor. This number gives great dramatic and creative talent. The person with this number is able to express themselves in a variety of ways and is often found in the arts. They have a magnetic personality and are able to charm their way through any difficulties. They must guard against becoming too theatrical or artificial.",
+  32: "Communication. This number is associated with the planet Mercury and gives great powers of communication. The person with this number is a natural talker and is able to express themselves with clarity and precision. They are often found in professions that involve writing, speaking, or teaching. They must guard against becoming too gossipy or superficial.",
+  33: "The Master Teacher. This is a master number and indicates a person with the potential to be a great spiritual teacher. They have a deep understanding of the mysteries of life and are able to inspire others. They are often found in positions of leadership and are respected for their wisdom and compassion. They must guard against becoming too dogmatic or self-righteous.",
+  34: "The Survivor. This number gives great powers of endurance. The person with this number is able to survive any difficulties and to come out stronger on the other side. They are often found in professions that require a great deal of courage and fortitude, such as the military, the police force, or firefighting.",
+  35: "The Artist. This number gives great artistic talent. The person with this number is able to express themselves in a variety of ways and is often found in the arts. They have a magnetic personality and are able to charm their way through any difficulties. They must guard against becoming too emotional or temperamental.",
+  36: "The Humanitarian. This number is associated with the planet Jupiter and gives a great love of humanity. The person with this number is a natural philanthropist and is often found in professions that involve helping others, such as social work, teaching, or medicine. They must guard against becoming too preachy or self-righteous.",
+  37: "The Royal Star of the Bull. This is a number of success, especially in financial matters. It promises wealth and abundance, but these are gained through hard work and perseverance. The person with this number is a natural leader and has the ability to inspire others. They are often found in positions of power and are respected for their integrity and wisdom.",
+  38: "The Thinker. This number is associated with the planet Saturn and gives a deep and philosophical mind. The person with this number is a natural scholar and is often found in professions that require a great deal of study and concentration, such as science, research, or academia. They must guard against becoming too serious or withdrawn.",
+  39: "The Old Soul. This number indicates a person who has lived many lives and has a great deal of wisdom and experience. They are often drawn to spiritual pursuits and have a deep understanding of the mysteries of life. They must guard against becoming too detached or otherworldly."
 };
 
-export const KARMIC_FATE_MEANINGS = {
+
+export const KARMIC_FATE_MEANINGS: { [key: number]: string } = {
     10: "Number 10 is formed by the combination of 1 and 0. The number 1 represents consciousness and the Sun, while 0 signifies infinity (Anant Tattva). The qualities of 1 predominantly shape number 10, as it belongs to the 1 series, granting honor, faith, self-assurance, and recognition—whether positive or negative—that varies according to karmic principles. The number 1 is considered fortunate, whereas 0 is seen as unfortunate. The unfortunate influence of 0 introduces struggles, which foster self-confidence and proper understanding in these psychic individuals, enabling them to stand out. The presence of 0 generates hidden adversaries, but 1 provides the alertness to identify them. Thus, 10 symbolizes success attained through persistent effort. Remaining introspective and vigilant is the only way to overcome the challenges described. Relying on others will lead to difficulties.",
     11: "Number 11 is regarded as a special number, often referred to as the mystic number in various occult traditions. In Hindu tradition, there are eleven forms or incarnations of Rudra, the Lord of Destruction. Because the number 1 appears twice, numerologists attribute to it a stubborn, revolutionary, and authoritative character. Psychic number 2 individuals who possess the 11 compound number are quick to respond, optimistic, and capable of guiding themselves and others through challenging situations. They have strong intuition and are inspired by lofty ideals. A dynamic energy radiates from their personal magnetism, making them masters of most situations.",
     12: "This number combines the Sun (1) and the Moon (2), forming a pair of opposites. This conflicting dynamic creates anxiety for those who possess the 12 compound number. They are caught between the stable, resolute nature of 1s and the fluctuating opinions of 2s. They often make decisions at the last moment, and even then, their choices remain uncertain. They may change their minds even after beginning a task, leaving it incomplete. They achieve success later in life, but leave countless projects and tasks, started with great enthusiasm, unfinished. They possess the strength of 1s and the gentleness of 2s.",
