@@ -115,22 +115,19 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     [gridContent['8'] || null, gridContent['1'] || null, gridContent['6'] || null],
   ];
 
-  // Tier 1: Compound Fate
   const compoundNum = birthDigitsRaw.reduce((a, b) => a + b, 0);
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for this compound number (${compoundNum}).`;
 
-  // Tier 2: Inner Essence
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
   if (compoundNum >= 10) {
       const reducedSum = String(compoundNum).split('').map(Number).reduce((a, b) => a + b, 0);
-      if(reducedSum >= 10) { // Only assign if it's still a compound number
+      if(reducedSum >= 10) {
         reducedCompoundNum = reducedSum;
         reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
       }
   }
 
-  // Tier 3: Karmic Fate
   const karmicInitialSum = day + month + year;
   const karmicFateNum = String(karmicInitialSum).split('').map(Number).reduce((a,b) => a+b, 0);
   const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || COMPOUND_NUMBER_MEANINGS[karmicFateNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || null;
@@ -397,7 +394,7 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   52: `Number 52 has the same meaning as the number 43. Number 52 is considered an unfortunate number by ancient traditions. If a name equals 52, it should be changed to a more fortunate compound number. It is symbolized by tendencies toward revolution, upheaval, strife, conflict, and war, carrying a vibration of repeated disappointment and failure.`
 };
 
- ### The Karmic Fate Meanings
+### The Karmic Fate Meanings
 
 This is the latter list of meanings, to be used exclusively for the **Karmic Fate** number.
 
@@ -423,7 +420,7 @@ This is the latter list of meanings, to be used exclusively for the **Karmic Fat
     This number combines two opposing forces—the Sun (1) and Venus (6). This combination creates challenges. As psychic number 7, ruled by Ketu, they struggle with decision-making, leading to uncertainties and anxieties. The Sun imparts idealism, while Venus fosters a love for pleasure, making them idealistic dreamers. Ketu’s influence reduces their interest in worldly desires. They experience multiple rises and falls, suffer from setbacks, but persist in their own way. They should be cautious of accidents and mishaps.
 
 *   **Meaning for Karmic Fate Number 17:**
-    This number combines the Sun (1) and the half-planet Ketu (7). As a psychic number 8, it is ruled by Saturn and represents struggle, obstacles, and difficulties. The Sun and Ketu are enemies, creating inner conflict. However, this conflict fosters genuine understanding, making them more aware, compassionate, and spiritual. They develop resilience, overcoming obstacles without losing hope. They become peaceful and bring peace to those around them. They leave a distinctive mark on history, and Saturn ensures success in the latter part of their lives.
+    This number combines the Sun (1) and the half-planet Ketu (7). As a psychic number 8, it is ruled by Saturn and represents struggle, obstacles, and difficulties. The Sun and Ketu are enemies, creating inner conflict. However, this conflict fosters genuine understanding, making them more aware, compassionate, and spiritual. They develop resilience, overcoming obstacles without losing hope. They become peaceful and bring peace to those around them. They leave a distinctive mark on history, and Saturn ensures success in the latter part of their lives. Despite struggles in their personal and family lives, they achieve wealth, prosperity, and respect from others.
 
 *   **Meaning for Karmic Fate Number 18:**
     This number combines the Sun (1) and Saturn (8) and is ruled by Mars (9). Those with the 18 compound number face strong opposition, inner conflict, and obstacles. However, their martial nature makes them resilient fighters. They grow accustomed to facing challenges and adverse situations caused by grudges and enmity from family members. They lack peace in their personal and family lives, and struggle with poor marital bonds. They may earn money through unethical means. If they adopt disciplined lives and embrace non-violence, they can prosper and leave a significant mark on history.
@@ -433,3 +430,36 @@ This is the latter list of meanings, to be used exclusively for the **Karmic Fat
 
 *   **Meaning for Karmic Fate Number 20:**
     This is The Awakening. This number represents a new life and a new sense of purpose. It can indicate a spiritual awakening, but just as often, it can signify that a person is about to have a major breakthrough in their career or their most important relationship. It is an extremely fortunate number, but only if the person’s goals are not entirely selfish. If the goals are for the good of many, then this is a karmic reward number. If the goals are selfish, then the karmic reward will turn into a karmic lesson. There will be many delays and obstacles in this person’s path.
+
+*   **Meaning for Karmic Fate Number 21:**
+    This number combines 2 (Moon) and 1 (Sun), and it is ruled by Jupiter (3). Those who possess the 21 compound number are more social and popular than other psychic 3 individuals. They achieve success and gain the support of authority figures.
+
+*   **Meaning for Karmic Fate Number 22:**
+    This number is ruled by Rahu (4). The two 2s are influenced by the Moon. While the Moon and Rahu are not enemies, they are not friends either. This creates a challenging number. Those who possess the 22 compound number face many difficulties and obstacles, particularly in their personal and family lives. They are advised to choose their partners carefully, as they are likely to experience betrayal.
+
+*   **Meaning for Karmic Fate Number 23:**
+    This number combines the Moon (2) and Jupiter (3) and is ruled by Mercury (5). This is a fortunate number that brings success, honor, and recognition. Those with the 23 compound number receive support from the government and achieve high positions.
+
+*   **Meaning for Karmic Fate Number 24:**
+    This number combines the Moon (2) and Rahu (4), and it is ruled by Venus (6). This is a very fortunate number. Those with the 24 compound number receive help from family and friends, particularly from the opposite sex. They live in luxury and enjoy material success. They are gentle, helpful, and sincere.
+
+*   **Meaning for Karmic Fate Number 25:**
+    This number combines the Moon (2) and Mercury (5), and it is ruled by Ketu (7). It is a number of inner conflict. Those with the 25 compound number experience struggles in their early years but achieve success later in life through their religious and philosophical pursuits. They are not fortunate in love.
+
+*   **Meaning for Karmic Fate Number 26:**
+    This number combines the Moon (2) and Venus (6), and it is ruled by Saturn (8). Those with the 26 compound number are prone to accidents and misfortunes caused by the opposite sex. They are advised to choose their partners carefully and avoid promiscuity.
+
+*   **Meaning for Karmic Fate Number 27:**
+    This number combines the Moon (2) and Ketu (7), and it is ruled by Mars (9). Those who possess the 27 compound number are powerful and authoritative. They achieve success through their own efforts. They are loving, caring, and receive support from their families.
+
+*   **Meaning for Karmic Fate Number 28:**
+    This number combines the Moon (2) and Saturn (8), and it is ruled by the Sun (1). This is a number of contradictions. Those who possess the 28 compound number face opposition and obstacles but ultimately achieve success. They are fighters who work for social justice.
+
+*   **Meaning for Karmic Fate Number 29:**
+    This number combines the Moon (2) and Mars (9), and it is ruled by the Moon (2). This is a number of insecurity and uncertainty. Those with the 29 compound number face many challenges in their personal lives, particularly in marriage. They are advised to marry early and choose their partners carefully.
+
+*   **Meaning for Karmic Fate Number 30:**
+    This number is ruled by Jupiter (3). The presence of zero brings challenges and slows progress. Those who possess the 30 compound number are hardworking and achieve success later in life. They are social, helpful, and become more philosophical with age.
+
+*   **Meaning for Karmic Fate Number 31:**
+    This number combines Jupiter (3) and the Sun (1), and it is ruled by Rahu (4). This is a number of inner conflict and loneliness. Those who possess the 31 compound number are often misunderstood and face many challenges. They are hardworking but achieve success only after great struggle.
