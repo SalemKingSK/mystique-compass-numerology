@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology';
 import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -179,35 +180,31 @@ const InfoCard = ({ title, value, icon, popoverContent }: { title: string, value
 
 function FatePopoverContent({ numerology }: { numerology: NumerologyData }) {
     return (
-        <div className="space-y-4">
-            <div>
-                <h4 className="font-bold text-lg mb-2 text-secondary flex items-center gap-2"><Skull className="h-5 w-5" /> Compound Fate: {numerology.compoundNum}</h4>
-                <SpeechPlayer text={numerology.compoundMeaning} elementId="fate-tier1-speech" />
-            </div>
-
-            {numerology.reducedCompoundNum && (
-                <>
-                    <Separator />
-                    <div>
-                        <h4 className="font-bold text-lg mb-2 text-secondary flex items-center gap-2"><Gem className="h-5 w-5" /> Inner Essence: {numerology.reducedCompoundNum}</h4>
-                        <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="fate-tier2-speech" />
-                    </div>
-                </>
-            )}
-            
-            {numerology.karmicFateNum && (
-                <>
-                    <Separator />
-                    <div>
-                        <h4 className="font-bold text-lg mb-2 text-secondary flex items-center gap-2"><Swords className="h-5 w-5" /> Karmic Fate: {numerology.karmicFateNum}</h4>
-                        <SpeechPlayer text={numerology.karmicFateMeaning} elementId="fate-tier3-speech" />
-                    </div>
-                </>
-            )}
-        </div>
+      <Tabs defaultValue="compound" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="compound">Compound Fate</TabsTrigger>
+          {numerology.reducedCompoundNum && <TabsTrigger value="essence">Inner Essence</TabsTrigger>}
+          {numerology.karmicFateNum && <TabsTrigger value="karmic">Karmic Fate</TabsTrigger>}
+        </TabsList>
+        <TabsContent value="compound" className="mt-4 space-y-2">
+            <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Skull className="h-5 w-5" /> {numerology.compoundNum}</h4>
+            <SpeechPlayer text={numerology.compoundMeaning} elementId="fate-tier1-speech" />
+        </TabsContent>
+        {numerology.reducedCompoundNum && (
+          <TabsContent value="essence" className="mt-4 space-y-2">
+            <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Gem className="h-5 w-5" /> {numerology.reducedCompoundNum}</h4>
+            <SpeechPlayer text={numerology.reducedCompoundMeaning || ''} elementId="fate-tier2-speech" />
+          </TabsContent>
+        )}
+        {numerology.karmicFateNum && (
+          <TabsContent value="karmic" className="mt-4 space-y-2">
+            <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Swords className="h-5 w-5" /> {numerology.karmicFateNum}</h4>
+            <SpeechPlayer text={numerology.karmicFateMeaning || ''} elementId="fate-tier3-speech" />
+          </TabsContent>
+        )}
+      </Tabs>
     );
 }
-
 
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const numberEntries = Object.entries(numerology.numberCounts)
@@ -272,7 +269,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                       meaning = NUMBER_MEANINGS[digit as keyof typeof NUMBER_MEANINGS]?.description || "No specific meaning for this number.";
                                   }
                                   
-                                  const title = count > 1 ? `Number ${digit} (appears ${count} times)` : `Number ${digit} (appears 1 time)`;
+                                  const title = count > 1 ? `Number ${digit} (appears ${count} times)` : `Number ${digit}`;
 
                                   return (
                                       <AccordionItem value={`item-${digit}`} key={digit}>
@@ -377,10 +374,12 @@ function ResultsDisplay({
   insight,
   numerology,
   onReset,
+  onHistoryOpen,
 }: {
   insight: AstroInsightOutput;
   numerology: NumerologyData | null;
   onReset: () => void;
+  onHistoryOpen: () => void;
 }) {
   
   const [activeTab, setActiveTab] = React.useState<'astro' | 'numerology'>('astro');
@@ -392,7 +391,10 @@ function ResultsDisplay({
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-        <header className="text-center mb-6">
+        <header className="text-center mb-6 relative">
+             <Button onClick={onHistoryOpen} variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
+                <History className="h-6 w-6"/>
+            </Button>
             <h1 
                 className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
             >
@@ -425,7 +427,7 @@ function ResultsDisplay({
         </AnimatePresence>
 
         <footer className="text-center mt-8">
-            <Button onClick={onReset} variant="link" className="text-primary text-lg">
+            <Button onClick={onReset} variant="outline" className="text-primary text-lg">
               ← Create a New Profile
             </Button>
       </footer>
@@ -452,14 +454,46 @@ const TabButton = ({ id, activeTab, setActiveTab, children } : { id: 'astro' | '
     );
 };
 
+const HISTORY_KEY = 'mystiqueCompassHistory';
+const MAX_HISTORY_SIZE = 21;
+
 
 export function ProfileGenerator() {
   const { toast } = useToast();
   const [isPending, startTransition] = React.useTransition();
-  const [formData, setFormData] = React.useState({ name: '', day: '', month: '', year: '', gender: '' });
+  const [formData, setFormData] = React.useState<AstroInsightInput>({ name: '', day: 0, month: 0, year: 0, gender: '' });
   const [insight, setInsight] = React.useState<AstroInsightOutput | null>(null);
   const [numerology, setNumerology] = React.useState<NumerologyData | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [history, setHistory] = React.useState<AstroInsightInput[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = React.useState(false);
+
+
+  React.useEffect(() => {
+    try {
+        const storedHistory = localStorage.getItem(HISTORY_KEY);
+        if (storedHistory) {
+            setHistory(JSON.parse(storedHistory));
+        }
+    } catch (e) {
+        console.error("Could not read history from localStorage", e)
+    }
+  }, []);
+
+  const addToHistory = (newItem: AstroInsightInput) => {
+    setHistory(prevHistory => {
+        const newHistory = [newItem, ...prevHistory.filter(item => item.name !== newItem.name)];
+        if (newHistory.length > MAX_HISTORY_SIZE) {
+            newHistory.pop();
+        }
+        try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+        } catch (e) {
+            console.error("Could not save history to localStorage", e);
+        }
+        return newHistory;
+    });
+};
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -477,14 +511,12 @@ export function ProfileGenerator() {
     setInsight(null);
     setNumerology(null);
     setError(null);
-    setFormData({ name: '', day: '', month: '', year: '', gender: '' });
+    setFormData({ name: '', day: 0, month: 0, year: 0, gender: '' });
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  
+  const processRequest = (data: AstroInsightInput) => {
     setError(null);
-    const { name, day, month, year, gender } = formData;
-    if (!name || !day || !month || !year || !gender) {
+    if (!data.name || !data.day || !data.month || !data.year || !data.gender) {
       toast({
         variant: 'destructive',
         title: 'Missing Information',
@@ -494,18 +526,12 @@ export function ProfileGenerator() {
     }
     
     startTransition(async () => {
-        const data = {
-            name,
-            day: parseInt(day),
-            month: parseInt(month),
-            year: parseInt(year),
-            gender,
-        };
         const result = await getAstroInsightAction(data);
         
         if (result.success && result.insight && result.numerology) {
             setInsight(result.insight);
             setNumerology(result.numerology);
+            addToHistory(data);
         } else {
             setInsight(null);
             setNumerology(null);
@@ -517,7 +543,25 @@ export function ProfileGenerator() {
             });
         }
     });
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const data = {
+        name: formData.name,
+        day: parseInt(String(formData.day)),
+        month: parseInt(String(formData.month)),
+        year: parseInt(String(formData.year)),
+        gender: formData.gender,
+    };
+    processRequest(data);
   };
+
+  const handleHistoryClick = (item: AstroInsightInput) => {
+    setIsHistoryOpen(false);
+    setFormData(item);
+    processRequest(item);
+  }
 
   return (
       <AnimatePresence mode="wait">
@@ -527,6 +571,7 @@ export function ProfileGenerator() {
                     insight={insight}
                     numerology={numerology}
                     onReset={handleReset}
+                    onHistoryOpen={() => setIsHistoryOpen(true)}
                  />
             </motion.div>
         ) : (
@@ -539,10 +584,35 @@ export function ProfileGenerator() {
             className="glass-card p-6"
           >
             <form onSubmit={handleSubmit}>
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Mystique Compass</h2>
-                <p className="text-gray-400">Astrology & Numerology</p>
-              </div>
+              <header className="text-center mb-6 relative">
+                 <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
+                            <History className="h-6 w-6"/>
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>Search History</SheetTitle>
+                        </SheetHeader>
+                        <ScrollArea className="h-[calc(100%-4rem)]">
+                            <div className="space-y-2 py-4">
+                                {history.length > 0 ? (
+                                    history.map((item, index) => (
+                                        <Button key={`${item.name}-${index}`} variant="ghost" className="w-full justify-start" onClick={() => handleHistoryClick(item)}>
+                                            {item.name}
+                                        </Button>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-center text-gray-400">No history yet.</p>
+                                )}
+                            </div>
+                        </ScrollArea>
+                    </SheetContent>
+                 </Sheet>
+                 <h2 className="text-2xl font-bold text-white">Mystique Compass</h2>
+                 <p className="text-gray-400">Giving your Life a meaning.</p>
+              </header>
 
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -552,9 +622,9 @@ export function ProfileGenerator() {
                 <div className="space-y-2">
                   <Label>Date of Birth</Label>
                   <div className="grid grid-cols-3 gap-2">
-                    <Input type="number" name="day" min="1" max="31" placeholder="Day" required value={formData.day} onChange={handleChange} disabled={isPending} />
-                    <Input type="number" name="month" min="1" max="12" placeholder="Month" required value={formData.month} onChange={handleChange} disabled={isPending} />
-                    <Input type="number" name="year" min="1900" max={new Date().getFullYear()} placeholder="Year" required value={formData.year} onChange={handleChange} disabled={isPending} />
+                    <Input type="number" name="day" min="1" max="31" placeholder="Day" required value={formData.day || ''} onChange={handleChange} disabled={isPending} />
+                    <Input type="number" name="month" min="1" max="12" placeholder="Month" required value={formData.month || ''} onChange={handleChange} disabled={isPending} />
+                    <Input type="number" name="year" min="1900" max={new Date().getFullYear()} placeholder="Year" required value={formData.year || ''} onChange={handleChange} disabled={isPending} />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -584,7 +654,8 @@ export function ProfileGenerator() {
               </div>
 
                <footer className="text-center mt-6">
-                    <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} Mystique Compass. All Rights Reserved.</p>
+                    <p className="text-xs text-gray-500">"He who knows others is learned; He who knows himself is wise."</p>
+                    <p className="text-xs text-gray-500">Lao Tzu, Dao De Jing</p>
                </footer>
             </form>
           </motion.div>
