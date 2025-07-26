@@ -53,6 +53,7 @@ export const calculateKua = (year: number, gender: string): number => {
 
   let finalKua = reduceToSingleDigit(kuaResult);
   
+  // Rule D: Apply the Kua 5 exception.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
@@ -96,9 +97,9 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  const birthDigits = (String(day) + String(month) + String(year)).split('').filter(d => d !== '0');
+  const birthDigitsForGrid = (String(day) + String(month) + String(year)).split('').filter(d => d !== '0');
   const allDigitsForGrid = [
-      ...birthDigits.map(d => parseInt(d)),
+      ...birthDigitsForGrid.map(d => parseInt(d)),
       psycheNum,
       destinyNum,
   ];
@@ -127,13 +128,14 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const birthDigitsRaw = (String(day) + String(month) + String(year)).split('').map(Number);
   const compoundNum = birthDigitsRaw.reduce((a, b) => a + b, 0);
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for this compound number (${compoundNum}).`;
-
+  
+  const firstReduction = reduceOnce(compoundNum);
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
-  if (compoundNum >= 10 && compoundNum <= 52) {
-      const reducedSum = reduceToSingleDigit(compoundNum);
-      reducedCompoundNum = reducedSum;
-      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
+
+  if (firstReduction >= 10) {
+      reducedCompoundNum = firstReduction;
+      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedCompoundNum}.`;
   }
   
   const karmicFateNum = calculateKarmicFate(day, month, year);

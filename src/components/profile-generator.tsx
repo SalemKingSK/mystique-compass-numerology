@@ -14,11 +14,9 @@ import type { AstroInsightInput, AstroInsightOutput } from '@/lib/astrology';
 import type { NumerologyData } from '@/lib/numerology';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
-import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 
@@ -30,7 +28,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
     const sentenceElementsRef = React.useRef<(HTMLSpanElement | null)[]>([]);
 
     React.useEffect(() => {
-        const textSentences = text ? text.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g) || [text] : [];
+        const textSentences = text ? text.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [text] : [];
         setSentences(textSentences);
         sentenceElementsRef.current = new Array(textSentences.length).fill(null);
     }, [text]);
@@ -86,7 +84,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
 
             utterance.onerror = (event) => {
                 if (event.error !== 'cancelled' && event.error !== 'interrupted') {
-                    // console.error("SpeechSynthesisUtterance.onerror", event);
+                    console.error("SpeechSynthesisUtterance.onerror", event);
                 }
                 setIsPlaying(false);
                 setCurrentSentenceIndex(-1);
@@ -96,12 +94,10 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
         };
         
         const startSpeech = () => {
-            // Cancel any previous speech
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
             }
-            // Use a timeout to ensure cancellation is processed before speaking
-            setTimeout(speakNextSentence, 100);
+            speakNextSentence();
         };
 
         if (window.speechSynthesis.getVoices().length === 0) {
@@ -148,8 +144,8 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
     );
 }
 
-const InfoCard = ({ title, value, icon, popoverContent }: { title: string, value: string | number, icon: React.ReactNode, popoverContent?: React.ReactNode }) => {
-    const cardContent = (
+const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => {
+    return (
       <div className="glass-card p-4 text-center h-full flex flex-col justify-center items-center">
         <h3 className="font-semibold text-primary flex items-center justify-center gap-1">
           {icon} {title}
@@ -157,54 +153,46 @@ const InfoCard = ({ title, value, icon, popoverContent }: { title: string, value
         <p className="text-5xl font-bold text-secondary">{value}</p>
       </div>
     );
-  
-    if (popoverContent) {
-      return (
-        <Popover>
-          <PopoverTrigger asChild>
-            <div className="cursor-pointer hover:bg-[rgba(40,40,40,0.7)] transition-colors rounded-2xl">
-              {cardContent}
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-96 max-h-[80vh] p-0" side="bottom" align="center">
-            <ScrollArea className="h-full max-h-[calc(80vh-2rem)]">
-              <div className="p-4">{popoverContent}</div>
-            </ScrollArea>
-          </PopoverContent>
-        </Popover>
-      );
-    }
-  
-    return cardContent;
 };
 
-function FatePopoverContent({ numerology }: { numerology: NumerologyData }) {
+function FateDisplay({ numerology }: { numerology: NumerologyData }) {
     return (
-      <Tabs defaultValue="compound" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="compound">Compound Fate</TabsTrigger>
-          {numerology.reducedCompoundNum && <TabsTrigger value="essence">Inner Essence</TabsTrigger>}
-          {numerology.karmicFateNum && <TabsTrigger value="karmic">Karmic Fate</TabsTrigger>}
-        </TabsList>
-        <TabsContent value="compound" className="mt-4 space-y-2">
-            <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Skull className="h-5 w-5" /> {numerology.compoundNum}</h4>
-            <SpeechPlayer text={numerology.compoundMeaning} elementId="fate-tier1-speech" />
-        </TabsContent>
-        {numerology.reducedCompoundNum && (
-          <TabsContent value="essence" className="mt-4 space-y-2">
-            <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Gem className="h-5 w-5" /> {numerology.reducedCompoundNum}</h4>
-            <SpeechPlayer text={numerology.reducedCompoundMeaning || ''} elementId="fate-tier2-speech" />
-          </TabsContent>
-        )}
-        {numerology.karmicFateNum && numerology.karmicFateMeaning && (
-          <TabsContent value="karmic" className="mt-4 space-y-2">
-            <h4 className="font-bold text-lg text-secondary flex items-center gap-2"><Swords className="h-5 w-5" /> {numerology.karmicFateNum}</h4>
-            <SpeechPlayer text={numerology.karmicFateMeaning} elementId="fate-tier3-speech" />
-          </TabsContent>
-        )}
-      </Tabs>
+        <div className="glass-card p-4">
+            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Skull className="h-5 w-5" /> Fate Interpretations</h3>
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="compound">
+                    <AccordionTrigger>Compound Fate: {numerology.compoundNum}</AccordionTrigger>
+                    <AccordionContent>
+                        <ScrollArea className="h-60 pr-3">
+                           <SpeechPlayer text={numerology.compoundMeaning} elementId="fate-compound-speech" />
+                        </ScrollArea>
+                    </AccordionContent>
+                </AccordionItem>
+                {numerology.reducedCompoundNum && numerology.reducedCompoundMeaning && (
+                    <AccordionItem value="essence">
+                        <AccordionTrigger>Inner Essence: {numerology.reducedCompoundNum}</AccordionTrigger>
+                        <AccordionContent>
+                            <ScrollArea className="h-60 pr-3">
+                               <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="fate-essence-speech" />
+                            </ScrollArea>
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+                {numerology.karmicFateNum && numerology.karmicFateMeaning && (
+                    <AccordionItem value="karmic">
+                        <AccordionTrigger>Karmic Fate: {numerology.karmicFateNum}</AccordionTrigger>
+                        <AccordionContent>
+                            <ScrollArea className="h-60 pr-3">
+                                <SpeechPlayer text={numerology.karmicFateMeaning} elementId="fate-karmic-speech" />
+                            </ScrollArea>
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+            </Accordion>
+        </div>
     );
 }
+
 
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const numberEntries = Object.entries(numerology.numberCounts)
@@ -222,8 +210,11 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                      <InfoCard title="Psyche Number" value={numerology.psycheNum} icon={<BrainCircuit className="h-4 w-4"/>} />
                      <InfoCard title="Destiny Number" value={numerology.destinyNum} icon={<Anchor className="h-4 w-4"/>} />
+                     <InfoCard title="Compound Fate" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} />
                      <InfoCard title="Kua Number" value={numerology.kuaNum} icon={<Compass className="h-4 w-4"/>} />
-                     <InfoCard title="Fate Number" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} popoverContent={<FatePopoverContent numerology={numerology} />} />
+                </div>
+                 <div className="grid grid-cols-1 gap-4">
+                    <FateDisplay numerology={numerology} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="glass-card p-4">
@@ -276,7 +267,9 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                                       <AccordionItem value={`item-${digit}`} key={digit}>
                                           <AccordionTrigger>{title}</AccordionTrigger>
                                           <AccordionContent>
+                                            <ScrollArea className="h-40 pr-3">
                                               <SpeechPlayer text={meaning} elementId={`insight-${digit}-speech`} />
+                                            </ScrollArea>
                                           </AccordionContent>
                                       </AccordionItem>
                                   );
@@ -324,13 +317,17 @@ function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
         <TabsContent value="introduction" className="mt-4">
           <div className="glass-card p-4">
             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><BookOpen /> Your Animal Sign: The {insight.sign}</h3>
-            <SpeechPlayer text={insight.signData.introduction} elementId="intro-speech" />
+            <ScrollArea className="h-72 pr-3">
+              <SpeechPlayer text={insight.signData.introduction} elementId="intro-speech" />
+            </ScrollArea>
           </div>
         </TabsContent>
         <TabsContent value="element" className="mt-4">
           <div className="glass-card p-4">
             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Zap /> The Influence of the {insight.element} Element</h3>
-            <SpeechPlayer text={elementText} elementId="element-speech"/>
+            <ScrollArea className="h-72 pr-3">
+              <SpeechPlayer text={elementText} elementId="element-speech"/>
+            </ScrollArea>
           </div>
         </TabsContent>
         <TabsContent value="compatibility" className="mt-4">
