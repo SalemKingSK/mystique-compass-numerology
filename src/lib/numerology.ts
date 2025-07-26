@@ -1,4 +1,3 @@
-
 // src/lib/numerology.ts
 import type { AstroInsightInput } from '@/lib/astrology';
 
@@ -34,7 +33,7 @@ export const calculateKua = (year: number, gender: string): number => {
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   const reducedYearSum = reduceToSingleDigit(yearSum);
-  
+
   let kuaResult: number;
 
   if (year < 2000) {
@@ -44,11 +43,11 @@ export const calculateKua = (year: number, gender: string): number => {
   }
 
   let finalKua = reduceToSingleDigit(kuaResult);
-  
+
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
-  
+
   return finalKua;
 };
 
@@ -85,22 +84,13 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  const birthDigitsRaw = (String(day) + String(month) + String(year)).split('').map(Number);
-  
-  const allDigitsForGrid = [
-    ...String(day).split('').map(Number),
-    ...String(month).split('').map(Number),
-    ...String(year).split('').map(Number),
-    psycheNum,
-    destinyNum,
-    kuaNum,
-  ].filter(d => d !== 0);
+  const allDigitsForGrid = (String(day) + String(month) + String(year) + String(psycheNum) + String(destinyNum) + String(kuaNum)).split('').map(Number).filter(d => d !== 0);
 
   const numberCounts: { [key: number]: number } = {};
   for (const digit of allDigitsForGrid) {
       numberCounts[digit] = (numberCounts[digit] || 0) + 1;
   }
-  
+
   const gridContent: { [key: string]: string } = {};
   for (let i = 1; i <= 9; i++) {
     const digitStr = String(i);
@@ -115,17 +105,16 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     [gridContent['8'] || null, gridContent['1'] || null, gridContent['6'] || null],
   ];
 
+  const birthDigitsRaw = (String(day) + String(month) + String(year)).split('').map(Number);
   const compoundNum = birthDigitsRaw.reduce((a, b) => a + b, 0);
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for this compound number (${compoundNum}).`;
 
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
-  if (compoundNum >= 10) {
+  if (compoundNum >= 10 && compoundNum <= 52) {
       const reducedSum = String(compoundNum).split('').map(Number).reduce((a, b) => a + b, 0);
-      if(reducedSum >=10){
-        reducedCompoundNum = reducedSum;
-        reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
-      }
+      reducedCompoundNum = reducedSum;
+      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
   }
 
   const karmicInitialSum = day + month + year;
@@ -133,9 +122,9 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || COMPOUND_NUMBER_MEANINGS[karmicFateNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || null;
 
   const calculateArrows = (grid: (string | null)[][]) => {
-    const strength = [];
-    const weakness = [];
-    
+    const strength: { name: string; description: string }[] = [];
+    const weakness: { name: string; description: string }[] = [];
+
     const has = (num: number) => grid.flat().some(cell => cell?.includes(String(num)) ?? false);
 
     const arrowDefs = {
@@ -160,13 +149,13 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
             { name: "Arrow of Doubt", line: [2, 5, 8], description: "You may suffer from a lack of self-belief and constantly question your own abilities and decisions, which can hold you back." },
         ]
     };
-    
+
     for (const arrow of arrowDefs.strength) {
         if (arrow.line.every(n => has(n))) {
             strength.push({ name: arrow.name, description: arrow.description });
         }
     }
-    
+
     for (const arrow of arrowDefs.weakness) {
         if (arrow.line.every(n => !has(n))) {
             weakness.push({ name: arrow.name, description: arrow.description });
@@ -180,7 +169,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   const kuaAttributes = KUA_ATTRIBUTES[kuaNum] || (gender.toLowerCase() === 'male' ? KUA_ATTRIBUTES[5].male : KUA_ATTRIBUTES[5].female) || {};
   const auspiciousDirections = KUA_DIRECTIONS[kuaNum] || (gender.toLowerCase() === 'male' ? KUA_DIRECTIONS[5].male : KUA_DIRECTIONS[5].female) || {};
-  
+
   return {
     psycheNum,
     destinyNum,
@@ -200,70 +189,21 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   };
 };
 
+// --- DATA CONSTANTS ---
 
 export const KUA_DIRECTIONS: { [key: number]: any } = {
-  1: {
-    Success: 'SE',
-    Health: 'E',
-    Family: 'S',
-    'Personal Growth': 'N',
-  },
-  2: {
-    Success: 'NE',
-    Health: 'W',
-    Family: 'NW',
-    'Personal Growth': 'SW',
-  },
-  3: {
-    Success: 'S',
-    Health: 'N',
-    Family: 'SE',
-    'Personal Growth': 'E', 
-  },
-  4: {
-    Success: 'N',
-    Health: 'S',
-    Family: 'E',
-    'Personal Growth': 'SE', 
-  },
+  1: { Success: 'SE', Health: 'E', Family: 'S', 'Personal-Growth': 'N' },
+  2: { Success: 'NE', Health: 'W', Family: 'NW', 'Personal-Growth': 'SW' },
+  3: { Success: 'S', Health: 'N', Family: 'SE', 'Personal-Growth': 'E' },
+  4: { Success: 'N', Health: 'S', Family: 'E', 'Personal-Growth': 'SE' },
   5: {
-    male: { 
-      Success: 'NE',
-      Health: 'W',
-      Family: 'NW',
-      'Personal Growth': 'SW',
-    },
-    female: { 
-      Success: 'SW',
-      Health: 'NW',
-      Family: 'W',
-      'Personal Growth': 'NE',
-    },
+    male: { Success: 'NE', Health: 'W', Family: 'NW', 'Personal-Growth': 'SW' },
+    female: { Success: 'SW', Health: 'NW', Family: 'W', 'Personal-Growth': 'NE' },
   },
-  6: {
-    Success: 'W', 
-    Health: 'SW',
-    Family: 'NE',
-    'Personal Growth': 'NW',
-  },
-  7: {
-    Success: 'NW',
-    Health: 'SW',
-    Family: 'NE',
-    'Personal Growth': 'W',
-  },
-  8: {
-    Success: 'SW',
-    Health: 'NW',
-    Family: 'W',
-    'Personal Growth': 'NE',
-  },
-  9: {
-    Success: 'E',
-    Health: 'SE',
-    Family: 'N',
-    'Personal Growth': 'S',
-  },
+  6: { Success: 'W', Health: 'SW', Family: 'NE', 'Personal-Growth': 'NW' },
+  7: { Success: 'NW', Health: 'SW', Family: 'NE', 'Personal-Growth': 'W' },
+  8: { Success: 'SW', Health: 'NW', Family: 'W', 'Personal-Growth': 'NE' },
+  9: { Success: 'E', Health: 'SE', Family: 'N', 'Personal-Growth': 'S' },
 };
 
 export const KUA_ATTRIBUTES: { [key: number]: any } = {
@@ -271,7 +211,7 @@ export const KUA_ATTRIBUTES: { [key: number]: any } = {
   2: { element: 'Earth', colors: 'Red, Pink, Maroon', season: 'Late Summer' },
   3: { element: 'Wood', colors: 'Green, Brown', season: 'Spring' },
   4: { element: 'Wood', colors: 'Green, Brown', season: 'Spring' },
-  5: { 
+  5: {
       male: { element: 'Earth', colors: 'Red, Pink, Maroon', season: 'Late Summer' },
       female: { element: 'Earth', colors: 'Yellow, Beige, Brown', season: 'Late Summer' }
   },
@@ -349,7 +289,7 @@ export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string 
 };
 
 export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
-  10: `Number 10 is symbolized by Isis and Osiris, representing a cycle of rise and fall determined by personal choices. The name associated with this number will gain recognition, either for positive or negative reasons, depending on the actions taken. It evokes extreme responses—love or hate, respect or fear—with no middle ground between honor and dishonor. Every outcome is self-determined. Number 10 embodies Love and Light, enabling the creation of all that can be imagined, with the principle: 'Image it, and it shall be. Ordain it, and it will materialize.' The power to manifest creative concepts is inherent, but it must be wielded wisely, as it also holds the potential for destruction. Self-discipline and infinite compassion are essential to avoid the tragedy of misuse. Discipline must precede dominion. Some individuals with the 10 compound number fail to recognize their potential, leading to feelings of frustration and unfulfillment. This may cause them to adopt a proud or arrogant demeanor to mask unwarranted feelings of inferiority.`,
+  10: `Number 10 is symbolized by Isis and Osiris, representing a cycle of rise and fall determined by personal choices. The name associated with this number will gain recognition, either for positive or negative reasons, depending on the actions taken. It evokes extreme responses—love or hate, respect or fear—with no middle ground between honor and dishonor. Every outcome is self-determined. Number 10 embodies Love and Light, enabling the creation of all that can be imagined, with the principle: "Image it, and it shall be. Ordain it, and it will materialize." The power to manifest creative concepts is inherent, but it must be wielded wisely, as it also holds the potential for destruction. Self-discipline and infinite compassion are essential to avoid the tragedy of misuse. Discipline must precede dominion. Some individuals with the 10 compound number fail to recognize their potential, leading to feelings of frustration and unfulfillment. This may cause them to adopt a proud or arrogant demeanor to mask unwarranted feelings of inferiority.`,
   11: `Number 11 is depicted as "A Lion Muzzled — A Clenched Fist," symbolizing hidden trials and treachery from others. It represents two individuals, either of the same or opposite sex, or two opposing situations, where compatibility is lacking, and a third force creates interference. This interference, whether a person or an idea, must be overcome to avoid frustration from unachieved goals. The illusion of separation fuels these difficulties, requiring the unification of divided objectives. The third force may manifest as a refusal to see another’s perspective, acting as a barrier to harmony. Identifying the source of this separation and seeking compromise is essential. Sometimes, internal conflicting desires are reflected as in a mirror, standing apart but needing to unite for fulfillment while retaining individuality. Those who possess the 11 compound number have strong intuition and are inspired by lofty ideals. A dynamic energy radiates from their personal magnetism, making them masters of most situations. Their executive abilities are prominent, and their minds are creative, original, and alert. They strive to protect those they love and enjoy the role of provider. They are modest and prefer not to flaunt their talents and abilities. They are drawn to the subtler aspects of life. They enjoy detective stories and mystical philosophy. They possess a strong magnetism that attracts others, but they are cautious about sharing their affections. Through mental and verbal influence, they can persuade others to act in ways that align with their desires. They have significant latent psychic abilities, which they can develop to express clairvoyance, trance, mediumship, or psychometry, thanks to the Moon’s influence. They should learn to engage in lighter mental and spiritual pleasures to relax. Excessive focus can lead to depression, which they must strive to avoid. They are typically successful in life and love, achieving honor, position, and authority. They are loyal to their friends and exhibit a noble disposition. They should remain vigilant against secret enemies.`,
   12: `Number 12 is known as "The Sacrifice — The Victim," indicating a tendency to be sacrificed for the plans or intrigues of others. It warns of the need to stay alert in every situation and to be cautious of false flattery from those seeking personal gain. Those with this number should be wary of offers of high positions and carefully examine the motives behind them. While duplicity is not always present, being forewarned is wise. This number brings mental anxiety due to the necessity of sacrificing personal goals for the ambitions of others. A secondary interpretation views the number 1 as the teacher (whether a person or life itself) and the number 2 as the submissive student. Severe emotional stress or mental anguish can lead to amnesia or forgetfulness of past lessons. Number 12 represents the educational process on all levels, requiring the submission of will and sacrifices to achieve knowledge and wisdom, both spiritually and intellectually. When the intellect is surrendered to feelings, the mind finds illumination and answers. Looking within for solutions and prioritizing education will end suffering and lead to success.`,
   13: `Number 13 is associated with "Regeneration — Change" and is not considered unlucky, despite common beliefs. The ancients believed that understanding the use of 13 grants power and dominion. Symbolized as a skeleton with a scythe reaping men in a field of new grass, with young faces emerging from the ground, it represents upheaval to break new ground. It is linked to power, which, if used selfishly, brings self-destruction. There is a warning of the unknown and unexpected. Adapting gracefully to change harnesses the strength of the 13 vibration, reducing its potential for negativity. It is associated with genius, exploration, breaking orthodox norms, and new discoveries. Those with the 13 compound number can delve deeply into matters and excel in scientific research or occult sciences like Tantra. Their interests in religion and philosophy can lead to great successes and supernatural powers (siddhis).`,
@@ -392,42 +332,12 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   50: `Number 50 has the same meaning as the number 32. Number 50, associated with "Communication," possesses a remarkable ability to influence large groups, similar to the 14 compound number. It also attracts support from those in high positions, much like the 23 compound number. Combined with a natural talent for captivating others through magnetic speech, it’s evident why 50 is sometimes referred to as “the politician’s vibration.” Fields such as advertising, writing, publishing, radio, and television are often easily navigable for those with the 50 compound number, though not always. They tend to thrive under pressure. However, a cautionary note accompanies this seemingly positive influence. The 50 compound number is highly fortunate if the individual remains steadfast in their own opinions and judgments, whether in artistic, intangible, or material matters. If they waver, their plans risk being undermined by the stubbornness or folly of others.`,
   51: `Number 51 possesses a distinct and powerful potency of its own. It is associated with the nature of a warrior, promising rapid advancement in any endeavor undertaken. It is particularly favorable for those requiring protection in military or naval careers, as well as for leaders of any cause unrelated to war. However, it also carries the risk of dangerous enemies and the potential for assassination attempts. Therefore, if an individual’s name equals 51, it is wise to change the spelling to align with a safer compound number, forgoing the allure of glory.`,
   52: `Number 52 has the same meaning as the number 43. Number 52 is considered an unfortunate number by ancient traditions. If a name equals 52, it should be changed to a more fortunate compound number. It is symbolized by tendencies toward revolution, upheaval, strife, conflict, and war, carrying a vibration of repeated disappointment and failure.`
-}; And for the Karmic fate numbers, here's their special meanings;
+};
 
-### The Karmic Fate Meanings
-
-This is the latter list of meanings, to be used exclusively for the **Karmic Fate** number.
-
-### Karmic Debt Number 10
-
-A karmic number 10 signifies that you were likely a person of privilege in a past life who misused your power and authority. Instead of leading with compassion, you acted with laziness and selfishness, failing to develop your talents while causing suffering to others.
-The lesson in this lifetime is to reclaim your leadership potential for the good of others. You will face numerous challenges that require you to tap into your courage and compassion. Success and happiness will come only when you learn to serve others rather than yourself. This is a path of rediscovering your inner strength through positive action.
-
-### Karmic Debt Number 13
-
-A karmic number 13 indicates that in a previous life, you took the easy way out. You were likely lazy, undisciplined, and relied on others to do your work, blaming them when things went wrong. You indulged in pleasure without contributing effort, leaving a trail of unfinished tasks and broken promises.
-The lesson in this lifetime is to learn the value of hard work and discipline. You will encounter many obstacles that seem to block your progress, forcing you to persevere and remain focused. Success will not come easily; it must be earned through consistent effort and by taking responsibility for your actions. This is a path of building character through dedication.
-
-### Karmic Debt Number 14
-
-A karmic number 14 suggests that in a past life, you misused your freedom at the expense of others. You may have been a person of power who dominated or enslaved others, or you may have lived a life of excessive indulgence in physical pleasures (such as drugs, alcohol, or sex) without regard for the consequences.
-The lesson in this lifetime is to find balance and moderation. You will face constant, unexpected changes and a chaotic flow of circumstances that challenge your stability. You must learn to remain committed and grounded amidst the turmoil. This is a path of learning self-control and using your freedom responsibly.
-
-### Karmic Debt Number 16
-
-A karmic number 16 indicates that in a past life, you were involved in illicit or forbidden love affairs that caused great pain to others. Your actions were driven by ego and a disregard for the sacredness of love and commitment, leading to the downfall of relationships.
-The lesson in this lifetime is to learn humility and to rebuild from the ground up, often through repeated cycles of destruction and rebirth. You will experience sudden, shocking events that tear down your ego and old structures, forcing you to find a higher, more spiritual path. This is a path of overcoming the ego and finding true spiritual connection.
-
-### Karmic Debt Number 19
-
-A karmic number 19 signifies that in a past life, you abused your power. You were likely in a position of great authority but acted with selfishness and greed, caring only for your own needs while ignoring the suffering of those you ruled.
-The lesson in this lifetime is to learn to stand on your own two feet and connect with others on a human level. You will often find yourself alone and forced to learn independence. The challenges you face are designed to teach you that you are part of a greater whole and that true power comes from serving others, not dominating them. This is a path of learning empathy and mutual respect.
-### Summary
-
-By comprehending the significance of compound numbers from 11 to 31, numerologists can gain clearer insights into the character of psychic individuals who possess these compound numbers on any date of any month.  
-The purpose of numerology is to provide general insights about human beings who, despite similar physical compositions, perceive the world differently.  
-Their complex behaviors can be understood through their astrological configurations and the interplay of their psychic, destiny, and name numbers.  
-Numerology seeks to educate individuals about their strengths and weaknesses, offering guidance on avoiding habits that cause problems in their lives.  
-It leads them out of the ignorance stemming from a lack of understanding of planetary influences on their lives.  
-It provides a method for working with these influences through the use of colors and gemstones.  
-It also offers advice on maintaining general mental and physical health, identifying potential ailments they may face, and suggesting ways to prevent those conditions.
+export const KARMIC_FATE_MEANINGS: { [key: number]: string } = {
+  10: `A karmic number 10 signifies that you were likely a person of privilege in a past life who misused your power and authority. Instead of leading with compassion, you acted with laziness and selfishness, failing to develop your talents while causing suffering to others. The lesson in this lifetime is to reclaim your leadership potential for the good of others. You will face numerous challenges that require you to tap into your courage and compassion. Success and happiness will come only when you learn to serve others rather than yourself. This is a path of rediscovering your inner strength through positive action.`,
+  13: `A karmic number 13 indicates that in a previous life, you took the easy way out. You were likely lazy, undisciplined, and relied on others to do your work, blaming them when things went wrong. You indulged in pleasure without contributing effort, leaving a trail of unfinished tasks and broken promises. The lesson in this lifetime is to learn the value of hard work and discipline. You will encounter many obstacles that seem to block your progress, forcing you to persevere and remain focused. Success will not come easily; it must be earned through consistent effort and by taking responsibility for your actions. This is a path of building character through dedication.`,
+  14: `A karmic number 14 suggests that in a past life, you misused your freedom at the expense of others. You may have been a person of power who dominated or enslaved others, or you may have lived a life of excessive indulgence in physical pleasures (such as drugs, alcohol, or sex) without regard for the consequences. The lesson in this lifetime is to find balance and moderation. You will face constant, unexpected changes and a chaotic flow of circumstances that challenge your stability. You must learn to remain committed and grounded amidst the turmoil. This is a path of learning self-control and using your freedom responsibly.`,
+  16: `A karmic number 16 indicates that in a past life, you were involved in illicit or forbidden love affairs that caused great pain to others. Your actions were driven by ego and a disregard for the sacredness of love and commitment, leading to the downfall of relationships. The lesson in this lifetime is to learn humility and to rebuild from the ground up, often through repeated cycles of destruction and rebirth. You will experience sudden, shocking events that tear down your ego and old structures, forcing you to find a higher, more spiritual path. This is a path of overcoming the ego and finding true spiritual connection.`,
+  19: `A karmic number 19 signifies that in a past life, you abused your power. You were likely in a position of great authority but acted with selfishness and greed, caring only for your own needs while ignoring the suffering of those you ruled. The lesson in this lifetime is to learn to stand on your own two feet and connect with others on a human level. You will often find yourself alone and forced to learn independence. The challenges you face are designed to teach you that you are part of a greater whole and that true power comes from serving others, not dominating them. This is a path of learning empathy and mutual respect.`
+};
