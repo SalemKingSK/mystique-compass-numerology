@@ -7,7 +7,7 @@ import type { AstroInsightInput } from '@/lib/astrology';
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
-    if ([11, 22, 33].includes(num)) break; 
+    if ([11, 22, 33].includes(num)) break;
     num = String(num)
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -122,14 +122,14 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   let reducedCompoundMeaning: string | null = null;
   if (compoundNum >= 10) {
       const reducedSum = String(compoundNum).split('').map(Number).reduce((a, b) => a + b, 0);
-      if(reducedSum >= 10) {
+      if(reducedSum >=10){
         reducedCompoundNum = reducedSum;
         reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
       }
   }
 
   const karmicInitialSum = day + month + year;
-  const karmicFateNum = String(karmicInitialSum).split('').map(Number).reduce((a,b) => a+b, 0);
+  const karmicFateNum = reduceToSingleDigit(karmicInitialSum);
   const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || COMPOUND_NUMBER_MEANINGS[karmicFateNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || null;
 
   const calculateArrows = (grid: (string | null)[][]) => {
@@ -218,7 +218,7 @@ export const KUA_DIRECTIONS: { [key: number]: any } = {
     Success: 'S',
     Health: 'N',
     Family: 'SE',
-    'Personal-Growth': 'E', 
+    'Personal Growth': 'E', 
   },
   4: {
     Success: 'N',
@@ -354,7 +354,7 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   12: `Number 12 is known as "The Sacrifice — The Victim," indicating a tendency to be sacrificed for the plans or intrigues of others. It warns of the need to stay alert in every situation and to be cautious of false flattery from those seeking personal gain. Those with this number should be wary of offers of high positions and carefully examine the motives behind them. While duplicity is not always present, being forewarned is wise. This number brings mental anxiety due to the necessity of sacrificing personal goals for the ambitions of others. A secondary interpretation views the number 1 as the teacher (whether a person or life itself) and the number 2 as the submissive student. Severe emotional stress or mental anguish can lead to amnesia or forgetfulness of past lessons. Number 12 represents the educational process on all levels, requiring the submission of will and sacrifices to achieve knowledge and wisdom, both spiritually and intellectually. When the intellect is surrendered to feelings, the mind finds illumination and answers. Looking within for solutions and prioritizing education will end suffering and lead to success.`,
   13: `Number 13 is associated with "Regeneration — Change" and is not considered unlucky, despite common beliefs. The ancients believed that understanding the use of 13 grants power and dominion. Symbolized as a skeleton with a scythe reaping men in a field of new grass, with young faces emerging from the ground, it represents upheaval to break new ground. It is linked to power, which, if used selfishly, brings self-destruction. There is a warning of the unknown and unexpected. Adapting gracefully to change harnesses the strength of the 13 vibration, reducing its potential for negativity. It is associated with genius, exploration, breaking orthodox norms, and new discoveries. Those with the 13 compound number can delve deeply into matters and excel in scientific research or occult sciences like Tantra. Their interests in religion and philosophy can lead to great successes and supernatural powers (siddhis).`,
   14: `Number 14, known as "Movement… Challenge," is linked to magnetic communication with the public through writing, publishing, and media-related endeavors. Periodic changes in business and partnerships are often beneficial. Engaging in speculative matters brings luck, as does movement and travel involving diverse groups and nations. However, gains and losses may be temporary due to constant currents of change. Number 14 warns of dangers from natural elements such as fire, floods, earthquakes, tornadoes, hurricanes, and tempests, advising caution without implying inevitability. There is risk in relying on the word of those who misrepresent situations, and depending on others is a mistake. Those with this number should trust their intuition and inner voice. The "luck" of 14 includes success in money dealings and speculative projects, but there is a danger of loss due to misguided advice or overconfidence.`,
-  15: `Number 15, dubbed "The Magician," carries deep esoteric significance, embodying the alchemy through which magic is manifested. It is extremely fortunate, radiating enchantment and charm. Associated with eloquent speech, it bestows gifts in music, art, and drama. Those with the 15 compound number possess a dramatic temperament and compelling charisma, making them highly appealing to others’ altruistic nature. This number is particularly lucky for attracting money, gifts, and favors. However, when linked to single numbers 4 or 8, it can incline toward the lower levels of occultism, such as black magic, hypnosis, or mental suggestion, either used by or against the individual. If the birth date is the 15th and the name number is 4, 13, 22, or 31, the name should be changed to a compound number reducing to 1 (e.g., 10 or 19). If the birth date is the 15th and the name number is 8, 17, or 26, or if the name number is 15 and the birth date is the 4th, 13, 22nd, 31st, 8th, 17th, or 26th, the name should be changed to equal 6 or 24. Otherwise, 15 is highly fortunate, enabling those with this number to bring happiness to others and shine light into darkness, provided they avoid using its magic for selfish purposes.`,
+  15: `Number 15, dubbed "The Magician," carries deep esoteric significance, embodying the alchemy through which magic is manifested. It is extremely fortunate, radiating enchantment and charm. Associated with eloquent speech, it bestows gifts in music, art, and drama. Those with the 15 compound number possess a dramatic temperament and compelling charisma, making them highly appealing to others’ altruistic nature. This number is particularly lucky for attracting money, gifts, and favors. However, when linked to single numbers 4 or 8, it can incline toward the lower levels of occultism, such as black magic, hypnosis, or mental suggestion, either used by or against the individual. If the birth date is the 15th and the name number is 4, 13, 22, or 31, the name should be changed to a compound number reducing to 1 (e.g., 10 or 19). If the birth date is the 15th and the name number is 8, 17, or 26, or if the name number is 15 and the birth date is the 4th, 13th, 22nd, 31st, 8th, 17th, or 26th, the name should be changed to equal 6 or 24. Otherwise, 15 is highly fortunate, enabling those with this number to bring happiness to others and shine light into darkness, provided they avoid using its magic for selfish purposes.`,
   16: `Number 16, known as "The Shattered Citadel," is depicted by the ancient Chaldeans as a tower struck by lightning, with a crowned man falling. It warns of a strange fatality, danger of accidents, and potential defeat of plans. If the name equals 16, changing its spelling is advisable to avoid this vibration. For those born on the 16th, the challenges must be met carefully to dilute its effect. Anticipating and circumventing failure through meticulous planning is crucial. The 16 brings the obligation of the single number 7 to heed the inner voice, which warns of danger through dreams or intuition. Ignoring this voice risks calamity, as illustrated by Abraham Lincoln, whose name equaled 16 and who ignored repeated warnings of assassination. To mitigate the negative aspects, those with the 16 compound number should avoid seeking fame or leadership and focus on a quieter life.`,
   17: `Number 17, "The Star of the Magi," is a highly spiritual number, symbolized by the ancient Chaldeans as the 8-pointed Star of Venus. It represents love and peace, promising that the individual or entity will rise above early trials and difficulties in relationships and career. Known as "the number of Immortality," it suggests that the person’s name will endure posthumously. This is a highly fortunate number, though it reduces to the single number 8, requiring careful attention to its challenges. Those with the 17 compound number become beneficent, contributing to humanity in ways that earn them lasting recognition. They develop resilience, overcoming obstacles without losing hope, and bring peace to those around them. Despite struggles in personal and family life, they achieve wealth, prosperity, and respect. Faith in spiritual practices can lead to miraculous resolutions of their problems. They are advised to choose friends cautiously and remain vigilant in seeking help.`,
   18: `Number 18, termed "Spiritual-Material Conflict," is one of the most challenging compound numbers to interpret. The ancients symbolize it as a rayed moon with falling drops of blood, caught by a wolf and a hungry dog, with a crab hastening to join them. It represents materialism striving to undermine spirituality, often leading to family quarrels, wars, social upheaval, or revolution. It may involve gaining money or position through divisive tactics or conflict. This number warns of treachery, deception from friends and enemies, and dangers from natural elements like fire, floods, earthquakes, or lightning. If the name equals 18, it should be changed to a more fortunate number. For those born on the 18th, extreme caution is needed to navigate its challenges. The negative aspects can be mitigated by consistently responding to deception and hatred with generosity, love, and forgiveness, turning the other cheek, and returning good for evil. This approach can transform the 18 into a vibration of illumination and success. Changing the name to a compound number reducing to 6 (e.g., 6 or 24) and planning important activities on the 3rd or 6th day of the month can further dilute its challenges. Emphasizing the number 6 in addresses, phone numbers, and other aspects of life enhances this transformation.`,
@@ -392,4 +392,42 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   50: `Number 50 has the same meaning as the number 32. Number 50, associated with "Communication," possesses a remarkable ability to influence large groups, similar to the 14 compound number. It also attracts support from those in high positions, much like the 23 compound number. Combined with a natural talent for captivating others through magnetic speech, it’s evident why 50 is sometimes referred to as “the politician’s vibration.” Fields such as advertising, writing, publishing, radio, and television are often easily navigable for those with the 50 compound number, though not always. They tend to thrive under pressure. However, a cautionary note accompanies this seemingly positive influence. The 50 compound number is highly fortunate if the individual remains steadfast in their own opinions and judgments, whether in artistic, intangible, or material matters. If they waver, their plans risk being undermined by the stubbornness or folly of others.`,
   51: `Number 51 possesses a distinct and powerful potency of its own. It is associated with the nature of a warrior, promising rapid advancement in any endeavor undertaken. It is particularly favorable for those requiring protection in military or naval careers, as well as for leaders of any cause unrelated to war. However, it also carries the risk of dangerous enemies and the potential for assassination attempts. Therefore, if an individual’s name equals 51, it is wise to change the spelling to align with a safer compound number, forgoing the allure of glory.`,
   52: `Number 52 has the same meaning as the number 43. Number 52 is considered an unfortunate number by ancient traditions. If a name equals 52, it should be changed to a more fortunate compound number. It is symbolized by tendencies toward revolution, upheaval, strife, conflict, and war, carrying a vibration of repeated disappointment and failure.`
-};
+}; And for the Karmic fate numbers, here's their special meanings;
+
+### The Karmic Fate Meanings
+
+This is the latter list of meanings, to be used exclusively for the **Karmic Fate** number.
+
+### Karmic Debt Number 10
+
+A karmic number 10 signifies that you were likely a person of privilege in a past life who misused your power and authority. Instead of leading with compassion, you acted with laziness and selfishness, failing to develop your talents while causing suffering to others.
+The lesson in this lifetime is to reclaim your leadership potential for the good of others. You will face numerous challenges that require you to tap into your courage and compassion. Success and happiness will come only when you learn to serve others rather than yourself. This is a path of rediscovering your inner strength through positive action.
+
+### Karmic Debt Number 13
+
+A karmic number 13 indicates that in a previous life, you took the easy way out. You were likely lazy, undisciplined, and relied on others to do your work, blaming them when things went wrong. You indulged in pleasure without contributing effort, leaving a trail of unfinished tasks and broken promises.
+The lesson in this lifetime is to learn the value of hard work and discipline. You will encounter many obstacles that seem to block your progress, forcing you to persevere and remain focused. Success will not come easily; it must be earned through consistent effort and by taking responsibility for your actions. This is a path of building character through dedication.
+
+### Karmic Debt Number 14
+
+A karmic number 14 suggests that in a past life, you misused your freedom at the expense of others. You may have been a person of power who dominated or enslaved others, or you may have lived a life of excessive indulgence in physical pleasures (such as drugs, alcohol, or sex) without regard for the consequences.
+The lesson in this lifetime is to find balance and moderation. You will face constant, unexpected changes and a chaotic flow of circumstances that challenge your stability. You must learn to remain committed and grounded amidst the turmoil. This is a path of learning self-control and using your freedom responsibly.
+
+### Karmic Debt Number 16
+
+A karmic number 16 indicates that in a past life, you were involved in illicit or forbidden love affairs that caused great pain to others. Your actions were driven by ego and a disregard for the sacredness of love and commitment, leading to the downfall of relationships.
+The lesson in this lifetime is to learn humility and to rebuild from the ground up, often through repeated cycles of destruction and rebirth. You will experience sudden, shocking events that tear down your ego and old structures, forcing you to find a higher, more spiritual path. This is a path of overcoming the ego and finding true spiritual connection.
+
+### Karmic Debt Number 19
+
+A karmic number 19 signifies that in a past life, you abused your power. You were likely in a position of great authority but acted with selfishness and greed, caring only for your own needs while ignoring the suffering of those you ruled.
+The lesson in this lifetime is to learn to stand on your own two feet and connect with others on a human level. You will often find yourself alone and forced to learn independence. The challenges you face are designed to teach you that you are part of a greater whole and that true power comes from serving others, not dominating them. This is a path of learning empathy and mutual respect.
+### Summary
+
+By comprehending the significance of compound numbers from 11 to 31, numerologists can gain clearer insights into the character of psychic individuals who possess these compound numbers on any date of any month.  
+The purpose of numerology is to provide general insights about human beings who, despite similar physical compositions, perceive the world differently.  
+Their complex behaviors can be understood through their astrological configurations and the interplay of their psychic, destiny, and name numbers.  
+Numerology seeks to educate individuals about their strengths and weaknesses, offering guidance on avoiding habits that cause problems in their lives.  
+It leads them out of the ignorance stemming from a lack of understanding of planetary influences on their lives.  
+It provides a method for working with these influences through the use of colors and gemstones.  
+It also offers advice on maintaining general mental and physical health, identifying potential ailments they may face, and suggesting ways to prevent those conditions.
