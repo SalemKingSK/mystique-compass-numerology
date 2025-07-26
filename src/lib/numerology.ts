@@ -1,149 +1,131 @@
-// src/lib/numerology.ts
-import type { AstroInsightInput } from '@/lib/astrology';
+// --- HELPER FUNCTION ---
 
-export interface NumerologyData {
-  psycheNum: number;
-  destinyNum: number;
-  compoundNum: number;
-  compoundMeaning: string;
-  reducedCompoundNum: number | null;
-  reducedCompoundMeaning: string | null;
-  karmicFateNum: number | null;
-  karmicFateMeaning: string | null;
-  kuaNum: number;
-  kuaAttributes: {
-    element: string;
-    colors: string;
-    season: string;
-  };
-  auspiciousDirections: { [key: string]: string };
-  loShuGrid: (number | null)[][];
-  numberCounts: { [key: number]: number };
-  arrowsOfStrength: { name: string; description: string }[];
-  arrowsOfWeakness: { name: string; description: string }[];
-}
-
-// Helper function to reduce a number to a single digit
-const reduceNumber = (num: number): number => {
-  let currentNum = num;
-  while (currentNum > 9) {
-    currentNum = currentNum.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+/**
+ * Reduces a number to a single digit by summing its digits repeatedly.
+ * @param n - The number to reduce.
+ * @returns The single-digit number.
+ */
+const reduceToSingleDigit = (n: number): number => {
+  let num = n;
+  while (num > 9) {
+    num = String(num)
+      .split('')
+      .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   }
-  return currentNum;
+  return num;
 };
 
-// Main function to generate all numerology data
-export async function generateLoShuData(input: AstroInsightInput): Promise<NumerologyData> {
-  const { day, month, year, gender } = input;
-  const fullDob = `${day}${month}${year}`;
 
-  // 1. Psyche Number
-  const psycheNum = reduceNumber(day);
+// --- CORE NUMBER CALCULATIONS ---
 
-  // 2. Destiny Number
-  const destinyNum = reduceNumber(day + month + year);
+/**
+ * Calculates the Psyche Number from the day of birth.
+ */
+export const calculatePsyche = (day: number): number => {
+  return reduceToSingleDigit(day);
+};
 
-  // 3. Lo Shu Grid and Number Counts
-  const dobDigits = fullDob.split('').map(Number);
-  const numberCounts: { [key: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-  dobDigits.forEach(digit => {
-    if (digit > 0) numberCounts[digit as keyof typeof numberCounts]++;
-  });
+/**
+ * Calculates the Destiny Number from the full date of birth.
+ */
+export const calculateDestiny = (day: number, month: number, year: number): number => {
+  const fullDateStr = String(day) + String(month) + String(year);
+  const sum = fullDateStr
+    .split('')
+    .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+  return reduceToSingleDigit(sum);
+};
 
-  const loShuGrid: (number | null)[][] = [
-      [null, null, null],
-      [null, null, null],
-      [null, null, null]
-  ];
+/**
+ * Calculates the Kua Number based on year and gender, with century-specific rules.
+ */
+export const calculateKua = (year: number, gender: string): number => {
+  // Rule A: Sum the year's digits and reduce to a single digit.
+  const yearSum = String(year)
+    .split('')
+    .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+  const reducedYearSum = reduceToSingleDigit(yearSum);
   
-  const gridPositions: { [key: number]: [number, number] } = {
-      4: [0, 0], 9: [0, 1], 2: [0, 2],
-      3: [1, 0], 5: [1, 1], 7: [1, 2],
-      8: [2, 0], 1: [2, 1], 6: [2, 2]
-  };
+  let kuaResult: number;
 
-  for(const digit of dobDigits) {
-      if(gridPositions[digit]) {
-          const [row, col] = gridPositions[digit];
-          loShuGrid[row][col] = digit;
+  // Rule B: Apply the correct formula based on birth century and gender.
+  if (year < 2000) {
+    kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
+  } else {
+    kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
+  }
+
+  // Rule C: Perform a final reduction on the result of the formula.
+  let finalKua = reduceToSingleDigit(kuaResult);
+  
+  // Rule D: Apply the Kua 5 exception. This is the very last step.
+  if (finalKua === 5) {
+    return gender.toLowerCase() === 'male' ? 2 : 8;
+  }
+  
+  return finalKua;
+};
+
+
+// --- MAIN GRID GENERATION FUNCTION ---
+
+interface UserData {
+  day: number;
+  month: number;
+  year: number;
+  gender: string;
+}
+
+/**
+ * Generates all numerology data including the Lo Shu Grid.
+ * This is a placeholder implementation that needs to be replaced with the full logic.
+ */
+export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
+  const psycheNum = calculatePsyche(day);
+  const destinyNum = calculateDestiny(day, month, year);
+  const kuaNum = calculateKua(year, gender);
+
+  const fullDob = String(day) + String(month) + String(year);
+  const birthDigits = fullDob.split('').map(Number).filter(d => d !== 0);
+  
+  const allDigitsForGrid = [
+    ...birthDigits,
+    psycheNum,
+    destinyNum,
+    kuaNum,
+  ];
+
+  const numberCounts: { [key: string]: number } = {};
+  for (const digit of allDigitsForGrid) {
+    numberCounts[digit] = (numberCounts[digit] || 0) + 1;
+  }
+
+  const gridContent: { [key: string]: string } = {};
+  for (let i = 1; i <= 9; i++) {
+    const digitStr = String(i);
+    gridContent[digitStr] = numberCounts[digitStr] ? digitStr.repeat(numberCounts[digitStr]) : '';
+  }
+
+  const loShuGrid = [
+    [gridContent['4'] || null, gridContent['9'] || null, gridContent['2'] || null],
+    [gridContent['3'] || null, gridContent['5'] || null, gridContent['7'] || null],
+    [gridContent['8'] || null, gridContent['1'] || null, gridContent['6'] || null],
+  ];
+
+  const compoundNum = (String(day) + String(month) + String(year)).split('').map(Number).reduce((a, b) => a + b, 0);
+  
+  let reducedCompoundNum: number | null = null;
+  if (compoundNum > 9) {
+      const reducedSum = reduceToSingleDigit(compoundNum);
+      if (reducedSum !== compoundNum) { // Ensure it's a reduction
+          reducedCompoundNum = reducedSum;
       }
   }
 
-
-  // 4. Kua Number
-  let kuaNum = reduceNumber(year);
-  if (gender === 'male') {
-    kuaNum = 11 - kuaNum;
-  } else {
-    kuaNum = 4 + kuaNum;
-  }
-  kuaNum = reduceNumber(kuaNum);
-
-  let effectiveKua = kuaNum;
-  if (kuaNum === 5) {
-    effectiveKua = gender === 'male' ? 2 : 8;
-  }
-
-  const kuaAttributes = KUA_ATTRIBUTES[effectiveKua];
-  const auspiciousDirections = KUA_DIRECTIONS[effectiveKua];
-
-  // 5. Arrows of Strength and Weakness
-  const arrows = calculateArrows(numberCounts);
-
-  // 6. Tier 1: Compound Fate Number
-  const compoundNum = fullDob.split('').map(Number).reduce((acc, digit) => acc + digit, 0);
-  const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum] || "No specific meaning for this compound number.";
-
-  // 7. Tier 2: Reduced Compound Number (Inner Essence)
-  let reducedCompoundNum: number | null = null;
-  let reducedCompoundMeaning: string | null = null;
-  if (compoundNum > 9) {
-    const reducedSum = compoundNum.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-    if (reducedSum >= 10 && COMPOUND_NUMBER_MEANINGS[reducedSum]) {
-      reducedCompoundNum = reducedSum;
-      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum];
-    }
-  }
-
-  // 8. Tier 3: Karmic Fate Number
   const karmicSumInitial = day + month + year;
-  let reducedKarmicSum = karmicSumInitial;
-   if (karmicSumInitial > 9) {
-    reducedKarmicSum = karmicSumInitial.toString().split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-  }
+  const karmicFateNum = reduceToSingleDigit(karmicSumInitial);
   
-  let karmicFateNum : number | null = null;
-  let karmicFateMeaning : string | null = null;
-  
-  const karmicMeaningText = COMPOUND_NUMBER_MEANINGS[reducedKarmicSum];
-
-  if (karmicMeaningText) {
-    karmicFateNum = reducedKarmicSum;
-    karmicFateMeaning = karmicMeaningText;
-  }
-
-
-  return {
-    psycheNum,
-    destinyNum,
-    compoundNum,
-    compoundMeaning,
-    reducedCompoundNum,
-    reducedCompoundMeaning,
-    karmicFateNum,
-    karmicFateMeaning,
-    kuaNum,
-    kuaAttributes,
-    auspiciousDirections,
-    loShuGrid,
-    numberCounts,
-    arrowsOfStrength: arrows.strength,
-    arrowsOfWeakness: arrows.weakness,
-  };
-}
-
-
-const calculateArrows = (counts: { [key: number]: number }) => {
+  const calculateArrows = (counts: { [key: string]: number }) => {
     const strength = [];
     const weakness = [];
     const arrowDefs = {
@@ -166,14 +148,66 @@ const calculateArrows = (counts: { [key: number]: number }) => {
     };
 
     for (const [name, def] of Object.entries(arrowDefs)) {
-        if (def.present.length > 0 && def.present.every(n => counts[n] > 0)) {
+        if (def.present.length > 0 && def.present.every(n => numberCounts[n] > 0)) {
             strength.push({ name, description: def.desc });
         }
-        if (def.absent.length > 0 && def.absent.every(n => counts[n] === 0)) {
+        if (def.absent.length > 0 && def.absent.every(n => !numberCounts[n])) {
             weakness.push({ name, description: def.desc });
         }
     }
     return { strength, weakness };
+  }
+
+  const arrows = calculateArrows(numberCounts);
+
+  const kuaAttributes = KUA_ATTRIBUTES[kuaNum] || {};
+  const auspiciousDirections = KUA_DIRECTIONS[kuaNum] || {};
+  
+  return {
+    psycheNum,
+    destinyNum,
+    kuaNum,
+    loShuGrid,
+    numberCounts: Object.entries(numberCounts).reduce((acc, [key, val]) => {
+      acc[Number(key)] = val;
+      return acc;
+    }, {} as {[key: number]: number}),
+    compoundNum,
+    compoundMeaning: COMPOUND_NUMBER_MEANINGS[compoundNum] || "No specific meaning for this compound number.",
+    reducedCompoundNum,
+    reducedCompoundMeaning: reducedCompoundNum ? COMPOUND_NUMBER_MEANINGS[reducedCompoundNum] : null,
+    karmicFateNum,
+    karmicFateMeaning: karmicFateNum ? COMPOUND_NUMBER_MEANINGS[karmicFateNum] : null,
+    arrowsOfStrength: arrows.strength,
+    arrowsOfWeakness: arrows.weakness,
+    kuaAttributes,
+    auspiciousDirections,
+  };
+};
+
+// src/lib/numerology.ts
+import type { AstroInsightInput } from '@/lib/astrology';
+
+export interface NumerologyData {
+  psycheNum: number;
+  destinyNum: number;
+  compoundNum: number;
+  compoundMeaning: string;
+  reducedCompoundNum: number | null;
+  reducedCompoundMeaning: string | null;
+  karmicFateNum: number | null;
+  karmicFateMeaning: string | null;
+  kuaNum: number;
+  kuaAttributes: {
+    element: string;
+    colors: string;
+    season: string;
+  };
+  auspiciousDirections: { [key: string]: string };
+  loShuGrid: (string | null)[][];
+  numberCounts: { [key: number]: number };
+  arrowsOfStrength: { name: string; description: string }[];
+  arrowsOfWeakness: { name: string; description: string }[];
 }
 
 export const KUA_DIRECTIONS: { [key: number]: any } = {

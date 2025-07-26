@@ -16,7 +16,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
-import { NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
+import { REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -178,7 +178,7 @@ const InfoCard = ({ title, value, icon, popoverContent }: { title: string, value
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const numberEntries = Object.entries(numerology.numberCounts)
         .map(([digit, count]) => ({ digit: parseInt(digit), count }))
-        .filter(item => item.count > 0 && item.count > 1)
+        .filter(item => item.count > 1)
         .sort((a, b) => a.digit - b.digit);
     
     const FatePopoverContent = () => (
@@ -208,78 +208,87 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     );
 
     return (
-        <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                 <InfoCard title="Psyche Number" value={numerology.psycheNum} icon={<BrainCircuit className="h-4 w-4"/>} />
-                 <InfoCard title="Destiny Number" value={numerology.destinyNum} icon={<Anchor className="h-4 w-4"/>} />
-                 <InfoCard title="Kua Number" value={numerology.kuaNum} icon={<Compass className="h-4 w-4"/>} />
-                 <InfoCard title="Fate Number" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} popoverContent={<FatePopoverContent />} />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="glass-card p-4">
-                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Grid3x3/> Lo Shu Grid</h3>
-                    <div className="grid grid-cols-3 gap-2 aspect-square">
-                        {numerology.loShuGrid.flat().map((num, index) => (
-                            <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg">
-                                {num || ''}
-                            </div>
-                        ))}
+        <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="grid">Lo Shu Grid</TabsTrigger>
+                <TabsTrigger value="attributes">Attributes</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="space-y-4 mt-4">
+                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                     <InfoCard title="Psyche Number" value={numerology.psycheNum} icon={<BrainCircuit className="h-4 w-4"/>} />
+                     <InfoCard title="Destiny Number" value={numerology.destinyNum} icon={<Anchor className="h-4 w-4"/>} />
+                     <InfoCard title="Kua Number" value={numerology.kuaNum} icon={<Compass className="h-4 w-4"/>} />
+                     <InfoCard title="Fate Number" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} popoverContent={<FatePopoverContent />} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="glass-card p-4">
+                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Zap/> Arrows of Strength</h3>
+                        {numerology.arrowsOfStrength.length > 0 ? (
+                            <ul className="space-y-2 text-gray-300">
+                              {numerology.arrowsOfStrength.map(arrow => <li key={arrow.name}><strong>{arrow.name}:</strong> {arrow.description}</li>)}
+                            </ul>
+                        ) : <p className="text-gray-400">No Arrows of Strength found.</p>}
+                    </div>
+                    <div className="glass-card p-4">
+                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><ShieldHalf/> Arrows of Weakness</h3>
+                         {numerology.arrowsOfWeakness.length > 0 ? (
+                            <ul className="space-y-2 text-gray-300">
+                              {numerology.arrowsOfWeakness.map(arrow => <li key={arrow.name}><strong>{arrow.name}:</strong> {arrow.description}</li>)}
+                            </ul>
+                        ) : <p className="text-gray-400">No Arrows of Weakness found.</p>}
                     </div>
                 </div>
+            </TabsContent>
+            <TabsContent value="grid" className="space-y-4 mt-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="glass-card p-4">
+                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Grid3x3/> Lo Shu Grid</h3>
+                        <div className="grid grid-cols-3 gap-2 aspect-square">
+                            {(numerology.loShuGrid as (string|null)[][]).flat().map((num, index) => (
+                                <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg">
+                                    {num || ''}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                <div className="glass-card p-4">
-                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye/> Repeated Number Insights</h3>
-                    <ScrollArea className="h-48">
-                      <Accordion type="single" collapsible className="w-full">
-                          {numberEntries.map(({ digit, count }) => {
-                              const meaning = REPEATED_NUMBER_MEANINGS[digit as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count] || "No specific meaning for this count.";
-                              return (
-                                  <AccordionItem value={`item-${digit}`} key={digit}>
-                                      <AccordionTrigger>Number {digit} (appears {count} times)</AccordionTrigger>
-                                      <AccordionContent>
-                                          <SpeechPlayer text={meaning} elementId={`repeated-${digit}-speech`} />
-                                      </AccordionContent>
-                                  </AccordionItem>
-                              );
-                          })}
-                          {numberEntries.length === 0 && <p className="text-gray-400">No numbers are repeated in the birth date.</p>}
-                      </Accordion>
-                    </ScrollArea>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="glass-card p-4">
-                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Zap/> Arrows of Strength</h3>
-                    {numerology.arrowsOfStrength.length > 0 ? (
-                        <ul className="space-y-2 text-gray-300">
-                          {numerology.arrowsOfStrength.map(arrow => <li key={arrow.name}><strong>{arrow.name}:</strong> {arrow.description}</li>)}
-                        </ul>
-                    ) : <p className="text-gray-400">No Arrows of Strength found.</p>}
-                </div>
-                <div className="glass-card p-4">
-                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><ShieldHalf/> Arrows of Weakness</h3>
-                     {numerology.arrowsOfWeakness.length > 0 ? (
-                        <ul className="space-y-2 text-gray-300">
-                          {numerology.arrowsOfWeakness.map(arrow => <li key={arrow.name}><strong>{arrow.name}:</strong> {arrow.description}</li>)}
-                        </ul>
-                    ) : <p className="text-gray-400">No Arrows of Weakness found.</p>}
-                </div>
-            </div>
-             <div className="glass-card p-4">
-                <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Kua Attributes</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                    <div><p className="font-semibold text-secondary">Element</p><p>{numerology.kuaAttributes.element}</p></div>
-                    <div><p className="font-semibold text-secondary">Colors</p><p>{numerology.kuaAttributes.colors}</p></div>
-                    <div><p className="font-semibold text-secondary">Season</p><p>{numerology.kuaAttributes.season}</p></div>
-                    <div>
-                        <p className="font-semibold text-secondary">Auspicious</p>
-                        <p className="text-sm">{Object.entries(numerology.auspiciousDirections).map(([key, val]) => `${key}: ${val}`).join(', ')}</p>
+                    <div className="glass-card p-4">
+                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye/> Repeated Number Insights</h3>
+                        <ScrollArea className="h-48">
+                          <Accordion type="single" collapsible className="w-full">
+                              {numberEntries.map(({ digit, count }) => {
+                                  const meaning = REPEATED_NUMBER_MEANINGS[digit as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count] || "No specific meaning for this count.";
+                                  return (
+                                      <AccordionItem value={`item-${digit}`} key={digit}>
+                                          <AccordionTrigger>Number {digit} (appears {count} times)</AccordionTrigger>
+                                          <AccordionContent>
+                                              <SpeechPlayer text={meaning} elementId={`repeated-${digit}-speech`} />
+                                          </AccordionContent>
+                                      </AccordionItem>
+                                  );
+                              })}
+                              {numberEntries.length === 0 && <p className="text-gray-400">No numbers are repeated in your birth date.</p>}
+                          </Accordion>
+                        </ScrollArea>
                     </div>
                 </div>
-            </div>
-        </div>
+            </TabsContent>
+            <TabsContent value="attributes" className="space-y-4 mt-4">
+                 <div className="glass-card p-4">
+                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Kua Attributes</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div><p className="font-semibold text-secondary">Element</p><p>{numerology.kuaAttributes.element}</p></div>
+                        <div><p className="font-semibold text-secondary">Colors</p><p>{numerology.kuaAttributes.colors}</p></div>
+                        <div><p className="font-semibold text-secondary">Season</p><p>{numerology.kuaAttributes.season}</p></div>
+                        <div>
+                            <p className="font-semibold text-secondary">Auspicious</p>
+                            <p className="text-sm">{Object.entries(numerology.auspiciousDirections).map(([key, val]) => `${key}: ${val}`).join(', ')}</p>
+                        </div>
+                    </div>
+                </div>
+            </TabsContent>
+        </Tabs>
     );
 }
 
@@ -379,7 +388,7 @@ function ResultsDisplay({
 
         <nav className="flex justify-center gap-2 mb-6">
             <TabButton id="astro" activeTab={activeTab} setActiveTab={setActiveTab}>Astro Insights</TabButton>
-            {numerology && <TabButton id="numerology" activeTab={activeTab} setActiveTab={setActiveTab}>Numerology</TabButton>}
+            {numerology && <TabButton id="numerology" activeTab={activeTab} setActiveTab={setActiveTab}>Numerology Report</TabButton>}
         </nav>
 
         <AnimatePresence mode="wait">
@@ -421,24 +430,8 @@ const TabButton = ({ id, activeTab, setActiveTab, children } : { id: 'astro' | '
             )}
         >
             {isActive && (
-                <motion.div
-                    className="absolute inset-0 border-2 border-transparent rounded-xl"
-                    style={{
-                      '--color-primary': 'hsl(var(--color-primary-hsl))',
-                      '--color-secondary': 'hsl(var(--color-secondary-hsl))',
-                      '--color-tertiary': 'hsl(var(--color-tertiary-hsl))',
-                      '--color-quaternary': 'hsl(var(--color-quaternary-hsl))',
-                      background: 'conic-gradient(from 180deg at 50% 50%, var(--color-primary), var(--color-quaternary), var(--color-secondary), var(--color-tertiary), var(--color-primary))',
-                      mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                      maskComposite: 'exclude',
-                      zIndex: 0
-                    }}
-                    layoutId="active-tab-border"
-                />
-            )}
-             {isActive ? (
                 <motion.div className="absolute inset-0 rounded-xl" style={{animation: 'pulse-border 4s linear infinite'}}/>
-             ) : null }
+            )}
             <span className="relative z-10">{children}</span>
         </button>
     );
