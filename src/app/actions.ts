@@ -11,7 +11,7 @@ export async function getAstroInsightAction(formData: AstroInsightInput) {
     
     const [insightResult, numerologyResult] = await Promise.all([
         getAstroInsight(formData),
-        generateLoShuData(formData)
+        Promise.resolve(generateLoShuData(formData))
     ]);
 
 

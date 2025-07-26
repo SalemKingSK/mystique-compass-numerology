@@ -1,12 +1,21 @@
 // src/lib/numerology.ts
 import type { AstroInsightInput } from '@/lib/astrology';
 
-// --- HELPER FUNCTIONS ---
+// --- HELPER FUNCTION ---
 
+/**
+ * Reduces a number to a single digit by summing its digits repeatedly.
+ * @param n - The number to reduce.
+ * @returns The single-digit number.
+ */
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
+  // Master numbers 11, 22, 33 are exceptions in some calculations, but not for the final Kua reduction.
+  // This simple reduction is correct for Kua and intermediate steps.
   while (num > 9) {
-    if ([11, 22, 33].includes(num)) break;
+    if ([11, 22, 33].includes(num) && num !== n) { // Don't reduce master numbers unless it's a subsequent reduction
+         // This logic is simplified; for now, we reduce all to a single digit for core numbers.
+    }
     num = String(num)
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -14,12 +23,19 @@ const reduceToSingleDigit = (n: number): number => {
   return num;
 };
 
+
 // --- CORE NUMBER CALCULATIONS ---
 
+/**
+ * Calculates the Psyche Number from the day of birth.
+ */
 export const calculatePsyche = (day: number): number => {
   return reduceToSingleDigit(day);
 };
 
+/**
+ * Calculates the Destiny Number from the full date of birth.
+ */
 export const calculateDestiny = (day: number, month: number, year: number): number => {
   const fullDateStr = String(day) + String(month) + String(year);
   const sum = fullDateStr
@@ -28,26 +44,33 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
   return reduceToSingleDigit(sum);
 };
 
+/**
+ * Calculates the Kua Number based on year and gender, with century-specific rules.
+ */
 export const calculateKua = (year: number, gender: string): number => {
+  // Rule A: Sum the year's digits and reduce to a single digit.
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
   const reducedYearSum = reduceToSingleDigit(yearSum);
-
+  
   let kuaResult: number;
 
+  // Rule B: Apply the correct formula based on birth century and gender.
   if (year < 2000) {
     kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
   } else {
     kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
   }
 
+  // Rule C: Perform a final reduction on the result of the formula.
   let finalKua = reduceToSingleDigit(kuaResult);
-
+  
+  // Rule D: Apply the Kua 5 exception. This is the very last step.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
-
+  
   return finalKua;
 };
 
@@ -70,7 +93,7 @@ export interface NumerologyData {
   };
   auspiciousDirections: { [key: string]: string };
   loShuGrid: (string | null)[][];
-  numberCounts: { [key: number]: number };
+  numberCounts: { [key: string]: number };
   arrowsOfStrength: { name: string; description: string }[];
   arrowsOfWeakness: { name: string; description: string }[];
 }
@@ -84,9 +107,15 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  const allDigitsForGrid = (String(day) + String(month) + String(year) + String(psycheNum) + String(destinyNum) + String(kuaNum)).split('').map(Number).filter(d => d !== 0);
+  const birthDigits = (String(day) + String(month) + String(year)).split('').filter(d => d !== '0');
+  const allDigitsForGrid = [
+      ...birthDigits,
+      ...String(psycheNum).split(''),
+      ...String(destinyNum).split(''),
+      ...String(kuaNum).split('')
+  ];
 
-  const numberCounts: { [key: number]: number } = {};
+  const numberCounts: { [key: string]: number } = {};
   for (const digit of allDigitsForGrid) {
       numberCounts[digit] = (numberCounts[digit] || 0) + 1;
   }
@@ -94,8 +123,8 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const gridContent: { [key: string]: string } = {};
   for (let i = 1; i <= 9; i++) {
     const digitStr = String(i);
-    if (numberCounts[i]) {
-      gridContent[digitStr] = digitStr.repeat(numberCounts[i]);
+    if (numberCounts[digitStr]) {
+      gridContent[digitStr] = digitStr.repeat(numberCounts[digitStr]);
     }
   }
 
@@ -116,10 +145,19 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
       reducedCompoundNum = reducedSum;
       reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedSum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedSum}.`;
   }
-
+  
+  let karmicFateNum : number | null = null;
   const karmicInitialSum = day + month + year;
-  const karmicFateNum = reduceToSingleDigit(karmicInitialSum);
-  const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || COMPOUND_NUMBER_MEANINGS[karmicFateNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || null;
+  const reducedKarmic = reduceToSingleDigit(karmicInitialSum);
+
+  if ([10, 13, 14, 16, 19].includes(karmicInitialSum)) {
+      karmicFateNum = karmicInitialSum;
+  } else if ([10, 13, 14, 16, 19].includes(reducedKarmic)) {
+      karmicFateNum = reducedKarmic;
+  }
+
+  const karmicFateMeaning = karmicFateNum ? (KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || null) : null;
+
 
   const calculateArrows = (grid: (string | null)[][]) => {
     const strength: { name: string; description: string }[] = [];
@@ -200,7 +238,7 @@ export const KUA_DIRECTIONS: { [key: number]: any } = {
     male: { Success: 'NE', Health: 'W', Family: 'NW', 'Personal-Growth': 'SW' },
     female: { Success: 'SW', Health: 'NW', Family: 'W', 'Personal-Growth': 'NE' },
   },
-  6: { Success: 'W', Health: 'SW', Family: 'NE', 'Personal-Growth': 'NW' },
+  6: { Success: 'W', Health: 'NE', Family: 'SW', 'Personal-Growth': 'NW' },
   7: { Success: 'NW', Health: 'SW', Family: 'NE', 'Personal-Growth': 'W' },
   8: { Success: 'SW', Health: 'NW', Family: 'W', 'Personal-Growth': 'NE' },
   9: { Success: 'E', Health: 'SE', Family: 'N', 'Personal-Growth': 'S' },
@@ -302,7 +340,7 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   20: `Number 20, called "The Awakening" or "The Judgment," is symbolized by a winged angel sounding a trumpet, with a man, woman, and child rising from a tomb in prayer. It signifies a powerful awakening at some point in life, bringing new purpose, plans, and ambitions for a great cause or ideal. Occasional delays and obstacles may arise, but these can be overcome through patience, the key challenge of the 20. Cultivating faith in one’s transformative abilities is essential. This number grants vivid precognitive dreams and the ability to manifest positive ones while negating negative ones. As a non-material number, financial success is uncertain, and those with the 20 compound number may need to adjust their name to a more materialistic number if wealth is a priority. However, those aligned with the 20 vibration often prioritize ideals over money, finding fulfillment in simpler necessities.`,
   21: `Number 21, known as "The Crown of the Magi" or "The Universe," is a highly fortunate number promising general success, advancement, honors, and elevation in life and career. It represents victory after long struggles, soul testing, and determination. Those with the 21 compound number can be confident of overcoming all odds and opposition, reaping the rewards of their perseverance. This is a number of karmic reward, ensuring a triumphant outcome.`,
   22: `Number 22, termed "Submission — and Caution," is symbolized as a good person, blinded by others’ folly, carrying a knapsack of errors and defenseless against a ferocious tiger. It warns of illusion, delusion, and misplaced trust in untrustworthy individuals. As a birth number, it cannot be changed, so those with the 22 compound number must exercise caution in career and personal matters. The karmic obligation is to overcome spiritual laziness, develop alertness, and cultivate spiritual aggressiveness to ordain success. By recognizing and mastering personal responsibility, they can control events, avoid being blinded by others, and realize their dreams. Those with the 22 compound number possess strong organizational skills and the ability to hold positions of authority. They exhibit a sense of pride and dignity, making it relatively easy to gain recognition for their abilities. The years between 40 and 60 mark the peak of their career. They often feel lonely because others struggle to match their level of thought and understanding. The first half of their life is challenging, but the second half can bring the fulfillment of earlier ambitions and desires. They may tend to be overly cautious when implementing inspirational initiatives. Doubts rarely trouble them due to their strong confidence. In life, they have much to offer and achieve, so they should move forward and build. They are typically tall with striking eyes. They often hold prominent positions, though these come with limited responsibility. They are generally easygoing but can be inconsistent in nature. Their actions can sometimes be erratic. Overall, they are fortunate in their endeavors and benefit from relationships with the opposite sex. They are content with their family life but also enjoy companionship. Their social circle is limited, with few close friends. They avoid disputes. They tend to be reserved in expressing their emotions.`,
-  23: `Number 23, "The Royal Star of the Lion," is a karmic reward number. It promises success in personal and career endeavors, with help from superiors and protection from those in high places. This highly fortunate number blesses the individual or entity with abundant grace. While other numbers in a numerological analysis may pose challenges, the 23’s strength ensures that no number can overpower it during difficult times.`,
+  23: `Number 23, "The Royal Star of the Lion," is a karmic reward number. It promises success in personal and career endeavors, with help from superiors and protection from those in high places. This highly fortunate number blesses the individual or entity with abundant grace. While other numbers in a full numerological analysis may pose challenges, the 23’s strength ensures that no number can overpower it during difficult times.`,
   24: `Number 24, associated with "Love — Money — Creativity," is a highly fortunate karmic reward number, especially as a birth number. It promises assistance from those in power and close ties with individuals of high rank. It enhances financial success and the ability to find happiness in love, often through romance, law, or the arts. Its magnetism is highly attractive to the opposite sex. The only caution is to avoid self-indulgence or arrogance in love, finance, or career, as everything comes effortlessly. Abusing the 24’s blessings could lead to a challenging birth number in a future life. Those with this number must appreciate their good fortune and avoid selfishness or disregard for spiritual values, as well as tendencies toward promiscuity or overindulgence.`,
   25: `Number 25, known as "Discrimination and Analysis," bestows spiritual wisdom gained through careful observation and worldly success through learning from experience. Its strength lies in overcoming early disappointments and learning from past mistakes. The judgment of those with the 25 compound number is excellent, but it is not a material number, so substantial financial gains depend on other numbers in the numerological analysis.`,
   26: `Number 26, termed "Partnerships," vibrates with a unique power rooted in compassion and unselfishness, enabling the ability to help others, though not always the self. It is full of contradictions, warning of dangers, disappointments, and failures, particularly in ambitions, due to bad advice, poor associations, or unhappy partnerships. If 26 is the name number, changing it is advisable. As a birth number, individuals should avoid partnerships, ignore others’ advice, and follow their own carefully examined intuition. They should stabilize their income, save money, avoid extravagance, and refrain from investing in others’ ideas. Instead, they should invest in their own future while being generous to those in need, building a solid foundation for themselves.`,
