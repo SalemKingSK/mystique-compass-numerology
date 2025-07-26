@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
-import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology';
+import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -263,8 +263,9 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                           <Accordion type="single" collapsible className="w-full">
                               {numberEntries.map(({ digit, count }) => {
                                   let meaning = "No specific meaning found.";
+                                  const key = `${digit}_${Math.min(count, 5)}`; // Cap at 5 for lookups
                                   if (count > 1) {
-                                      meaning = REPEATED_NUMBER_MEANINGS[digit as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count] || `No specific meaning for ${count} appearances.`;
+                                      meaning = REPEATED_NUMBER_MEANINGS[key as keyof typeof REPEATED_NUMBER_MEANINGS] || `No specific meaning for ${count} appearances.`;
                                   } else {
                                       meaning = NUMBER_MEANINGS[digit as keyof typeof NUMBER_MEANINGS]?.description || "No specific meaning for this number.";
                                   }
