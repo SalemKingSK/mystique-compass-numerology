@@ -1,10 +1,9 @@
-// --- HELPER FUNCTION ---
 
-/**
- * Reduces a number to a single digit by summing its digits repeatedly.
- * @param n - The number to reduce.
- * @returns The single-digit number.
- */
+// src/lib/numerology.ts
+import type { AstroInsightInput } from '@/lib/astrology';
+
+// --- HELPER FUNCTIONS ---
+
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
@@ -15,19 +14,26 @@ const reduceToSingleDigit = (n: number): number => {
   return num;
 };
 
+const reduceToCompound = (n: number): number => {
+    // This reduction is for Karmic Fate, it can result in a compound number
+    let numStr = String(n);
+    let sum = n;
+    while (sum > 9) {
+      sum = numStr
+        .split('')
+        .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+      numStr = String(sum);
+    }
+    return sum;
+};
+
 
 // --- CORE NUMBER CALCULATIONS ---
 
-/**
- * Calculates the Psyche Number from the day of birth.
- */
 export const calculatePsyche = (day: number): number => {
   return reduceToSingleDigit(day);
 };
 
-/**
- * Calculates the Destiny Number from the full date of birth.
- */
 export const calculateDestiny = (day: number, month: number, year: number): number => {
   const fullDateStr = String(day) + String(month) + String(year);
   const sum = fullDateStr
@@ -36,11 +42,7 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
   return reduceToSingleDigit(sum);
 };
 
-/**
- * Calculates the Kua Number based on year and gender, with century-specific rules.
- */
 export const calculateKua = (year: number, gender: string): number => {
-  // Rule A: Sum the year's digits and reduce to a single digit.
   const yearSum = String(year)
     .split('')
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -48,17 +50,14 @@ export const calculateKua = (year: number, gender: string): number => {
   
   let kuaResult: number;
 
-  // Rule B: Apply the correct formula based on birth century and gender.
   if (year < 2000) {
     kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
   } else {
     kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
   }
 
-  // Rule C: Perform a final reduction on the result of the formula.
   let finalKua = reduceToSingleDigit(kuaResult);
   
-  // Rule D: Apply the Kua 5 exception. This is the very last step.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
@@ -66,27 +65,40 @@ export const calculateKua = (year: number, gender: string): number => {
   return finalKua;
 };
 
+// --- DATA INTERFACES ---
+
+export interface NumerologyData {
+  psycheNum: number;
+  destinyNum: number;
+  compoundNum: number;
+  compoundMeaning: string;
+  reducedCompoundNum: number | null;
+  reducedCompoundMeaning: string | null;
+  karmicFateNum: number | null;
+  karmicFateMeaning: string | null;
+  kuaNum: number;
+  kuaAttributes: {
+    element: string;
+    colors: string;
+    season: string;
+  };
+  auspiciousDirections: { [key: string]: string };
+  loShuGrid: (string | null)[][];
+  numberCounts: { [key: number]: number };
+  arrowsOfStrength: { name: string; description: string }[];
+  arrowsOfWeakness: { name: string; description: string }[];
+}
 
 // --- MAIN GRID GENERATION FUNCTION ---
 
-interface UserData {
-  day: number;
-  month: number;
-  year: number;
-  gender: string;
-}
+export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
+  const { day, month, year, gender } = input;
 
-/**
- * Generates all numerology data including the Lo Shu Grid.
- * This is a placeholder implementation that needs to be replaced with the full logic.
- */
-export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   const psycheNum = calculatePsyche(day);
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  const fullDob = String(day) + String(month) + String(year);
-  const birthDigits = fullDob.split('').map(Number).filter(d => d !== 0);
+  const birthDigits = (String(day) + String(month) + String(year)).split('').map(Number).filter(d => d !== 0);
   
   const allDigitsForGrid = [
     ...birthDigits,
@@ -95,7 +107,7 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     kuaNum,
   ];
 
-  const numberCounts: { [key: string]: number } = {};
+  const numberCounts: { [key: number]: number } = {};
   for (const digit of allDigitsForGrid) {
     numberCounts[digit] = (numberCounts[digit] || 0) + 1;
   }
@@ -103,7 +115,9 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   const gridContent: { [key: string]: string } = {};
   for (let i = 1; i <= 9; i++) {
     const digitStr = String(i);
-    gridContent[digitStr] = numberCounts[digitStr] ? digitStr.repeat(numberCounts[digitStr]) : '';
+    if (numberCounts[i]) {
+      gridContent[digitStr] = digitStr.repeat(numberCounts[i]);
+    }
   }
 
   const loShuGrid = [
@@ -112,20 +126,21 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     [gridContent['8'] || null, gridContent['1'] || null, gridContent['6'] || null],
   ];
 
+  // Fate Number Calculations
   const compoundNum = (String(day) + String(month) + String(year)).split('').map(Number).reduce((a, b) => a + b, 0);
-  
+
   let reducedCompoundNum: number | null = null;
-  if (compoundNum > 9) {
-      const reducedSum = reduceToSingleDigit(compoundNum);
-      if (reducedSum !== compoundNum) { // Ensure it's a reduction
+  if (compoundNum > 9 && compoundNum !== 11 && compoundNum !== 22 && compoundNum !== 33) {
+      const reducedSum = String(compoundNum).split('').map(Number).reduce((a, b) => a + b, 0);
+      if (reducedSum !== compoundNum) {
           reducedCompoundNum = reducedSum;
       }
   }
 
-  const karmicSumInitial = day + month + year;
-  const karmicFateNum = reduceToSingleDigit(karmicSumInitial);
-  
-  const calculateArrows = (counts: { [key: string]: number }) => {
+  const karmicInitialSum = day + month + year;
+  const karmicFateNum = reduceToCompound(karmicInitialSum);
+
+  const calculateArrows = (counts: { [key: number]: number }) => {
     const strength = [];
     const weakness = [];
     const arrowDefs = {
@@ -168,16 +183,13 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
     destinyNum,
     kuaNum,
     loShuGrid,
-    numberCounts: Object.entries(numberCounts).reduce((acc, [key, val]) => {
-      acc[Number(key)] = val;
-      return acc;
-    }, {} as {[key: number]: number}),
+    numberCounts,
     compoundNum,
-    compoundMeaning: COMPOUND_NUMBER_MEANINGS[compoundNum] || "No specific meaning for this compound number.",
+    compoundMeaning: COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || "No specific meaning for this compound number.",
     reducedCompoundNum,
-    reducedCompoundMeaning: reducedCompoundNum ? COMPOUND_NUMBER_MEANINGS[reducedCompoundNum] : null,
+    reducedCompoundMeaning: reducedCompoundNum ? COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] : null,
     karmicFateNum,
-    karmicFateMeaning: karmicFateNum ? COMPOUND_NUMBER_MEANINGS[karmicFateNum] : null,
+    karmicFateMeaning: karmicFateNum ? COMPOUND_NUMBER_MEANINGS[karmicFateNum as keyof typeof COMPOUND_NUMBER_MEANINGS] : null,
     arrowsOfStrength: arrows.strength,
     arrowsOfWeakness: arrows.weakness,
     kuaAttributes,
@@ -185,30 +197,6 @@ export const generateLoShuData = ({ day, month, year, gender }: UserData) => {
   };
 };
 
-// src/lib/numerology.ts
-import type { AstroInsightInput } from '@/lib/astrology';
-
-export interface NumerologyData {
-  psycheNum: number;
-  destinyNum: number;
-  compoundNum: number;
-  compoundMeaning: string;
-  reducedCompoundNum: number | null;
-  reducedCompoundMeaning: string | null;
-  karmicFateNum: number | null;
-  karmicFateMeaning: string | null;
-  kuaNum: number;
-  kuaAttributes: {
-    element: string;
-    colors: string;
-    season: string;
-  };
-  auspiciousDirections: { [key: string]: string };
-  loShuGrid: (string | null)[][];
-  numberCounts: { [key: number]: number };
-  arrowsOfStrength: { name: string; description: string }[];
-  arrowsOfWeakness: { name: string; description: string }[];
-}
 
 export const KUA_DIRECTIONS: { [key: number]: any } = {
   1: {
@@ -291,7 +279,7 @@ export const KUA_ATTRIBUTES: { [key: number]: any } = {
 };
 
 
-export const NUMBER_MEANINGS = {
+export const NUMBER_MEANINGS: { [key: number]: { title: string; description: string } } = {
   1: { title: "Communication", description: "Represents communication, expression, and the flow of ideas. It's the number of origin and individuality." },
   2: { title: "Intuition & Sensitivity", description: "This number governs intuition, sensitivity, and partnerships. It's a number of cooperation and diplomacy." },
   3: { title: "Action & Intellect", description: "Signifies action, creativity, and intellectual pursuits. It's a dynamic number associated with planning and execution." },
@@ -305,61 +293,52 @@ export const NUMBER_MEANINGS = {
 
 export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string } } = {
     1: {
-        1: "You face difficulty in communication & expression (verbal). You can communicate by other means, through art, craft, design, sculpturing, cartoons, graffiti, painting, writing, dancing etc. But you are never able to soak yourself into anything; you touch the crust but never reach the core. You find it difficult to understand others' point of view. You have a good financial level, as 6 & 8 are also in this plane.",
         2: "You are good in Expression & Communication. You have an impartial & balanced outlook towards everyone in life. Your way of living life is very neutral. You understand others' point of view as well as your own. You are good in financial matters. This is a perfect placement of this pair in a chart.",
         3: "You are good in Expression, very sensitive & caring. This can indicate a number of extra-marital relations (the concept of 'Pati, Patni & Wo'). Sometimes you are too much talkative and never stop talking, but at other times you can be very quiet & introvert, as you have both extremes in your behavior. You keep on changing your behavior according to time & situations. You will have materialistic growth if other two numbers are supporting. Generally, you are happy and a good entertainer in life. You love going out of the house.",
         4: "You have a blockage at the Vishuddha or Throat chakra, hence it is extremely difficult for you to open your heart out verbally. You are very sensitive & caring by nature but are mostly misunderstood. You are always on your toes, anxious, and overly energetic, taking rest or getting relaxed very rarely; you are always hyperactive. Only materialistic desires will be found & you have more focus on wealth accumulation than anything else in your life.",
         5: "You face too many difficulties in expressing your emotions out verbally. You are a very much misunderstood personality. You direct your energy of expression into other forms, like writing, painting, dancing, art, sculpture, and creativity. You may have a tendency to over-indulge in alcoholism, drugs, food, many relationships, or any other types of addictions.",
     },
     2: {
-        1: "You are caring & intelligent by nature and are easily hurt by others. You easily understand & gauge people just by looking at them. You can easily distinguish between sincere & insincere people. If only the number 2 is present in the plane, you have an average mindset, but if the other two numbers are also there, you have high intellect. You do well in the philosophical, judicial & literary fields.",
         2: "You are high in Intelligence, Sensitivity & have a double Intuition Level (as 2 appears 2 times). You have an innate ability to get into someone's Mind & Soul. You can easily scan the Mind & Soul of someone & find out about their feelings, motive & purpose. If you only have two 2s in the plane without 4 & 9, it makes you highly skeptical & very negative. This also makes you deprived of positive energy and enthusiasm; the level of Chi or Life Driving Force in you is very weak, which will eventually affect both your physical & mental health. If 4 & 9 are present along with 2, then you will be good at memorizing things & highly intellectual.",
         3: "Having more 2s in your chart makes you more intuitive & sensitive. But sensitivity & intuitiveness are good up to a limit; after a point, these two properties can make a person maniacal. You become too vulnerable or defenseless & are hence easily hurt & affected by others. As a result, you prefer to be alone & aloof, away from the public, to protect yourself from being hurt. You lock yourself in your own mental world as you don't find the people around you in the physical world capable enough to understand you. You become an introvert regardless of your basic behavior and tendencies.",
         4: "Your patience level is very low. You have a tendency to overreact over issues which are irrelevant & meaningless. Extreme behavioral sensitivity is seen which can lead to self-hurting behavior.",
         5: "This is a rarely found set in a grid. If you have 5, 6, or more 2s with no support from 4 & 9, then the condition will be unfortunate, making your life very difficult to live and adjust to. Too much arrogance in your behavior is seen, along with sarcasm & rudeness. Self-doubt & lack of confidence are also seen. In this century, people can have six 2s in their chart (e.g., 22 Feb 2022).",
     },
     3: {
-        1: "You experience STRESS & HURT if there is only one 3. You have a good creative brain with an excellent memory. You are DOWN TO EARTH in your approach towards life and have a POSITIVE MINDSET in achieving any task or goal. You keep inspiring others with your honesty & optimism. You are totally focused on your growth and your goals. You find it DIFFICULT TO DEAL WITH COMPETITIONS.",
         2: "Intelligence, sensitiveness & intuitiveness are the qualities associated with you. You have a balanced mentality & strong personality. You have good compatibility & an adjusting nature, hence you emerge as a good friend. You can easily sense the motive of other people around you. You develop a concept of life & evolve spiritually with faith & devotion when there is support of 5 & 7. You have an active, imaginative & very creative brain. You enjoy breaking rules or contracts & are strange or unconventional in nature. You can emerge as a path breaker or trend maker. Your power of creativity makes you a trendsetter. You know very well how to control your innovative mind and have the power of projecting expression through words, so you excel professionally as a writer, artist, actor, etc.",
         3: "You live in an IMAGINARY BUBBLE OR DAYDREAMING STATE. You often find it hard to relate with others and are not a good listener. You can appear self-engaged & isolated. You have brilliant mental ability, but you spend your life in the world of dreams. You can be quarrelsome & unimportant at times. You have potential for clairvoyance & spiritualism.",
         4: "You can be unrealistic, fearful & over-imaginative (an illusionist). These qualities make it hard for you to function well in everyday life. This combination is rare to find in charts. You are sensitive, imaginative & intuitive in nature, a daydreamer who loves to stick in that world. High intelligence, high intellect, high spirituality & high intuitive abilities are seen if 3 is supported by 5 & 7 in this plane. You can also be intolerant, irresponsible & thoughtless. Other supportive numbers are not of much help in the case of too many 3s."
     },
     4: {
-        1: "You are good at physical hard work. You are an intelligent person with a logical & rational mind. You perform well in tasks done by hand (Hands Occupation / Work). You are imaginative & impatient by nature. You are a good organizer of others & have the ability to carry out plans with perfection. You deeply connect with music, melodies, tunes, art, craft & handicrafts. You take your decisions very carefully and think before getting involved in anything. But these qualities are used on the basis of other numbers present in your chart. You earn by your traditional occupations.",
         2: "You have a tendency for OVERINDULGENCE in physical & materialistic actions at the cost of other deeds. You have good organizing skills. You are a good task initiator & fantastic as a completer. You are reliable, precise & organized. You are good in art & craft by hand. You can also be rigid, stubborn, have low tolerance power, and be judgmental & inflexible. You possess a high level of intelligence, pride because of that intelligence, and a superiority complex.",
         3: "You are extremely stubborn & rigid, and find it hard to connect with spiritual or philosophical people. You have a non-adjusting nature & behavior, and are hard to get along with. You have a complete attention deficit & are majorly governed by or involved in physical activities. You are planned, self-restrained, hard-working & thorough. You are easily predictable, so your capabilities are evident to others. You can be unaware of your inborn talents & have a non-accepting attitude towards them, which can lead to a wastage of time in the wrong profession or career.",
         4: "You are extremely stubborn & rigid, and find it hard to connect with spiritual or philosophical people. You have a non-adjusting nature & behavior, and are hard to get along with. You have a complete attention deficit & are majorly governed by or involved in physical activities. You are planned, self-restrained, hard-working & thorough. You are easily predictable, so your capabilities are evident to others. You can be unaware of your inborn talents & have a non-accepting attitude towards them, which can lead to a wastage of time in the wrong profession or career."
     },
     5: {
-        1: "You have well-balanced emotional sensitivity. You are concerned, supportive & kind-hearted. You are motivating & inspiring for others. The company of 3 & 7 makes you wise in decision making.",
         2: "You can be uncontrollable, and governing & dealing with you is challenging. You are passionate, strong-minded, lively, impatient & flexible. You are a risk-taker, adventurous, self-confident, determined & a show-off. You are filled with a high level of determination & eagerness. You can have frequent emotional outbursts which later lead to repentance. You can be a problem creator at work & home. You also show laziness in behavior & are sensual by nature.",
         3: "You can be bossy, uncontrollable, and tough to deal with. You may engage in brainless talking which in turn can hurt you & your family members. You are filled with too much energy & joy, but you need to have control over it. You have too much of a desire for enjoyment, exploration, enthusiasm, and a persistent want for change, and you take avoidable risks. Four or five 5s is a very dangerous, accidental combination. You need to slow down in your approach & lifestyle; you should talk through your head, not your hat. Brainless talking can hurt others, willingly or unwillingly.",
         4: "You can be bossy, uncontrollable, and tough to deal with. You may engage in brainless talking which in turn can hurt you & your family members. You are filled with too much energy & joy, but you need to have control over it. You have too much of a desire for enjoyment, exploration, enthusiasm, and a persistent want for change, and you take avoidable risks. Four or five 5s is a very dangerous, accidental combination. You need to slow down in your approach & lifestyle; you should talk through your head, not your hat. Brainless talking can hurt others, willingly or unwillingly.",
         5: "You can be bossy, uncontrollable, and tough to deal with. You may engage in brainless talking which in turn can hurt you & your family members. You are filled with too much energy & joy, but you need to have control over it. You have too much of a desire for enjoyment, exploration, enthusiasm, and a persistent want for change, and you take avoidable risks. Four or five 5s is a very dangerous, accidental combination. You need to slow down in your approach & lifestyle; you should talk through your head, not your hat. Brainless talking can hurt others, willingly or unwillingly."
     },
     6: {
-        1: "You show love, regard & care for your family, relations & loved ones. You enjoy your home duties & have creative or innovative abilities. You are a DECENT PARENT and provide suggestions in family matters when required. You can be insecure, worried & afraid about being left alone in life (e.g., death of a life partner). You are a lucky person but with narrow-mindedness. You will have financial stability, a good lifestyle with fewer discomforts, if 8 & 1 are also in your chart. If 8 & 1 are not there, then only financial security will be there. You are family-oriented & love to work in an enjoyable & friendly environment.",
         2: "You are highly creative, but lack self-confidence & believe less in your work & your abilities. You take unnecessary tension for your family & family members, which makes your energy drained/exhausted & hence you feel tired most of the time. You are too stressed all the time because of your thinking style. You are overprotective by nature, hence you keep interfering in the lives of your family members (especially towards your kids). You can provide an obstruction to your children in becoming self-dependent. Your life is filled with creativity, activeness & beauty. You require constant support & encouragement from your family & friends.",
         3: "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
         4: "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen).",
         5: "You exhibit possession & overly protective behavior for your progeny, friends, family & relatives. You are artistic & creative, which helps vent your frustrations, expression & emotions. You need constant encouragement & a push as you are more prone towards the stressful & negative aspects of life. More 6s make you creative, but energy channelization is difficult for you (especially in the early phase of your life). You are very touchy & over-sensitive, hence escapism can be seen in your behavior. Financial prosperity is seen when accompanied by 8 & 1 (and less stress is seen)."
     },
     7: {
-        1: "You learn the lessons of your life through RELATIONAL LOSS or LOSS OF LOVED ONES, LOSS OF BELONGINGS, or on the COST of HEALTH & WELL-BEING. With the lessons you learn throughout your life & losses, you become more inclined towards the spiritual field & spiritual practices. If supported by 3 & 5, you start your quest for the ultimate reality of life & precision or perfection in the journey of life. Your career can be in a spiritual or humanitarian field. If 3 & 5 are there, your behavior is rigid.",
         2: "You gain your knowledge & wisdom at the cost of your loved ones, your health, or your monetary losses. This push will eventually take you to the path of occultism, spirituality & meditation. You have a technical (IT & Computers) & analytical (Mathematical & Reasoning) brain. You are good at minute, odd & baseless criticism. You are spiritual but have a tendency for show-off & bragging by nature. You have the potential to bring finance & prosperity into your life.",
         3: "Your life is filled with disappointments, setbacks & sadness. Your love life, well-being, along with finance & prosperity are affected. These affects & complications make you a stronger human & help you in your growth & development. You can be a fortunate, ideal citizen of a state & work hard in goal accomplishment. If 4, 5 & 6 are missing in your chart then you can be unfortunate & disheartened due to the name, fame & beliefs you have earned in your life.",
         4: "Your life is filled with disappointments, setbacks & sadness. Your love life, well-being, along with finance & prosperity are affected. These affects & complications make you a stronger human & help you in your growth & development. You can be a fortunate, ideal citizen of a state & work hard in goal accomplishment. If 4, 5 & 6 are missing in your chart then you can be unfortunate & disheartened due to the name, fame & beliefs you have earned in your life.",
         5: "Your life is filled with disappointments, setbacks & sadness. Your love life, well-being, along with finance & prosperity are affected. These affects & complications make you a stronger human & help you in your growth & development. You can be a fortunate, ideal citizen of a state & work hard in goal accomplishment. If 4, 5 & 6 are missing in your chart then you can be unfortunate & disheartened due to the name, fame & beliefs you have earned in your life."
     },
     8: {
-        1: "You are systematic, reliable & good with finer details. You are a good task initiator but a bad task completer. You have a constantly active mind, hence you have restlessness in your behavior. As a result, you have a constant mystery-resolving & daring attitude. With the support of 1 & 6, you can have good materialistic success.",
         2: "You are good in business & financial matters. You are entertaining, intellectual, clever & shrewd. You are good in analysis, evaluation & taking advantage of any opportunity. You have keen observation & are thorough in your approach. You love to have experiences by yourself and never count upon others' stories. You are very rigid & inflexible in your approach & the decisions you make.",
         3: "You are hardworking, inflexible, harsh & agitated all the time. You bring variety, change & variable thinking into your life. Your progress is slow or you see no progress in your young life; real progress takes place by the age of 40. Your complete inclination is towards materialism, but you should understand the priorities of life & the definition of real happiness. If you want something, you desire to occupy that thing, and until then, you roam around pointless, directionless & aimless.",
         4: "You are hardworking, inflexible, harsh & agitated all the time. You bring variety, change & variable thinking into your life. Your progress is slow or you see no progress in your young life; real progress takes place by the age of 40. Your complete inclination is towards materialism, but you should understand the priorities of life & the definition of real happiness. If you want something, you desire to occupy that thing, and until then, you roam around pointless, directionless & aimless.",
         5: "You are hardworking, inflexible, harsh & agitated all the time. You bring variety, change & variable thinking into your life. Your progress is slow or you see no progress in your young life; real progress takes place by the age of 40. Your complete inclination is towards materialism, but you should understand the priorities of life & the definition of real happiness. If you want something, you desire to occupy that thing, and until then, you roam around pointless, directionless & aimless."
     },
     9: {
-        1: "You are ambitious, determined & have a very strong wish for self-improvement. If supported by 4 & 2, then you can be humorous, intellectual, affluent, prosperous, spiritual & divine. If there is no support of 4 & 2, then there will be a tussle in all areas of your life.",
         2: "You have a 'Master Number' impact, but the Master Number activation is required. You are idealistic & brainy in your life. You love to learn about everything around you. You can do too much criticism of others. You have a sympathetic attitude & you love to work in fields in which much use of the brain is required. It is necessary for you to get along with people of all levels of society.",
         3: "You are idealistic, smart, & intellectual in your life & can do well in education, but multiple 9s make your survival in the world difficult. You can have arrogance & a bad temper. Multiple 9s give you the power of escapism & life in your own fairytale world. You have a tendency to stretch unrequired topics (तित का ताइ करना), and you need to control this nature of yourself. You are joyful & progressive when you handle your life & nature with care. You have an inclination for becoming unsatisfied & unhappy. You can do good for the world if you understand the power you are blessed with & learn how to channelize that too.",
         4: "You are idealistic, smart, & intellectual in your life & can do well in education, but multiple 9s make your survival in the world difficult. You can have arrogance & a bad temper. Multiple 9s give you the power of escapism & life in your own fairytale world. You have a tendency to stretch unrequired topics (तित का ताइ करना), and you need to control this nature of yourself. You are joyful & progressive when you handle their life & nature with care. You have an inclination for becoming unsatisfied & unhappy. You can do good for the world if you understand the power you are blessed with & learn how to channelize that too.",
@@ -367,7 +346,7 @@ export const REPEATED_NUMBER_MEANINGS: { [key: number]: { [key: number]: string 
     }
 };
 
-export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
+export const COMPOUND_NUMBER_MEANINGS = {
   10: "Number 10 is formed by the combination of 1 and 0. The number 1 represents consciousness and the Sun, while 0 signifies infinity (Anant Tattva). The qualities of 1 predominantly shape number 10, as it belongs to the 1 series, granting honor, faith, self-assurance, and recognition—whether positive or negative—that varies according to karmic principles. The number 1 is considered fortunate, whereas 0 is seen as unfortunate. The unfortunate influence of 0 introduces struggles, which foster self-confidence and proper understanding in these psychic individuals, enabling them to stand out. The presence of 0 generates hidden adversaries, but 1 provides the alertness to identify them. Thus, 10 symbolizes success attained through persistent effort. Remaining introspective and vigilant is the only way to overcome the challenges described. Relying on others will lead to difficulties.",
   11: "Number 11 is regarded as a special number, often referred to as the mystic number in various occult traditions. For instance, in Babylonian creation stories, the name TIAMAT is associated with eleven supporting chaos demons. In Hindu tradition, there are eleven forms or incarnations of Rudra, the Lord of Destruction. In the first book of Moses, Joseph dreamed that the Sun, Moon, and eleven stars bowed before him (Genesis 37:9). In theological texts, 11 is seen as a number of negative omens, sinners, and penance. However, in Hindu tradition, 11 is not viewed as negative or sinful but is considered auspicious and dynamic. Because the number 1 appears twice, numerologists attribute to it a stubborn, revolutionary, and authoritative character. Psychic number 2 individuals who possess the 11 compound number are quick to respond, optimistic, and capable of guiding themselves and others through challenging situations. With proper guidance and constructive feedback, they can achieve significant success in the material world. Although this number is linked to the Moon, and psychic 2 individuals who possess the 11 compound number exhibit all the traits of 2s—such as indecisiveness, periodic separation from their life partner, and emotional fluctuations—they later gain fame and respect. Just as numerology gives special attention to this number, calculated as 2 but recognized as 11, those with this number attract and manage to receive special attention in life. Number 11 is called a mystic number because its natives have a heightened sensitivity to vibrations and may perceive spirits or ghosts. This sensitivity is part of their imaginative and fantasizing nature. They also enjoy creating personalized rituals for their activities to evoke emotions and draw attention. This date is considered a master power number. Those who possess the 11 compound number have strong intuition and are inspired by lofty ideals. A dynamic energy radiates from their personal magnetism, making them masters of most situations. Their executive abilities are prominent, and their minds are creative, original, and alert. They strive to protect those they love and enjoy the role of provider. They are modest and prefer not to flaunt their talents and abilities. They are drawn to the subtler aspects of life. They enjoy detective stories and mystical philosophy. They possess a strong magnetism that attracts others, but they are cautious about sharing their affections. Through mental and verbal influence, they can persuade others to act in ways that align with their desires. They have significant latent psychic abilities, which they can develop to express clairvoyance, trance, mediumship, or psychometry, thanks to the Moon’s influence. They should learn to engage in lighter mental and spiritual pleasures to relax. Excessive focus can lead to depression, which they must strive to avoid. They are typically successful in life and love, achieving honor, position, and authority. They are loyal to their friends and exhibit a noble disposition. They should remain vigilant against secret enemies.",
   12: "This number combines the Sun (1) and the Moon (2), forming a pair of opposites. As previously discussed, the numbers 1 and 2 do not form an ideal partnership, as individuals with these numbers often disagree. This conflicting dynamic between 1 and 2 creates anxiety for those who possess the 12 compound number. Although psychic number 3 individuals are fortunate in receiving help, cooperation, and success in life, this anxiety persists for those who possess the 12 compound number. Psychic 3s are known for agreeing to everything and everyone, yet they only act within their capabilities. As a result, they are notorious for letting down their friends and family. Those who possess the 12 compound number experience this issue most acutely. They are caught between the stable, resolute nature of 1s and the fluctuating opinions of 2s. Their tendency to agree causes problems, as they are uncertain whether they truly mean their affirmations, since the influence of 2 may soon alter their stance. Those who possess the 12 compound number often make decisions at the last moment, and even then, their choices remain uncertain. They may change their minds even after beginning a task, leaving it incomplete. They achieve success later in life, but leave countless projects and tasks, started with great enthusiasm, unfinished. They frequently and rapidly change their plans, making their whereabouts unpredictable to friends and family. These individuals enjoy their personal lives and are happy, healthy, and prosperous. They take care of themselves, show interest in cooking, enjoy hosting feasts, have refined tastes, and are philosophical and religious. They possess the strength of 1s and the gentleness of 2s. They believe in blending ideas and are unconventional, adapting readily to all kinds of situations.",
@@ -378,7 +357,7 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
   17: "This number combines the Sun (1) and the half-planet Ketu (7). As a psychic number 8, 17 is ruled by Saturn. Thus, 17 represents struggle, obstacles, and difficulties. Additionally, the Sun and Ketu are enemies, creating inner conflict for those with this number. However, this inner conflict fosters genuine understanding, making them more aware, compassionate, loving, and spiritual. They develop resilience, overcoming obstacles and difficulties without losing hope. They become peaceful and bring peace to those around them. Although number 8 is governed by the challenging Saturn, those who possess the 17 compound number become beneficent, contributing to humanity in ways that earn them posthumous recognition. Saturn’s difficulties and delays remain, but they are unaffected by them and leave a distinctive mark on history. Saturn ensures success for those with the 17 compound number in the latter part of their lives, and they are regarded as fortunate by others. Despite struggles in their personal and family lives, they acquire wealth, prosperity, and respect from others. If they develop faith in God and adopt spiritual practices, divine intervention miraculously resolves their problems. They are advised to choose friends carefully and be cautious when seeking help from friends, relatives, and colleagues. They are courageous and bold.",
   18: "This number combines the Sun (1) and Saturn (8) and is ruled by Mars (9). Those who possess the 18 compound number face strong opposition, inner conflict, and obstacles in their lives. However, since number 9 is ruled by Mars, they are resilient fighters who endure challenging circumstances. They grow accustomed to facing challenges and adverse situations caused by grudges and enmity from family members and relatives. They lack peace in their personal and family lives. Due to their martial nature, they create strained relationships with their kin and struggle with poor marital bonds. They earn money through unethical means, disregarding society’s moral standards. They gain financial benefits from wars, revolutions, and social upheavals. They experience tension, instability, and restlessness. They become malicious, associate with negative influences, and sometimes enjoy being rough or cruel. If these individuals adopt disciplined lives, they prosper and rise to prominent positions. If they embrace the principle of ahimsa (non-violence), they can leave a significant mark on history. They are advised to avoid conflicts with family and friends. They are materialistic and develop specialized skills to earn money. They achieve financial stability after age 40 and are rewarded for their efforts later in life.",
   19: "This number combines the Sun (1) and Mars (9) and is ruled by the Sun (1). Those who possess the 19 compound number are fortunate psychic number 1 individuals. The Sun and Mars are allies, and the Sun is exalted in Aries, a zodiac sign governed by Mars. These individuals are filled with enthusiasm, joy, and inspiration, achieving success in all areas of life. They are vibrant and honored by their friends and colleagues. The Sun’s influence makes them wise, while Mars enables them to confront difficult situations and challenges. Their hard work and persistence lead to success. However, this combination and Mars’ influence make them stubborn and short-tempered, causing issues in their marital lives. They possess all the qualities of number 1 individuals and are more fortunate than those who possess the 10 compound number, but less fortunate than those who possess the 28 compound number. Overall, those who possess the 19 compound number enjoy high status, honor, success, and material prosperity. They are helpful, cooperative, and generous.",
-  20: "The combination of 2 and 0 forms 20, a number associated with impatience. Number 2 individuals are typically impatient, nervous, dependent, and prone to rapid changes. The presence of 0 adds responsibilities that exhaust these 2s. They are tender and emotional, like other 2s, but are more cooperative, loving, and caring. However, their efforts and care are not adequately rewarded. They face unnecessary delays in their projects and experience anxiety and frustration. Their marital lives are often unsuccessful, and they neglect their family members and relatives. To find peace and achieve success, they are advised to cultivate interests in spirituality.",
+  20: "This is The Awakening. This number represents a new life and a new sense of purpose. It can indicate a spiritual awakening, but just as often, it can signify that a person is about to have a major breakthrough in their career or their most important relationship. It is an extremely fortunate number, but only if the person’s goals are not entirely selfish. If the goals are for the good of many, then this is a karmic reward number. If the goals are selfish, then the karmic reward will turn into a karmic lesson. There will be many delays and obstacles in this person’s path.",
   21: "Although those who possess the 21 compound number are psychic number 3s, they differ from other psychic number 3s. The combination of 2 and 1 in 21 is distinct from that in 12. Number 21 belongs to the 20 series and is thus more influenced by the number 2, despite being ruled by Jupiter. The number 2 imparts gentleness, while 1 provides the potential for success in life. They are more social than other psychic number 3 individuals, gaining popularity in various circles and with the opposite sex. They interact more freely than other 3s and successfully overcome challenges to establish themselves in service or business. With the number 2, they excel as arbitrators and diplomats; with the number 1, they achieve success and rise. In this combination, the 1 supports the 2. If these individuals develop a bit of patience, they can become fortunate and make steady progress.",
   22: "Psychic number 4 individuals who possess the 22 compound number are more strongly influenced by the number 2, yet they retain all the characteristics of number 4. They become highly stubborn and are often seen as difficult by their friends and relatives. Individuals with this number face separation from their families, and in some cases, men may experience remarriage. Number 22 is considered a mystical number in certain circles. Those with the 22 compound number are specialists who perform their tasks efficiently. They are practical and methodical. They face significant struggles, as they receive little support from colleagues, partners, relatives, or family members. Individuals with this number achieve great success in politics. In business, they can excel only when their partners are supportive. They should learn techniques to calm their minds and use hessonite powder (gomed pishthi) to mitigate Rahu’s influence. Aside from marital challenges, they are able to overcome difficulties and obstacles to achieve success. They possess strong organizational skills and the ability to hold positions of authority. They exhibit a sense of pride and dignity, making it relatively easy to gain recognition for their abilities. The years between 40 and 60 mark the peak of their career. They often feel lonely because others struggle to match their level of thought and understanding. The first half of their life is challenging, but the second half can bring the fulfillment of earlier ambitions and desires. They may tend to be overly cautious when implementing inspirational initiatives. Doubts rarely trouble them due to their strong confidence. In life, they have much to offer and achieve, so they should move forward and build. They are typically tall with striking eyes. They often hold prominent positions, though these come with limited responsibility. They are generally easygoing but can be inconsistent in nature. Their actions can sometimes be erratic. Overall, they are fortunate in their endeavors and benefit from relationships with the opposite sex. They are content with their family life but also enjoy companionship. Their social circle is limited, with few close friends. They avoid disputes. They tend to be reserved in expressing their emotions.",
   23: "The combination of the Moon (2) and Jupiter (3) is considered a number of success. Those who possess the 23 compound number are psychic number 5s and are ruled by Mercury, making them intelligent, hardworking, well-informed, and curious about everything. They have strong prospects for success in their professions and gain popularity. They receive support from the opposite sex and assistance from authority figures. Although they can be somewhat moody, short-tempered, and fond of taking risks, they are well-liked and achieve success in life. They live in prosperity and promote innovative ideas. They earn recognition and fame, rise within their communities, and are known for their cheerful nature.",

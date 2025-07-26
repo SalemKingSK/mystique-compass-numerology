@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -16,7 +17,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
-import { REPEATED_NUMBER_MEANINGS } from '@/lib/numerology';
+import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology';
+import { Separator } from '@/components/ui/separator';
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -175,37 +177,42 @@ const InfoCard = ({ title, value, icon, popoverContent }: { title: string, value
     return cardContent;
 };
 
+function FatePopoverContent({ numerology }: { numerology: NumerologyData }) {
+    return (
+        <div className="space-y-4">
+            <div>
+                <h4 className="font-bold text-lg mb-2 text-secondary flex items-center gap-2"><Skull className="h-5 w-5" /> Compound Fate: {numerology.compoundNum}</h4>
+                <SpeechPlayer text={numerology.compoundMeaning} elementId="fate-tier1-speech" />
+            </div>
+
+            {numerology.reducedCompoundNum && (
+                <>
+                    <Separator />
+                    <div>
+                        <h4 className="font-bold text-lg mb-2 text-secondary flex items-center gap-2"><Gem className="h-5 w-5" /> Inner Essence: {numerology.reducedCompoundNum}</h4>
+                        <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="fate-tier2-speech" />
+                    </div>
+                </>
+            )}
+            
+            {numerology.karmicFateNum && (
+                <>
+                    <Separator />
+                    <div>
+                        <h4 className="font-bold text-lg mb-2 text-secondary flex items-center gap-2"><Swords className="h-5 w-5" /> Karmic Fate: {numerology.karmicFateNum}</h4>
+                        <SpeechPlayer text={numerology.karmicFateMeaning} elementId="fate-tier3-speech" />
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const numberEntries = Object.entries(numerology.numberCounts)
         .map(([digit, count]) => ({ digit: parseInt(digit), count }))
-        .filter(item => item.count > 1)
         .sort((a, b) => a.digit - b.digit);
-    
-    const FatePopoverContent = () => (
-      <Tabs defaultValue="tier1" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="tier1">Compound</TabsTrigger>
-              {numerology.reducedCompoundNum && <TabsTrigger value="tier2">Inner Essence</TabsTrigger>}
-              {numerology.karmicFateNum && <TabsTrigger value="tier3">Karmic</TabsTrigger>}
-          </TabsList>
-          <TabsContent value="tier1" className="p-4">
-              <h4 className="font-bold text-lg mb-2 text-secondary">Compound Fate: {numerology.compoundNum}</h4>
-              <SpeechPlayer text={numerology.compoundMeaning} elementId="fate-tier1-speech" />
-          </TabsContent>
-          {numerology.reducedCompoundNum && numerology.reducedCompoundMeaning && (
-              <TabsContent value="tier2" className="p-4">
-                  <h4 className="font-bold text-lg mb-2 text-secondary">Inner Essence: {numerology.reducedCompoundNum}</h4>
-                  <SpeechPlayer text={numerology.reducedCompoundMeaning} elementId="fate-tier2-speech" />
-              </TabsContent>
-          )}
-          {numerology.karmicFateNum && numerology.karmicFateMeaning && (
-              <TabsContent value="tier3" className="p-4">
-                  <h4 className="font-bold text-lg mb-2 text-secondary">Karmic Fate: {numerology.karmicFateNum}</h4>
-                  <SpeechPlayer text={numerology.karmicFateMeaning} elementId="fate-tier3-speech" />
-              </TabsContent>
-          )}
-      </Tabs>
-    );
 
     return (
         <Tabs defaultValue="overview" className="w-full">
@@ -219,7 +226,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                      <InfoCard title="Psyche Number" value={numerology.psycheNum} icon={<BrainCircuit className="h-4 w-4"/>} />
                      <InfoCard title="Destiny Number" value={numerology.destinyNum} icon={<Anchor className="h-4 w-4"/>} />
                      <InfoCard title="Kua Number" value={numerology.kuaNum} icon={<Compass className="h-4 w-4"/>} />
-                     <InfoCard title="Fate Number" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} popoverContent={<FatePopoverContent />} />
+                     <InfoCard title="Fate Number" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} popoverContent={<FatePopoverContent numerology={numerology} />} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="glass-card p-4">
@@ -254,21 +261,29 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     </div>
 
                     <div className="glass-card p-4">
-                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye/> Repeated Number Insights</h3>
+                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye/> Number Insights</h3>
                         <ScrollArea className="h-48">
                           <Accordion type="single" collapsible className="w-full">
                               {numberEntries.map(({ digit, count }) => {
-                                  const meaning = REPEATED_NUMBER_MEANINGS[digit as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count] || "No specific meaning for this count.";
+                                  let meaning = "No specific meaning found.";
+                                  if (count > 1) {
+                                      meaning = REPEATED_NUMBER_MEANINGS[digit as keyof typeof REPEATED_NUMBER_MEANINGS]?.[count] || `No specific meaning for ${count} appearances.`;
+                                  } else {
+                                      meaning = NUMBER_MEANINGS[digit as keyof typeof NUMBER_MEANINGS]?.description || "No specific meaning for this number.";
+                                  }
+                                  
+                                  const title = count > 1 ? `Number ${digit} (appears ${count} times)` : `Number ${digit} (appears 1 time)`;
+
                                   return (
                                       <AccordionItem value={`item-${digit}`} key={digit}>
-                                          <AccordionTrigger>Number {digit} (appears {count} times)</AccordionTrigger>
+                                          <AccordionTrigger>{title}</AccordionTrigger>
                                           <AccordionContent>
-                                              <SpeechPlayer text={meaning} elementId={`repeated-${digit}-speech`} />
+                                              <SpeechPlayer text={meaning} elementId={`insight-${digit}-speech`} />
                                           </AccordionContent>
                                       </AccordionItem>
                                   );
                               })}
-                              {numberEntries.length === 0 && <p className="text-gray-400">No numbers are repeated in your birth date.</p>}
+                              {numberEntries.length === 0 && <p className="text-gray-400">No numbers found in your birth date.</p>}
                           </Accordion>
                         </ScrollArea>
                     </div>
