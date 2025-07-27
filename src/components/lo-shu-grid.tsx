@@ -6,24 +6,27 @@ import type { ArrowData } from '@/lib/numerology';
 
 const ARROW_PATHS: { [key: string]: string } = {
     // Rows
-    "4-3-8": "M16.6 16.6 L83.3 16.6 L150 16.6", // Top row (grid numbers 4, 3, 8)
-    "9-5-1": "M16.6 50 L83.3 50 L150 50",   // Middle row (grid numbers 9, 5, 1)
-    "2-7-6": "M16.6 83.3 L83.3 83.3 L150 83.3", // Bottom row (grid numbers 2, 7, 6)
+    "4-3-8": "M16.6 50 L83.3 50 L150 50", // Top row (grid numbers 4, 3, 8) -> Corrected to center
+    "9-5-1": "M16.6 150 L83.3 150 L150 150",   // Middle row (grid numbers 9, 5, 1) -> Corrected to center
+    "2-7-6": "M16.6 250 L83.3 250 L150 250", // Bottom row (grid numbers 2, 7, 6) -> Corrected to center
     // Columns
-    "4-9-2": "M16.6 16.6 L16.6 50 L16.6 83.3", // Left col (grid numbers 4, 9, 2)
-    "3-5-7": "M83.3 16.6 L83.3 50 L83.3 83.3", // Middle col (grid numbers 3, 5, 7)
-    "8-1-6": "M150 16.6 L150 50 L150 83.3",  // Right col (grid numbers 8, 1, 6)
+    "4-9-2": "M50 16.6 L50 150 L50 250", // Left col (grid numbers 4, 9, 2) -> Corrected to center
+    "3-5-7": "M150 16.6 L150 150 L150 250", // Middle col (grid numbers 3, 5, 7) -> Corrected to center
+    "8-1-6": "M250 16.6 L250 150 L250 250",  // Right col (grid numbers 8, 1, 6) -> Corrected to center
     // Diagonals
-    "4-5-6": "M16.6 16.6 L83.3 50 L150 83.3", // Top-left to bottom-right (grid numbers 4, 5, 6)
-    "2-5-8": "M16.6 83.3 L83.3 50 L150 16.6",  // Bottom-left to top-right (grid numbers 2, 5, 8)
+    "4-5-6": "M16.6 16.6 L150 150 L283.3 283.3", // Top-left to bottom-right 
+    "2-5-8": "M16.6 283.3 L150 150 L283.3 16.6",  // Bottom-left to top-right
 };
 
-const PulsatingArrow = ({ path, delay }: { path: string, delay: number }) => {
-    const id = React.useId();
+const PulsatingArrow = ({ path, delay, id }: { path: string, delay: number, id: string }) => {
     return (
-        <svg className="absolute top-0 left-0 w-full h-full overflow-visible">
-            <defs>
-                <linearGradient id={`gradient-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+        <svg className="absolute top-0 left-0 w-full h-full overflow-visible" viewBox="0 0 300 300">
+             <defs>
+                <marker id={`arrowhead-${id}`} markerWidth="10" markerHeight="7" 
+                refX="0" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill={`url(#gradient-${id})`} />
+                </marker>
+                <linearGradient id={`gradient-${id}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(45)">
                     <stop offset="0%" stopColor="hsl(var(--color-primary-hsl))" />
                     <stop offset="50%" stopColor="hsl(var(--color-quaternary-hsl))" />
                     <stop offset="100%" stopColor="hsl(var(--color-secondary-hsl))" />
@@ -36,10 +39,11 @@ const PulsatingArrow = ({ path, delay }: { path: string, delay: number }) => {
                 strokeWidth="4"
                 strokeLinecap="round"
                 className="opacity-80"
+                markerEnd={`url(#arrowhead-${id})`}
                 style={{
                     filter: 'drop-shadow(0 0 3px hsl(var(--color-primary-hsl)))',
-                    strokeDasharray: 250,
-                    strokeDashoffset: 250,
+                    strokeDasharray: 450,
+                    strokeDashoffset: 450,
                     animation: `arrow-flow 2s ease-out forwards ${delay}s, arrow-pulse 4s linear infinite ${delay + 2}s`
                 }}
             />
@@ -50,8 +54,6 @@ const PulsatingArrow = ({ path, delay }: { path: string, delay: number }) => {
 
 export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows: ArrowData[] }) {
     
-    // The grid is displayed with visual numbers 1-9, but the logic maps to the Lo Shu positions.
-    // Let's create a visual map.
     const loShuMap = [
         ['4', '9', '2'],
         ['3', '5', '7'],
@@ -75,13 +77,14 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                     );
                 })}
             </div>
-            <div className="absolute inset-0 p-4 pt-12 z-0">
+            <div className="absolute inset-0 p-4 z-0">
                 <div className="relative w-full h-full">
                     {arrows.map((arrow, index) => {
                         const pathKey = arrow.numbers.join('-');
                         const path = ARROW_PATHS[pathKey];
                         if (!path) return null;
-                        return <PulsatingArrow key={index} path={path} delay={index * 0.5} />;
+                        const uniqueId = `${pathKey}-${index}`;
+                        return <PulsatingArrow key={uniqueId} id={uniqueId} path={path} delay={index * 0.5} />;
                     })}
                 </div>
             </div>

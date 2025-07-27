@@ -114,19 +114,15 @@
 
 @keyframes arrow-pulse {
   0%, 100% {
-    stroke: hsl(var(--color-primary-hsl));
     filter: drop-shadow(0 0 2px hsl(var(--color-primary-hsl)));
   }
   25% {
-    stroke: hsl(var(--color-quaternary-hsl));
-    filter: drop-shadow(0 0 3px hsl(var(--color-quaternary-hsl)));
+    filter: drop-shadow(0 0 4px hsl(var(--color-quaternary-hsl)));
   }
   50% {
-    stroke: hsl(var(--color-secondary-hsl));
-    filter: drop-shadow(0 0 4px hsl(var(--color-secondary-hsl)));
+    filter: drop-shadow(0 0 6px hsl(var(--color-secondary-hsl)));
   }
   75% {
-    stroke: hsl(var(--color-tertiary-hsl));
-    filter: drop-shadow(0 0 3px hsl(var(--color-tertiary-hsl)));
+    filter: drop-shadow(0 0 4px hsl(var(--color-tertiary-hsl)));
   }
 }
