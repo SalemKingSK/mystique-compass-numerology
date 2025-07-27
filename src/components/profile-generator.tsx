@@ -372,12 +372,10 @@ function ResultsDisplay({
   insight,
   numerology,
   onReset,
-  onHistoryOpen,
 }: {
   insight: AstroInsightOutput;
   numerology: NumerologyData | null;
   onReset: () => void;
-  onHistoryOpen: () => void;
 }) {
   
   const [activeTab, setActiveTab] = React.useState<'astro' | 'numerology'>('astro');
@@ -390,9 +388,11 @@ function ResultsDisplay({
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
         <header className="text-center mb-6 relative">
-             <Button onClick={onHistoryOpen} variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
-                <History className="h-6 w-6"/>
-            </Button>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
+                    <History className="h-6 w-6"/>
+                </Button>
+            </SheetTrigger>
             <h1 
                 className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
             >
@@ -562,6 +562,7 @@ export function ProfileGenerator() {
   }
 
   return (
+    <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
       <AnimatePresence mode="wait">
         {insight && numerology ? (
             <motion.div key="results">
@@ -569,7 +570,6 @@ export function ProfileGenerator() {
                     insight={insight}
                     numerology={numerology}
                     onReset={handleReset}
-                    onHistoryOpen={() => setIsHistoryOpen(true)}
                  />
             </motion.div>
         ) : (
@@ -583,31 +583,11 @@ export function ProfileGenerator() {
           >
             <form onSubmit={handleSubmit}>
               <header className="text-center mb-6 relative">
-                 <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
-                    <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
-                            <History className="h-6 w-6"/>
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Search History</SheetTitle>
-                        </SheetHeader>
-                        <ScrollArea className="h-[calc(100%-4rem)]">
-                            <div className="space-y-2 py-4">
-                                {history.length > 0 ? (
-                                    history.map((item, index) => (
-                                        <Button key={`${item.name}-${index}`} variant="ghost" className="w-full justify-start" onClick={() => handleHistoryClick(item)}>
-                                            {item.name}
-                                        </Button>
-                                    ))
-                                ) : (
-                                    <p className="text-sm text-center text-gray-400">No history yet.</p>
-                                )}
-                            </div>
-                        </ScrollArea>
-                    </SheetContent>
-                 </Sheet>
+                 <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
+                        <History className="h-6 w-6"/>
+                    </Button>
+                </SheetTrigger>
                  <h2 className="text-2xl font-bold text-white">Mystique Compass</h2>
                  <p className="text-gray-400">Giving your Life a meaning.</p>
               </header>
@@ -659,5 +639,26 @@ export function ProfileGenerator() {
           </motion.div>
         )}
       </AnimatePresence>
+      <SheetContent>
+          <SheetHeader>
+              <SheetTitle>Search History</SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100%-4rem)]">
+              <div className="space-y-2 py-4">
+                  {history.length > 0 ? (
+                      history.map((item, index) => (
+                          <Button key={`${item.name}-${index}`} variant="ghost" className="w-full justify-start" onClick={() => handleHistoryClick(item)}>
+                              {item.name}
+                          </Button>
+                      ))
+                  ) : (
+                      <p className="text-sm text-center text-gray-400">No history yet.</p>
+                  )}
+              </div>
+          </ScrollArea>
+      </SheetContent>
+    </Sheet>
   );
 }
+
+    
