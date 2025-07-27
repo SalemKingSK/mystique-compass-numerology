@@ -6,13 +6,13 @@ import type { ArrowData } from '@/lib/numerology';
 
 const ARROW_PATHS: { [key: string]: string } = {
     // Rows
-    "4-9-2": "M50 50 L150 50 L250 50",
+    "2-4-9": "M50 50 L150 50 L250 50",
     "3-5-7": "M50 150 L150 150 L250 150",
-    "8-1-6": "M50 250 L150 250 L250 250",
+    "1-6-8": "M50 250 L150 250 L250 250",
     // Columns
-    "4-3-8": "M50 50 L50 150 L50 250",
-    "9-5-1": "M150 50 L150 150 L150 250",
-    "2-7-6": "M250 50 L250 150 L250 250",
+    "3-4-8": "M50 50 L50 150 L50 250",
+    "1-5-9": "M150 50 L150 150 L150 250",
+    "2-6-7": "M250 50 L250 150 L250 250",
     // Diagonals
     "2-5-8": "M50 250 L150 150 L250 50",
     "4-5-6": "M50 50 L150 150 L250 250",
@@ -80,22 +80,14 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
             <div className="absolute inset-0 p-0 z-0">
                 <div className="relative w-full h-full">
                     {arrows.map((arrow, index) => {
-                        const pathKey = arrow.numbers.join('-');
-                        const pathKeyReversed = [...arrow.numbers].reverse().join('-');
                         const sortedKey = [...arrow.numbers].sort((a,b) => a - b).join('-');
+                        const pathKey = Object.keys(ARROW_PATHS).find(k => k === sortedKey);
 
-                        // This logic is more robust for finding the correct path key regardless of number order.
-                        const foundKey = Object.keys(ARROW_PATHS).find(k => {
-                            const keyParts = k.split('-').map(Number).sort((a,b) => a-b);
-                            const arrowNumbersSorted = [...arrow.numbers].sort((a,b) => a-b);
-                            return keyParts.join('-') === arrowNumbersSorted.join('-');
-                        });
-
-                        const path = ARROW_PATHS[pathKey] || ARROW_PATHS[pathKeyReversed] || (foundKey ? ARROW_PATHS[foundKey] : "");
+                        if (!pathKey) return null;
                         
-                        if (!path) return null;
-                        
+                        const path = ARROW_PATHS[pathKey];
                         const uniqueId = `${pathKey.replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
+
                         return <PulsatingArrow key={uniqueId} id={uniqueId} path={path} delay={index * 0.5} />;
                     })}
                 </div>
