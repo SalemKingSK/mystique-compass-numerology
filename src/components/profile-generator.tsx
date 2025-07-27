@@ -256,10 +256,6 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                  <div className="grid grid-cols-1 gap-4">
                     <FateDisplay numerology={numerology} />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <ArrowsDisplay arrows={numerology.arrowsOfStrength} title="Arrows of Strength" icon={<Zap />} idPrefix="strength" />
-                   <ArrowsDisplay arrows={numerology.arrowsOfWeakness} title="Arrows of Weakness" icon={<ShieldHalf />} idPrefix="weakness" />
-                </div>
             </TabsContent>
             <TabsContent value="grid" className="space-y-4 mt-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -296,6 +292,10 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                           </Accordion>
                         </ScrollArea>
                     </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <ArrowsDisplay arrows={numerology.arrowsOfStrength} title="Arrows of Strength" icon={<Zap />} idPrefix="strength" />
+                   <ArrowsDisplay arrows={numerology.arrowsOfWeakness} title="Arrows of Weakness" icon={<ShieldHalf />} idPrefix="weakness" />
                 </div>
             </TabsContent>
             <TabsContent value="attributes" className="space-y-4 mt-4">
@@ -386,9 +386,9 @@ function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     );
   }
 
-const HistoryButton = ({ onClick }: { onClick?: () => void }) => (
+const HistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
     <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onClick}>
+        <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
             <History className="h-6 w-6"/>
         </Button>
     </SheetTrigger>
@@ -416,7 +416,7 @@ function ResultsDisplay({
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
         <header className="text-center mb-6 relative">
-            <HistoryButton onClick={onHistoryOpen} />
+            <HistoryButton onHistoryOpen={onHistoryOpen} />
             <h1 
                 className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
             >
@@ -608,7 +608,7 @@ export function ProfileGenerator() {
           >
             <form onSubmit={handleSubmit}>
               <header className="text-center mb-6 relative">
-                 <HistoryButton />
+                 <HistoryButton onHistoryOpen={() => setIsHistoryOpen(true)} />
                  <h2 className="text-2xl font-bold text-white">Mystique Compass</h2>
                  <p className="text-gray-400">Giving your Life a meaning.</p>
               </header>
