@@ -32,10 +32,17 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
   }
   
   const getPathKeyForArrow = (arrow: ArrowData) => {
+    // Sort numbers to create a consistent key (e.g., 8-1-6 becomes 1-6-8)
     const sortedNumbers = [...arrow.numbers].sort((a, b) => a - b).join('-');
+    // Find a key in ARROW_PATHS that contains the same numbers
     const directMatch = Object.keys(ARROW_PATHS).find(key => {
         const keyNumbers = new Set(key.split('-').map(Number));
-        return arrow.numbers.every(num => keyNumbers.has(num)) && arrow.numbers.length === keyNumbers.size;
+        const arrowNumbers = new Set(arrow.numbers);
+        if (keyNumbers.size !== arrowNumbers.size) return false;
+        for (let num of arrowNumbers) {
+            if (!keyNumbers.has(num)) return false;
+        }
+        return true;
     });
     return directMatch || null;
   }
@@ -77,9 +84,10 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
             const pathInfo = ARROW_PATHS[pathKey];
 
             const isStrength = arrow.type === 'strength';
-            // On-theme color palette
-            const colorStart = isStrength ? 'hsl(var(--color-primary-hsl))' : 'hsl(var(--color-destructive))';
-            const colorEnd = isStrength ? 'hsl(var(--color-secondary-hsl))' : 'hsl(var(--color-quaternary-hsl))';   
+            
+            // Google-inspired color palette
+            const colorStart = isStrength ? '#4285F4' : '#FBBC05'; // Blue for strength, Yellow for weakness
+            const colorEnd = isStrength ? '#34A853' : '#EA4335';   // Green for strength, Red for weakness
 
             const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${index}`;
             const gradientId = `gradient-${uniqueId}`;
