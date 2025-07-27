@@ -86,8 +86,8 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
             const isStrength = arrow.type === 'strength';
             
             // Google-inspired color palette
-            const colorStart = isStrength ? '#4285F4' : '#FDBB2D'; // Blue for strength, Vibrant Yellow for weakness
-            const colorEnd = isStrength ? '#34A853' : '#D93025';   // Green for strength, Strong Red for weakness
+            const colorStart = isStrength ? '#4285F4' : '#F4B400'; // Blue for strength, Bright Yellow for weakness
+            const colorEnd = isStrength ? '#34A853' : '#DB4437';   // Green for strength, Red for weakness
 
             const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${index}`;
             const gradientId = `gradient-${uniqueId}`;
