@@ -1,122 +1,156 @@
 // src/components/lo-shu-grid.tsx
-import * as React from 'react';
+
+import React from 'react';
 import type { ArrowData } from '@/lib/numerology';
 
+// Props for the LoShuGrid component
 interface LoShuGridProps {
-    grid: (string | null)[][];
-    arrows: ArrowData[];
+  gridData: (string | null)[][];
+  arrows: (ArrowData & { type: 'strength' | 'weakness' })[];
 }
 
-const ARROW_PATHS: { [key: string]: string } = {
-  // Horizontal
-  '4-9-2': 'M16.67 16.67 L83.33 16.67',
-  '3-5-7': 'M16.67 50 L83.33 50',
-  '8-1-6': 'M16.67 83.33 L83.33 83.33',
-  // Vertical
-  '4-3-8': 'M16.67 16.67 L16.67 83.33',
-  '9-5-1': 'M50 16.67 L50 83.33',
-  '2-7-6': 'M83.33 16.67 L83.33 83.33',
-  // Diagonal
-  '4-5-6': 'M16.67 16.67 L83.33 83.33',
-  '2-5-8': 'M83.33 16.67 L16.67 83.33',
+// Central repository for all possible arrow path coordinates (start, end)
+// These percentages correspond to the center of each grid cell.
+const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: string } } = {
+  // Horizontal Arrows
+  '4-9-2': { x1: '16.67%', y1: '16.67%', x2: '83.33%', y2: '16.67%' },
+  '3-5-7': { x1: '16.67%', y1: '50%',   x2: '83.33%', y2: '50%' },
+  '8-1-6': { x1: '16.67%', y1: '83.33%', x2: '83.33%', y2: '83.33%' },
+  // Vertical Arrows
+  '4-3-8': { x1: '16.67%', y1: '16.67%', x2: '16.67%', y2: '83.33%' },
+  '9-5-1': { x1: '50%',    y1: '16.67%', x2: '50%',    y2: '83.33%' },
+  '2-7-6': { x1: '83.33%', y1: '16.67%', x2: '83.33%', y2: '83.33%' },
+  // Diagonal Arrows
+  '4-5-6': { x1: '16.67%', y1: '16.67%', x2: '83.33%', y2: '83.33%' },
+  '2-5-8': { x1: '83.33%', y1: '16.67%', x2: '16.67%', y2: '83.33%' },
 };
 
 
-const PulsatingArrow = ({ arrow, delay }: { arrow: ArrowData; delay: number }) => {
-    // Create a reliable, sorted key from the arrow's numbers to look up the path.
-    const sortedKey = [...arrow.numbers].sort((a, b) => a - b).join('-');
-    
-    // Find the correct path regardless of the original number order for vertical/horizontal arrows
-    const pathKey = Object.keys(ARROW_PATHS).find(key => {
+const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
+  if (!gridData || gridData.length !== 3) {
+    return <p>Grid data is not available.</p>;
+  }
+  
+  const getPathKeyForArrow = (arrow: ArrowData) => {
+    const sortedNumbers = [...arrow.numbers].sort((a, b) => a - b).join('-');
+    const directMatch = Object.keys(ARROW_PATHS).find(key => {
         const keyNumbers = new Set(key.split('-').map(Number));
         return arrow.numbers.every(num => keyNumbers.has(num)) && arrow.numbers.length === keyNumbers.size;
     });
+    return directMatch || null;
+  }
 
-    if (!pathKey) return null;
-    const path = ARROW_PATHS[pathKey];
+  return (
+    // The main container that establishes the coordinate system for the overlay
+    <div className="relative aspect-square w-full max-w-[400px] mx-auto glass-card p-4">
+        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M3 3v18h18" /><path d="M7 16v-4h4" /><path d="m15.5 15.5-8-8" /></svg>
+            Lo Shu Grid
+        </h3>
+      
+      {/* 1. The Grid of Numbers (the base layer) */}
+      <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2">
+        {gridData.flat().map((cell, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square"
+          >
+            {cell ? (
+              <span className="truncate">{cell}</span>
+            ) : (
+              <span className="opacity-20">{[ '4', '9', '2', '3', '5', '7', '8', '1', '6' ][index]}</span>
+            )}
+          </div>
+        ))}
+      </div>
 
-    // Generate a guaranteed unique ID for every arrow to prevent SVG conflicts.
-    const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${delay}`;
-    const gradientId = `gradient-${uniqueId}`;
-    const arrowheadId = `arrowhead-${uniqueId}`;
+      {/* 2. The SVG Overlay for drawing arrows (sits on top of the grid) */}
+      <svg
+        className="absolute top-0 left-0 w-full h-full pointer-events-none p-4"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          {arrows.map((arrow, index) => {
+            const pathKey = getPathKeyForArrow(arrow);
+            if (!pathKey) return null;
+            const pathInfo = ARROW_PATHS[pathKey];
 
-    const isStrength = true; // For now, all displayed arrows are strengths. Logic can be added for weaknesses.
-    const fromColor = isStrength ? 'hsl(var(--color-primary-hsl))' : 'hsl(var(--color-destructive) / 0.7)';
-    const toColor = isStrength ? 'hsl(var(--color-secondary-hsl))' : 'hsl(var(--color-tertiary-hsl) / 0.7)';
+            const isStrength = arrow.type === 'strength';
+            // On-theme color palette
+            const colorStart = isStrength ? 'hsl(var(--color-primary-hsl))' : 'hsl(var(--color-destructive))';
+            const colorEnd = isStrength ? 'hsl(var(--color-secondary-hsl))' : 'hsl(var(--color-quaternary-hsl))';   
 
-    return (
-        <React.Fragment>
-            <defs>
-                <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(45)">
-                    <stop offset="0%" stopColor={fromColor} />
-                    <stop offset="100%" stopColor={toColor} />
+            const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${index}`;
+            const gradientId = `gradient-${uniqueId}`;
+            const markerId = `marker-${uniqueId}`;
+
+            return (
+              <React.Fragment key={uniqueId}>
+                <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1={pathInfo.x1} y1={pathInfo.y1} x2={pathInfo.x2} y2={pathInfo.y2}>
+                  <stop offset="0%" stopColor={colorStart} stopOpacity="0.8" />
+                  <stop offset="100%" stopColor={colorEnd} stopOpacity="0.8" />
                 </linearGradient>
                 <marker
-                    id={arrowheadId}
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerUnits="strokeWidth"
-                    markerWidth="8"
-                    markerHeight="8"
-                    orient="auto-start-reverse"
+                  id={markerId}
+                  viewBox="0 0 10 10"
+                  refX="5" // Center the arrowhead on the line end
+                  refY="5"
+                  markerWidth="5" // Smaller arrowhead
+                  markerHeight="5"
+                  orient="auto-start-reverse"
                 >
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill={`url(#${gradientId})`} />
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={`url(#${gradientId})`} />
                 </marker>
-            </defs>
-            <path
-                d={path}
-                fill="none"
+              </React.Fragment>
+            );
+          })}
+        </defs>
+
+        {/* Render the unified, animated lines */}
+        {arrows.map((arrow, index) => {
+          const pathKey = getPathKeyForArrow(arrow);
+          if (!pathKey) return null;
+          const pathInfo = ARROW_PATHS[pathKey];
+
+          const isStrength = arrow.type === 'strength';
+          const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${index}`;
+          const gradientId = `gradient-${uniqueId}`;
+          const markerId = `marker-${uniqueId}`;
+          
+          return (
+             <line
+                key={uniqueId}
+                x1={pathInfo.x1} y1={pathInfo.y1}
+                x2={pathInfo.x2} y2={pathInfo.y2}
                 stroke={`url(#${gradientId})`}
-                strokeWidth="2"
+                strokeWidth="1.5" // Thinner line
                 strokeLinecap="round"
-                markerEnd={`url(#${arrowheadId})`}
+                markerEnd={`url(#${markerId})`}
                 style={{
-                    filter: `drop-shadow(0 0 3px ${fromColor})`,
-                    strokeDasharray: 450,
-                    strokeDashoffset: 450,
-                    animation: `arrow-flow 2s ease-out forwards ${delay}s, arrow-pulse 4s linear infinite ${delay + 2}s`,
+                    animation: `glow 3s infinite ${index * 0.3}s ease-in-out`,
+                    strokeDasharray: isStrength ? 'none' : '3 3' // More subtle dash for weakness
                 }}
-            />
-        </React.Fragment>
-    );
+              />
+          );
+        })}
+      </svg>
+      
+      {/* New, more subtle animation */}
+      <style>{`
+        @keyframes glow {
+          0%, 100% { 
+            opacity: 0.6;
+            filter: drop-shadow(0 0 1.5px hsla(0, 0%, 100%, 0.3));
+          }
+          50% { 
+            opacity: 1;
+            filter: drop-shadow(0 0 4px hsla(0, 0%, 100%, 0.6));
+          }
+        }
+      `}</style>
+    </div>
+  );
 };
 
-
-export function LoShuGrid({ grid, arrows }: LoShuGridProps) {
-    const loShuMap = [
-        ['4', '9', '2'],
-        ['3', '5', '7'],
-        ['8', '1', '6'],
-    ];
-
-    return (
-        <div className="glass-card p-4 relative aspect-square">
-            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M3 3v18h18" /><path d="M7 16v-4h4" /><path d="m15.5 15.5-8-8" /></svg>
-                Lo Shu Grid
-            </h3>
-            <div className="grid grid-cols-3 gap-2 aspect-square relative z-10">
-                {loShuMap.flat().map((num, index) => {
-                    const row = Math.floor(index / 3);
-                    const col = index % 3;
-                    const cellContent = grid[row] && grid[row][col];
-                    return (
-                        <div key={index} className="flex items-center justify-center text-2xl font-bold bg-black/20 rounded-lg h-full p-1 aspect-square">
-                            <span className="truncate">
-                                {cellContent || <span className="opacity-20">{loShuMap[row][col]}</span>}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="absolute inset-0 p-0 z-0">
-                <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {arrows.map((arrow, index) => (
-                        <PulsatingArrow key={`${arrow.name}-${index}`} arrow={arrow} delay={index * 0.5} />
-                    ))}
-                </svg>
-            </div>
-        </div>
-    );
-}
+export default LoShuGrid;

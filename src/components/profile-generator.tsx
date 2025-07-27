@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
-import { LoShuGrid } from '@/components/lo-shu-grid';
+import LoShuGrid from '@/components/lo-shu-grid';
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -232,6 +232,11 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const numberEntries = Object.entries(numerology.numberCounts)
         .map(([digit, count]) => ({ digit: parseInt(digit), count }))
         .sort((a, b) => a.digit - b.digit);
+        
+    const allArrows = [
+        ...numerology.arrowsOfStrength.map(arrow => ({ ...arrow, type: 'strength' as const })),
+        ...numerology.arrowsOfWeakness.map(arrow => ({ ...arrow, type: 'weakness' as const })),
+    ];
 
     return (
         <Tabs defaultValue="overview" className="w-full">
@@ -258,7 +263,7 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
             <TabsContent value="grid" className="space-y-4 mt-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     
-                    <LoShuGrid grid={numerology.loShuGrid} arrows={[...numerology.arrowsOfStrength, ...numerology.arrowsOfWeakness]} />
+                    <LoShuGrid gridData={numerology.loShuGrid} arrows={allArrows} />
 
                     <div className="glass-card p-4">
                         <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye className="h-5 w-5"/>Number Insights</h3>
