@@ -5,17 +5,17 @@ import { cn } from '@/lib/utils';
 import type { ArrowData } from '@/lib/numerology';
 
 const ARROW_PATHS: { [key: string]: string } = {
-    // Rows (sorted)
-    "2-4-9": "M50 50 L150 50 L250 50",
-    "3-5-7": "M50 150 L150 150 L250 150",
-    "1-6-8": "M50 250 L150 250 L250 250",
-    // Columns (sorted)
-    "3-4-8": "M50 50 L50 150 L50 250",
-    "1-5-9": "M150 50 L150 150 L150 250",
-    "2-6-7": "M250 50 L250 150 L250 250",
-    // Diagonals (sorted)
-    "2-5-8": "M50 250 L150 150 L250 50",
-    "4-5-6": "M50 50 L150 150 L250 250",
+    // Horizontal
+    "2-4-9": "M50 50 L250 50",
+    "3-5-7": "M50 150 L250 150",
+    "1-6-8": "M50 250 L250 250",
+    // Vertical
+    "3-4-8": "M50 50 L50 250",
+    "1-5-9": "M150 50 L150 250",
+    "2-6-7": "M250 50 L250 250",
+    // Diagonal
+    "2-5-8": "M250 50 L50 250",
+    "4-5-6": "M50 50 L250 250",
 };
 
 const PulsatingArrow = ({ path, delay, id }: { path: string, delay: number, id: string }) => {
@@ -72,7 +72,7 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                     const col = index % 3;
                     const cellContent = grid[row][col];
                     return (
-                        <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg h-full p-1 aspect-square">
+                        <div key={index} className="flex items-center justify-center text-2xl font-bold bg-black/20 rounded-lg h-full p-1 aspect-square">
                            <span className="truncate"> {cellContent || <span className="opacity-20">{loShuMap[row][col]}</span>}</span>
                         </div>
                     );
@@ -81,13 +81,10 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
             <div className="absolute inset-0 p-0 z-0">
                 <div className="relative w-full h-full">
                     {arrows.map((arrow, index) => {
-                        // THIS IS THE FIX: Sort the numbers to create a consistent key for lookup.
                         const sortedKey = [...arrow.numbers].sort((a,b) => a - b).join('-');
-                        
                         const path = ARROW_PATHS[sortedKey as keyof typeof ARROW_PATHS];
                         if (!path) return null;
                         
-                        // THIS IS THE OTHER FIX: Create a guaranteed unique ID for each arrow.
                         const uniqueId = `${sortedKey.replace(/-/g, '')}-${index}`;
 
                         return <PulsatingArrow key={uniqueId} id={uniqueId} path={path} delay={index * 0.5} />;
