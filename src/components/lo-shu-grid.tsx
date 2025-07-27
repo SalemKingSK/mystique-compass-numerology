@@ -1,4 +1,3 @@
-
 // src/components/lo-shu-grid.tsx
 'use client';
 import * as React from 'react';
@@ -63,7 +62,7 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
 
     return (
         <div className="glass-card p-4 relative aspect-square">
-            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+            <h3 className="font-semibold text-lg text-primary mb-2">
                 Lo Shu Grid
             </h3>
             <div className="grid grid-cols-3 gap-2 aspect-square relative z-10">
