@@ -1,14 +1,12 @@
 // src/lib/numerology.ts
 import type { AstroInsightInput } from '@/lib/astrology';
 import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS } from './numerology/data';
+import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
 
 // --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
-    if ([11, 22, 33].includes(num) && num !== n) { 
-        // This logic is simplified for now; we reduce all to a single digit for core numbers.
-    }
     num = String(num)
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -66,6 +64,11 @@ export const calculateKarmicFate = (day: number, month: number, year: number): n
 }
 
 // --- DATA INTERFACES ---
+export interface ArrowData {
+    name: string;
+    description: string;
+    numbers: number[];
+}
 export interface NumerologyData {
   psycheNum: number;
   destinyNum: number;
@@ -84,8 +87,8 @@ export interface NumerologyData {
   auspiciousDirections: { [key: string]: string };
   loShuGrid: (string | null)[][];
   numberCounts: { [key: string]: number };
-  arrowsOfStrength: { name: string; description: string }[];
-  arrowsOfWeakness: { name: string; description: string }[];
+  arrowsOfStrength: ArrowData[];
+  arrowsOfWeakness: ArrowData[];
 }
 
 // --- MAIN GRID GENERATION FUNCTION ---
@@ -96,17 +99,17 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const destinyNum = calculateDestiny(day, month, year);
   const kuaNum = calculateKua(year, gender);
 
-  const birthDigitsForGrid = (String(day) + String(month) + String(year)).split('').filter(d => d !== '0');
+  const birthDigitsForGrid = (String(day) + String(month) + String(year)).split('').map(d => parseInt(d, 10)).filter(d => d !== 0);
   const allDigitsForGrid = [
-      ...birthDigitsForGrid.map(d => parseInt(d)),
+      ...birthDigitsForGrid,
       psycheNum,
       destinyNum,
-      kuaNum
+      kuaNum,
   ];
 
   const numberCounts: { [key: string]: number } = {};
   for (const digit of allDigitsForGrid) {
-      if (digit > 0) { // Ensure we don't count 0
+      if (digit > 0) {
           numberCounts[digit] = (numberCounts[digit] || 0) + 1;
       }
   }
@@ -142,46 +145,22 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || null;
 
   const calculateArrows = (grid: (string | null)[][]) => {
-    const strength: { name: string; description: string }[] = [];
-    const weakness: { name: string; description: string }[] = [];
+    const strength: ArrowData[] = [];
+    const weakness: ArrowData[] = [];
 
     const has = (num: number) => grid.flat().some(cell => cell?.includes(String(num)) ?? false);
 
-    const arrowDefs = {
-        strength: [
-            { name: "Arrow of Planning", line: [4, 3, 8], description: "This indicates the Arrow of Planning & Proper Execution. It gives you shrewdness, cunningness, and intelligence. Your nature can be unethical, like a 'Dirty Player' who doesn't go by the rules. You possess a high degree of intelligence and can be a politician." },
-            { name: "Arrow of Willpower", line: [9, 5, 1], description: "This is the Arrow of Success. You exhibit stubbornness & persistence in your behavior. This behavior leads you towards being victorious in life. You possess a high level of determination and are not hesitant in expressing your opinion about everything." },
-            { name: "Arrow of Action / Outlook", line: [2, 7, 6], description: "This signifies a life of activity and a particular outlook on the world. You are a person of practical engagement and action." },
-            { name: "Arrow of Intellect", line: [4, 9, 2], description: "Also known as the Brain / Mental plane. You are a thinker with a powerful intellect, an orderly and tidy mind, and excellent memory. You are not easily fooled and are considered a very brainy person." },
-            { name: "Arrow of Spirituality", line: [3, 5, 7], description: "The Arrow of Emotional Harmony, Spiritual Ethics & Values. It leads to contentment, calmness & inner peace after 30-40 years of age. You may come to the field of spirituality after seeing too much trouble in life." },
-            { name: "Arrow of Prosperity", line: [8, 1, 6], description: "The Action / Practical plane. It indicates materialistic or commercial success and prosperity with practicality. You are always interested in superficial life & success and are never inclined towards a higher purpose." },
-            { name: "Arrow of Emotional Balance", line: [4, 5, 6], description: "You are humanitarian, helping & compassionate by nature. You are psychic, intuitive, sensitive, and caring. You easily understand the demands of people around you and are quite gentle and generous." },
-            { name: "Arrow of Determination", line: [2, 5, 8], description: "This arrow signifies a strong will and determination. It represents your resolve and powerful drive to see things through to the end." },
-        ],
-        weakness: [
-            { name: "Arrow of Confusion", line: [4, 9, 2], description: "Without numbers on the mental plane, you may struggle with mental clarity, be slow to grasp concepts, and need to work harder on intellectual tasks." },
-            { name: "Arrow of Scepticism", line: [3, 5, 7], description: "You are a born skeptic, demanding proof for everything and not inclined towards faith or intuition. You can be insensitive to the feelings of others." },
-            { name: "Arrow of Frustration", line: [8, 1, 6], description: "You may have many great ideas but lack the practical ability to bring them to fruition, leading to a sense of frustration." },
-            { name: "Arrow of Indecision", line: [4, 3, 8], description: "You may lack the ability to think things through methodically, leading to a tendency to hesitate and be indecisive when faced with important choices." },
-            { name: "Arrow of Suspicion / Poor Memory", line: [9, 5, 1], description: "You may lack determination and willpower, and you might also have a tendency to be forgetful or to doubt the intentions of others." },
-            { name: "Arrow of Apathy", line: [2, 7, 6], description: "You may lack the physical drive to put plans into action, preferring to remain passive rather than actively engaging with the world." },
-            { name: "Arrow of Disappointment", line: [4, 5, 6], description: "You may experience frequent setbacks and feel that life often lets you down, fostering a pessimistic outlook." },
-            { name: "Arrow of Doubt", line: [2, 5, 8], description: "You may suffer from a lack of self-belief and constantly question your own abilities and decisions, which can hold you back." },
-        ]
-    };
-
-    for (const arrow of arrowDefs.strength) {
-        if (arrow.line.every(n => has(n))) {
-            strength.push({ name: arrow.name, description: arrow.description });
+    for (const arrow of ARROWS_OF_STRENGTH) {
+        if (arrow.numbers.every(n => has(n))) {
+            strength.push(arrow);
         }
     }
 
-    for (const arrow of arrowDefs.weakness) {
-        if (arrow.line.every(n => !has(n))) {
-            weakness.push({ name: arrow.name, description: arrow.description });
+    for (const arrow of ARROWS_OF_WEAKNESS) {
+        if (arrow.numbers.every(n => !has(n))) {
+            weakness.push(arrow);
         }
     }
-
     return { strength, weakness };
   }
 

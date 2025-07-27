@@ -8,16 +8,17 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Grid3x3, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info, Swords, Sun, Moon, Zap, Hand, Heart, Link2, BrainCircuit, ShieldHalf, Anchor, Eye, Telescope, Lightbulb, Handshake, Shield, Hourglass, BarChart, FileText } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info, Swords, Sun, Moon, Zap, Hand, Heart, Link2, BrainCircuit, ShieldHalf, Anchor, Eye, Telescope, Lightbulb, Handshake, Shield, Hourglass, BarChart, FileText } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightInput, AstroInsightOutput } from '@/lib/astrology';
-import type { NumerologyData } from '@/lib/numerology';
+import type { NumerologyData, ArrowData } from '@/lib/numerology';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { LoShuGrid } from '@/components/lo-shu-grid';
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -28,7 +29,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
     const sentenceElementsRef = React.useRef<(HTMLSpanElement | null)[]>([]);
 
     React.useEffect(() => {
-        const textSentences = text ? text.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [text] : [];
+        const textSentences = text ? text.match(/[^.!?\n]+(?:[.!?\n]+["']?|$)/g) || [text] : [];
         setSentences(textSentences);
         sentenceElementsRef.current = new Array(textSentences.length).fill(null);
     }, [text]);
@@ -64,7 +65,14 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
                 return;
             }
 
-            const utterance = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
+            const sentenceToSpeak = sentences[sentenceIndex].trim();
+            if (!sentenceToSpeak) {
+                sentenceIndex++;
+                speakNextSentence();
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(sentenceToSpeak);
             utteranceRef.current = utterance;
             
             const voices = window.speechSynthesis.getVoices();
@@ -193,6 +201,34 @@ function FateDisplay({ numerology }: { numerology: NumerologyData }) {
     );
 }
 
+const ArrowsDisplay = ({ arrows, title, icon, idPrefix }: { arrows: ArrowData[], title: string, icon: React.ReactNode, idPrefix: string }) => {
+    if (arrows.length === 0) {
+        return (
+            <div className="glass-card p-4">
+                <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">{icon} {title}</h3>
+                <p className="text-gray-400">No {title} found.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="glass-card p-4">
+            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">{icon} {title}</h3>
+            <Accordion type="single" collapsible className="w-full">
+                {arrows.map((arrow, index) => (
+                    <AccordionItem value={`${idPrefix}-${index}`} key={`${idPrefix}-${index}`}>
+                        <AccordionTrigger>{arrow.name} ({arrow.numbers.join('-')})</AccordionTrigger>
+                        <AccordionContent>
+                            <ScrollArea className="h-40 pr-3">
+                               <SpeechPlayer text={arrow.description} elementId={`${idPrefix}-speech-${index}`} />
+                            </ScrollArea>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+            </Accordion>
+        </div>
+    )
+}
 
 function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const numberEntries = Object.entries(numerology.numberCounts)
@@ -217,40 +253,18 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
                     <FateDisplay numerology={numerology} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="glass-card p-4">
-                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Zap/> Arrows of Strength</h3>
-                        {numerology.arrowsOfStrength.length > 0 ? (
-                            <ul className="space-y-2 text-gray-300">
-                              {numerology.arrowsOfStrength.map(arrow => <li key={arrow.name}><strong>{arrow.name}:</strong> {arrow.description}</li>)}
-                            </ul>
-                        ) : <p className="text-gray-400">No Arrows of Strength found.</p>}
-                    </div>
-                    <div className="glass-card p-4">
-                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><ShieldHalf/> Arrows of Weakness</h3>
-                         {numerology.arrowsOfWeakness.length > 0 ? (
-                            <ul className="space-y-2 text-gray-300">
-                              {numerology.arrowsOfWeakness.map(arrow => <li key={arrow.name}><strong>{arrow.name}:</strong> {arrow.description}</li>)}
-                            </ul>
-                        ) : <p className="text-gray-400">No Arrows of Weakness found.</p>}
-                    </div>
+                   <ArrowsDisplay arrows={numerology.arrowsOfStrength} title="Arrows of Strength" icon={<Zap />} idPrefix="strength" />
+                   <ArrowsDisplay arrows={numerology.arrowsOfWeakness} title="Arrows of Weakness" icon={<ShieldHalf />} idPrefix="weakness" />
                 </div>
             </TabsContent>
             <TabsContent value="grid" className="space-y-4 mt-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="glass-card p-4">
-                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Grid3x3/> Lo Shu Grid</h3>
-                        <div className="grid grid-cols-3 gap-2 aspect-square">
-                            {(numerology.loShuGrid as (string|null)[][]).flat().map((num, index) => (
-                                <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg">
-                                    {num || ''}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    
+                    <LoShuGrid grid={numerology.loShuGrid} arrows={[...numerology.arrowsOfStrength, ...numerology.arrowsOfWeakness]} />
 
                     <div className="glass-card p-4">
                         <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye/> Number Insights</h3>
-                        <ScrollArea className="h-48 pr-3">
+                        <ScrollArea className="h-[21rem] pr-3">
                           <Accordion type="single" collapsible className="w-full">
                               {numberEntries.map(({ digit, count }) => {
                                   let meaning = "No specific meaning found.";
