@@ -6,13 +6,13 @@ import type { ArrowData } from '@/lib/numerology';
 
 const ARROW_PATHS: { [key: string]: string } = {
     // Rows
-    "2-4-9": "M50 50 L150 50 L250 50",
+    "4-9-2": "M50 50 L150 50 L250 50",
     "3-5-7": "M50 150 L150 150 L250 150",
-    "1-6-8": "M50 250 L150 250 L250 250",
+    "8-1-6": "M50 250 L150 250 L250 250",
     // Columns
-    "3-4-8": "M50 50 L50 150 L50 250",
-    "1-5-9": "M150 50 L150 150 L150 250",
-    "2-6-7": "M250 50 L250 150 L250 250",
+    "4-3-8": "M50 50 L50 150 L50 250",
+    "9-5-1": "M150 50 L150 150 L150 250",
+    "2-7-6": "M250 50 L250 150 L250 250",
     // Diagonals
     "2-5-8": "M50 250 L150 150 L250 50",
     "4-5-6": "M50 50 L150 150 L250 250",
@@ -62,7 +62,8 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
 
     return (
         <div className="glass-card p-4 relative aspect-square">
-            <h3 className="font-semibold text-lg text-primary mb-2">
+            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M3 3v18h18"/><path d="M7 16v-4h4"/><path d="m15.5 15.5-8-8"/></svg>
                 Lo Shu Grid
             </h3>
             <div className="grid grid-cols-3 gap-2 aspect-square relative z-10">
@@ -71,8 +72,8 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                     const col = index % 3;
                     const cellContent = grid[row][col];
                     return (
-                        <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg h-full">
-                            {cellContent || <span className="opacity-20">{loShuMap[row][col]}</span>}
+                        <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg h-full p-1">
+                           <span className="truncate"> {cellContent || <span className="opacity-20">{loShuMap[row][col]}</span>}</span>
                         </div>
                     );
                 })}
@@ -81,11 +82,14 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                 <div className="relative w-full h-full">
                     {arrows.map((arrow, index) => {
                         const sortedKey = [...arrow.numbers].sort((a,b) => a - b).join('-');
-                        const pathKey = Object.keys(ARROW_PATHS).find(k => k === sortedKey);
+                        const pathKey = Object.keys(ARROW_PATHS).find(k => {
+                            const sortedK = k.split('-').map(Number).sort((a,b) => a-b).join('-');
+                            return sortedK === sortedKey;
+                        });
 
                         if (!pathKey) return null;
                         
-                        const path = ARROW_PATHS[pathKey];
+                        const path = ARROW_PATHS[pathKey as keyof typeof ARROW_PATHS];
                         const uniqueId = `${pathKey.replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
 
                         return <PulsatingArrow key={uniqueId} id={uniqueId} path={path} delay={index * 0.5} />;

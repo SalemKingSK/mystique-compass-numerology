@@ -63,7 +63,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             return;
         }
 
-        if (window.speechSynthesis.speaking) {
+        if (window.speechSynthesis.speaking && utteranceRef.current) {
             stopSpeech();
             return;
         }
@@ -98,8 +98,10 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             };
 
             utterance.onend = () => {
-                sentenceIndex++;
-                speakNextSentence();
+                if (utteranceRef.current === utterance) { // Ensure it's not an old utterance
+                    sentenceIndex++;
+                    speakNextSentence();
+                }
             };
 
             utterance.onerror = (event) => {
@@ -117,7 +119,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
                 window.speechSynthesis.cancel();
             }
             // A tiny delay to ensure cancel has finished processing
-            setTimeout(speakNextSentence, 50);
+            setTimeout(speakNextSentence, 100);
         };
 
         if (window.speechSynthesis.getVoices().length === 0) {
@@ -400,11 +402,9 @@ function ResultsDisplay({
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
         <header className="text-center mb-6 relative">
-            <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
-                    <History className="h-6 w-6"/>
-                </Button>
-            </SheetTrigger>
+            <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
+                <History className="h-6 w-6"/>
+            </Button>
             <h1 
                 className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
             >
@@ -675,5 +675,6 @@ export function ProfileGenerator() {
 }
 
     
+
 
 

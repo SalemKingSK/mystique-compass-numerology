@@ -15,7 +15,6 @@ const reduceToSingleDigit = (n: number): number => {
 };
 
 const reduceOnce = (n: number): number => {
-    if (n < 10) return n;
     return String(n)
         .split('')
         .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -51,8 +50,11 @@ export const calculateKua = (year: number, gender: string): number => {
 
   let finalKua = reduceToSingleDigit(kuaResult);
   
-  if (finalKua === 5) {
-    return gender.toLowerCase() === 'male' ? 2 : 8;
+  if (finalKua === 5 && gender.toLowerCase() === 'male') {
+      return 2;
+  }
+  if (finalKua === 5 && gender.toLowerCase() === 'female') {
+      return 8;
   }
   
   return finalKua;
@@ -149,16 +151,21 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     const strength: ArrowData[] = [];
     const weakness: ArrowData[] = [];
 
-    const has = (num: number) => grid.flat().some(cell => cell?.includes(String(num)) ?? false);
+    const presentNumbers = new Set<number>();
+    grid.flat().forEach(cell => {
+        if(cell) {
+            presentNumbers.add(parseInt(cell.charAt(0)));
+        }
+    });
 
     for (const arrow of ARROWS_OF_STRENGTH) {
-        if (arrow.numbers.every(n => has(n))) {
+        if (arrow.numbers.every(n => presentNumbers.has(n))) {
             strength.push(arrow);
         }
     }
 
     for (const arrow of ARROWS_OF_WEAKNESS) {
-        if (arrow.numbers.every(n => !has(n))) {
+        if (arrow.numbers.every(n => !presentNumbers.has(n))) {
             weakness.push(arrow);
         }
     }
@@ -167,8 +174,16 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   const arrows = calculateArrows(loShuGrid);
 
-  const kuaAttributes = KUA_ATTRIBUTES[kuaNum] || (gender.toLowerCase() === 'male' ? KUA_ATTRIBUTES[5].male : KUA_ATTRIBUTES[5].female) || {};
-  const auspiciousDirections = KUA_DIRECTIONS[kuaNum] || (gender.toLowerCase() === 'male' ? KUA_DIRECTIONS[5].male : KUA_DIRECTIONS[5].female) || {};
+  let kuaAttributes = KUA_ATTRIBUTES[kuaNum];
+  if(kuaNum === 5) {
+    kuaAttributes = gender.toLowerCase() === 'male' ? KUA_ATTRIBUTES[5].male : KUA_ATTRIBUTES[5].female;
+  }
+  
+  let auspiciousDirections = KUA_DIRECTIONS[kuaNum];
+  if(kuaNum === 5) {
+    auspiciousDirections = gender.toLowerCase() === 'male' ? KUA_DIRECTIONS[5].male : KUA_DIRECTIONS[5].female;
+  }
+
 
   return {
     psycheNum,
@@ -184,7 +199,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     karmicFateMeaning,
     arrowsOfStrength: arrows.strength,
     arrowsOfWeakness: arrows.weakness,
-    kuaAttributes,
-    auspiciousDirections,
+    kuaAttributes: kuaAttributes || {},
+    auspiciousDirections: auspiciousDirections || {},
   };
 };
