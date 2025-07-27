@@ -82,13 +82,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
             const pathKey = getPathKeyForArrow(arrow);
             if (!pathKey) return null;
             const pathInfo = ARROW_PATHS[pathKey];
-
-            const isStrength = arrow.type === 'strength';
             
-            // Google-inspired color palette
-            const colorStart = isStrength ? '#4285F4' : '#F4B400'; // Blue for strength, Bright Yellow for weakness
-            const colorEnd = isStrength ? '#34A853' : '#DB4437';   // Green for strength, Red for weakness
-
             const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${index}`;
             const gradientId = `gradient-${uniqueId}`;
             const markerId = `marker-${uniqueId}`;
@@ -96,8 +90,10 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
             return (
               <React.Fragment key={uniqueId}>
                 <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1={pathInfo.x1} y1={pathInfo.y1} x2={pathInfo.x2} y2={pathInfo.y2}>
-                  <stop offset="0%" stopColor={colorStart} stopOpacity="0.8" />
-                  <stop offset="100%" stopColor={colorEnd} stopOpacity="0.8" />
+                  <stop offset="0%" stopColor="hsl(var(--color-quaternary-hsl))" />
+                  <stop offset="33%" stopColor="hsl(var(--color-primary-hsl))" />
+                  <stop offset="66%" stopColor="hsl(var(--color-secondary-hsl))" />
+                  <stop offset="100%" stopColor="hsl(var(--color-tertiary-hsl))" />
                 </linearGradient>
                 <marker
                   id={markerId}
@@ -136,27 +132,13 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
                 strokeLinecap="round"
                 markerEnd={`url(#${markerId})`}
                 style={{
-                    animation: `glow 3s infinite ${index * 0.3}s ease-in-out`,
+                    animation: `arrow-pulse 4s infinite ${index * 0.3}s ease-in-out`,
                     strokeDasharray: isStrength ? 'none' : '3 3' // More subtle dash for weakness
                 }}
               />
           );
         })}
       </svg>
-      
-      {/* New, more subtle animation */}
-      <style>{`
-        @keyframes glow {
-          0%, 100% { 
-            opacity: 0.6;
-            filter: drop-shadow(0 0 1.5px hsla(0, 0%, 100%, 0.3));
-          }
-          50% { 
-            opacity: 1;
-            filter: drop-shadow(0 0 4px hsla(0, 0%, 100%, 0.6));
-          }
-        }
-      `}</style>
     </div>
   );
 };
