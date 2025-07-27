@@ -81,13 +81,20 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                 <div className="relative w-full h-full">
                     {arrows.map((arrow, index) => {
                         const pathKey = arrow.numbers.join('-');
-                        // Handle cases where arrow numbers might be in a different order than the path key
-                        const sortedKey = arrow.numbers.sort((a,b) => a-b).join('-');
                         const pathKeyReversed = [...arrow.numbers].reverse().join('-');
+                        const sortedKey = [...arrow.numbers].sort((a,b) => a - b).join('-');
 
-                        const path = ARROW_PATHS[pathKey] || ARROW_PATHS[pathKeyReversed] || ARROW_PATHS[Object.keys(ARROW_PATHS).find(k => k.split('-').sort((a,b) => parseInt(a)-parseInt(b)).join('-') === sortedKey) || ""];
+                        // This logic is more robust for finding the correct path key regardless of number order.
+                        const foundKey = Object.keys(ARROW_PATHS).find(k => {
+                            const keyParts = k.split('-').map(Number).sort((a,b) => a-b);
+                            const arrowNumbersSorted = [...arrow.numbers].sort((a,b) => a-b);
+                            return keyParts.join('-') === arrowNumbersSorted.join('-');
+                        });
+
+                        const path = ARROW_PATHS[pathKey] || ARROW_PATHS[pathKeyReversed] || (foundKey ? ARROW_PATHS[foundKey] : "");
                         
                         if (!path) return null;
+                        
                         const uniqueId = `${pathKey.replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
                         return <PulsatingArrow key={uniqueId} id={uniqueId} path={path} delay={index * 0.5} />;
                     })}
