@@ -100,11 +100,12 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const kuaNum = calculateKua(year, gender);
 
   const birthDigitsForGrid = (String(day) + String(month) + String(year)).split('').map(d => parseInt(d, 10)).filter(d => d !== 0);
+  
   const allDigitsForGrid = [
       ...birthDigitsForGrid,
       psycheNum,
       destinyNum,
-      kuaNum,
+      kuaNum
   ];
 
   const numberCounts: { [key: string]: number } = {};

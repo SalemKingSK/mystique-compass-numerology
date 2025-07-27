@@ -1,3 +1,4 @@
+
 // src/components/lo-shu-grid.tsx
 'use client';
 import * as React from 'react';
