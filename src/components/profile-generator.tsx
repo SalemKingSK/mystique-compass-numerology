@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { LoShuGrid } from '@/components/lo-shu-grid';
 
 
@@ -386,10 +386,12 @@ function ResultsDisplay({
   insight,
   numerology,
   onReset,
+  onHistoryOpen
 }: {
   insight: AstroInsightOutput;
   numerology: NumerologyData | null;
   onReset: () => void;
+  onHistoryOpen: () => void;
 }) {
   
   const [activeTab, setActiveTab] = React.useState<'astro' | 'numerology'>('astro');
@@ -402,11 +404,9 @@ function ResultsDisplay({
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
         <header className="text-center mb-6 relative">
-            <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white">
-                    <History className="h-6 w-6"/>
-                </Button>
-            </SheetTrigger>
+            <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
+                <History className="h-6 w-6"/>
+            </Button>
             <h1 
                 className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
             >
@@ -584,6 +584,7 @@ export function ProfileGenerator() {
                     insight={insight}
                     numerology={numerology}
                     onReset={handleReset}
+                    onHistoryOpen={() => setIsHistoryOpen(true)}
                  />
             </motion.div>
         ) : (
