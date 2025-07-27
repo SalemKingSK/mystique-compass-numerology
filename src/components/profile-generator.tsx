@@ -48,10 +48,23 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }, [currentSentenceIndex, isPlaying]);
+    
+    const stopSpeech = () => {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        setIsPlaying(false);
+        setCurrentSentenceIndex(-1);
+    };
 
     const handleListen = () => {
         if (typeof window === 'undefined' || !window.speechSynthesis) {
             console.error("Speech Synthesis not supported.");
+            return;
+        }
+
+        if (window.speechSynthesis.speaking) {
+            stopSpeech();
             return;
         }
 
@@ -60,8 +73,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
         
         const speakNextSentence = () => {
             if (sentenceIndex >= sentences.length) {
-                setIsPlaying(false);
-                setCurrentSentenceIndex(-1);
+                stopSpeech();
                 return;
             }
 
@@ -94,8 +106,7 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
                 if (event.error !== 'cancelled' && event.error !== 'interrupted') {
                     console.error("SpeechSynthesisUtterance.onerror", event);
                 }
-                setIsPlaying(false);
-                setCurrentSentenceIndex(-1);
+                stopSpeech();
             };
 
             window.speechSynthesis.speak(utterance);
@@ -105,7 +116,8 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
             }
-            speakNextSentence();
+            // A tiny delay to ensure cancel has finished processing
+            setTimeout(speakNextSentence, 50);
         };
 
         if (window.speechSynthesis.getVoices().length === 0) {
@@ -114,26 +126,10 @@ function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) 
             startSpeech();
         }
     };
-    
-    const handleStop = () => {
-        if (window.speechSynthesis) {
-             window.speechSynthesis.cancel();
-        }
-        setIsPlaying(false);
-        setCurrentSentenceIndex(-1);
-    };
-
-    const handlePlayPause = () => {
-        if (isPlaying) {
-            handleStop();
-        } else {
-            handleListen();
-        }
-    };
 
     return (
         <div className="flex items-start gap-2">
-             <Button onClick={handlePlayPause} size="icon" variant="ghost" className="shrink-0 text-gray-400 hover:text-white" disabled={!text}>
+             <Button onClick={handleListen} size="icon" variant="ghost" className="shrink-0 text-gray-400 hover:text-white" disabled={!text}>
                 {isPlaying ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                 <span className="sr-only">{isPlaying ? 'Stop' : 'Listen'}</span>
             </Button>
@@ -677,3 +673,4 @@ export function ProfileGenerator() {
 }
 
     
+

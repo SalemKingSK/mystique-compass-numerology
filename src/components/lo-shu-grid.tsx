@@ -6,16 +6,16 @@ import type { ArrowData } from '@/lib/numerology';
 
 const ARROW_PATHS: { [key: string]: string } = {
     // Rows
-    "4-3-8": "M50 50 L150 50 L250 50", // Top row (grid numbers 4, 3, 8) -> Corrected to center
-    "9-5-1": "M50 150 L150 150 L250 150",   // Middle row (grid numbers 9, 5, 1) -> Corrected to center
-    "2-7-6": "M50 250 L150 250 L250 250", // Bottom row (grid numbers 2, 7, 6) -> Corrected to center
+    "4-3-8": "M50 50 L150 50 L250 50",
+    "9-5-1": "M50 150 L150 150 L250 150",
+    "2-7-6": "M50 250 L150 250 L250 250",
     // Columns
-    "4-9-2": "M50 50 L50 150 L50 250", // Left col (grid numbers 4, 9, 2) -> Corrected to center
-    "3-5-7": "M150 50 L150 150 L150 250", // Middle col (grid numbers 3, 5, 7) -> Corrected to center
-    "8-1-6": "M250 50 L250 150 L250 250",  // Right col (grid numbers 8, 1, 6) -> Corrected to center
+    "4-9-2": "M50 50 L50 150 L50 250",
+    "3-5-7": "M150 50 L150 150 L150 250",
+    "8-1-6": "M250 50 L250 150 L250 250",
     // Diagonals
-    "4-5-6": "M50 50 L150 150 L250 250", // Top-left to bottom-right 
-    "2-5-8": "M50 250 L150 150 L250 50",  // Bottom-left to top-right
+    "4-5-6": "M50 50 L150 150 L250 250",
+    "2-5-8": "M50 250 L150 150 L250 50",
 };
 
 const PulsatingArrow = ({ path, delay, id }: { path: string, delay: number, id: string }) => {
