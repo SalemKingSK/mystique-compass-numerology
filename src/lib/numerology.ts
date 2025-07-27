@@ -53,7 +53,6 @@ export const calculateKua = (year: number, gender: string): number => {
 
   let finalKua = reduceToSingleDigit(kuaResult);
   
-  // Rule D: Apply the Kua 5 exception.
   if (finalKua === 5) {
     return gender.toLowerCase() === 'male' ? 2 : 8;
   }
@@ -102,6 +101,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
       ...birthDigitsForGrid.map(d => parseInt(d)),
       psycheNum,
       destinyNum,
+      kuaNum
   ];
 
   const numberCounts: { [key: string]: number } = {};
