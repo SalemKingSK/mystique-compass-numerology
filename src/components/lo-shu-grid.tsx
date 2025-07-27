@@ -6,16 +6,16 @@ import type { ArrowData } from '@/lib/numerology';
 
 const ARROW_PATHS: { [key: string]: string } = {
     // Rows
-    "4-3-8": "M50 50 L150 50 L250 50",
-    "9-5-1": "M50 150 L150 150 L250 150",
-    "2-7-6": "M50 250 L150 250 L250 250",
+    "4-9-2": "M50 50 L150 50 L250 50",
+    "3-5-7": "M50 150 L150 150 L250 150",
+    "8-1-6": "M50 250 L150 250 L250 250",
     // Columns
-    "4-9-2": "M50 50 L50 150 L50 250",
-    "3-5-7": "M150 50 L150 150 L150 250",
-    "8-1-6": "M250 50 L250 150 L250 250",
+    "4-3-8": "M50 50 L50 150 L50 250",
+    "9-5-1": "M150 50 L150 150 L150 250",
+    "2-7-6": "M250 50 L250 150 L250 250",
     // Diagonals
-    "4-5-6": "M50 50 L150 150 L250 250",
     "2-5-8": "M50 250 L150 150 L250 50",
+    "4-5-6": "M50 50 L150 150 L250 250",
 };
 
 const PulsatingArrow = ({ path, delay, id }: { path: string, delay: number, id: string }) => {
@@ -71,7 +71,7 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                     const col = index % 3;
                     const cellContent = grid[row][col];
                     return (
-                        <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg">
+                        <div key={index} className="flex items-center justify-center text-3xl font-bold bg-black/20 rounded-lg h-full">
                             {cellContent || <span className="opacity-20">{loShuMap[row][col]}</span>}
                         </div>
                     );
@@ -81,7 +81,12 @@ export function LoShuGrid({ grid, arrows }: { grid: (string | null)[][], arrows:
                 <div className="relative w-full h-full">
                     {arrows.map((arrow, index) => {
                         const pathKey = arrow.numbers.join('-');
-                        const path = ARROW_PATHS[pathKey];
+                        // Handle cases where arrow numbers might be in a different order than the path key
+                        const sortedKey = arrow.numbers.sort((a,b) => a-b).join('-');
+                        const pathKeyReversed = [...arrow.numbers].reverse().join('-');
+
+                        const path = ARROW_PATHS[pathKey] || ARROW_PATHS[pathKeyReversed] || ARROW_PATHS[Object.keys(ARROW_PATHS).find(k => k.split('-').sort((a,b) => parseInt(a)-parseInt(b)).join('-') === sortedKey) || ""];
+                        
                         if (!path) return null;
                         const uniqueId = `${pathKey.replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
                         return <PulsatingArrow key={uniqueId} id={uniqueId} path={path} delay={index * 0.5} />;
