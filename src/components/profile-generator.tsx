@@ -402,9 +402,11 @@ function ResultsDisplay({
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
         <header className="text-center mb-6 relative">
-            <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
-                <History className="h-6 w-6"/>
-            </Button>
+             <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
+                    <History className="h-6 w-6"/>
+                </Button>
+            </SheetTrigger>
             <h1 
                 className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
             >
@@ -673,9 +675,3 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
-
-    
-
-
-
-
