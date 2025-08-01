@@ -266,3 +266,5 @@ As a parent, the Gemini/Pig is loving and generous, encouraging their children t
 As a boss, the Gemini/Pig is generous and inspiring but may be too trusting. As an employee, they are hardworking and creative but may need guidance to stay focused. Careers in hospitality, media, or design suit their cultured and versatile nature.`,
   },
 };
+
+    
