@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info, Swords, Sun, Moon, Zap, Hand, Heart, Link2, BrainCircuit, ShieldHalf, Anchor, Eye, Telescope, Lightbulb, Handshake, Shield, Hourglass, BarChart, FileText } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, BookOpen, Star, Users, Calendar, Compass, Gem, Hash, ChevronsUpDown, History, UserCheck, Volume2, StopCircle, Skull, Info, Swords, Sun, Moon, Zap, Hand, Heart, Link2, BrainCircuit, ShieldHalf, Anchor, Eye, Telescope, Lightbulb, Handshake, Shield, Hourglass, BarChart, FileText, Home, Briefcase, HeartHandshake } from 'lucide-react';
 import { getAstroInsightAction } from '@/app/actions';
 import type { AstroInsightInput, AstroInsightOutput } from '@/lib/astrology';
 import type { NumerologyData, ArrowData } from '@/lib/numerology';
@@ -20,6 +20,8 @@ import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import LoShuGrid from '@/components/lo-shu-grid';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { NEW_ASTROLOGY_DATA } from '@/lib/new-astrology';
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -394,6 +396,51 @@ const HistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
     </SheetTrigger>
 );
 
+function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
+    const categories = [
+        { key: 'description', title: 'Description', icon: <Info className="h-5 w-5" /> },
+        { key: 'love', title: 'Love', icon: <Heart className="h-5 w-5" /> },
+        { key: 'homeAndFamily', title: 'Home & Family', icon: <Home className="h-5 w-5" /> },
+        { key: 'profession', title: 'Profession', icon: <Briefcase className="h-5 w-5" /> },
+        { key: 'compatibilities', title: 'Compatibilities', icon: <HeartHandshake className="h-5 w-5" /> },
+    ];
+
+    if (!signData) {
+        return (
+            <div className="text-center text-gray-400">
+                <p>No detailed information available for {sign}.</p>
+                <p>Content is being prepared.</p>
+            </div>
+        );
+    }
+    
+    return (
+        <DialogContent className="max-w-2xl">
+            <DialogHeader>
+                <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
+                    {sign}
+                </DialogTitle>
+                <DialogDescription className="text-center text-gray-400">
+                    A detailed look into the combined traits of your unique astrological sign.
+                </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="h-[60vh] pr-4">
+                <div className="space-y-6 py-4">
+                    {categories.map(({ key, title, icon }) => (
+                        <div key={key} className="glass-card p-4 rounded-lg">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">{icon} {title}</h3>
+                            <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                                {signData[key]}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </ScrollArea>
+        </DialogContent>
+    );
+}
+
+
 function ResultsDisplay({
   insight,
   numerology,
@@ -407,6 +454,7 @@ function ResultsDisplay({
 }) {
   
   const [activeTab, setActiveTab] = React.useState<'astro' | 'numerology'>('astro');
+  const newAstroData = NEW_ASTROLOGY_DATA[insight.new_astrology_sign.replace(/\s+/g, '')];
 
   return (
     <motion.div 
@@ -415,15 +463,23 @@ function ResultsDisplay({
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-        <header className="text-center mb-6 relative">
-            <HistoryButton onHistoryOpen={onHistoryOpen} />
-            <h1 
-                className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
-            >
-                {insight.name}
-            </h1>
-            <p className="text-lg text-gray-400 mt-1">{insight.new_astrology_sign}</p>
-        </header>
+        <Dialog>
+            <header className="text-center mb-6 relative">
+                <HistoryButton onHistoryOpen={onHistoryOpen} />
+                <h1 
+                    className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
+                >
+                    {insight.name}
+                </h1>
+                <DialogTrigger asChild>
+                    <button className="text-lg text-gray-400 mt-1 hover:text-white transition-colors duration-300 underline underline-offset-4 decoration-dashed decoration-gray-500 hover:decoration-solid hover:decoration-primary">
+                        {insight.new_astrology_sign}
+                    </button>
+                </DialogTrigger>
+            </header>
+            <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
+        </Dialog>
+
 
         <nav className="flex justify-center gap-2 mb-6">
             <TabButton id="astro" activeTab={activeTab} setActiveTab={setActiveTab}>Astro Insights</TabButton>
