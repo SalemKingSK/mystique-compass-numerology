@@ -1,0 +1,88 @@
+// src/lib/new-astrology/scorpio.ts
+
+export const scorpio = {
+  "Scorpio/Rat": {
+    description: "PENDING SCORPIO/RAT DESCRIPTION",
+    love: "PENDING SCORPIO/RAT LOVE",
+    compatibilities: "PENDING SCORPIO/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/RAT HOME & FAMILY",
+    profession: "PENDING SCORPIO/RAT PROFESSION",
+  },
+  "Scorpio/Ox": {
+    description: "PENDING SCORPIO/OX DESCRIPTION",
+    love: "PENDING SCORPIO/OX LOVE",
+    compatibilities: "PENDING SCORPIO/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/OX HOME & FAMILY",
+    profession: "PENDING SCORPIO/OX PROFESSION",
+  },
+  "Scorpio/Tiger": {
+    description: "PENDING SCORPIO/TIGER DESCRIPTION",
+    love: "PENDING SCORPIO/TIGER LOVE",
+    compatibilities: "PENDING SCORPIO/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/TIGER HOME & FAMILY",
+    profession: "PENDING SCORPIO/TIGER PROFESSION",
+  },
+  "Scorpio/Rabbit": {
+    description: "PENDING SCORPIO/RABBIT DESCRIPTION",
+    love: "PENDING SCORPIO/RABBIT LOVE",
+    compatibilities: "PENDING SCORPIO/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/RABBIT HOME & FAMILY",
+    profession: "PENDING SCORPIO/RABBIT PROFESSION",
+  },
+  "Scorpio/Dragon": {
+    description: "PENDING SCORPIO/DRAGON DESCRIPTION",
+    love: "PENDING SCORPIO/DRAGON LOVE",
+    compatibilities: "PENDING SCORPIO/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/DRAGON HOME & FAMILY",
+    profession: "PENDING SCORPIO/DRAGON PROFESSION",
+  },
+  "Scorpio/Snake": {
+    description: "PENDING SCORPIO/SNAKE DESCRIPTION",
+    love: "PENDING SCORPIO/SNAKE LOVE",
+    compatibilities: "PENDING SCORPIO/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/SNAKE HOME & FAMILY",
+    profession: "PENDING SCORPIO/SNAKE PROFESSION",
+  },
+  "Scorpio/Horse": {
+    description: "PENDING SCORPIO/HORSE DESCRIPTION",
+    love: "PENDING SCORPIO/HORSE LOVE",
+    compatibilities: "PENDING SCORPIO/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/HORSE HOME & FAMILY",
+    profession: "PENDING SCORPIO/HORSE PROFESSION",
+  },
+  "Scorpio/Goat": {
+    description: "PENDING SCORPIO/GOAT DESCRIPTION",
+    love: "PENDING SCORPIO/GOAT LOVE",
+    compatibilities: "PENDING SCORPIO/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/GOAT HOME & FAMILY",
+    profession: "PENDING SCORPIO/GOAT PROFESSION",
+  },
+  "Scorpio/Monkey": {
+    description: "PENDING SCORPIO/MONKEY DESCRIPTION",
+    love: "PENDING SCORPIO/MONKEY LOVE",
+    compatibilities: "PENDING SCORPIO/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/MONKEY HOME & FAMILY",
+    profession: "PENDING SCORPIO/MONKEY PROFESSION",
+  },
+  "Scorpio/Rooster": {
+    description: "PENDING SCORPIO/ROOSTER DESCRIPTION",
+    love: "PENDING SCORPIO/ROOSTER LOVE",
+    compatibilities: "PENDING SCORPIO/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/ROOSTER HOME & FAMILY",
+    profession: "PENDING SCORPIO/ROOSTER PROFESSION",
+  },
+  "Scorpio/Dog": {
+    description: "PENDING SCORPIO/DOG DESCRIPTION",
+    love: "PENDING SCORPIO/DOG LOVE",
+    compatibilities: "PENDING SCORPIO/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/DOG HOME & FAMILY",
+    profession: "PENDING SCORPIO/DOG PROFESSION",
+  },
+  "Scorpio/Pig": {
+    description: "PENDING SCORPIO/PIG DESCRIPTION",
+    love: "PENDING SCORPIO/PIG LOVE",
+    compatibilities: "PENDING SCORPIO/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING SCORPIO/PIG HOME & FAMILY",
+    profession: "PENDING SCORPIO/PIG PROFESSION",
+  },
+};

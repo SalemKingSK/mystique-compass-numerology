@@ -1,0 +1,88 @@
+// src/lib/new-astrology/aquarius.ts
+
+export const aquarius = {
+  "Aquarius/Rat": {
+    description: "PENDING AQUARIUS/RAT DESCRIPTION",
+    love: "PENDING AQUARIUS/RAT LOVE",
+    compatibilities: "PENDING AQUARIUS/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/RAT HOME & FAMILY",
+    profession: "PENDING AQUARIUS/RAT PROFESSION",
+  },
+  "Aquarius/Ox": {
+    description: "PENDING AQUARIUS/OX DESCRIPTION",
+    love: "PENDING AQUARIUS/OX LOVE",
+    compatibilities: "PENDING AQUARIUS/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/OX HOME & FAMILY",
+    profession: "PENDING AQUARIUS/OX PROFESSION",
+  },
+  "Aquarius/Tiger": {
+    description: "PENDING AQUARIUS/TIGER DESCRIPTION",
+    love: "PENDING AQUARIUS/TIGER LOVE",
+    compatibilities: "PENDING AQUARIUS/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/TIGER HOME & FAMILY",
+    profession: "PENDING AQUARIUS/TIGER PROFESSION",
+  },
+  "Aquarius/Rabbit": {
+    description: "PENDING AQUARIUS/RABBIT DESCRIPTION",
+    love: "PENDING AQUARIUS/RABBIT LOVE",
+    compatibilities: "PENDING AQUARIUS/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/RABBIT HOME & FAMILY",
+    profession: "PENDING AQUARIUS/RABBIT PROFESSION",
+  },
+  "Aquarius/Dragon": {
+    description: "PENDING AQUARIUS/DRAGON DESCRIPTION",
+    love: "PENDING AQUARIUS/DRAGON LOVE",
+    compatibilities: "PENDING AQUARIUS/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/DRAGON HOME & FAMILY",
+    profession: "PENDING AQUARIUS/DRAGON PROFESSION",
+  },
+  "Aquarius/Snake": {
+    description: "PENDING AQUARIUS/SNAKE DESCRIPTION",
+    love: "PENDING AQUARIUS/SNAKE LOVE",
+    compatibilities: "PENDING AQUARIUS/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/SNAKE HOME & FAMILY",
+    profession: "PENDING AQUARIUS/SNAKE PROFESSION",
+  },
+  "Aquarius/Horse": {
+    description: "PENDING AQUARIUS/HORSE DESCRIPTION",
+    love: "PENDING AQUARIUS/HORSE LOVE",
+    compatibilities: "PENDING AQUARIUS/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/HORSE HOME & FAMILY",
+    profession: "PENDING AQUARIUS/HORSE PROFESSION",
+  },
+  "Aquarius/Goat": {
+    description: "PENDING AQUARIUS/GOAT DESCRIPTION",
+    love: "PENDING AQUARIUS/GOAT LOVE",
+    compatibilities: "PENDING AQUARIUS/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/GOAT HOME & FAMILY",
+    profession: "PENDING AQUARIUS/GOAT PROFESSION",
+  },
+  "Aquarius/Monkey": {
+    description: "PENDING AQUARIUS/MONKEY DESCRIPTION",
+    love: "PENDING AQUARIUS/MONKEY LOVE",
+    compatibilities: "PENDING AQUARIUS/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/MONKEY HOME & FAMILY",
+    profession: "PENDING AQUARIUS/MONKEY PROFESSION",
+  },
+  "Aquarius/Rooster": {
+    description: "PENDING AQUARIUS/ROOSTER DESCRIPTION",
+    love: "PENDING AQUARIUS/ROOSTER LOVE",
+    compatibilities: "PENDING AQUARIUS/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/ROOSTER HOME & FAMILY",
+    profession: "PENDING AQUARIUS/ROOSTER PROFESSION",
+  },
+  "Aquarius/Dog": {
+    description: "PENDING AQUARIUS/DOG DESCRIPTION",
+    love: "PENDING AQUARIUS/DOG LOVE",
+    compatibilities: "PENDING AQUARIUS/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/DOG HOME & FAMILY",
+    profession: "PENDING AQUARIUS/DOG PROFESSION",
+  },
+  "Aquarius/Pig": {
+    description: "PENDING AQUARIUS/PIG DESCRIPTION",
+    love: "PENDING AQUARIUS/PIG LOVE",
+    compatibilities: "PENDING AQUARIUS/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING AQUARIUS/PIG HOME & FAMILY",
+    profession: "PENDING AQUARIUS/PIG PROFESSION",
+  },
+};

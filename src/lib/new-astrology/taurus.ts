@@ -1,0 +1,88 @@
+// src/lib/new-astrology/taurus.ts
+
+export const taurus = {
+  "Taurus/Rat": {
+    description: "PENDING TAURUS/RAT DESCRIPTION",
+    love: "PENDING TAURUS/RAT LOVE",
+    compatibilities: "PENDING TAURUS/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/RAT HOME & FAMILY",
+    profession: "PENDING TAURUS/RAT PROFESSION",
+  },
+  "Taurus/Ox": {
+    description: "PENDING TAURUS/OX DESCRIPTION",
+    love: "PENDING TAURUS/OX LOVE",
+    compatibilities: "PENDING TAURUS/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/OX HOME & FAMILY",
+    profession: "PENDING TAURUS/OX PROFESSION",
+  },
+  "Taurus/Tiger": {
+    description: "PENDING TAURUS/TIGER DESCRIPTION",
+    love: "PENDING TAURUS/TIGER LOVE",
+    compatibilities: "PENDING TAURUS/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/TIGER HOME & FAMILY",
+    profession: "PENDING TAURUS/TIGER PROFESSION",
+  },
+  "Taurus/Rabbit": {
+    description: "PENDING TAURUS/RABBIT DESCRIPTION",
+    love: "PENDING TAURUS/RABBIT LOVE",
+    compatibilities: "PENDING TAURUS/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/RABBIT HOME & FAMILY",
+    profession: "PENDING TAURUS/RABBIT PROFESSION",
+  },
+  "Taurus/Dragon": {
+    description: "PENDING TAURUS/DRAGON DESCRIPTION",
+    love: "PENDING TAURUS/DRAGON LOVE",
+    compatibilities: "PENDING TAURUS/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/DRAGON HOME & FAMILY",
+    profession: "PENDING TAURUS/DRAGON PROFESSION",
+  },
+  "Taurus/Snake": {
+    description: "PENDING TAURUS/SNAKE DESCRIPTION",
+    love: "PENDING TAURUS/SNAKE LOVE",
+    compatibilities: "PENDING TAURUS/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/SNAKE HOME & FAMILY",
+    profession: "PENDING TAURUS/SNAKE PROFESSION",
+  },
+  "Taurus/Horse": {
+    description: "PENDING TAURUS/HORSE DESCRIPTION",
+    love: "PENDING TAURUS/HORSE LOVE",
+    compatibilities: "PENDING TAURUS/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/HORSE HOME & FAMILY",
+    profession: "PENDING TAURUS/HORSE PROFESSION",
+  },
+  "Taurus/Goat": {
+    description: "PENDING TAURUS/GOAT DESCRIPTION",
+    love: "PENDING TAURUS/GOAT LOVE",
+    compatibilities: "PENDING TAURUS/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/GOAT HOME & FAMILY",
+    profession: "PENDING TAURUS/GOAT PROFESSION",
+  },
+  "Taurus/Monkey": {
+    description: "PENDING TAURUS/MONKEY DESCRIPTION",
+    love: "PENDING TAURUS/MONKEY LOVE",
+    compatibilities: "PENDING TAURUS/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/MONKEY HOME & FAMILY",
+    profession: "PENDING TAURUS/MONKEY PROFESSION",
+  },
+  "Taurus/Rooster": {
+    description: "PENDING TAURUS/ROOSTER DESCRIPTION",
+    love: "PENDING TAURUS/ROOSTER LOVE",
+    compatibilities: "PENDING TAURUS/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/ROOSTER HOME & FAMILY",
+    profession: "PENDING TAURUS/ROOSTER PROFESSION",
+  },
+  "Taurus/Dog": {
+    description: "PENDING TAURUS/DOG DESCRIPTION",
+    love: "PENDING TAURUS/DOG LOVE",
+    compatibilities: "PENDING TAURUS/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/DOG HOME & FAMILY",
+    profession: "PENDING TAURUS/DOG PROFESSION",
+  },
+  "Taurus/Pig": {
+    description: "PENDING TAURUS/PIG DESCRIPTION",
+    love: "PENDING TAURUS/PIG LOVE",
+    compatibilities: "PENDING TAURUS/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING TAURUS/PIG HOME & FAMILY",
+    profession: "PENDING TAURUS/PIG PROFESSION",
+  },
+};

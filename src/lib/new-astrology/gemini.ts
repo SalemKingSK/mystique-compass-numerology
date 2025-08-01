@@ -1,0 +1,88 @@
+// src/lib/new-astrology/gemini.ts
+
+export const gemini = {
+  "Gemini/Rat": {
+    description: "PENDING GEMINI/RAT DESCRIPTION",
+    love: "PENDING GEMINI/RAT LOVE",
+    compatibilities: "PENDING GEMINI/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/RAT HOME & FAMILY",
+    profession: "PENDING GEMINI/RAT PROFESSION",
+  },
+  "Gemini/Ox": {
+    description: "PENDING GEMINI/OX DESCRIPTION",
+    love: "PENDING GEMINI/OX LOVE",
+    compatibilities: "PENDING GEMINI/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/OX HOME & FAMILY",
+    profession: "PENDING GEMINI/OX PROFESSION",
+  },
+  "Gemini/Tiger": {
+    description: "PENDING GEMINI/TIGER DESCRIPTION",
+    love: "PENDING GEMINI/TIGER LOVE",
+    compatibilities: "PENDING GEMINI/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/TIGER HOME & FAMILY",
+    profession: "PENDING GEMINI/TIGER PROFESSION",
+  },
+  "Gemini/Rabbit": {
+    description: "PENDING GEMINI/RABBIT DESCRIPTION",
+    love: "PENDING GEMINI/RABBIT LOVE",
+    compatibilities: "PENDING GEMINI/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/RABBIT HOME & FAMILY",
+    profession: "PENDING GEMINI/RABBIT PROFESSION",
+  },
+  "Gemini/Dragon": {
+    description: "PENDING GEMINI/DRAGON DESCRIPTION",
+    love: "PENDING GEMINI/DRAGON LOVE",
+    compatibilities: "PENDING GEMINI/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/DRAGON HOME & FAMILY",
+    profession: "PENDING GEMINI/DRAGON PROFESSION",
+  },
+  "Gemini/Snake": {
+    description: "PENDING GEMINI/SNAKE DESCRIPTION",
+    love: "PENDING GEMINI/SNAKE LOVE",
+    compatibilities: "PENDING GEMINI/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/SNAKE HOME & FAMILY",
+    profession: "PENDING GEMINI/SNAKE PROFESSION",
+  },
+  "Gemini/Horse": {
+    description: "PENDING GEMINI/HORSE DESCRIPTION",
+    love: "PENDING GEMINI/HORSE LOVE",
+    compatibilities: "PENDING GEMINI/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/HORSE HOME & FAMILY",
+    profession: "PENDING GEMINI/HORSE PROFESSION",
+  },
+  "Gemini/Goat": {
+    description: "PENDING GEMINI/GOAT DESCRIPTION",
+    love: "PENDING GEMINI/GOAT LOVE",
+    compatibilities: "PENDING GEMINI/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/GOAT HOME & FAMILY",
+    profession: "PENDING GEMINI/GOAT PROFESSION",
+  },
+  "Gemini/Monkey": {
+    description: "PENDING GEMINI/MONKEY DESCRIPTION",
+    love: "PENDING GEMINI/MONKEY LOVE",
+    compatibilities: "PENDING GEMINI/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/MONKEY HOME & FAMILY",
+    profession: "PENDING GEMINI/MONKEY PROFESSION",
+  },
+  "Gemini/Rooster": {
+    description: "PENDING GEMINI/ROOSTER DESCRIPTION",
+    love: "PENDING GEMINI/ROOSTER LOVE",
+    compatibilities: "PENDING GEMINI/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/ROOSTER HOME & FAMILY",
+    profession: "PENDING GEMINI/ROOSTER PROFESSION",
+  },
+  "Gemini/Dog": {
+    description: "PENDING GEMINI/DOG DESCRIPTION",
+    love: "PENDING GEMINI/DOG LOVE",
+    compatibilities: "PENDING GEMINI/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/DOG HOME & FAMILY",
+    profession: "PENDING GEMINI/DOG PROFESSION",
+  },
+  "Gemini/Pig": {
+    description: "PENDING GEMINI/PIG DESCRIPTION",
+    love: "PENDING GEMINI/PIG LOVE",
+    compatibilities: "PENDING GEMINI/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING GEMINI/PIG HOME & FAMILY",
+    profession: "PENDING GEMINI/PIG PROFESSION",
+  },
+};

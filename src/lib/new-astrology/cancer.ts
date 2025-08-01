@@ -1,0 +1,88 @@
+// src/lib/new-astrology/cancer.ts
+
+export const cancer = {
+  "Cancer/Rat": {
+    description: "PENDING CANCER/RAT DESCRIPTION",
+    love: "PENDING CANCER/RAT LOVE",
+    compatibilities: "PENDING CANCER/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/RAT HOME & FAMILY",
+    profession: "PENDING CANCER/RAT PROFESSION",
+  },
+  "Cancer/Ox": {
+    description: "PENDING CANCER/OX DESCRIPTION",
+    love: "PENDING CANCER/OX LOVE",
+    compatibilities: "PENDING CANCER/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/OX HOME & FAMILY",
+    profession: "PENDING CANCER/OX PROFESSION",
+  },
+  "Cancer/Tiger": {
+    description: "PENDING CANCER/TIGER DESCRIPTION",
+    love: "PENDING CANCER/TIGER LOVE",
+    compatibilities: "PENDING CANCER/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/TIGER HOME & FAMILY",
+    profession: "PENDING CANCER/TIGER PROFESSION",
+  },
+  "Cancer/Rabbit": {
+    description: "PENDING CANCER/RABBIT DESCRIPTION",
+    love: "PENDING CANCER/RABBIT LOVE",
+    compatibilities: "PENDING CANCER/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/RABBIT HOME & FAMILY",
+    profession: "PENDING CANCER/RABBIT PROFESSION",
+  },
+  "Cancer/Dragon": {
+    description: "PENDING CANCER/DRAGON DESCRIPTION",
+    love: "PENDING CANCER/DRAGON LOVE",
+    compatibilities: "PENDING CANCER/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/DRAGON HOME & FAMILY",
+    profession: "PENDING CANCER/DRAGON PROFESSION",
+  },
+  "Cancer/Snake": {
+    description: "PENDING CANCER/SNAKE DESCRIPTION",
+    love: "PENDING CANCER/SNAKE LOVE",
+    compatibilities: "PENDING CANCER/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/SNAKE HOME & FAMILY",
+    profession: "PENDING CANCER/SNAKE PROFESSION",
+  },
+  "Cancer/Horse": {
+    description: "PENDING CANCER/HORSE DESCRIPTION",
+    love: "PENDING CANCER/HORSE LOVE",
+    compatibilities: "PENDING CANCER/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/HORSE HOME & FAMILY",
+    profession: "PENDING CANCER/HORSE PROFESSION",
+  },
+  "Cancer/Goat": {
+    description: "PENDING CANCER/GOAT DESCRIPTION",
+    love: "PENDING CANCER/GOAT LOVE",
+    compatibilities: "PENDING CANCER/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/GOAT HOME & FAMILY",
+    profession: "PENDING CANCER/GOAT PROFESSION",
+  },
+  "Cancer/Monkey": {
+    description: "PENDING CANCER/MONKEY DESCRIPTION",
+    love: "PENDING CANCER/MONKEY LOVE",
+    compatibilities: "PENDING CANCER/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/MONKEY HOME & FAMILY",
+    profession: "PENDING CANCER/MONKEY PROFESSION",
+  },
+  "Cancer/Rooster": {
+    description: "PENDING CANCER/ROOSTER DESCRIPTION",
+    love: "PENDING CANCER/ROOSTER LOVE",
+    compatibilities: "PENDING CANCER/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/ROOSTER HOME & FAMILY",
+    profession: "PENDING CANCER/ROOSTER PROFESSION",
+  },
+  "Cancer/Dog": {
+    description: "PENDING CANCER/DOG DESCRIPTION",
+    love: "PENDING CANCER/DOG LOVE",
+    compatibilities: "PENDING CANCER/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/DOG HOME & FAMILY",
+    profession: "PENDING CANCER/DOG PROFESSION",
+  },
+  "Cancer/Pig": {
+    description: "PENDING CANCER/PIG DESCRIPTION",
+    love: "PENDING CANCER/PIG LOVE",
+    compatibilities: "PENDING CANCER/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING CANCER/PIG HOME & FAMILY",
+    profession: "PENDING CANCER/PIG PROFESSION",
+  },
+};

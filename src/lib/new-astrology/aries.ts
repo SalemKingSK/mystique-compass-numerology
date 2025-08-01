@@ -1,0 +1,88 @@
+// src/lib/new-astrology/aries.ts
+
+export const aries = {
+  "Aries/Rat": {
+    description: "PENDING ARIES/RAT DESCRIPTION",
+    love: "PENDING ARIES/RAT LOVE",
+    compatibilities: "PENDING ARIES/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/RAT HOME & FAMILY",
+    profession: "PENDING ARIES/RAT PROFESSION",
+  },
+  "Aries/Ox": {
+    description: "PENDING ARIES/OX DESCRIPTION",
+    love: "PENDING ARIES/OX LOVE",
+    compatibilities: "PENDING ARIES/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/OX HOME & FAMILY",
+    profession: "PENDING ARIES/OX PROFESSION",
+  },
+  "Aries/Tiger": {
+    description: "PENDING ARIES/TIGER DESCRIPTION",
+    love: "PENDING ARIES/TIGER LOVE",
+    compatibilities: "PENDING ARIES/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/TIGER HOME & FAMILY",
+    profession: "PENDING ARIES/TIGER PROFESSION",
+  },
+  "Aries/Rabbit": {
+    description: "PENDING ARIES/RABBIT DESCRIPTION",
+    love: "PENDING ARIES/RABBIT LOVE",
+    compatibilities: "PENDING ARIES/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/RABBIT HOME & FAMILY",
+    profession: "PENDING ARIES/RABBIT PROFESSION",
+  },
+  "Aries/Dragon": {
+    description: "PENDING ARIES/DRAGON DESCRIPTION",
+    love: "PENDING ARIES/DRAGON LOVE",
+    compatibilities: "PENDING ARIES/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/DRAGON HOME & FAMILY",
+    profession: "PENDING ARIES/DRAGON PROFESSION",
+  },
+  "Aries/Snake": {
+    description: "PENDING ARIES/SNAKE DESCRIPTION",
+    love: "PENDING ARIES/SNAKE LOVE",
+    compatibilities: "PENDING ARIES/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/SNAKE HOME & FAMILY",
+    profession: "PENDING ARIES/SNAKE PROFESSION",
+  },
+  "Aries/Horse": {
+    description: "PENDING ARIES/HORSE DESCRIPTION",
+    love: "PENDING ARIES/HORSE LOVE",
+    compatibilities: "PENDING ARIES/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/HORSE HOME & FAMILY",
+    profession: "PENDING ARIES/HORSE PROFESSION",
+  },
+  "Aries/Goat": {
+    description: "PENDING ARIES/GOAT DESCRIPTION",
+    love: "PENDING ARIES/GOAT LOVE",
+    compatibilities: "PENDING ARIES/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/GOAT HOME & FAMILY",
+    profession: "PENDING ARIES/GOAT PROFESSION",
+  },
+  "Aries/Monkey": {
+    description: "PENDING ARIES/MONKEY DESCRIPTION",
+    love: "PENDING ARIES/MONKEY LOVE",
+    compatibilities: "PENDING ARIES/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/MONKEY HOME & FAMILY",
+    profession: "PENDING ARIES/MONKEY PROFESSION",
+  },
+  "Aries/Rooster": {
+    description: "PENDING ARIES/ROOSTER DESCRIPTION",
+    love: "PENDING ARIES/ROOSTER LOVE",
+    compatibilities: "PENDING ARIES/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/ROOSTER HOME & FAMILY",
+    profession: "PENDING ARIES/ROOSTER PROFESSION",
+  },
+  "Aries/Dog": {
+    description: "PENDING ARIES/DOG DESCRIPTION",
+    love: "PENDING ARIES/DOG LOVE",
+    compatibilities: "PENDING ARIES/DOG COMPATIBilities",
+    homeAndFamily: "PENDING ARIES/DOG HOME & FAMILY",
+    profession: "PENDING ARIES/DOG PROFESSION",
+  },
+  "Aries/Pig": {
+    description: "PENDING ARIES/PIG DESCRIPTION",
+    love: "PENDING ARIES/PIG LOVE",
+    compatibilities: "PENDING ARIES/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING ARIES/PIG HOME & FAMILY",
+    profession: "PENDING ARIES/PIG PROFESSION",
+  },
+};

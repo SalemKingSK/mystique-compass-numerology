@@ -1,0 +1,88 @@
+// src/lib/new-astrology/virgo.ts
+
+export const virgo = {
+  "Virgo/Rat": {
+    description: "PENDING VIRGO/RAT DESCRIPTION",
+    love: "PENDING VIRGO/RAT LOVE",
+    compatibilities: "PENDING VIRGO/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/RAT HOME & FAMILY",
+    profession: "PENDING VIRGO/RAT PROFESSION",
+  },
+  "Virgo/Ox": {
+    description: "PENDING VIRGO/OX DESCRIPTION",
+    love: "PENDING VIRGO/OX LOVE",
+    compatibilities: "PENDING VIRGO/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/OX HOME & FAMILY",
+    profession: "PENDING VIRGO/OX PROFESSION",
+  },
+  "Virgo/Tiger": {
+    description: "PENDING VIRGO/TIGER DESCRIPTION",
+    love: "PENDING VIRGO/TIGER LOVE",
+    compatibilities: "PENDING VIRGO/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/TIGER HOME & FAMILY",
+    profession: "PENDING VIRGO/TIGER PROFESSION",
+  },
+  "Virgo/Rabbit": {
+    description: "PENDING VIRGO/RABBIT DESCRIPTION",
+    love: "PENDING VIRGO/RABBIT LOVE",
+    compatibilities: "PENDING VIRGO/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/RABBIT HOME & FAMILY",
+    profession: "PENDING VIRGO/RABBIT PROFESSION",
+  },
+  "Virgo/Dragon": {
+    description: "PENDING VIRGO/DRAGON DESCRIPTION",
+    love: "PENDING VIRGO/DRAGON LOVE",
+    compatibilities: "PENDING VIRGO/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/DRAGON HOME & FAMILY",
+    profession: "PENDING VIRGO/DRAGON PROFESSION",
+  },
+  "Virgo/Snake": {
+    description: "PENDING VIRGO/SNAKE DESCRIPTION",
+    love: "PENDING VIRGO/SNAKE LOVE",
+    compatibilities: "PENDING VIRGO/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/SNAKE HOME & FAMILY",
+    profession: "PENDING VIRGO/SNAKE PROFESSION",
+  },
+  "Virgo/Horse": {
+    description: "PENDING VIRGO/HORSE DESCRIPTION",
+    love: "PENDING VIRGO/HORSE LOVE",
+    compatibilities: "PENDING VIRGO/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/HORSE HOME & FAMILY",
+    profession: "PENDING VIRGO/HORSE PROFESSION",
+  },
+  "Virgo/Goat": {
+    description: "PENDING VIRGO/GOAT DESCRIPTION",
+    love: "PENDING VIRGO/GOAT LOVE",
+    compatibilities: "PENDING VIRGO/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/GOAT HOME & FAMILY",
+    profession: "PENDING VIRGO/GOAT PROFESSION",
+  },
+  "Virgo/Monkey": {
+    description: "PENDING VIRGO/MONKEY DESCRIPTION",
+    love: "PENDING VIRGO/MONKEY LOVE",
+    compatibilities: "PENDING VIRGO/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/MONKEY HOME & FAMILY",
+    profession: "PENDING VIRGO/MONKEY PROFESSION",
+  },
+  "Virgo/Rooster": {
+    description: "PENDING VIRGO/ROOSTER DESCRIPTION",
+    love: "PENDING VIRGO/ROOSTER LOVE",
+    compatibilities: "PENDING VIRGO/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/ROOSTER HOME & FAMILY",
+    profession: "PENDING VIRGO/ROOSTER PROFESSION",
+  },
+  "Virgo/Dog": {
+    description: "PENDING VIRGO/DOG DESCRIPTION",
+    love: "PENDING VIRGO/DOG LOVE",
+    compatibilities: "PENDING VIRGO/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/DOG HOME & FAMILY",
+    profession: "PENDING VIRGO/DOG PROFESSION",
+  },
+  "Virgo/Pig": {
+    description: "PENDING VIRGO/PIG DESCRIPTION",
+    love: "PENDING VIRGO/PIG LOVE",
+    compatibilities: "PENDING VIRGO/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING VIRGO/PIG HOME & FAMILY",
+    profession: "PENDING VIRGO/PIG PROFESSION",
+  },
+};

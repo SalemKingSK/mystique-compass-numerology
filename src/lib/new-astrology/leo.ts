@@ -1,0 +1,88 @@
+// src/lib/new-astrology/leo.ts
+
+export const leo = {
+  "Leo/Rat": {
+    description: "PENDING LEO/RAT DESCRIPTION",
+    love: "PENDING LEO/RAT LOVE",
+    compatibilities: "PENDING LEO/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/RAT HOME & FAMILY",
+    profession: "PENDING LEO/RAT PROFESSION",
+  },
+  "Leo/Ox": {
+    description: "PENDING LEO/OX DESCRIPTION",
+    love: "PENDING LEO/OX LOVE",
+    compatibilities: "PENDING LEO/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/OX HOME & FAMILY",
+    profession: "PENDING LEO/OX PROFESSION",
+  },
+  "Leo/Tiger": {
+    description: "PENDING LEO/TIGER DESCRIPTION",
+    love: "PENDING LEO/TIGER LOVE",
+    compatibilities: "PENDING LEO/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/TIGER HOME & FAMILY",
+    profession: "PENDING LEO/TIGER PROFESSION",
+  },
+  "Leo/Rabbit": {
+    description: "PENDING LEO/RABBIT DESCRIPTION",
+    love: "PENDING LEO/RABBIT LOVE",
+    compatibilities: "PENDING LEO/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/RABBIT HOME & FAMILY",
+    profession: "PENDING LEO/RABBIT PROFESSION",
+  },
+  "Leo/Dragon": {
+    description: "PENDING LEO/DRAGON DESCRIPTION",
+    love: "PENDING LEO/DRAGON LOVE",
+    compatibilities: "PENDING LEO/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/DRAGON HOME & FAMILY",
+    profession: "PENDING LEO/DRAGON PROFESSION",
+  },
+  "Leo/Snake": {
+    description: "PENDING LEO/SNAKE DESCRIPTION",
+    love: "PENDING LEO/SNAKE LOVE",
+    compatibilities: "PENDING LEO/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/SNAKE HOME & FAMILY",
+    profession: "PENDING LEO/SNAKE PROFESSION",
+  },
+  "Leo/Horse": {
+    description: "PENDING LEO/HORSE DESCRIPTION",
+    love: "PENDING LEO/HORSE LOVE",
+    compatibilities: "PENDING LEO/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/HORSE HOME & FAMILY",
+    profession: "PENDING LEO/HORSE PROFESSION",
+  },
+  "Leo/Goat": {
+    description: "PENDING LEO/GOAT DESCRIPTION",
+    love: "PENDING LEO/GOAT LOVE",
+    compatibilities: "PENDING LEO/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/GOAT HOME & FAMILY",
+    profession: "PENDING LEO/GOAT PROFESSION",
+  },
+  "Leo/Monkey": {
+    description: "PENDING LEO/MONKEY DESCRIPTION",
+    love: "PENDING LEO/MONKEY LOVE",
+    compatibilities: "PENDING LEO/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/MONKEY HOME & FAMILY",
+    profession: "PENDING LEO/MONKEY PROFESSION",
+  },
+  "Leo/Rooster": {
+    description: "PENDING LEO/ROOSTER DESCRIPTION",
+    love: "PENDING LEO/ROOSTER LOVE",
+    compatibilities: "PENDING LEO/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/ROOSTER HOME & FAMILY",
+    profession: "PENDING LEO/ROOSTER PROFESSION",
+  },
+  "Leo/Dog": {
+    description: "PENDING LEO/DOG DESCRIPTION",
+    love: "PENDING LEO/DOG LOVE",
+    compatibilities: "PENDING LEO/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/DOG HOME & FAMILY",
+    profession: "PENDING LEO/DOG PROFESSION",
+  },
+  "Leo/Pig": {
+    description: "PENDING LEO/PIG DESCRIPTION",
+    love: "PENDING LEO/PIG LOVE",
+    compatibilities: "PENDING LEO/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING LEO/PIG HOME & FAMILY",
+    profession: "PENDING LEO/PIG PROFESSION",
+  },
+};

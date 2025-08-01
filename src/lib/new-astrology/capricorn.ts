@@ -1,0 +1,88 @@
+// src/lib/new-astrology/capricorn.ts
+
+export const capricorn = {
+  "Capricorn/Rat": {
+    description: "PENDING CAPRICORN/RAT DESCRIPTION",
+    love: "PENDING CAPRICORN/RAT LOVE",
+    compatibilities: "PENDING CAPRICORN/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/RAT HOME & FAMILY",
+    profession: "PENDING CAPRICORN/RAT PROFESSION",
+  },
+  "Capricorn/Ox": {
+    description: "PENDING CAPRICORN/OX DESCRIPTION",
+    love: "PENDING CAPRICORN/OX LOVE",
+    compatibilities: "PENDING CAPRICORN/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/OX HOME & FAMILY",
+    profession: "PENDING CAPRICORN/OX PROFESSION",
+  },
+  "Capricorn/Tiger": {
+    description: "PENDING CAPRICORN/TIGER DESCRIPTION",
+    love: "PENDING CAPRICORN/TIGER LOVE",
+    compatibilities: "PENDING CAPRICORN/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/TIGER HOME & FAMILY",
+    profession: "PENDING CAPRICORN/TIGER PROFESSION",
+  },
+  "Capricorn/Rabbit": {
+    description: "PENDING CAPRICORN/RABBIT DESCRIPTION",
+    love: "PENDING CAPRICORN/RABBIT LOVE",
+    compatibilities: "PENDING CAPRICORN/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/RABBIT HOME & FAMILY",
+    profession: "PENDING CAPRICORN/RABBIT PROFESSION",
+  },
+  "Capricorn/Dragon": {
+    description: "PENDING CAPRICORN/DRAGON DESCRIPTION",
+    love: "PENDING CAPRICORN/DRAGON LOVE",
+    compatibilities: "PENDING CAPRICORN/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/DRAGON HOME & FAMILY",
+    profession: "PENDING CAPRICORN/DRAGON PROFESSION",
+  },
+  "Capricorn/Snake": {
+    description: "PENDING CAPRICORN/SNAKE DESCRIPTION",
+    love: "PENDING CAPRICORN/SNAKE LOVE",
+    compatibilities: "PENDING CAPRICORN/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/SNAKE HOME & FAMILY",
+    profession: "PENDING CAPRICORN/SNAKE PROFESSION",
+  },
+  "Capricorn/Horse": {
+    description: "PENDING CAPRICORN/HORSE DESCRIPTION",
+    love: "PENDING CAPRICORN/HORSE LOVE",
+    compatibilities: "PENDING CAPRICORN/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/HORSE HOME & FAMILY",
+    profession: "PENDING CAPRICORN/HORSE PROFESSION",
+  },
+  "Capricorn/Goat": {
+    description: "PENDING CAPRICORN/GOAT DESCRIPTION",
+    love: "PENDING CAPRICORN/GOAT LOVE",
+    compatibilities: "PENDING CAPRICORN/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/GOAT HOME & FAMILY",
+    profession: "PENDING CAPRICORN/GOAT PROFESSION",
+  },
+  "Capricorn/Monkey": {
+    description: "PENDING CAPRICORN/MONKEY DESCRIPTION",
+    love: "PENDING CAPRICORN/MONKEY LOVE",
+    compatibilities: "PENDING CAPRICORN/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/MONKEY HOME & FAMILY",
+    profession: "PENDING CAPRICORN/MONKEY PROFESSION",
+  },
+  "Capricorn/Rooster": {
+    description: "PENDING CAPRICORN/ROOSTER DESCRIPTION",
+    love: "PENDING CAPRICORN/ROOSTER LOVE",
+    compatibilities: "PENDING CAPRICORN/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/ROOSTER HOME & FAMILY",
+    profession: "PENDING CAPRICORN/ROOSTER PROFESSION",
+  },
+  "Capricorn/Dog": {
+    description: "PENDING CAPRICORN/DOG DESCRIPTION",
+    love: "PENDING CAPRICORN/DOG LOVE",
+    compatibilities: "PENDING CAPRICORN/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/DOG HOME & FAMILY",
+    profession: "PENDING CAPRICORN/DOG PROFESSION",
+  },
+  "Capricorn/Pig": {
+    description: "PENDING CAPRICORN/PIG DESCRIPTION",
+    love: "PENDING CAPRICORN/PIG LOVE",
+    compatibilities: "PENDING CAPRICORN/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING CAPRICORN/PIG HOME & FAMILY",
+    profession: "PENDING CAPRICORN/PIG PROFESSION",
+  },
+};

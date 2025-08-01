@@ -1,0 +1,88 @@
+// src/lib/new-astrology/libra.ts
+
+export const libra = {
+  "Libra/Rat": {
+    description: "PENDING LIBRA/RAT DESCRIPTION",
+    love: "PENDING LIBRA/RAT LOVE",
+    compatibilities: "PENDING LIBRA/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/RAT HOME & FAMILY",
+    profession: "PENDING LIBRA/RAT PROFESSION",
+  },
+  "Libra/Ox": {
+    description: "PENDING LIBRA/OX DESCRIPTION",
+    love: "PENDING LIBRA/OX LOVE",
+    compatibilities: "PENDING LIBRA/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/OX HOME & FAMILY",
+    profession: "PENDING LIBRA/OX PROFESSION",
+  },
+  "Libra/Tiger": {
+    description: "PENDING LIBRA/TIGER DESCRIPTION",
+    love: "PENDING LIBRA/TIGER LOVE",
+    compatibilities: "PENDING LIBRA/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/TIGER HOME & FAMILY",
+    profession: "PENDING LIBRA/TIGER PROFESSION",
+  },
+  "Libra/Rabbit": {
+    description: "PENDING LIBRA/RABBIT DESCRIPTION",
+    love: "PENDING LIBRA/RABBIT LOVE",
+    compatibilities: "PENDING LIBRA/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/RABBIT HOME & FAMILY",
+    profession: "PENDING LIBRA/RABBIT PROFESSION",
+  },
+  "Libra/Dragon": {
+    description: "PENDING LIBRA/DRAGON DESCRIPTION",
+    love: "PENDING LIBRA/DRAGON LOVE",
+    compatibilities: "PENDING LIBRA/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/DRAGON HOME & FAMILY",
+    profession: "PENDING LIBRA/DRAGON PROFESSION",
+  },
+  "Libra/Snake": {
+    description: "PENDING LIBRA/SNAKE DESCRIPTION",
+    love: "PENDING LIBRA/SNAKE LOVE",
+    compatibilities: "PENDING LIBRA/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/SNAKE HOME & FAMILY",
+    profession: "PENDING LIBRA/SNAKE PROFESSION",
+  },
+  "Libra/Horse": {
+    description: "PENDING LIBRA/HORSE DESCRIPTION",
+    love: "PENDING LIBRA/HORSE LOVE",
+    compatibilities: "PENDING LIBRA/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/HORSE HOME & FAMILY",
+    profession: "PENDING LIBRA/HORSE PROFESSION",
+  },
+  "Libra/Goat": {
+    description: "PENDING LIBRA/GOAT DESCRIPTION",
+    love: "PENDING LIBRA/GOAT LOVE",
+    compatibilities: "PENDING LIBRA/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/GOAT HOME & FAMILY",
+    profession: "PENDING LIBRA/GOAT PROFESSION",
+  },
+  "Libra/Monkey": {
+    description: "PENDING LIBRA/MONKEY DESCRIPTION",
+    love: "PENDING LIBRA/MONKEY LOVE",
+    compatibilities: "PENDING LIBRA/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/MONKEY HOME & FAMILY",
+    profession: "PENDING LIBRA/MONKEY PROFESSION",
+  },
+  "Libra/Rooster": {
+    description: "PENDING LIBRA/ROOSTER DESCRIPTION",
+    love: "PENDING LIBRA/ROOSTER LOVE",
+    compatibilities: "PENDING LIBRA/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/ROOSTER HOME & FAMILY",
+    profession: "PENDING LIBRA/ROOSTER PROFESSION",
+  },
+  "Libra/Dog": {
+    description: "PENDING LIBRA/DOG DESCRIPTION",
+    love: "PENDING LIBRA/DOG LOVE",
+    compatibilities: "PENDING LIBRA/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/DOG HOME & FAMILY",
+    profession: "PENDING LIBRA/DOG PROFESSION",
+  },
+  "Libra/Pig": {
+    description: "PENDING LIBRA/PIG DESCRIPTION",
+    love: "PENDING LIBRA/PIG LOVE",
+    compatibilities: "PENDING LIBRA/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING LIBRA/PIG HOME & FAMILY",
+    profession: "PENDING LIBRA/PIG PROFESSION",
+  },
+};

@@ -1,0 +1,88 @@
+// src/lib/new-astrology/pisces.ts
+
+export const pisces = {
+  "Pisces/Rat": {
+    description: "PENDING PISCES/RAT DESCRIPTION",
+    love: "PENDING PISCES/RAT LOVE",
+    compatibilities: "PENDING PISCES/RAT COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/RAT HOME & FAMILY",
+    profession: "PENDING PISCES/RAT PROFESSION",
+  },
+  "Pisces/Ox": {
+    description: "PENDING PISCES/OX DESCRIPTION",
+    love: "PENDING PISCES/OX LOVE",
+    compatibilities: "PENDING PISCES/OX COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/OX HOME & FAMILY",
+    profession: "PENDING PISCES/OX PROFESSION",
+  },
+  "Pisces/Tiger": {
+    description: "PENDING PISCES/TIGER DESCRIPTION",
+    love: "PENDING PISCES/TIGER LOVE",
+    compatibilities: "PENDING PISCES/TIGER COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/TIGER HOME & FAMILY",
+    profession: "PENDING PISCES/TIGER PROFESSION",
+  },
+  "Pisces/Rabbit": {
+    description: "PENDING PISCES/RABBIT DESCRIPTION",
+    love: "PENDING PISCES/RABBIT LOVE",
+    compatibilities: "PENDING PISCES/RABBIT COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/RABBIT HOME & FAMILY",
+    profession: "PENDING PISCES/RABBIT PROFESSION",
+  },
+  "Pisces/Dragon": {
+    description: "PENDING PISCES/DRAGON DESCRIPTION",
+    love: "PENDING PISCES/DRAGON LOVE",
+    compatibilities: "PENDING PISCES/DRAGON COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/DRAGON HOME & FAMILY",
+    profession: "PENDING PISCES/DRAGON PROFESSION",
+  },
+  "Pisces/Snake": {
+    description: "PENDING PISCES/SNAKE DESCRIPTION",
+    love: "PENDING PISCES/SNAKE LOVE",
+    compatibilities: "PENDING PISCES/SNAKE COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/SNAKE HOME & FAMILY",
+    profession: "PENDING PISCES/SNAKE PROFESSION",
+  },
+  "Pisces/Horse": {
+    description: "PENDING PISCES/HORSE DESCRIPTION",
+    love: "PENDING PISCES/HORSE LOVE",
+    compatibilities: "PENDING PISCES/HORSE COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/HORSE HOME & FAMILY",
+    profession: "PENDING PISCES/HORSE PROFESSION",
+  },
+  "Pisces/Goat": {
+    description: "PENDING PISCES/GOAT DESCRIPTION",
+    love: "PENDING PISCES/GOAT LOVE",
+    compatibilities: "PENDING PISCES/GOAT COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/GOAT HOME & FAMILY",
+    profession: "PENDING PISCES/GOAT PROFESSION",
+  },
+  "Pisces/Monkey": {
+    description: "PENDING PISCES/MONKEY DESCRIPTION",
+    love: "PENDING PISCES/MONKEY LOVE",
+    compatibilities: "PENDING PISCES/MONKEY COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/MONKEY HOME & FAMILY",
+    profession: "PENDING PISCES/MONKEY PROFESSION",
+  },
+  "Pisces/Rooster": {
+    description: "PENDING PISCES/ROOSTER DESCRIPTION",
+    love: "PENDING PISCES/ROOSTER LOVE",
+    compatibilities: "PENDING PISCES/ROOSTER COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/ROOSTER HOME & FAMILY",
+    profession: "PENDING PISCES/ROOSTER PROFESSION",
+  },
+  "Pisces/Dog": {
+    description: "PENDING PISCES/DOG DESCRIPTION",
+    love: "PENDING PISCES/DOG LOVE",
+    compatibilities: "PENDING PISCES/DOG COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/DOG HOME & FAMILY",
+    profession: "PENDING PISCES/DOG PROFESSION",
+  },
+  "Pisces/Pig": {
+    description: "PENDING PISCES/PIG DESCRIPTION",
+    love: "PENDING PISCES/PIG LOVE",
+    compatibilities: "PENDING PISCES/PIG COMPATIBILITIES",
+    homeAndFamily: "PENDING PISCES/PIG HOME & FAMILY",
+    profession: "PENDING PISCES/PIG PROFESSION",
+  },
+};
