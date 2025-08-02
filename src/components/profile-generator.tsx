@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -396,6 +397,14 @@ const HistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
 );
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
+    const categories = [
+        { key: 'description', title: 'Description', icon: <Info className="h-5 w-5" /> },
+        { key: 'love', title: 'Love', icon: <Heart className="h-5 w-5" /> },
+        { key: 'homeAndFamily', title: 'Home & Family', icon: <Home className="h-5 w-5" /> },
+        { key: 'profession', title: 'Profession', icon: <Briefcase className="h-5 w-5" /> },
+        { key: 'compatibilities', title: 'Compatibilities', icon: <HeartHandshake className="h-5 w-5" /> },
+    ];
+
     if (!signData) {
         return (
              <DialogContent className="max-w-2xl">
@@ -412,14 +421,6 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         );
     }
     
-    const categories = [
-        { key: 'description', title: 'Description', icon: <Info className="h-5 w-5" /> },
-        { key: 'love', title: 'Love', icon: <Heart className="h-5 w-5" /> },
-        { key: 'homeAndFamily', title: 'Home & Family', icon: <Home className="h-5 w-5" /> },
-        { key: 'profession', title: 'Profession', icon: <Briefcase className="h-5 w-5" /> },
-        { key: 'compatibilities', title: 'Compatibilities', icon: <HeartHandshake className="h-5 w-5" /> },
-    ];
-
     return (
         <DialogContent className="max-w-3xl">
             <DialogHeader>
@@ -443,9 +444,10 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                         <div className="glass-card p-4">
                              <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">{cat.icon} {cat.title}</h3>
                              <ScrollArea className="h-72 pr-3">
-                                 <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                                     {signData[cat.key]}
-                                 </p>
+                                 <SpeechPlayer 
+                                     text={signData[cat.key]} 
+                                     elementId={`new-astro-${cat.key}-speech`}
+                                 />
                             </ScrollArea>
                         </div>
                      </TabsContent>
