@@ -388,13 +388,24 @@ function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     );
   }
 
-const HistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
+const FormHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
     <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute top-0 right-0 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
+        <Button variant="ghost" size="icon" className="absolute top-4 right-4 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
             <History className="h-6 w-6"/>
+            <span className="sr-only">Open History</span>
         </Button>
     </SheetTrigger>
 );
+
+const ResultsHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
+  <SheetTrigger asChild>
+    <Button variant="outline" size="icon" className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg text-primary bg-background/70 backdrop-blur-sm" onClick={onHistoryOpen}>
+      <History className="h-7 w-7"/>
+      <span className="sr-only">Open History</span>
+    </Button>
+  </SheetTrigger>
+);
+
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
     const categories = [
@@ -402,7 +413,6 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         { key: 'love', title: 'Love', icon: <Heart className="h-5 w-5" /> },
         { key: 'homeAndFamily', title: 'Home & Family', icon: <Home className="h-5 w-5" /> },
         { key: 'profession', title: 'Profession', icon: <Briefcase className="h-5 w-5" /> },
-        { key: 'compatibilities', title: 'Compatibilities', icon: <HeartHandshake className="h-5 w-5" /> },
     ];
 
     if (!signData) {
@@ -421,13 +431,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         );
     }
     
-    const [activeTab, setActiveTab] = React.useState(categories[2].key); // Default to middle
-    const activeIndex = categories.findIndex(c => c.key === activeTab);
-    
-    const cycleTab = (direction: 'next' | 'prev') => {
-        const newIndex = (activeIndex + (direction === 'next' ? 1 : -1) + categories.length) % categories.length;
-        setActiveTab(categories[newIndex].key);
-    };
+    const [activeTab, setActiveTab] = React.useState(categories[0].key);
 
     return (
         <DialogContent className="max-w-3xl">
@@ -440,70 +444,34 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                 </DialogDescription>
             </DialogHeader>
 
-            <div className="relative h-28 flex items-center justify-center overflow-hidden">
-                {[-2, -1, 0, 1, 2].map((offset) => {
-                    const index = (activeIndex + offset + categories.length) % categories.length;
-                    const category = categories[index];
-                    const isActive = offset === 0;
-                    
-                    return (
-                        <motion.button
-                            key={category.key}
-                            onClick={() => setActiveTab(category.key)}
-                            className={cn(
-                                "absolute text-center transition-all duration-500",
-                                isActive ? "z-10" : "z-0"
-                            )}
-                            initial={false}
-                            animate={{
-                                x: `${offset * 70}%`, // Horizontal spread
-                                y: `${Math.abs(offset) * 20}%`, // Arc effect
-                                scale: isActive ? 1.2 : 0.8,
-                                opacity: isActive ? 1 : 0.4,
-                            }}
-                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        >
-                            <div className={cn(
-                                "flex flex-col items-center justify-center p-2 rounded-lg w-28 h-20 transition-colors duration-300",
-                                isActive ? "text-primary font-bold" : "text-gray-400"
-                            )}>
-                                {React.cloneElement(category.icon, { className: cn("h-6 w-6 mb-1 transition-all", isActive ? "h-7 w-7" : "h-5 w-5") })}
-                                <span className={cn("text-xs transition-all", isActive ? "font-semibold" : "")}>{category.title}</span>
-                            </div>
-                        </motion.button>
-                    );
-                })}
-                 <Button variant="ghost" size="icon" className="absolute left-0 z-20" onClick={() => cycleTab('prev')}><ChevronLeft /></Button>
-                <Button variant="ghost" size="icon" className="absolute right-0 z-20" onClick={() => cycleTab('next')}><ChevronRight /></Button>
-            </div>
-            
-            <AnimatePresence mode="wait">
-                 <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                 >
-                     <div className="glass-card p-4 min-h-[300px]">
-                         <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-                             {categories[activeIndex].icon} {categories[activeIndex].title}
-                         </h3>
-                         <ScrollArea className="h-60 pr-3">
-                             <SpeechPlayer 
-                                 text={signData[activeTab] || `Content for ${activeTab} is being prepared.`} 
-                                 elementId={`new-astro-${activeTab}-speech`}
-                             />
-                        </ScrollArea>
-                    </div>
-                 </motion.div>
-            </AnimatePresence>
-
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2">
+                    {categories.map(category => (
+                        <TabsTrigger key={category.key} value={category.key} className="flex-1 text-xs sm:text-sm">
+                             {React.cloneElement(category.icon, { className: "mr-2 h-4 w-4" })}
+                             {category.title}
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+                {categories.map(category => (
+                    <TabsContent key={category.key} value={category.key}>
+                        <div className="glass-card p-4 min-h-[300px] mt-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+                                {React.cloneElement(category.icon, { className: "h-5 w-5" })} {category.title}
+                            </h3>
+                            <ScrollArea className="h-60 pr-3">
+                                <SpeechPlayer 
+                                    text={signData[category.key] || `Content for ${category.key} is being prepared.`} 
+                                    elementId={`new-astro-${category.key}-speech`}
+                                />
+                           </ScrollArea>
+                       </div>
+                    </TabsContent>
+                ))}
+            </Tabs>
         </DialogContent>
     );
 }
-
-
 
 function ResultsDisplay({
   insight,
@@ -522,61 +490,64 @@ function ResultsDisplay({
 
   return (
     <motion.div 
+        className="results-background-image"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-        <Dialog>
-            <header className="text-center mb-6 relative">
-                <HistoryButton onHistoryOpen={onHistoryOpen} />
-                <h1 
-                    className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
+        <div className="relative z-10 p-4 sm:p-8">
+            <Dialog>
+                <header className="text-center mb-6 relative">
+                    <h1 
+                        className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
+                    >
+                        {insight.name}
+                    </h1>
+                    <div className="relative inline-block mt-1 group">
+                         <DialogTrigger asChild>
+                             <motion.div className="animated-border">
+                                <button className="text-lg w-full h-full px-4 py-2 bg-[hsl(var(--bg-dark-hsl))] text-gray-400 hover:text-white transition-colors duration-300 underline underline-offset-4 decoration-dashed decoration-gray-500 hover:decoration-solid hover:decoration-primary">
+                                    {insight.new_astrology_sign}
+                                </button>
+                            </motion.div>
+                        </DialogTrigger>
+                    </div>
+                </header>
+                <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
+            </Dialog>
+
+
+            <nav className="flex justify-center gap-2 mb-6">
+                <TabButton id="astro" activeTab={activeTab} setActiveTab={setActiveTab}>Astro Insights</TabButton>
+                {numerology && <TabButton id="numerology" activeTab={activeTab} setActiveTab={setActiveTab}>Numerology Report</TabButton>}
+            </nav>
+
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
                 >
-                    {insight.name}
-                </h1>
-                <div className="relative inline-block mt-1 group">
-                     <DialogTrigger asChild>
-                         <div className="relative inline-block mt-1 group animated-border">
-                            <button className="text-lg w-full h-full px-4 py-2 bg-[hsl(var(--bg-dark-hsl))] text-gray-400 hover:text-white transition-colors duration-300 underline underline-offset-4 decoration-dashed decoration-gray-500 hover:decoration-solid hover:decoration-primary">
-                                {insight.new_astrology_sign}
-                            </button>
-                        </div>
-                    </DialogTrigger>
-                </div>
-            </header>
-            <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
-        </Dialog>
+                    {activeTab === 'astro' && (
+                        <AstroDisplay insight={insight} />
+                    )}
 
+                    {activeTab === 'numerology' && numerology && (
+                        <NumerologyDisplay numerology={numerology} />
+                    )}
+                </motion.div>
+            </AnimatePresence>
 
-        <nav className="flex justify-center gap-2 mb-6">
-            <TabButton id="astro" activeTab={activeTab} setActiveTab={setActiveTab}>Astro Insights</TabButton>
-            {numerology && <TabButton id="numerology" activeTab={activeTab} setActiveTab={setActiveTab}>Numerology Report</TabButton>}
-        </nav>
-
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-            >
-                {activeTab === 'astro' && (
-                    <AstroDisplay insight={insight} />
-                )}
-
-                {activeTab === 'numerology' && numerology && (
-                    <NumerologyDisplay numerology={numerology} />
-                )}
-            </motion.div>
-        </AnimatePresence>
-
-        <footer className="text-center mt-8">
-            <Button onClick={onReset} variant="outline" className="text-primary text-lg">
-              ← Create a New Profile
-            </Button>
-      </footer>
+            <footer className="text-center mt-8">
+                <Button onClick={onReset} variant="outline" className="text-primary text-lg">
+                  ← Create a New Profile
+                </Button>
+          </footer>
+        </div>
+        <ResultsHistoryButton onHistoryOpen={onHistoryOpen} />
     </motion.div>
   );
 }
@@ -723,14 +694,14 @@ export function ProfileGenerator() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="glass-card p-6"
+            className="glass-card p-6 md:p-8"
           >
-            <form onSubmit={handleSubmit}>
-              <header className="text-center mb-6 relative">
-                 <HistoryButton onHistoryOpen={() => setIsHistoryOpen(true)} />
+            <form onSubmit={handleSubmit} className="relative">
+              <header className="text-center mb-6">
                  <h2 className="text-2xl font-bold text-white">Mystique Compass</h2>
                  <p className="text-gray-400">Giving your Life a meaning.</p>
               </header>
+              <FormHistoryButton onHistoryOpen={() => setIsHistoryOpen(true)} />
 
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -804,5 +775,6 @@ export function ProfileGenerator() {
     
 
     
+
 
 
