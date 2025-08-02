@@ -397,6 +397,22 @@ const HistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
 );
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
+    if (!signData) {
+        return (
+             <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
+                        {sign}
+                    </DialogTitle>
+                </DialogHeader>
+                <div className="text-center text-gray-400 py-8">
+                    <p>No detailed information available for {sign}.</p>
+                    <p>Content is being prepared.</p>
+                </div>
+            </DialogContent>
+        );
+    }
+    
     const categories = [
         { key: 'description', title: 'Description', icon: <Info className="h-5 w-5" /> },
         { key: 'love', title: 'Love', icon: <Heart className="h-5 w-5" /> },
@@ -405,37 +421,35 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         { key: 'compatibilities', title: 'Compatibilities', icon: <HeartHandshake className="h-5 w-5" /> },
     ];
 
-    if (!signData) {
-        return (
-            <div className="text-center text-gray-400">
-                <p>No detailed information available for {sign}.</p>
-                <p>Content is being prepared.</p>
-            </div>
-        );
-    }
-    
     return (
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl">
             <DialogHeader>
                 <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
                 </DialogTitle>
-                <DialogDescription className="text-center text-gray-400">
+                <DialogDescription className="text-center text-gray-400 !mt-2">
                     A detailed look into the combined traits of your unique astrological sign.
                 </DialogDescription>
             </DialogHeader>
-            <ScrollArea className="h-[60vh] pr-4">
-                <div className="space-y-6 py-4">
-                    {categories.map(({ key, title, icon }) => (
-                        <div key={key} className="glass-card p-4 rounded-lg">
-                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">{icon} {title}</h3>
-                            <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                                {signData[key]}
-                            </p>
-                        </div>
+            <Tabs defaultValue="description" className="w-full pt-4">
+                <TabsList className="grid w-full grid-cols-5">
+                    {categories.map(cat => (
+                        <TabsTrigger key={cat.key} value={cat.key}>{cat.title}</TabsTrigger>
                     ))}
-                </div>
-            </ScrollArea>
+                </TabsList>
+                {categories.map(cat => (
+                     <TabsContent key={cat.key} value={cat.key} className="mt-4">
+                        <div className="glass-card p-4">
+                             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">{cat.icon} {cat.title}</h3>
+                             <ScrollArea className="h-72 pr-3">
+                                 <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                                     {signData[cat.key]}
+                                 </p>
+                            </ScrollArea>
+                        </div>
+                     </TabsContent>
+                ))}
+            </Tabs>
         </DialogContent>
     );
 }
