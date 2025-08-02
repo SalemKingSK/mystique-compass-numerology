@@ -23,32 +23,74 @@ The Leo/Rat child will be demanding and bright. He or she needs lots of very top
 This sign’s inborn desire to assist his fellows and exert beneficent power qualifies Leo/Rat for all political positions—especially president. He may also make a fine professor whose sideline is writing books and making speeches around the world on his pet subject. Of course the Leo/Rat will make an excellent owner of any type of business and could even be a very successful gentleman farmer on a grand scale. He won’t be too handy at manual tasks. He prefers to be in a position to pay people to fix things for him.`,
   },
   "Leo/Ox": {
-    description: "PENDING LEO/OX DESCRIPTION",
-    love: "PENDING LEO/OX LOVE",
-    compatibilities: "PENDING LEO/OX COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/OX HOME & FAMILY",
-    profession: "PENDING LEO/OX PROFESSION",
+    description: `Leo/Oxen are solid citizens. They don’t make waves and they don’t seek the spotlight either. But they always seem to get a lot of attention anyway. I guess it’s their robust and durable nature that attracts. A Leo/Ox is not a frail or retiring sort of person. This character is built to last. The Leo/Ox will be found at the head of his class, his regiment, his newspaper, his political party or his family. This person is a natural-born leader who, despite his apparent reserve, loves to wield authority over groups of any size.
+
+The Leo/Ox is a powerhouse of energy and goodwill. He’s also rather serious and not easily amused. This is a sober sort of person who doesn’t undertake any enterprise without first carefully examining all sides of the question. Leo/Oxen are not hasty. They plod rather than scamper. They ruminate and ponder before acting. Once their mind is made up, however, trying to dissuade a Leo/Ox from his intended path is about as effective as attempting to stop a steamroller by standing in front of it and waving your arms.
+
+You will always be able to recognize the Leo/Ox by his puritanical streak. There’s a rigidity about this person’s moral stance that makes you want to salute him. He’s so upright and proper that you cannot imagine him doing anything really mean or sneaky. And indeed, this person is not at all sneaky. He may be a bit manipulative at times. But mostly, the Leo/Ox is an above-board, cards-on-the-table sort who will tell you exactly what he thinks of you and why—whether you want to hear it or not.
+
+The Leo/Ox is a generous soul. He may not throw his money around or spend it on frivolous items for himself. But he is always ready to help out a friend or family member in need. Leo/Oxen don’t care much for pomp or circumstance either. They like things simple, yet elegant. Their homes will be comfortable but not ostentatious. Their cars will be practical yet luxurious.`,
+    love: `In love, the Leo/Ox is fiercely loyal. Once he has chosen a partner, he sticks by them through thick and thin. This person doesn’t fall in love easily, but when he does, it’s for keeps. The Leo/Ox is not one for casual flings or superficial relationships. He wants depth, commitment, and a partner who shares his values. If you’re involved with a Leo/Ox, expect to be treated with respect and devotion, but also be prepared for their occasional bossiness. They like to be in charge, even in matters of the heart.
+
+If you love a Leo/Ox, you’ll need to be patient. This person takes time to open up emotionally. They’re not cold, but they are cautious. Once you’ve earned their trust, however, you’ll have a partner who will stand by you no matter what. Just don’t try to push them into anything they’re not ready for—you’ll hit a brick wall.`,
+    compatibilities: `You’ll find harmony with Rat subjects, particularly those born under Gemini, Libra, or Sagittarius. Snakes also make excellent partners, especially Gemini, Libra, or Capricorn/Snakes. Roosters from Libra or Capricorn are another good match. Avoid Horses, particularly Taurus, Scorpio, or Aquarius/Horses, as their free-spirited nature clashes with your steadfastness. Cats, especially Scorpio or Aquarius/Cats, may also be problematic due to their independent streak.`,
+    homeAndFamily: `The Leo/Ox is a pillar of strength in the family. They take their role as provider and protector very seriously. Their home is their castle, and they work hard to ensure it’s a place of stability and comfort. They’re not overly demonstrative with affection, but their actions speak louder than words. A Leo/Ox parent will be strict but fair, expecting their children to uphold the same high standards they set for themselves.
+
+The Leo/Ox child is a bit of a paradox—confident yet reserved, ambitious yet cautious. They’ll need encouragement to come out of their shell, but once they do, they’ll shine. These kids respond well to structure and clear expectations, but they also need room to express their creativity.`,
+    profession: `Leo/Oxen excel in roles that require leadership, discipline, and strategic thinking. They’re not afraid of hard work and will climb the ladder steadily, if not spectacularly. They make excellent managers, administrators, or military officers, as their natural authority and integrity inspire trust. They’re not the most innovative types, but they’re brilliant at taking an idea and seeing it through to completion.
+
+As employees, Leo/Oxen are reliable and thorough, but they don’t respond well to micromanagement. They need to feel trusted to do their job well. As bosses, they can be demanding but fair, expecting the same level of commitment from their team as they give themselves.`,
   },
   "Leo/Tiger": {
-    description: "PENDING LEO/TIGER DESCRIPTION",
-    love: "PENDING LEO/TIGER LOVE",
-    compatibilities: "PENDING LEO/TIGER COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/TIGER HOME & FAMILY",
-    profession: "PENDING LEO/TIGER PROFESSION",
+    description: `The Leo/Tiger is a firecracker of a person—bold, dynamic, and impossible to ignore. This is a character who thrives on action and adventure, always ready to leap into the fray with boundless enthusiasm. The Leo/Tiger’s natural magnetism draws people to them like moths to a flame, and they revel in the attention. They’re not just here to live life—they’re here to conquer it.
+
+This combination brings together Leo’s regal charisma and the Tiger’s fearless energy. The result is a person who is both commanding and unpredictable, a leader who inspires with their passion but occasionally trips over their own impetuousness. Leo/Tigers don’t just walk into a room—they burst in, ready to take charge and make things happen. They’re not afraid to take risks, and their optimism often leads to surprising successes.
+
+However, the Leo/Tiger’s hotheadedness can get them into trouble. They’re quick to act and even quicker to react, sometimes without thinking things through. Their need for authority can also make them come across as overbearing, especially when their plans don’t go as expected. Yet, their benevolence and genuine desire to do good often smooth over any ruffled feathers.`,
+    love: `In love, the Leo/Tiger is passionate and all-in. They love with the intensity of a wildfire, showering their partner with affection and grand gestures. They’re not subtle, and they don’t want a partner who is either. They crave excitement and drama in their relationships, but this can sometimes lead to stormy arguments. A Leo/Tiger needs a partner who can match their energy and isn’t intimidated by their larger-than-life personality.
+
+If you love a Leo/Tiger, brace yourself for a wild ride. They’ll sweep you off your feet, but they’ll also expect you to keep up with their fast-paced lifestyle. Loyalty is crucial—they’ll give it and demand it in return. Tame their wild side with patience and understanding, but don’t try to cage them. They need freedom to roam.`,
+    compatibilities: `You’ll find great chemistry with Horse subjects, particularly those born under Aries, Gemini, or Libra. Dogs, especially Gemini, Libra, or Sagittarius/Dogs, also make excellent partners. Pigs from Aries or Libra are another good match. Avoid Snakes, particularly Taurus, Scorpio, or Aquarius/Snakes, as their calculated nature clashes with your spontaneity. Monkeys, especially Taurus or Scorpio/Monkeys, may also prove challenging due to their trickster tendencies.`,
+    homeAndFamily: `The Leo/Tiger’s home is a vibrant, lively place, filled with energy and activity. They’re not the type to sit quietly at home—they’d rather host a party or plan a family adventure. As parents, Leo/Tigers are encouraging and inspiring, pushing their children to be bold and chase their dreams. However, their impatience can make them less adept at handling the day-to-day minutiae of parenting.
+
+The Leo/Tiger child is a handful—full of energy, ideas, and a touch of rebellion. They’ll need guidance to channel their enthusiasm into productive pursuits. Encourage their creativity, but set clear boundaries to keep their impulsiveness in check.`,
+    profession: `Leo/Tigers are born for the spotlight. They thrive in roles where they can lead, inspire, and take risks. Think entrepreneurs, performers, or high-stakes negotiators. They’re not content with routine jobs—they need challenges that let them flex their creativity and authority. Their natural charisma makes them excellent at rallying teams, but their tendency to act first and think later can lead to occasional missteps.
+
+As employees, Leo/Tigers are dynamic but can be difficult to manage if they feel stifled. As bosses, they’re inspiring but sometimes overly demanding. They’re at their best when given the freedom to innovate and lead.`,
   },
   "Leo/Rabbit": {
-    description: "PENDING LEO/RABBIT DESCRIPTION",
-    love: "PENDING LEO/RABBIT LOVE",
-    compatibilities: "PENDING LEO/RABBIT COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/RABBIT HOME & FAMILY",
-    profession: "PENDING LEO/RABBIT PROFESSION",
+    description: `The Leo/Rabbit is a refined and ambitious soul, blending Leo’s natural flair with the Rabbit’s tact and subtlety. This person is a master of finesse, navigating social situations with grace and charm. They’re not as brash as other Leos, thanks to the Rabbit’s cautious influence, but they still command attention with their quiet confidence and impeccable style.
+
+Leo/Rabbits are driven by ambition, but they pursue their goals with a careful, calculated approach. They’re not ones to rush headlong into things—instead, they plan, strategize, and strike when the moment is right. This makes them formidable in achieving their dreams, but their secretiveness can sometimes make others wary. They don’t reveal their cards easily.
+
+The downside of this combination is a tendency toward pedantry and hypochondria. Leo/Rabbits can get caught up in details, insisting on perfection in everything they do. They’re also prone to worrying about their health, sometimes to an excessive degree. But their warmth and genuine kindness make them beloved by those who know them well.`,
+    love: `In love, the Leo/Rabbit is romantic and attentive, but they’re not as flashy as other Leos. They prefer intimate, meaningful connections over grand displays of affection. They’re loyal and protective of their partners, but their need for control can sometimes make them seem distant or overly critical. A Leo/Rabbit wants a partner who appreciates their sophistication and can handle their occasional need for solitude.
+
+If you love a Leo/Rabbit, you’ll need to respect their need for privacy and give them space to recharge. They’re not cold, but they do value their independence. Show them you’re reliable and share their appreciation for the finer things in life, and you’ll win their heart.`,
+    compatibilities: `You’ll find harmony with Sheep subjects, particularly those born under Aries, Libra, or Sagittarius. Pigs, especially Aries, Libra, or Capricorn/Pigs, are also a great match. Dogs from Libra or Sagittarius work well, too. Avoid Roosters, particularly Taurus, Scorpio, or Aquarius/Roosters, as their bluntness clashes with your sensitivity. Dragons, especially Taurus or Scorpio/Dragons, may also be too domineering for your taste.`,
+    homeAndFamily: `The Leo/Rabbit’s home is a sanctuary of elegance and comfort. They have a keen eye for design and love surrounding themselves with beauty. As parents, they’re nurturing but expect their children to live up to their high standards. They’ll encourage their kids to pursue their ambitions but may struggle with letting go of control.
+
+The Leo/Rabbit child is sensitive and creative, with a natural talent for the arts. They’ll need reassurance to overcome their self-doubt, but with the right support, they’ll blossom into confident, accomplished individuals.`,
+    profession: `Leo/Rabbits excel in careers that combine creativity with precision. Think interior design, diplomacy, or high-end event planning. They’re ambitious but prefer to work behind the scenes, orchestrating success with their sharp minds and impeccable taste. They’re not fans of chaos or high-pressure environments, so they thrive in roles that allow them to set their own pace.
+
+As employees, Leo/Rabbits are diligent and detail-oriented, but they need to feel valued. As bosses, they’re fair but can be overly particular about how things are done. Their ability to balance ambition with tact makes them excellent mediators.`,
   },
   "Leo/Dragon": {
-    description: "PENDING LEO/DRAGON DESCRIPTION",
-    love: "PENDING LEO/DRAGON LOVE",
-    compatibilities: "PENDING LEO/DRAGON COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/DRAGON HOME & FAMILY",
-    profession: "PENDING LEO/DRAGON PROFESSION",
+    description: `The Leo/Dragon is a force of nature—bold, ambitious, and brimming with vitality. This person radiates confidence and has an almost magnetic ability to draw others into their orbit. They’re born to lead, and they know it, striding through life with a sense of purpose that’s hard to ignore. The combination of Leo’s charisma and the Dragon’s strength creates a personality that’s larger than life.
+
+Leo/Dragons are driven by a desire for success, and they’re not afraid to work hard to get it. They’re enthusiastic and optimistic, often inspiring those around them with their can-do attitude. However, their rigidity and tendency to mistrust others can make them difficult to work with at times. They have high standards—for themselves and everyone else—and they don’t take kindly to those who don’t measure up.
+
+Their sentimental side is often hidden beneath their bold exterior, but it’s there, and it runs deep. Leo/Dragons are fiercely loyal to those they care about, and they’ll go to great lengths to protect their loved ones. Their braggadocio can be off-putting, but it’s usually just a reflection of their genuine pride in their accomplishments.`,
+    love: `In love, the Leo/Dragon is passionate and devoted, but they need a partner who can handle their intensity. They’re not interested in half-measures—they want a relationship that’s as grand and epic as they are. They’re generous with their affection but can be demanding, expecting their partner to match their enthusiasm and loyalty.
+
+If you love a Leo/Dragon, you’ll need to be strong-willed and confident in your own right. They respect partners who stand up to them and can keep up with their relentless drive. Be prepared for grand romantic gestures, but also for the occasional clash of egos.`,
+    compatibilities: `You’ll find great partners in Rat subjects, particularly those born under Gemini, Libra, or Sagittarius. Monkeys, especially Aries, Gemini, or Libra/Monkeys, are also a good match. Roosters from Libra or Capricorn work well, too. Avoid Dogs, particularly Taurus, Scorpio, or Aquarius/Dogs, as their practicality clashes with your grandeur. Rabbits, especially Taurus or Scorpio/Rabbits, may also find your intensity overwhelming.`,
+    homeAndFamily: `The Leo/Dragon’s home is a reflection of their personality—bold, vibrant, and a little over-the-top. They love to entertain and will go all out to make their guests feel welcome. As parents, they’re inspiring and encouraging, pushing their children to aim high. However, their high expectations can sometimes feel overwhelming to their kids.
+
+The Leo/Dragon child is a natural leader, full of energy and big ideas. They’ll need guidance to temper their impulsiveness, but with the right support, they’ll achieve great things.`,
+    profession: `Leo/Dragons are born for greatness. They thrive in high-profile roles where they can showcase their talents and lead others. Think CEOs, politicians, or creative directors. Their enthusiasm and drive make them natural motivators, but their tendency to be rigid can make them less adaptable to change.
+
+As employees, Leo/Dragons are ambitious and hardworking, but they need to feel appreciated. As bosses, they’re commanding and inspiring, but they can be intolerant of mistakes. They’re at their best when given the freedom to pursue their vision.`,
   },
   "Leo/Snake": {
     description: `The Snake born in Leo is always right. Even if he’s wrong. He is nonetheless absolutely certain that he knows best. And frequently, especially for himself and in order to achieve his own ends, the Leo/Snake is not far off. Wisdom and clairvoyance are part of the Snake legacy. But the addition of Leo to the cool-headed Snake character, although it lends some sunshine and warmth, also deals this character a hand loaded with vanity. Now the already extravagant and presumptuous Snake has to carry around excess baggage in the form of a swollen skull that just doesn’t quit. Then too, there is the question of Leo will. The pushiness quotient is rising. And we also have to consider the Snake’s inherent laziness. And his tendency to dissimulate and pinch pennies. Are you beginning to get the picture? Can you see why the Leo/Snake is always—infuriatingly—right? Of course anybody who is so indubitably right has to go very often far wrong. Extremes operate that way. But as they say in French, and I paraphrase, No matter how high up you may be sitting, it is wise to remember you are only sitting on your derrière. Accepting his own pride as occasional foolishness or humbling himself long enough to accept aid or assistance is simply beyond the Leo/Snake. He is one of those people who always gives you an indulgent laugh and snaps, “Don’t be so naive! I know what I’m doing.” Shortly after you have turned tail and left the overconfident Leo/Snake teetering at the edge of his favorite precipice, you hear the thud. He’s not one to complain.
@@ -74,45 +116,105 @@ Also, Leo/Snakes are bright. They are among the most intellectual of signs. So a
 This is one employee you would never be able to convince to work in the stock room or accept having an office without a window. If you have a Leo/Snake employee, watch your job. You may be in serious danger of being supplanted by your hired hand. Even so, Leo/Snakes don’t make excellent bosses. They can’t be bothered bossing people around …in a designer negligee? Standing up to the strong-willed Leo/Snake in any professional capacity will be difficult. He could make a super lawyer or sales person. But your average Leo/Snake would rather know a lot about a lot and then become a famous movie star—it’s prettier than being a lawyer.`,
   },
   "Leo/Horse": {
-    description: "PENDING LEO/HORSE DESCRIPTION",
-    love: "PENDING LEO/HORSE LOVE",
-    compatibilities: "PENDING LEO/HORSE COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/HORSE HOME & FAMILY",
-    profession: "PENDING LEO/HORSE PROFESSION",
+    description: `The Leo/Horse is a whirlwind of energy and charm, a person who gallops through life with unbridled enthusiasm and a knack for making things happen. This combination blends Leo’s natural charisma with the Horse’s adventurous spirit, creating a personality that’s both dazzling and dynamic. Leo/Horses are the life of the party, always ready to entertain, inspire, or lead the charge into the next big adventure.
+
+Their popularity is undeniable. People are drawn to their infectious optimism and their ability to turn even the most mundane moment into something exciting. They’re accomplished and dexterous, often juggling multiple projects or passions with ease. However, their hastiness and impatience can lead to careless mistakes, and their opportunistic streak sometimes makes them seem self-serving. They’re not malicious, but they’re always on the lookout for the next big opportunity to shine.
+
+Leo/Horses love to be admired, and they thrive in environments where they can showcase their talents. They’re not content to sit on the sidelines—they want to be in the thick of things, leading, creating, or performing. Their eloquence makes them natural communicators, whether they’re rallying a team or charming a crowd. But their fickleness can make it hard for them to stick to one path, and their selfishness can sometimes alienate those who feel overshadowed by their brilliance.`,
+    love: `In love, the Leo/Horse is passionate, romantic, and a bit of a show-off. They love grand gestures and sweeping declarations, and they want a partner who can keep up with their fast-paced, adventurous lifestyle. They’re fiercely loyal when truly committed, but their fickle nature can make them flirtatious or restless in relationships that feel too routine. A Leo/Horse needs a partner who’s confident enough to handle their larger-than-life personality and independent enough to give them space.
+
+If you love a Leo/Horse, be prepared for a rollercoaster. They’ll shower you with affection and excitement, but they’ll also demand attention and freedom. Keep them engaged with new experiences, and don’t try to tie them down too tightly—they’ll bolt. Show them you can match their energy, and they’ll be yours for the long haul.`,
+    compatibilities: `You’ll find great chemistry with Tiger subjects, especially those born under Aries, Gemini, or Libra. Dogs, particularly Gemini, Libra, or Sagittarius/Dogs, are also a fantastic match. Sheep from Aries or Libra work well, too. Avoid Rats, especially Gemini, Libra, or Sagittarius/Rats, as their cunning clashes with your straightforwardness. Oxen, particularly Taurus or Scorpio/Oxen, may also be too stubborn for your free-spirited nature.`,
+    homeAndFamily: `The Leo/Horse’s home is a lively, welcoming space, often filled with friends, music, and laughter. They love to entertain and make their home a hub of activity. As parents, they’re fun and inspiring, encouraging their children to explore, take risks, and chase their dreams. However, their impatience can make them less adept at handling the day-to-day grind of parenting.
+
+The Leo/Horse child is a bundle of energy, always on the move and full of big ideas. They’ll need guidance to focus their enthusiasm and avoid spreading themselves too thin. Encourage their creativity, but teach them the value of patience and follow-through.`,
+    profession: `Leo/Horses are born for roles that let them shine. They thrive in creative, high-energy fields like entertainment, marketing, or entrepreneurship. Their dexterity and eloquence make them excellent at pitching ideas or rallying teams, but their impatience can lead to rushed decisions. They’re not suited for repetitive or overly structured jobs—they need variety and the chance to take risks.
+
+As employees, Leo/Horses are dynamic and innovative, but they can be hard to manage if they feel constrained. As bosses, they’re inspiring but sometimes overly demanding, expecting everyone to keep up with their relentless pace. They’re at their best when given the freedom to lead and create.`,
   },
   "Leo/Goat": {
-    description: "PENDING LEO/GOAT DESCRIPTION",
-    love: "PENDING LEO/GOAT LOVE",
-    compatibilities: "PENDING LEO/GOAT COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/GOAT HOME & FAMILY",
-    profession: "PENDING LEO/GOAT PROFESSION",
+    description: `The Leo/Sheep is a delightful blend of creativity and charisma, a person who brings a touch of whimsy to everything they do. This combination marries Leo’s natural flair with the Sheep’s sensitivity and aesthetic sense, creating a personality that’s both magnetic and deeply artistic. Leo/Sheep people are dreamers who can turn their visions into reality, often with a flourish that leaves others in awe.
+
+They’re inventive and persevere in their pursuits, whether it’s creating a masterpiece or building a cozy, beautiful life. Their gentleness makes them approachable, and their sensitivity allows them to connect deeply with others. However, their tendency toward pessimism and worry can cast a shadow over their sunny Leo disposition, and their dependency can make them lean too heavily on others for support. They’re not lazy, but their tardiness and lack of foresight can frustrate those who rely on them.
+
+Leo/Sheep people have a strong aesthetic sense and a love for beauty in all its forms. Their homes, clothes, and even their conversations reflect their refined taste. They’re not as domineering as other Leos, thanks to the Sheep’s gentler influence, but they still crave admiration and validation for their creative efforts.`,
+    love: `In love, the Leo/Sheep is romantic, attentive, and deeply emotional. They pour their heart into their relationships, seeking a partner who appreciates their creativity and sensitivity. They’re not as demanding as other Leos, but they do need reassurance and affection to feel secure. Their dependency can sometimes make them clingy, but their genuine warmth makes it easy to forgive.
+
+If you love a Leo/Sheep, be prepared to be their cheerleader. They need encouragement to overcome their self-doubt and pessimism. Offer them stability and appreciation, and they’ll reward you with unwavering loyalty and a love that’s both tender and passionate.`,
+    compatibilities: `You’ll find harmony with Rabbit subjects, particularly those born under Aries, Libra, or Sagittarius. Pigs, especially Aries, Libra, or Capricorn/Pigs, are also a great match. Horses from Aries or Libra work well, too. Avoid Oxen, particularly Taurus or Scorpio/Oxen, as their rigidity clashes with your free-spirited nature. Dogs, especially Taurus or Scorpio/Dogs, may also be too practical for your whimsical soul.`,
+    homeAndFamily: `The Leo/Sheep’s home is a haven of beauty and comfort, filled with art, soft textures, and a warm, inviting atmosphere. They love creating a space that reflects their personality and makes others feel at ease. As parents, they’re nurturing and imaginative, encouraging their children to explore their creativity. However, their tendency to worry can make them overprotective.
+
+The Leo/Sheep child is sensitive and artistic, with a vivid imagination. They’ll need reassurance to build their confidence and guidance to stay focused on their goals. Foster their creativity, but help them develop practical skills to balance their dreamy nature.`,
+    profession: `Leo/Sheep excel in creative fields where their inventiveness and aesthetic sense can shine. Think artists, designers, or writers. They’re not as driven by ambition as other Leos, but their perseverance helps them achieve their goals over time. They thrive in environments that allow them to express themselves freely and avoid rigid, high-pressure settings.
+
+As employees, Leo/Sheep are dedicated and creative, but they need a supportive environment to thrive. As bosses, they’re gentle and encouraging, but their lack of foresight can lead to organizational challenges. They’re at their best when given the freedom to create and inspire.`,
   },
   "Leo/Monkey": {
-    description: "PENDING LEO/MONKEY DESCRIPTION",
-    love: "PENDING LEO/MONKEY LOVE",
-    compatibilities: "PENDING LEO/MONKEY COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/MONKEY HOME & FAMILY",
-    profession: "PENDING LEO/MONKEY PROFESSION",
+    description: `The Leo/Monkey is a dazzling performer, blending Leo’s charisma with the Monkey’s quick wit and cunning. This person is a master of improvisation, always ready with a clever quip or a bold idea to steal the show. They’re confident, charming, and a little mischievous, with a knack for turning any situation to their advantage.
+
+Leo/Monkeys are stable in their core, but their opportunistic streak makes them adaptable to almost any environment. They thrive on attention and love being the center of the action, whether it’s in a boardroom, on a stage, or at a party. Their loquacity and wit make them excellent conversationalists, but their tendency toward deceit and manipulation can sometimes get them into trouble. They’re not malicious, but they’re not above bending the truth to get what they want.
+
+Their self-involvement can make them seem aloof or selfish at times, but their genuine warmth and humor usually win people over. Leo/Monkeys are ambitious, but they pursue their goals with a playful, almost effortless grace that masks their underlying drive.`,
+    love: `In love, the Leo/Monkey is charming, flirtatious, and full of surprises. They love the thrill of romance and enjoy keeping their partner on their toes. They’re generous with their affection but can be self-centered, expecting their partner to revolve around their needs. A Leo/Monkey needs a partner who’s confident, witty, and not easily rattled by their occasional trickery.
+
+If you love a Leo/Monkey, be ready for a relationship that’s never boring. They’ll keep you entertained, but you’ll need to set boundaries to keep their manipulative tendencies in check. Show them you can match their wit, and they’ll respect you all the more.`,
+    compatibilities: `You’ll find great partners in Rat subjects, particularly those born under Aries, Gemini, Libra, or Capricorn. Dragons, especially Gemini, Libra, or Capricorn/Dragons, are also a fantastic match. Snakes from Libra or Capricorn work well, too. Avoid Tigers, particularly Taurus, Scorpio, or Aquarius/Tigers, as their impulsiveness clashes with your calculated nature. Pigs, especially Taurus or Scorpio/Pigs, may also find your cunning hard to handle.`,
+    homeAndFamily: `The Leo/Monkey’s home is a vibrant, eclectic space, filled with quirky touches and bold designs. They love entertaining and making their home a stage for their personality. As parents, they’re fun and engaging, encouraging their children to think outside the box. However, their self-involvement can make them less attentive to their kids’ emotional needs.
+
+The Leo/Monkey child is clever, mischievous, and full of charm. They’ll need guidance to channel their energy into productive pursuits and to learn the value of honesty. Encourage their creativity, but set clear expectations to keep their guile in check.`,
+    profession: `Leo/Monkeys shine in roles that require quick thinking and charisma. Think sales, public relations, or stand-up comedy. Their ability to improvise and adapt makes them excellent problem-solvers, but their manipulative tendencies can sometimes undermine their credibility. They’re not suited for rigid or monotonous jobs—they need variety and the chance to shine.
+
+As employees, Leo/Monkeys are innovative and engaging, but they can be difficult to manage if they feel bored. As bosses, they’re charismatic and motivating, but their selfishness can make them less empathetic to their team’s needs. They’re at their best when given the freedom to think on their feet.`,
   },
   "Leo/Rooster": {
-    description: "PENDING LEO/ROOSTER DESCRIPTION",
-    love: "PENDING LEO/ROOSTER LOVE",
-    compatibilities: "PENDING LEO/ROOSTER COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/ROOSTER HOME & FAMILY",
-    profession: "PENDING LEO/ROOSTER PROFESSION",
+    description: `The Leo/Rooster is a bold, confident character who struts through life with a mix of resilience and flamboyance. This combination blends Leo’s regal charisma with the Rooster’s enthusiasm and candor, creating a personality that’s both commanding and refreshingly honest. Leo/Roosters are not afraid to speak their mind, and their humor and chic style make them stand out in any crowd.
+
+They’re resilient and able to bounce back from setbacks with remarkable ease. Their enthusiasm is infectious, and they have a knack for rallying others to their cause. However, their pomposity and cockiness can rub people the wrong way, and their tendency toward pedantry can make them seem overly critical. They’re conservative in their values, preferring tradition and structure, but their Leo flair ensures they’re never boring.
+
+Leo/Roosters are driven by a desire to succeed, but their dissatisfaction can make them hard to please. They have high standards and expect others to meet them, which can lead to tension in relationships or work. Their blind spots—particularly their inability to see their own flaws—can also cause problems, but their humor and warmth usually smooth things over.`,
+    love: `In love, the Leo/Rooster is passionate, loyal, and a bit bossy. They love to take charge in relationships, planning romantic outings and setting the tone. They’re candid about their feelings, which can be both refreshing and overwhelming. A Leo/Rooster needs a partner who can handle their strong personality and isn’t afraid to stand up to their occasional arrogance.
+
+If you love a Leo/Rooster, be prepared for a relationship that’s full of energy and honesty. They’ll keep things exciting, but you’ll need to call them out on their bossiness from time to time. Show them you admire their resilience, and they’ll be devoted to you.`,
+    compatibilities: `You’ll find harmony with Snake subjects, particularly those born under Libra, Sagittarius, or Capricorn. Oxen, especially Gemini, Libra, or Capricorn/Oxen, are also a great match. Dragons from Libra or Capricorn work well, too. Avoid Rabbits, particularly Taurus, Scorpio, or Aquarius/Rabbits, as their sensitivity clashes with your bluntness. Cats, especially Taurus or Scorpio/Cats, may also find your candor too harsh.`,
+    homeAndFamily: `The Leo/Rooster’s home is a stylish, organized space that reflects their love for tradition and flair. They take pride in creating a welcoming environment for family and friends. As parents, they’re encouraging and disciplined, pushing their children to excel while instilling strong values. However, their bossiness can make them overly controlling at times.
+
+The Leo/Rooster child is confident, outspoken, and a bit of a show-off. They’ll need guidance to temper their cockiness and learn to listen to others. Encourage their enthusiasm, but teach them the value of humility.`,
+    profession: `Leo/Roosters excel in roles that require confidence, organization, and a touch of flair. Think event planners, public speakers, or corporate managers. Their resilience and enthusiasm make them natural leaders, but their pedantry and dissatisfaction can make them hard to work with. They’re not suited for chaotic or overly flexible environments—they need structure to thrive.
+
+As employees, Leo/Roosters are hardworking and reliable, but they can be overly critical if things don’t go their way. As bosses, they’re commanding and organized, but their bossiness can alienate their team. They’re at their best when given the chance to lead with clear goals in sight.`,
   },
   "Leo/Dog": {
-    description: "PENDING LEO/DOG DESCRIPTION",
-    love: "PENDING LEO/DOG LOVE",
-    compatibilities: "PENDING LEO/DOG COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/DOG HOME & FAMILY",
-    profession: "PENDING LEO/DOG PROFESSION",
+    description: `The Leo/Dog is a fascinating mix of loyalty and charisma, blending Leo’s boldness with the Dog’s deep sense of duty and guardianship. This person is a natural protector, always ready to stand up for those they care about or defend a cause they believe in. Their intelligence and altruism make them a force for good, but their cynicism and anxiety can sometimes cloud their sunny Leo disposition.
+
+Leo/Dogs are fiercely loyal, whether to friends, family, or their principles. They’re not as flashy as other Leos, thanks to the Dog’s introverted influence, but they still command attention with their quiet strength and unwavering commitment. Their stubbornness can make them difficult to sway, and their pessimism can lead to moments of doubt or worry. However, their warmth and genuine desire to help others make them deeply respected.
+
+They’re not ones to seek the spotlight for its own sake, but they often find themselves in leadership roles because of their intelligence and sense of responsibility. Their unease and defensiveness can make them cautious, but once they trust someone, they’re a friend for life.`,
+    love: `In love, the Leo/Dog is devoted, protective, and deeply emotional. They’re not into casual flings—they want a partner they can trust and build a life with. Their loyalty is unmatched, but their anxiety and defensiveness can make them seem overly cautious or clingy. A Leo/Dog needs a partner who’s patient, understanding, and willing to reassure them when their worries get the better of them.
+
+If you love a Leo/Dog, be prepared to earn their trust. They’re not quick to open up, but once they do, they’ll be your most steadfast ally. Show them you value their loyalty and share their sense of duty, and they’ll love you fiercely.`,
+    compatibilities: `You’ll find great partners in Tiger subjects, particularly those born under Gemini, Libra, or Sagittarius. Horses, especially Aries, Gemini, or Libra/Horses, are also a fantastic match. Rabbits from Libra or Sagittarius work well, too. Avoid Dragons, particularly Taurus, Scorpio, or Aquarius/Dragons, as their intensity clashes with your cautious nature. Sheep, especially Taurus or Scorpio/Sheep, may also find your pessimism hard to handle.`,
+    homeAndFamily: `The Leo/Dog’s home is a warm, secure space where family and friends feel protected and valued. They take their role as guardian seriously, ensuring their loved ones are cared for. As parents, they’re nurturing and disciplined, instilling a strong sense of responsibility in their children. However, their anxiety can make them overprotective at times.
+
+The Leo/Dog child is loyal and thoughtful, with a strong sense of right and wrong. They’ll need encouragement to overcome their self-doubt and step out of their comfort zone. Foster their intelligence and sense of duty, but help them manage their worries.`,
+    profession: `Leo/Dogs excel in roles that combine leadership with a sense of purpose. Think teachers, social workers, or community organizers. Their intelligence and altruism make them excellent at serving others, but their stubbornness can make them resistant to change. They’re not suited for high-risk or chaotic environments—they need stability to shine.
+
+As employees, Leo/Dogs are reliable and hardworking, but their defensiveness can make them sensitive to criticism. As bosses, they’re fair and protective, but their anxiety can make them overly cautious. They’re at their best when given the chance to lead with a clear sense of mission.`,
   },
   "Leo/Pig": {
-    description: "PENDING LEO/PIG DESCRIPTION",
-    love: "PENDING LEO/PIG LOVE",
-    compatibilities: "PENDING LEO/PIG COMPATIBILITIES",
-    homeAndFamily: "PENDING LEO/PIG HOME & FAMILY",
-    profession: "PENDING LEO/PIG PROFESSION",
+    description: `The Leo/Pig is a warm, generous soul, blending Leo’s charisma with the Pig’s sincerity and love for the finer things in life. This person is a natural host, always ready to welcome others with open arms and a lavish spread. Their gallantry and honesty make them beloved, but their naiveté and gullibility can sometimes leave them vulnerable.
+
+Leo/Pigs are cultured and have a deep appreciation for beauty, art, and pleasure. They’re not as domineering as other Leos, thanks to the Pig’s gentle influence, but they still love to be admired and appreciated. Their hot-temperedness can flare up when they feel disrespected, but their sincerity usually smooths things over. They’re materialistic and love indulging in life’s luxuries, but they’re equally happy sharing their bounty with others.
+
+Their scrupulousness makes them meticulous in their pursuits, whether it’s planning a perfect dinner party or pursuing a creative project. However, their self-indulgence and sensuality can sometimes lead them astray, and their gullibility can make them easy targets for those with less-than-honest intentions.`,
+    love: `In love, the Leo/Pig is passionate, romantic, and deeply devoted. They love to spoil their partner with gifts, affection, and grand gestures. They’re sincere and open-hearted, but their naiveté can make them overly trusting in relationships. A Leo/Pig needs a partner who’s honest, supportive, and appreciates their generous nature without taking advantage of it.
+
+If you love a Leo/Pig, be prepared to be pampered. They’ll go all out to make you feel special, but you’ll need to be patient with their occasional temper flares. Show them you value their sincerity, and protect them from those who might exploit their trust.`,
+    compatibilities: `You’ll find harmony with Rabbit subjects, particularly those born under Aries, Libra, or Sagittarius. Sheep, especially Aries, Libra, or Capricorn/Sheep, are also a great match. Tigers from Gemini or Libra work well, too. Avoid Snakes, particularly Taurus, Scorpio, or Aquarius/Snakes, as their cunning clashes with your sincerity. Monkeys, especially Taurus or Scorpio/Monkeys, may also take advantage of your trusting nature.`,
+    homeAndFamily: `The Leo/Pig’s home is a warm, luxurious space, filled with beautiful things and a welcoming atmosphere. They love hosting and making their loved ones feel cherished. As parents, they’re nurturing and generous, spoiling their children with love and opportunities. However, their hot-temperedness can make them quick to react when things don’t go their way.
+
+The Leo/Pig child is kind, creative, and a bit indulgent. They’ll need guidance to balance their love for pleasure with responsibility. Encourage their cultural interests, but teach them to be discerning to avoid being taken advantage of.`,
+    profession: `Leo/Pigs excel in roles that combine creativity with a touch of luxury. Think chefs, art curators, or luxury brand managers. Their scrupulousness and culture make them excellent at creating beautiful, meaningful experiences, but their self-indulgence can lead to procrastination. They’re not suited for high-pressure or overly practical jobs—they need room to express their creativity.
+
+As employees, Leo/Pigs are dedicated and charming, but their gullibility can make them vulnerable to workplace politics. As bosses, they’re generous and inspiring, but their hot-temperedness can make them unpredictable. They’re at their best when given the chance to create and share beauty.`,
   },
 };
