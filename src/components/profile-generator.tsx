@@ -22,6 +22,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose 
 import LoShuGrid from '@/components/lo-shu-grid';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { NEW_ASTROLOGY_DATA } from '@/lib/new-astrology';
+import { CelestialArcNav } from '@/components/celestial-arc-nav';
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -240,81 +241,95 @@ function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
         ...numerology.arrowsOfStrength.map(arrow => ({ ...arrow, type: 'strength' as const })),
         ...numerology.arrowsOfWeakness.map(arrow => ({ ...arrow, type: 'weakness' as const })),
     ];
+    
+    const categories = [
+        { id: 'overview', label: 'Overview' },
+        { id: 'grid', label: 'Lo Shu Grid' },
+        { id: 'attributes', label: 'Attributes' }
+    ];
+    const [activeTab, setActiveTab] = React.useState(categories[0].id);
 
     return (
-        <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="grid">Lo Shu Grid</TabsTrigger>
-                <TabsTrigger value="attributes">Attributes</TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview" className="space-y-4 mt-4">
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                     <InfoCard title="Psyche Number" value={numerology.psycheNum} icon={<BrainCircuit className="h-4 w-4"/>} />
-                     <InfoCard title="Destiny Number" value={numerology.destinyNum} icon={<Anchor className="h-4 w-4"/>} />
-                     <InfoCard title="Compound Fate" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} />
-                     <InfoCard title="Kua Number" value={numerology.kuaNum} icon={<Compass className="h-4 w-4"/>} />
-                </div>
-                 <div className="grid grid-cols-1 gap-4">
-                    <FateDisplay numerology={numerology} />
-                </div>
-            </TabsContent>
-            <TabsContent value="grid" className="space-y-4 mt-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    
-                    <LoShuGrid gridData={numerology.loShuGrid} arrows={allArrows} />
-
-                    <div className="glass-card p-4">
-                        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye className="h-5 w-5"/> Number Insights</h3>
-                        <ScrollArea className="h-[21rem] pr-3">
-                          <Accordion type="single" collapsible className="w-full">
-                              {numberEntries.map(({ digit, count }) => {
-                                  let meaning = "No specific meaning found.";
-                                  const key = `${digit}_${Math.min(count, 5)}`; // Cap at 5 for lookups
-                                  if (count > 1) {
-                                      meaning = REPEATED_NUMBER_MEANINGS[key as keyof typeof REPEATED_NUMBER_MEANINGS] || `No specific meaning for ${count} appearances.`;
-                                  } else {
-                                      meaning = NUMBER_MEANINGS[digit as keyof typeof NUMBER_MEANINGS]?.description || "No specific meaning for this number.";
-                                  }
-                                  
-                                  const title = count > 1 ? `Number ${digit} (appears ${count} times)` : `Number ${digit}`;
-
-                                  return (
-                                      <AccordionItem value={`item-${digit}`} key={digit}>
-                                          <AccordionTrigger>{title}</AccordionTrigger>
-                                          <AccordionContent>
-                                            <ScrollArea className="h-40 pr-3">
-                                              <SpeechPlayer text={meaning} elementId={`insight-${digit}-speech`} />
-                                            </ScrollArea>
-                                          </AccordionContent>
-                                      </AccordionItem>
-                                  );
-                              })}
-                              {numberEntries.length === 0 && <p className="text-gray-400">No numbers found in your birth date.</p>}
-                          </Accordion>
-                        </ScrollArea>
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <ArrowsDisplay arrows={numerology.arrowsOfStrength} title="Arrows of Strength" icon={<Zap />} idPrefix="strength" />
-                   <ArrowsDisplay arrows={numerology.arrowsOfWeakness} title="Arrows of Weakness" icon={<ShieldHalf />} idPrefix="weakness" />
-                </div>
-            </TabsContent>
-            <TabsContent value="attributes" className="space-y-4 mt-4">
-                 <div className="glass-card p-4">
-                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Kua Attributes</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                        <div><p className="font-semibold text-secondary">Element</p><p>{numerology.kuaAttributes.element}</p></div>
-                        <div><p className="font-semibold text-secondary">Colors</p><p>{numerology.kuaAttributes.colors}</p></div>
-                        <div><p className="font-semibold text-secondary">Season</p><p>{numerology.kuaAttributes.season}</p></div>
-                        <div>
-                            <p className="font-semibold text-secondary">Auspicious</p>
-                            <p className="text-sm">{Object.entries(numerology.auspiciousDirections).map(([key, val]) => `${key}: ${val}`).join(', ')}</p>
+        <div className="w-full">
+            <CelestialArcNav categories={categories} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-4"
+                >
+                    {activeTab === 'overview' && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <InfoCard title="Psyche Number" value={numerology.psycheNum} icon={<BrainCircuit className="h-4 w-4"/>} />
+                                <InfoCard title="Destiny Number" value={numerology.destinyNum} icon={<Anchor className="h-4 w-4"/>} />
+                                <InfoCard title="Compound Fate" value={numerology.compoundNum} icon={<Skull className="h-4 w-4"/>} />
+                                <InfoCard title="Kua Number" value={numerology.kuaNum} icon={<Compass className="h-4 w-4"/>} />
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <FateDisplay numerology={numerology} />
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </TabsContent>
-        </Tabs>
+                    )}
+                    {activeTab === 'grid' && (
+                         <div className="space-y-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <LoShuGrid gridData={numerology.loShuGrid} arrows={allArrows} />
+                                <div className="glass-card p-4">
+                                    <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Eye className="h-5 w-5"/> Number Insights</h3>
+                                    <ScrollArea className="h-[21rem] pr-3">
+                                        <Accordion type="single" collapsible className="w-full">
+                                            {numberEntries.map(({ digit, count }) => {
+                                                let meaning = "No specific meaning found.";
+                                                const key = `${digit}_${Math.min(count, 5)}`;
+                                                if (count > 1) {
+                                                    meaning = REPEATED_NUMBER_MEANINGS[key as keyof typeof REPEATED_NUMBER_MEANINGS] || `No specific meaning for ${count} appearances.`;
+                                                } else {
+                                                    meaning = NUMBER_MEANINGS[digit as keyof typeof NUMBER_MEANINGS]?.description || "No specific meaning for this number.";
+                                                }
+                                                const title = count > 1 ? `Number ${digit} (appears ${count} times)` : `Number ${digit}`;
+                                                return (
+                                                    <AccordionItem value={`item-${digit}`} key={digit}>
+                                                        <AccordionTrigger>{title}</AccordionTrigger>
+                                                        <AccordionContent>
+                                                            <ScrollArea className="h-40 pr-3">
+                                                                <SpeechPlayer text={meaning} elementId={`insight-${digit}-speech`} />
+                                                            </ScrollArea>
+                                                        </AccordionContent>
+                                                    </AccordionItem>
+                                                );
+                                            })}
+                                            {numberEntries.length === 0 && <p className="text-gray-400">No numbers found in your birth date.</p>}
+                                        </Accordion>
+                                    </ScrollArea>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <ArrowsDisplay arrows={numerology.arrowsOfStrength} title="Arrows of Strength" icon={<Zap />} idPrefix="strength" />
+                                <ArrowsDisplay arrows={numerology.arrowsOfWeakness} title="Arrows of Weakness" icon={<ShieldHalf />} idPrefix="weakness" />
+                            </div>
+                        </div>
+                    )}
+                    {activeTab === 'attributes' && (
+                        <div className="glass-card p-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Kua Attributes</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                                <div><p className="font-semibold text-secondary">Element</p><p>{numerology.kuaAttributes.element}</p></div>
+                                <div><p className="font-semibold text-secondary">Colors</p><p>{numerology.kuaAttributes.colors}</p></div>
+                                <div><p className="font-semibold text-secondary">Season</p><p>{numerology.kuaAttributes.season}</p></div>
+                                <div>
+                                    <p className="font-semibold text-secondary">Auspicious</p>
+                                    <p className="text-sm">{Object.entries(numerology.auspiciousDirections).map(([key, val]) => `${key}: ${val}`).join(', ')}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </motion.div>
+            </AnimatePresence>
+        </div>
     );
 }
 
@@ -325,66 +340,80 @@ function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     const futureYears = Object.entries(insight.signData.futures)
       .filter(([year]) => parseInt(year) >= new Date().getFullYear())
       .sort(([yearA], [yearB]) => parseInt(yearA) - parseInt(yearB));
+      
+    const categories = [
+        { id: 'introduction', label: 'Introduction' },
+        { id: 'element', label: 'Element' },
+        { id: 'compatibility', label: 'Compatibility' },
+        { id: 'future', label: 'Future' },
+    ];
+    const [activeTab, setActiveTab] = React.useState(categories[0].id);
   
     return (
-      <Tabs defaultValue="introduction" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="introduction">Introduction</TabsTrigger>
-          <TabsTrigger value="element">Element</TabsTrigger>
-          <TabsTrigger value="compatibility">Compatibility</TabsTrigger>
-          <TabsTrigger value="future">Future</TabsTrigger>
-        </TabsList>
-        <TabsContent value="introduction" className="mt-4">
-          <div className="glass-card p-4">
-            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><BookOpen /> Your Animal Sign: The {insight.sign}</h3>
-            <ScrollArea className="h-72 pr-3">
-              <SpeechPlayer text={insight.signData.introduction} elementId="intro-speech" />
-            </ScrollArea>
-          </div>
-        </TabsContent>
-        <TabsContent value="element" className="mt-4">
-          <div className="glass-card p-4">
-            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Zap /> The Influence of the {insight.element} Element</h3>
-            <ScrollArea className="h-72 pr-3">
-              <SpeechPlayer text={elementText} elementId="element-speech"/>
-            </ScrollArea>
-          </div>
-        </TabsContent>
-        <TabsContent value="compatibility" className="mt-4">
-          <div className="glass-card p-4">
-            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Users /> Compatibility</h3>
-            <ScrollArea className="h-72 pr-3">
-                <Accordion type="single" collapsible className="w-full">
-                    {compatibilitySigns.map((sign, index) => (
-                        <AccordionItem value={sign} key={sign}>
-                            <AccordionTrigger className="text-base text-gray-300 hover:text-white hover:no-underline">With the {sign}</AccordionTrigger>
-                            <AccordionContent>
-                                <SpeechPlayer text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} elementId={`compat-speech-${index}`} />
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
-            </ScrollArea>
-          </div>
-        </TabsContent>
-        <TabsContent value="future" className="mt-4">
-           <div className="glass-card p-4">
-            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Future Years</h3>
-            <ScrollArea className="h-72 pr-3">
-                <Accordion type="single" collapsible className="w-full">
-                    {futureYears.map(([year, futureData], index) => (
-                        <AccordionItem value={year} key={year}>
-                            <AccordionTrigger className="text-base text-gray-300 hover:text-white hover:no-underline">{year} - The {futureData.element} {futureData.year}</AccordionTrigger>
-                            <AccordionContent>
-                                <SpeechPlayer text={futureData.prediction} elementId={`future-speech-${index}`} />
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
-            </ScrollArea>
-          </div>
-        </TabsContent>
-      </Tabs>
+        <div className="w-full">
+            <CelestialArcNav categories={categories} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-4"
+                >
+                    {activeTab === 'introduction' && (
+                         <div className="glass-card p-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><BookOpen /> Your Animal Sign: The {insight.sign}</h3>
+                            <ScrollArea className="h-72 pr-3">
+                                <SpeechPlayer text={insight.signData.introduction} elementId="intro-speech" />
+                            </ScrollArea>
+                        </div>
+                    )}
+                    {activeTab === 'element' && (
+                        <div className="glass-card p-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Zap /> The Influence of the {insight.element} Element</h3>
+                            <ScrollArea className="h-72 pr-3">
+                                <SpeechPlayer text={elementText} elementId="element-speech"/>
+                            </ScrollArea>
+                        </div>
+                    )}
+                    {activeTab === 'compatibility' && (
+                        <div className="glass-card p-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Users /> Compatibility</h3>
+                            <ScrollArea className="h-72 pr-3">
+                                <Accordion type="single" collapsible className="w-full">
+                                    {compatibilitySigns.map((sign, index) => (
+                                        <AccordionItem value={sign} key={sign}>
+                                            <AccordionTrigger className="text-base text-gray-300 hover:text-white hover:no-underline">With the {sign}</AccordionTrigger>
+                                            <AccordionContent>
+                                                <SpeechPlayer text={insight.signData.compatibilities[sign as keyof typeof insight.signData.compatibilities]} elementId={`compat-speech-${index}`} />
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            </ScrollArea>
+                        </div>
+                    )}
+                    {activeTab === 'future' && (
+                        <div className="glass-card p-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2"><Telescope/> Future Years</h3>
+                            <ScrollArea className="h-72 pr-3">
+                                <Accordion type="single" collapsible className="w-full">
+                                    {futureYears.map(([year, futureData], index) => (
+                                        <AccordionItem value={year} key={year}>
+                                            <AccordionTrigger className="text-base text-gray-300 hover:text-white hover:no-underline">{year} - The {futureData.element} {futureData.year}</AccordionTrigger>
+                                            <AccordionContent>
+                                                <SpeechPlayer text={futureData.prediction} elementId={`future-speech-${index}`} />
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            </ScrollArea>
+                        </div>
+                    )}
+                </motion.div>
+            </AnimatePresence>
+      </div>
     );
   }
 
@@ -408,12 +437,15 @@ const ResultsHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) 
 
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
-    const categories = [
-        { key: 'description', title: 'Description', icon: <Info className="h-5 w-5" /> },
-        { key: 'love', title: 'Love', icon: <Heart className="h-5 w-5" /> },
-        { key: 'homeAndFamily', title: 'Home & Family', icon: <Home className="h-5 w-5" /> },
-        { key: 'profession', title: 'Profession', icon: <Briefcase className="h-5 w-5" /> },
-    ];
+    const categories = React.useMemo(() => [
+        { id: 'description', label: 'Description', icon: Info },
+        { id: 'love', label: 'Love', icon: Heart },
+        { id: 'home', label: 'Home & Family', icon: Home },
+        { id: 'profession', label: 'Profession', icon: Briefcase },
+        { id: 'compatibilities', label: 'Compatibilities', icon: HeartHandshake }
+    ], []);
+
+    const [activeTab, setActiveTab] = React.useState(categories[0].id);
 
     if (!signData) {
         return (
@@ -431,7 +463,8 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         );
     }
     
-    const [activeTab, setActiveTab] = React.useState(categories[0].key);
+    const activeCategory = categories.find(c => c.id === activeTab);
+    const ActiveIcon = activeCategory?.icon || Info;
 
     return (
         <DialogContent className="max-w-3xl">
@@ -444,31 +477,31 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                 </DialogDescription>
             </DialogHeader>
 
-            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2">
-                    {categories.map(category => (
-                        <TabsTrigger key={category.key} value={category.key} className="flex-1 text-xs sm:text-sm">
-                             {React.cloneElement(category.icon, { className: "mr-2 h-4 w-4" })}
-                             {category.title}
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
-                {categories.map(category => (
-                    <TabsContent key={category.key} value={category.key}>
-                        <div className="glass-card p-4 min-h-[300px] mt-4">
+            <div className="w-full">
+                <CelestialArcNav categories={categories} activeTab={activeTab} setActiveTab={setActiveTab} />
+
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                         <div className="glass-card p-4 min-h-[300px] mt-4">
                             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-                                {React.cloneElement(category.icon, { className: "h-5 w-5" })} {category.title}
+                                <ActiveIcon className="h-5 w-5" /> {activeCategory?.label}
                             </h3>
                             <ScrollArea className="h-60 pr-3">
                                 <SpeechPlayer 
-                                    text={signData[category.key] || `Content for ${category.key} is being prepared.`} 
-                                    elementId={`new-astro-${category.key}-speech`}
+                                    text={signData[activeTab] || `Content for ${activeTab} is being prepared.`} 
+                                    elementId={`new-astro-${activeTab}-speech`}
                                 />
                            </ScrollArea>
                        </div>
-                    </TabsContent>
-                ))}
-            </Tabs>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
         </DialogContent>
     );
 }
@@ -485,7 +518,14 @@ function ResultsDisplay({
   onHistoryOpen: () => void;
 }) {
   
-  const [activeTab, setActiveTab] = React.useState<'astro' | 'numerology'>('astro');
+  const categories = React.useMemo(() => [
+    { id: 'astro', label: 'Astro Insights' },
+    ...(numerology ? [{ id: 'numerology', label: 'Numerology' }] : []),
+    { id: 'new_astro', label: 'New Astrology' }
+  ], [numerology]);
+  
+  const [activeTab, setActiveTab] = React.useState(categories[0].id);
+
   const newAstroData = NEW_ASTROLOGY_DATA[insight.new_astrology_sign.replace(/\s+/g, '')];
 
   return (
@@ -497,30 +537,17 @@ function ResultsDisplay({
         transition={{ duration: 0.4, ease: 'easeOut' }}
     >
         <div className="relative z-10 p-4 sm:p-8">
-            <Dialog>
-                <header className="text-center mb-6 relative">
-                    <h1 
-                        className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
-                    >
-                        {insight.name}
-                    </h1>
-                    <div className="relative inline-block mt-1 group">
-                         <DialogTrigger asChild>
-                             <motion.div className="animated-border">
-                                <button className="text-lg w-full h-full px-4 py-2 bg-[hsl(var(--bg-dark-hsl))] text-gray-400 hover:text-white transition-colors duration-300 underline underline-offset-4 decoration-dashed decoration-gray-500 hover:decoration-solid hover:decoration-primary">
-                                    {insight.new_astrology_sign}
-                                </button>
-                            </motion.div>
-                        </DialogTrigger>
-                    </div>
-                </header>
-                <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
-            </Dialog>
+            <header className="text-center mb-6 relative">
+                <h1 
+                    className="text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]"
+                >
+                    {insight.name}
+                </h1>
+                 <p className="text-lg text-gray-400 mt-1">{insight.new_astrology_sign}</p>
+            </header>
 
-
-            <nav className="flex justify-center gap-2 mb-6">
-                <TabButton id="astro" activeTab={activeTab} setActiveTab={setActiveTab}>Astro Insights</TabButton>
-                {numerology && <TabButton id="numerology" activeTab={activeTab} setActiveTab={setActiveTab}>Numerology Report</TabButton>}
+            <nav className="flex justify-center mb-6">
+                <CelestialArcNav categories={categories} activeTab={activeTab} setActiveTab={setActiveTab} />
             </nav>
 
             <AnimatePresence mode="wait">
@@ -534,9 +561,13 @@ function ResultsDisplay({
                     {activeTab === 'astro' && (
                         <AstroDisplay insight={insight} />
                     )}
-
                     {activeTab === 'numerology' && numerology && (
                         <NumerologyDisplay numerology={numerology} />
+                    )}
+                    {activeTab === 'new_astro' && (
+                        <Dialog defaultOpen={true}>
+                          <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
+                        </Dialog>
                     )}
                 </motion.div>
             </AnimatePresence>
@@ -551,20 +582,6 @@ function ResultsDisplay({
     </motion.div>
   );
 }
-
-const TabButton = ({ id, activeTab, setActiveTab, children } : { id: 'astro' | 'numerology', activeTab: string, setActiveTab: (id: 'astro' | 'numerology') => void, children: React.ReactNode }) => {
-    const isActive = activeTab === id;
-    return (
-        <div className={cn("flex-1 max-w-xs animated-border", isActive ? "" : "grayscale")}>
-            <button
-                onClick={() => setActiveTab(id)}
-                className="w-full h-full p-3 font-semibold text-gray-400 bg-[hsl(var(--bg-dark-hsl))] rounded-xl cursor-pointer transition-all hover:text-white"
-            >
-                <span className="relative z-10">{children}</span>
-            </button>
-        </div>
-    );
-};
 
 const HISTORY_KEY = 'mystiqueCompassHistory';
 const MAX_HISTORY_SIZE = 21;
@@ -775,6 +792,7 @@ export function ProfileGenerator() {
     
 
     
+
 
 
 
