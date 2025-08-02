@@ -503,6 +503,13 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
     );
 }
 
+const ResultsHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
+    <Button variant="outline" size="icon" className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg text-primary bg-background/70 backdrop-blur-sm" onClick={onHistoryOpen}>
+      <History className="h-7 w-7"/>
+      <span className="sr-only">Open History</span>
+    </Button>
+  );
+
 function ResultsDisplay({
   insight,
   numerology,
@@ -711,14 +718,6 @@ export function ProfileGenerator() {
             <span className="sr-only">Open History</span>
         </Button>
     );
-
-    const ResultsHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
-      <Button variant="outline" size="icon" className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg text-primary bg-background/70 backdrop-blur-sm" onClick={onHistoryOpen}>
-        <History className="h-7 w-7"/>
-        <span className="sr-only">Open History</span>
-      </Button>
-    );
-
 
   return (
     <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
