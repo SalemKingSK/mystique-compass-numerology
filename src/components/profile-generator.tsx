@@ -488,11 +488,17 @@ function ResultsDisplay({
                 >
                     {insight.name}
                 </h1>
-                <DialogTrigger asChild>
-                    <button className="text-lg text-gray-400 mt-1 hover:text-white transition-colors duration-300 underline underline-offset-4 decoration-dashed decoration-gray-500 hover:decoration-solid hover:decoration-primary">
-                        {insight.new_astrology_sign}
-                    </button>
-                </DialogTrigger>
+                <div className="relative inline-block mt-1 group">
+                    <DialogTrigger asChild>
+                        <button className="text-lg text-gray-400 hover:text-white transition-colors duration-300 underline underline-offset-4 decoration-dashed decoration-gray-500 hover:decoration-solid hover:decoration-primary relative z-10">
+                            {insight.new_astrology_sign}
+                        </button>
+                    </DialogTrigger>
+                    <motion.div 
+                        className="absolute inset-0 rounded-xl group-hover:bg-primary/10"
+                        style={{animation: 'pulse-border 4s linear infinite'}}
+                    />
+                </div>
             </header>
             <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
         </Dialog>
@@ -758,3 +764,4 @@ export function ProfileGenerator() {
     
 
     
+
