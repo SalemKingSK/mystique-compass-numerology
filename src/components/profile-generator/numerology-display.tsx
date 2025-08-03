@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -23,14 +24,14 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
     return (
         <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="glass-card px-4">
-                <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
-                    <div className="flex justify-between items-center w-full">
+                <div className="flex justify-between items-center w-full">
+                    <AccordionTrigger>
                         <span className="font-semibold text-lg text-primary flex items-center gap-2">
                             <Wand2 className="h-5 w-5" /> {title}
                         </span>
-                        <SpeechPlayer text={meaning} />
-                    </div>
-                </AccordionTrigger>
+                    </AccordionTrigger>
+                    <SpeechPlayer text={meaning} />
+                </div>
                 <AccordionContent>
                     <ScrollableTextDisplay text={meaning} />
                 </AccordionContent>
@@ -45,12 +46,12 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
     const ArrowItem = ({ arrow, type }: { arrow: ArrowData, type: 'Strength' | 'Weakness' }) => {
         return (
             <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
-                <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
-                    <div className="flex justify-between items-center w-full">
+                <div className="flex justify-between items-center w-full">
+                    <AccordionTrigger>
                         <span className="text-left">Arrow of {type}: {arrow.name}</span>
-                         <SpeechPlayer text={arrow.description} />
-                    </div>
-                </AccordionTrigger>
+                    </AccordionTrigger>
+                    <SpeechPlayer text={arrow.description} />
+                </div>
                 <AccordionContent>
                    <ScrollableTextDisplay text={arrow.description}/>
                 </AccordionContent>
@@ -87,12 +88,12 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
   const RepetitionItem = ({ number, count, meaning }: { number: string, count: number, meaning: string }) => {
       return (
            <AccordionItem value={`number-${number}`} key={number} className="glass-card px-4">
-              <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
-                  <div className="flex justify-between items-center w-full">
+              <div className="flex justify-between items-center w-full">
+                  <AccordionTrigger>
                      <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
-                     <SpeechPlayer text={meaning || ''} />
-                  </div>
-              </AccordionTrigger>
+                  </AccordionTrigger>
+                  <SpeechPlayer text={meaning || ''} />
+              </div>
               <AccordionContent>
                    <ScrollableTextDisplay text={meaning || ''} />
               </AccordionContent>

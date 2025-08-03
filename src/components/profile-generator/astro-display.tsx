@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -36,12 +37,10 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
-                        <div className="flex justify-between items-center w-full">
-                            <span>With the {sign}</span>
-                            <SpeechPlayer text={String(text)} />
-                        </div>
-                    </AccordionTrigger>
+                    <div className="flex justify-between items-center w-full">
+                       <AccordionTrigger>With the {sign}</AccordionTrigger>
+                       <SpeechPlayer text={String(text)} />
+                    </div>
                     <AccordionContent>
                         <ScrollableTextDisplay text={String(text)} />
                     </AccordionContent>
@@ -65,12 +64,10 @@ function FutureDisplay({ futures }: { futures: any }) {
                 const text = data.prediction;
                 return (
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                        <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
-                             <div className="flex justify-between items-center w-full">
-                                <span>{year} - Year of the {data.year}</span>
-                                <SpeechPlayer text={text} />
-                            </div>
-                        </AccordionTrigger>
+                        <div className="flex justify-between items-center w-full">
+                           <AccordionTrigger>{year} - Year of the {data.year}</AccordionTrigger>
+                           <SpeechPlayer text={text} />
+                        </div>
                         <AccordionContent>
                            <ScrollableTextDisplay text={text} />
                         </AccordionContent>
