@@ -8,10 +8,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { BookOpen, Leaf, Users, Forward, Info, Heart, Home, Briefcase } from "lucide-react";
-import type { AstroInsightOutput, NewAstroSignData } from './types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '../ui/button';
+import { BookOpen, Leaf, Users, Forward } from "lucide-react";
+import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
@@ -56,69 +54,6 @@ function FutureDisplay({ futures }: { futures: any }) {
 }
 
 
-function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAstroSignData }) {
-  if (!signData || Object.keys(signData).length === 0) {
-    return (
-      <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
-        <DialogHeader>
-          <DialogTitle className="text-3xl font-bold text-center text-purple-300">
-            {sign.replace('/', ' / ')}
-          </DialogTitle>
-          <div className="pt-8 text-center text-slate-400">
-            Detailed information for {sign} is not yet available.
-          </div>
-        </DialogHeader>
-      </DialogContent>
-    );
-  }
-
-  return (
-    <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
-      <DialogHeader>
-        <DialogTitle className="text-3xl font-bold text-center text-purple-300">
-            {sign.replace('/', ' / ')}
-        </DialogTitle>
-        <DialogDescription className="text-center text-slate-400">
-          A detailed look into the combined traits of your unique astrological sign.
-        </DialogDescription>
-      </DialogHeader>
-
-      <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto sm:h-12">
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="love">Love</TabsTrigger>
-          <TabsTrigger value="homeAndFamily">Home & Family</TabsTrigger>
-          <TabsTrigger value="profession">Profession</TabsTrigger>
-          <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
-        </TabsList>
-        
-        <div className="h-72 w-full pt-4">
-          <TabsContent value="description">
-             <ScrollableTextDisplay text={signData.description || ''} icon={<Info className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-          </TabsContent>
-
-          <TabsContent value="love">
-             <ScrollableTextDisplay text={signData.love || ''} icon={<Heart className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-          </TabsContent>
-
-          <TabsContent value="homeAndFamily">
-             <ScrollableTextDisplay text={signData.homeAndFamily || ''} icon={<Home className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-          </TabsContent>
-
-          <TabsContent value="profession">
-            <ScrollableTextDisplay text={signData.profession || ''} icon={<Briefcase className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-          </TabsContent>
-
-          <TabsContent value="compatibilities">
-            <ScrollableTextDisplay text={signData.compatibilities || ''} icon={<Users className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-          </TabsContent>
-        </div>
-      </Tabs>
-    </DialogContent>
-  );
-}
-
-
 export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const { zodiacData, sign, element } = insight;
   const { introduction, elements, compatibilities, futures } = zodiacData;
@@ -127,7 +62,6 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
 
   return (
     <div className="space-y-4">
-      
       <Tabs defaultValue="introduction" className="w-full glass-card p-4">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto bg-black/20">
           <TabsTrigger value="introduction">Introduction</TabsTrigger>
@@ -169,4 +103,3 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     </div>
   );
 }
-

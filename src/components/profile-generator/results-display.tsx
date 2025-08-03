@@ -7,20 +7,20 @@ import { Button } from '@/components/ui/button';
 import type { AstroInsightOutput, NumerologyData, NewAstroSignData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
-import { ArrowLeft, History } from "lucide-react";
+import { ArrowLeft, History, Briefcase, Heart, Home, Info, Users } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { ScrollableTextDisplay } from './scrollable-text-display';
-import { Briefcase, Heart, Home, Info, Users } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 
 function TabButton({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
     return (
-        <button 
+        <button
             onClick={onClick}
-            className={`px-6 py-2 text-lg font-medium rounded-lg transition-all duration-300 ease-in-out transform
-                ${isActive 
-                    ? 'bg-purple-500/30 text-white shadow-lg scale-105 border border-purple-400/50' 
+            className={`px-6 py-2 w-1/2 text-lg font-medium rounded-lg transition-all duration-300 ease-in-out transform
+                ${isActive
+                    ? 'bg-purple-500/30 text-white shadow-lg scale-105 border border-purple-400/50'
                     : 'text-purple-200/70 hover:bg-purple-500/10 hover:text-white'
                 }`}
         >
@@ -83,7 +83,14 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAs
           </TabsContent>
 
           <TabsContent value="compatibilities">
-            <ScrollableTextDisplay text={signData.compatibilities || ''} icon={<Users className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
+              <Accordion type="multiple" className="w-full space-y-1">
+                <AccordionItem value="compatibilities">
+                    <AccordionTrigger>Compatibility Details</AccordionTrigger>
+                    <AccordionContent>
+                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{signData.compatibilities}</p>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
           </TabsContent>
         </div>
       </Tabs>
@@ -111,7 +118,7 @@ function ResultsHeader({ onReset, onHistoryOpen, name, newAstrologySign, signDat
 
        <Dialog>
           <DialogTrigger asChild>
-            <Button variant="ghost" className="text-lg text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 mt-2">
+            <Button variant="link" className="text-lg text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 mt-2 px-6 py-2">
                 {newAstrologySign}
             </Button>
           </DialogTrigger>
@@ -126,7 +133,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
   const [activeTab, setActiveTab] = React.useState('astro');
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -134,17 +141,19 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
       className="results-background w-full"
     >
       <div className="max-w-4xl mx-auto p-4">
-        <ResultsHeader 
-            onReset={onReset} 
-            onHistoryOpen={onHistoryOpen} 
-            name={insight.name} 
+        <ResultsHeader
+            onReset={onReset}
+            onHistoryOpen={onHistoryOpen}
+            name={insight.name}
             newAstrologySign={insight.new_astrology_sign}
             signData={insight.signData}
         />
 
-        <div className="flex justify-center space-x-4 mb-6">
-            <TabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</TabButton>
-            <TabButton isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology Report</TabButton>
+        <div className="animated-border mb-6">
+            <div className='flex justify-center space-x-0 bg-background/80 p-1 rounded-2xl'>
+                 <TabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</TabButton>
+                 <TabButton isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology Report</TabButton>
+            </div>
         </div>
 
         <AnimatePresence mode="wait">
