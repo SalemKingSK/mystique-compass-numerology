@@ -20,8 +20,11 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         const synth = window.speechSynthesis;
 
         const handleSpeakingState = () => {
+            // Only update state if this component's utterance is the one being spoken
             if (utteranceRef.current && synth.speaking !== isPlaying) {
-                setIsPlaying(synth.speaking);
+                 setIsPlaying(synth.speaking);
+            } else if (!synth.speaking && isPlaying) {
+                 setIsPlaying(false);
             }
         };
 
@@ -29,6 +32,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
 
         return () => {
             clearInterval(interval);
+            // Cleanup on unmount
             if (synth.speaking && utteranceRef.current) {
                 synth.cancel();
             }
@@ -39,11 +43,14 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         e.preventDefault();
         e.stopPropagation();
 
+        if (!text || text.trim() === '') return; // Prevent speaking empty text
+
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
         const synth = window.speechSynthesis;
 
         if (isPlaying) {
-            synth.cancel(); // This will trigger the 'onend' event, resetting state.
+            synth.cancel(); 
+            setIsPlaying(false);
             return;
         }
 
@@ -75,7 +82,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
             };
 
             synth.speak(utterance);
-        }, 100); // A small delay can help prevent race conditions
+        }, 100); 
 
     }, [text, onBoundary, onEnd, isPlaying]);
 
