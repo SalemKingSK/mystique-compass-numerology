@@ -212,11 +212,9 @@
 .scroll-container {
   max-height: 20rem; /* Adjusted height */
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 1rem;
   border-radius: 0.5rem;
-  color: hsl(var(--muted-foreground));
   background-color: transparent;
-  whitespace-pre-wrap: break-spaces;
   line-height: 1.7;
 }
 
