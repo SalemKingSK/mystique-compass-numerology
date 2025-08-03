@@ -444,7 +444,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
     }
     
     return (
-        <DialogContent className="max-w-4xl min-h-[580px] flex flex-col">
+        <DialogContent className="max-w-4xl min-h-[580px] flex flex-col glass-card">
             <DialogHeader>
                 <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
@@ -455,29 +455,31 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
             </DialogHeader>
             <div className="flex-grow mt-4">
                 <Tabs defaultValue="description" className="w-full">
-                    <TabsList className="flex flex-wrap h-auto justify-center gap-1 sm:gap-2 bg-transparent">
-                        <TabsTrigger value="description" className="flex-1 min-w-[120px] whitespace-normal">Description</TabsTrigger>
-                        <TabsTrigger value="love" className="flex-1 min-w-[120px] whitespace-normal">Love</TabsTrigger>
-                        <TabsTrigger value="compatibilities" className="flex-1 min-w-[120px] whitespace-normal">Compatibilities</TabsTrigger>
-                        <TabsTrigger value="home" className="flex-1 min-w-[120px] whitespace-normal">Home & Family</TabsTrigger>
-                        <TabsTrigger value="profession" className="flex-1 min-w-[120px] whitespace-normal">Profession</TabsTrigger>
+                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1">
+                        <TabsTrigger value="description">Description</TabsTrigger>
+                        <TabsTrigger value="love">Love</TabsTrigger>
+                        <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
+                        <TabsTrigger value="home">Home & Family</TabsTrigger>
+                        <TabsTrigger value="profession">Profession</TabsTrigger>
                     </TabsList>
-
-                    <TabsContent value="description" className="mt-4">
-                        <p>Description placeholder...</p>
-                    </TabsContent>
-                    <TabsContent value="love" className="mt-4">
-                        <p>Love placeholder...</p>
-                    </TabsContent>
-                    <TabsContent value="compatibilities" className="mt-4">
-                        <p>Compatibilities placeholder...</p>
-                    </TabsContent>
-                    <TabsContent value="home" className="mt-4">
-                        <p>Home & Family placeholder...</p>
-                    </TabsContent>
-                    <TabsContent value="profession" className="mt-4">
-                        <p>Profession placeholder...</p>
-                    </TabsContent>
+                    
+                    <ScrollArea className="h-96 mt-4 pr-3">
+                        <TabsContent value="description">
+                           <SpeechPlayer text={signData.description || 'Not available.'} elementId="new-astro-desc" />
+                        </TabsContent>
+                        <TabsContent value="love">
+                            <SpeechPlayer text={signData.love || 'Not available.'} elementId="new-astro-love" />
+                        </TabsContent>
+                        <TabsContent value="compatibilities">
+                            <SpeechPlayer text={signData.compatibilities || 'Not available.'} elementId="new-astro-comp" />
+                        </TabsContent>
+                        <TabsContent value="home">
+                            <SpeechPlayer text={signData.homeAndFamily || 'Not available.'} elementId="new-astro-home" />
+                        </TabsContent>
+                        <TabsContent value="profession">
+                            <SpeechPlayer text={signData.profession || 'Not available.'} elementId="new-astro-prof" />
+                        </TabsContent>
+                    </ScrollArea>
                 </Tabs>
             </div>
         </DialogContent>
@@ -802,3 +804,4 @@ export function ProfileGenerator() {
 }
 
     
+
