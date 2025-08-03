@@ -1,17 +1,56 @@
-
 'use client';
 
 import * as React from 'react';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { BookOpen, Leaf, Users, Forward } from "lucide-react";
+import { cva } from "class-variance-authority";
+
 import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { cn } from '@/lib/utils';
+
+// --- SUB-COMPONENTS ---
+
+const arcItemVariants = cva(
+  "cursor-pointer font-medium text-sm transition-all",
+  {
+    variants: {
+      variant: {
+        selected: "bg-[hsl(var(--arc-selected-bg))] text-[hsl(var(--arc-selected-fg))] font-bold py-2 px-4 rounded-2xl",
+        unselected: "text-[hsl(var(--arc-unselected-fg))]",
+      },
+    },
+    defaultVariants: {
+      variant: "unselected",
+    },
+  }
+);
+
+function CelestialArcNav({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: string) => void }) {
+  const tabs = ["Introduction", "Element", "Compatibility", "Future"];
+  
+  return (
+    <div className="flex justify-center items-center gap-6 my-8">
+      {tabs.map((tab, index) => {
+        const isSelected = activeTab === tab.toLowerCase();
+        const isOffset = index === 1 || index === 2;
+        return (
+          <div
+            key={tab}
+            className={cn(
+              arcItemVariants({ variant: isSelected ? 'selected' : 'unselected' }),
+              isOffset && 'transform translateY(8px)'
+            )}
+            style={{ transform: isOffset ? 'translateY(8px)' : 'none' }}
+            onClick={() => setActiveTab(tab.toLowerCase())}
+          >
+            {tab}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {
@@ -53,53 +92,56 @@ function FutureDisplay({ futures }: { futures: any }) {
     );
 }
 
+// --- MAIN COMPONENT ---
 
 export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
+  const [activeSubTab, setActiveSubTab] = React.useState('introduction');
   const { zodiacData, sign, element } = insight;
   const { introduction, elements, compatibilities, futures } = zodiacData;
 
   const signElementData = elements?.[element as keyof typeof elements];
 
+  const renderContent = () => {
+    switch (activeSubTab) {
+      case 'introduction':
+        return (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><BookOpen className="h-5 w-5" /> Your Animal Sign: The {sign}</h3>
+            <ScrollableTextDisplay text={introduction || "No introduction available."} />
+          </div>
+        );
+      case 'element':
+        return (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {element}</h3>
+            <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
+          </div>
+        );
+      case 'compatibility':
+        return (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Users className="h-5 w-5" /> Compatibility Guide</h3>
+            <CompatibilityDisplay compatibilities={compatibilities} />
+          </div>
+        );
+      case 'future':
+        return (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Forward className="h-5 w-5" /> Future Outlook</h3>
+            <FutureDisplay futures={futures} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
-    <div className="space-y-4">
-      <Tabs defaultValue="introduction" className="w-full glass-card p-4">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto bg-black/20">
-          <TabsTrigger value="introduction">Introduction</TabsTrigger>
-          <TabsTrigger value="element">Element</TabsTrigger>
-          <TabsTrigger value="compatibility">Compatibility</TabsTrigger>
-          <TabsTrigger value="future">Future</TabsTrigger>
-        </TabsList>
-        
-        <div className="mt-4 min-h-[250px]">
-          <TabsContent value="introduction">
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><BookOpen className="h-5 w-5" /> Your Animal Sign: The {sign}</h3>
-              <ScrollableTextDisplay text={introduction || "No introduction available."} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="element">
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {element}</h3>
-              <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="compatibility">
-             <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Users className="h-5 w-5" /> Compatibility Guide</h3>
-              <CompatibilityDisplay compatibilities={compatibilities} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="future">
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Forward className="h-5 w-5" /> Future Outlook</h3>
-              <FutureDisplay futures={futures} />
-            </div>
-          </TabsContent>
-        </div>
-      </Tabs>
+    <div className="w-full glass-card p-4">
+      <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} />
+      <div className="mt-4 min-h-[250px]">
+        {renderContent()}
+      </div>
     </div>
   );
 }

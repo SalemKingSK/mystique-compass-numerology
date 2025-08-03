@@ -7,22 +7,33 @@ import { Button } from '@/components/ui/button';
 import type { AstroInsightOutput, NumerologyData, NewAstroSignData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
-import { ArrowLeft, History, Briefcase, Heart, Home, Info, Users } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { ArrowLeft, History, Info, Heart, Home, Briefcase, Users } from "lucide-react";
+import { cva } from "class-variance-authority";
+import { cn } from '@/lib/utils';
 import { ScrollableTextDisplay } from './scrollable-text-display';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 
-function TabButton({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
+const mainTabVariants = cva(
+    "py-3 px-6 rounded-full text-base font-medium cursor-pointer transition-colors duration-300",
+    {
+        variants: {
+            variant: {
+                selected: "bg-[hsl(var(--main-tab-selected-bg))] text-[hsl(var(--main-tab-selected-fg))] font-bold border-2 border-[hsl(var(--main-tab-selected-bg))]",
+                unselected: "bg-transparent text-[hsl(var(--main-tab-unselected-border))] border-2 border-[hsl(var(--main-tab-unselected-border))]"
+            }
+        },
+        defaultVariants: {
+            variant: "unselected"
+        }
+    }
+);
+
+function MainTabButton({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
     return (
         <button
             onClick={onClick}
-            className={`px-4 py-2.5 w-1/3 text-base md:text-lg font-medium transition-colors duration-300
-                ${isActive
-                    ? 'text-white'
-                    : 'text-purple-200/70 hover:text-white'
-                }`}
+            className={cn(mainTabVariants({ variant: isActive ? 'selected' : 'unselected' }))}
         >
             {children}
         </button>
@@ -82,7 +93,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAs
 
 function ResultsHeader({ name }: { name: string }) {
   return (
-    <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl bg-black/20 w-full">
+    <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center">
             {name}
         </h1>
@@ -117,12 +128,12 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
     >
       <div className="w-full max-w-4xl mx-auto flex-grow">
         <ResultsHeader name={insight.name} />
-
+        
         <div className="animated-border mb-6">
             <div className='flex justify-center divide-x divide-white/10 bg-background/80 p-1 rounded-lg'>
-                 <TabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</TabButton>
-                 <TabButton isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology</TabButton>
-                 <TabButton isActive={activeTab === 'new-astro'} onClick={() => setActiveTab('new-astro')}>{insight.new_astrology_sign}</TabButton>
+                 <MainTabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</MainTabButton>
+                 <MainTabButton isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology Report</MainTabButton>
+                 <MainTabButton isActive={activeTab === 'new-astro'} onClick={() => setActiveTab('new-astro')}>New Astrology</MainTabButton>
             </div>
         </div>
 

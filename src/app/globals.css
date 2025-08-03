@@ -4,71 +4,75 @@
 
 @layer base {
   :root {
-    /* Google-inspired color palette from Aura Flow concept */
-    --color-primary-hsl: 217 91% 72%;
-    --color-secondary-hsl: 47 98% 69%;
-    --color-tertiary-hsl: 108 27% 67%;
-    --color-quaternary-hsl: 337 69% 71%;
+    /* Main Theme Colors (Celestial) */
+    --background: 240 10% 3.9%; /* Deep space blue/black */
+    --foreground: 210 40% 98%; /* Light nebula white */
     
-    --bg-dark-hsl: 222 84% 4.9%;
-    
-    --background: var(--bg-dark-hsl);
-    --foreground: 210 40% 98%;
-
-    --card: var(--bg-dark-hsl);
+    --card: 222 84% 4.9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: var(--bg-dark-hsl);
+    --popover: 222 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: var(--color-primary-hsl);
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: var(--color-secondary-hsl);
-    --secondary-foreground: 340 10% 25%;
+    --primary: 263 80% 65%; /* Vibrant cosmic purple */
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 48 98% 50%; /* Golden-yellow for selected tabs */
+    --secondary-foreground: 260 25% 15%; /* Dark purple text for selected tabs */
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 240 3.7% 15.9%; /* For hovered/unselected borders */
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: var(--color-primary-hsl);
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 263 80% 65%;
 
     --radius: 0.75rem;
 
-    --gradient-start: hsl(var(--color-quaternary-hsl));
-    --gradient-mid1: hsl(var(--color-primary-hsl));
-    --gradient-mid2: hsl(var(--color-secondary-hsl));
-    --gradient-end: hsl(var(--color-tertiary-hsl));
+    /* Custom Colors from Screenshot */
+    --main-tab-selected-bg: 48 100% 50%; /* #FFD700 - Golden Yellow */
+    --main-tab-selected-fg: 276 38% 15%; /* #301934 - Dark Purple */
+    --main-tab-unselected-border: 245 100% 88%; /* #BDB2FF - Light Lavender */
+
+    --arc-selected-bg: 273 100% 12%; /* #2C003E - Darkest Purple */
+    --arc-selected-fg: 240 67% 94%; /* #E6E6FA - Bright Lavender/White */
+    --arc-unselected-fg: 260 58% 64%; /* #9370DB - Muted Lavender */
   }
 
   .dark {
-    /* Same as root for a consistent dark theme */
-    --background: var(--bg-dark-hsl);
+    --background: 240 10% 3.9%;
     --foreground: 210 40% 98%;
-    --card: var(--bg-dark-hsl);
+    
+    --card: 222 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --popover: var(--bg-dark-hsl);
+
+    --popover: 222 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: var(--color-primary-hsl);
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: var(--color-secondary-hsl);
-    --secondary-foreground: 340 10% 25%;
+
+    --primary: 263 80% 65%;
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 48 98% 50%;
+    --secondary-foreground: 260 25% 15%;
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 210 40% 98%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: var(--color-primary-hsl);
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 263 80% 65%;
   }
 }
 
@@ -113,11 +117,11 @@
   border-radius: inherit;
   background: conic-gradient(
     from var(--angle),
-    var(--gradient-start),
-    var(--gradient-mid1),
-    var(--gradient-mid2),
-    var(--gradient-end),
-    var(--gradient-start)
+    hsl(var(--color-quaternary-hsl)),
+    hsl(var(--color-primary-hsl)),
+    hsl(var(--color-secondary-hsl)),
+    hsl(var(--color-tertiary-hsl)),
+    hsl(var(--color-quaternary-hsl))
   );
   animation: border-flow 8s linear infinite;
   z-index: -1;
@@ -176,15 +180,15 @@
 
 @keyframes arrow-pulse {
   0%, 100% {
-    filter: drop-shadow(0 0 2px hsl(var(--color-primary-hsl)));
+    filter: drop-shadow(0 0 2px hsl(var(--primary)));
   }
   25% {
-    filter: drop-shadow(0 0 4px hsl(var(--color-quaternary-hsl)));
+    filter: drop-shadow(0 0 4px hsl(337 69% 71%));
   }
   50% {
-    filter: drop-shadow(0 0 6px hsl(var(--color-secondary-hsl)));
+    filter: drop-shadow(0 0 6px hsl(var(--secondary)));
   }
   75% {
-    filter: drop-shadow(0 0 4px hsl(var(--color-tertiary-hsl)));
+    filter: drop-shadow(0 0 4px hsl(108 27% 67%));
   }
 }
