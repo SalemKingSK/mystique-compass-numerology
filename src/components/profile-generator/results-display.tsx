@@ -15,6 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 
 // --- SUB-COMPONENTS ---
@@ -92,10 +93,12 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                             <CarouselItem key={tab.key}>
                                 <div className="p-1 h-96">
                                     <ScrollArea className="h-full w-full rounded-md p-4 bg-black/20">
-                                        <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
-                                            <tab.icon className="h-6 w-6" /> {tab.name}
-                                        </h3>
-                                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{text}</p>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h3 className="text-xl font-bold text-primary flex items-center gap-2">
+                                                <tab.icon className="h-6 w-6" /> {tab.name}
+                                            </h3>
+                                        </div>
+                                        <ScrollableTextDisplay text={String(text)} />
                                     </ScrollArea>
                                 </div>
                             </CarouselItem>
@@ -148,6 +151,15 @@ function ResultsFooter({ onReset, onHistoryOpen }: { onReset: () => void; onHist
 
 export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: { insight: AstroInsightOutput; numerology: NumerologyData, onReset: () => void; onHistoryOpen: () => void; }) {
   const [activeTab, setActiveTab] = React.useState('astro');
+
+  // Stop any speaking when the component unmounts or the tab changes
+  React.useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [activeTab]);
 
   return (
     <motion.div

@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -24,7 +23,6 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     if (synth.speaking || synth.paused) {
       synth.cancel();
     }
-    // The onend event will handle resetting the state
   }, []);
 
   React.useEffect(() => {
@@ -35,57 +33,56 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
   }, [handleStop]);
 
   const handlePlayPause = React.useCallback(() => {
-    if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) {
+        return;
+    }
 
     const synth = window.speechSynthesis;
 
-    if (isPlaying) {
-      if (isPaused) {
-        synth.resume();
-        setIsPaused(false);
-      } else {
+    if (synth.speaking && !isPaused) {
+        // Is speaking, and we want to pause
         synth.pause();
         setIsPaused(true);
-      }
-      return;
+        setIsPlaying(true); // Still "playing" in a paused state
+    } else if (synth.paused && isPaused) {
+        // Is paused, and we want to resume
+        synth.resume();
+        setIsPaused(false);
+    } else {
+        // Not speaking, start a new utterance
+        handleStop(); // Stop any residual speech
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance;
+        
+        utterance.onboundary = onBoundary;
+
+        utterance.onend = () => {
+            setIsPlaying(false);
+            setIsPaused(false);
+            utteranceRef.current = null;
+            if (onEnd) onEnd();
+        };
+        
+        utterance.onerror = (event) => {
+            if (event.error !== 'canceled') {
+              console.error("SpeechSynthesis Error", event);
+              toast({
+                variant: 'destructive',
+                title: 'Speech Error',
+                description: 'Could not generate audio. Please try again.',
+              });
+            }
+            // onend will also fire, cleaning up state.
+        };
+        
+        setIsPlaying(true);
+        setIsPaused(false);
+        synth.speak(utterance);
     }
-    
-    // Stop any currently playing speech before starting a new one
-    if (synth.speaking) {
-      synth.cancel();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
 
-    utterance.onboundary = onBoundary;
+  }, [text, onBoundary, onEnd, toast, isPlaying, isPaused, handleStop]);
 
-    utterance.onend = () => {
-      setIsPlaying(false);
-      setIsPaused(false);
-      utteranceRef.current = null;
-      if (onEnd) onEnd();
-    };
-    
-    utterance.onerror = (event) => {
-        // A "canceled" error is expected when we call synth.cancel(). 
-        // We don't need to log this as a real error.
-        if (event.error !== 'canceled') {
-          console.error("SpeechSynthesis Error", event);
-          toast({
-            variant: 'destructive',
-            title: 'Speech Error',
-            description: 'Could not generate audio. Please try again.',
-          });
-        }
-       // The onend event will fire after an error, so state cleanup is handled there.
-    };
-    
-    setIsPlaying(true);
-    setIsPaused(false);
-    synth.speak(utterance);
-
-  }, [text, onBoundary, onEnd, toast, isPlaying, isPaused]);
 
   return (
     <div className="flex items-center gap-2 mb-4">
