@@ -398,11 +398,12 @@ const TabButton = ({
   onClick: () => void;
   className?: string;
 }) => (
-    <div className={cn("relative p-0.5 overflow-hidden rounded-xl", isActive ? "bg-transparent" : "", className)}>
+    <div className={cn("relative p-0.5 overflow-hidden rounded-xl", isActive ? "" : "bg-transparent", className)}>
          {isActive && (
-            <div
-                className="animated-border absolute inset-0 z-0"
+            <motion.div
+                className="absolute inset-0 z-0"
                 style={{
+                    '--angle': '0deg',
                     background: 'conic-gradient(from var(--angle), var(--gradient-start), var(--gradient-mid1), var(--gradient-mid2), var(--gradient-end), var(--gradient-start))',
                     animation: 'border-flow 8s linear infinite',
                 }}
@@ -435,16 +436,15 @@ function CelestialArcNav({
 }) {
   const activeIndex = categories.indexOf(activeCategory);
   
-  // Calculate the rotation for each item to be on an arc
   const arcItems = categories.map((category, index) => {
-    const angle = (index - activeIndex) * 25 - 0; // Adjust multiplier for spread, and offset
+    const angle = (index - activeIndex) * 25 - 0;
     return { category, angle };
   });
 
   return (
     <div className="relative h-28 w-full flex items-center justify-center mb-6">
       <div className="absolute w-full h-[200px] -top-16">
-        {arcItems.map(({ category, angle }, index) => {
+        {arcItems.map(({ category, angle }) => {
             const isActive = category === activeCategory;
             return (
               <motion.div
@@ -479,6 +479,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
     const categories = ["Description", "Love", "Compatibilities", "Home & Family", "Profession"];
 
     const getContentForTab = (tab: string) => {
+      if (!signData) return "No content available.";
       switch (tab.toLowerCase()) {
         case 'description': return signData.description;
         case 'love': return signData.love;
@@ -859,6 +860,3 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
-
-    
-    
