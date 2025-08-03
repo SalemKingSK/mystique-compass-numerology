@@ -15,27 +15,15 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
+    // Effect for cleaning up when the component unmounts
     React.useEffect(() => {
         const synth = window.speechSynthesis;
-
-        const handleSpeakingState = () => {
-            // Check if the specific utterance is still speaking
-             const isCurrentlySpeaking = synth.speaking && utteranceRef.current && utteranceRef.current.text === text;
-             if (isCurrentlySpeaking !== isPlaying) {
-                 setIsPlaying(isCurrentlySpeaking);
-             }
-        };
-
-        // Check the state periodically
-        const interval = setInterval(handleSpeakingState, 500);
-
         return () => {
-            clearInterval(interval);
             if (synth.speaking && utteranceRef.current && utteranceRef.current.text === text) {
                 synth.cancel();
             }
         };
-    }, [text, isPlaying]);
+    }, [text]);
 
 
     const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
@@ -48,9 +36,10 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         
         const synth = window.speechSynthesis;
 
-        if (synth.speaking) {
+        if (isPlaying) {
             synth.cancel();
             setIsPlaying(false);
+            utteranceRef.current = null;
             return;
         }
         
@@ -59,12 +48,17 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
              return;
         }
         
-        synth.cancel();
+        // Cancel any other playing speech before starting a new one
+        if(synth.speaking) {
+            synth.cancel();
+        }
         
         const utterance = new SpeechSynthesisUtterance(text);
         utteranceRef.current = utterance;
         
-        utterance.onboundary = onBoundary || null;
+        if(onBoundary) {
+            utterance.onboundary = onBoundary;
+        }
 
         utterance.onend = () => {
             setIsPlaying(false);
@@ -89,7 +83,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
 
         synth.speak(utterance);
 
-    }, [text, onBoundary, onEnd]);
+    }, [text, onBoundary, onEnd, isPlaying]);
 
     return (
         <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
