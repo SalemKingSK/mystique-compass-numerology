@@ -13,68 +13,54 @@ interface SpeechPlayerProps {
 
 export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
-    // utteranceRef is not strictly needed anymore for state checking but can be useful for debugging
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
     React.useEffect(() => {
+        if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
+
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        utterance.onboundary = (event) => onBoundary?.(event);
+        utterance.onstart = () => setIsPlaying(true);
+        utterance.onend = (event) => {
+            setIsPlaying(false);
+            onEnd?.(event);
+        };
+        utterance.onerror = (event) => {
+            console.error("SpeechSynthesis Error", event);
+            setIsPlaying(false);
+        };
+
+        utteranceRef.current = utterance;
+
         // Cleanup on unmount
         return () => {
-            if (window.speechSynthesis?.speaking) {
-                window.speechSynthesis.cancel();
-            }
+            synth.cancel();
         };
-    }, []);
+    }, [text, onBoundary, onEnd]);
+
 
     const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
-
-        if (!text || text.trim() === '' || typeof window === 'undefined' || !window.speechSynthesis) return;
         
         const synth = window.speechSynthesis;
+        const utterance = utteranceRef.current;
 
-        if (isPlaying) {
-            synth.cancel(); // This will trigger the 'onend' event, which resets the state
-            return;
-        }
-
-        // Stop any other speech before starting a new one
+        if (!utterance) return;
+        
         if (synth.speaking) {
+            // If it's speaking, always cancel, which will trigger onend and reset state
             synth.cancel();
-        }
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance;
-        
-        utterance.onboundary = (event) => {
-            if (onBoundary) onBoundary(event);
-        };
-        
-        utterance.onend = (event) => {
-            if (onEnd) onEnd(event);
-            setIsPlaying(false);
-            utteranceRef.current = null;
-        };
-
-        utterance.onerror = (event) => {
-            console.error("SpeechSynthesis Error", event);
-            setIsPlaying(false);
-            utteranceRef.current = null;
-        };
-
-        utterance.onstart = () => {
-            setIsPlaying(true);
-        };
-        
-        // Use a brief timeout to ensure the synth is ready after a potential cancel
-        setTimeout(() => {
+        } else {
+            // If not speaking, start speaking this utterance
             synth.speak(utterance);
-        }, 100);
+        }
 
-
-    }, [text, onBoundary, onEnd, isPlaying]);
+    }, []);
 
     return (
         <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
