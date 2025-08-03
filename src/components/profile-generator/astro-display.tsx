@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, Leaf, Users, Forward, Play, Pause } from "lucide-react";
+import { BookOpen, Leaf, Users, Forward } from "lucide-react";
 import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -37,21 +37,31 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {
         return <p className="text-slate-400">No compatibility information available.</p>;
     }
+    
+    const CompItem = ({ sign, text } : { sign: string, text: string}) => {
+        const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
+        const handleBoundary = () => {};
+        const handleEnd = () => setCurrentSentenceIndex(-1);
+
+        return (
+            <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
+                <AccordionTrigger>
+                  <div className="flex justify-between items-center w-full">
+                    <span>With the {sign}</span>
+                    <SpeechPlayer text={String(text)} onBoundary={handleBoundary} onEnd={handleEnd} />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ScrollableTextDisplay text={String(text)} onBoundary={handleBoundary} onEnd={handleEnd}/>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
 
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
-                <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger>
-                      <div className="flex justify-between items-center w-full">
-                        <span>With the {sign}</span>
-                        <SpeechPlayer text={String(text)} />
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <ScrollableTextDisplay text={String(text)} />
-                    </AccordionContent>
-                </AccordionItem>
+                <CompItem key={sign} sign={sign} text={String(text)} />
             ))}
         </Accordion>
     );
@@ -63,21 +73,32 @@ function FutureDisplay({ futures }: { futures: any }) {
     }
 
     const sortedYears = Object.keys(futures).sort((a, b) => parseInt(a) - parseInt(b));
+
+    const FutureItem = ({ year, data }: { year: string, data: any }) => {
+        const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
+        const handleBoundary = () => {};
+        const handleEnd = () => setCurrentSentenceIndex(-1);
+        const text = data.prediction;
+
+        return (
+            <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
+                <AccordionTrigger>
+                    <div className="flex justify-between items-center w-full">
+                      <span>{year} - Year of the {data.year}</span>
+                      <SpeechPlayer text={text} onBoundary={handleBoundary} onEnd={handleEnd} />
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ScrollableTextDisplay text={text} onBoundary={handleBoundary} onEnd={handleEnd} />
+                </AccordionContent>
+            </AccordionItem>
+        );
+    };
     
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {sortedYears.map(year => (
-                <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger>
-                        <div className="flex justify-between items-center w-full">
-                          <span>{year} - Year of the {futures[year].year}</span>
-                          <SpeechPlayer text={futures[year].prediction} />
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <ScrollableTextDisplay text={futures[year].prediction} />
-                    </AccordionContent>
-                </AccordionItem>
+               <FutureItem key={year} year={year} data={futures[year]} />
             ))}
         </Accordion>
     );
@@ -88,6 +109,7 @@ function FutureDisplay({ futures }: { futures: any }) {
 export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const [api, setApi] = React.useState<any>(null);
   const [current, setCurrent] = React.useState(0);
+  const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
 
   const { zodiacData, sign, element } = insight;
   const { introduction, elements, compatibilities, futures } = zodiacData;
@@ -106,18 +128,21 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     api?.scrollTo(index);
   };
   
+  const handleBoundary = () => {};
+  const handleEnd = () => setCurrentSentenceIndex(-1);
+  
   const contentMap = {
     introduction: {
       title: `Your Animal Sign: The ${sign}`,
       content: (
-        <ScrollableTextDisplay text={introduction || "No introduction available."} />
+        <ScrollableTextDisplay text={introduction || "No introduction available."} onBoundary={handleBoundary} onEnd={handleEnd} />
       ),
       textToSpeak: introduction || ''
     },
     element: {
       title: `Your Element: The ${element}`,
       content: (
-        <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
+        <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} onBoundary={handleBoundary} onEnd={handleEnd} />
       ),
       textToSpeak: signElementData || ''
     },
@@ -164,7 +189,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                                       <h3 className="text-xl font-bold text-primary flex items-center gap-2">
                                           <tab.icon className="h-6 w-6" /> {item.title}
                                       </h3>
-                                      {item.textToSpeak && <SpeechPlayer text={item.textToSpeak} />}
+                                      {item.textToSpeak && <SpeechPlayer text={item.textToSpeak} onBoundary={handleBoundary} onEnd={handleEnd} />}
                                   </div>
                                   <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{item.content}</div>
                               </ScrollArea>

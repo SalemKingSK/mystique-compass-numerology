@@ -7,63 +7,65 @@ import { Play, Pause } from "lucide-react";
 
 interface SpeechPlayerProps {
     text: string;
+    onBoundary?: (event: SpeechSynthesisEvent) => void;
+    onEnd?: (event: SpeechSynthesisEvent) => void;
 }
 
-export function SpeechPlayer({ text }: SpeechPlayerProps) {
+export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
+    // utteranceRef is not strictly necessary anymore but can be useful for debugging
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
-    const handlePlayPause = React.useCallback(() => {
+    const handlePlayPause = React.useCallback((e: React.MouseEvent) => {
+        e.stopPropagation(); // Stop click from propagating to parent (like AccordionTrigger)
+        
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
+        const synth = window.speechSynthesis;
 
         if (isPlaying) {
-            window.speechSynthesis.cancel();
-            setIsPlaying(false);
+            synth.cancel(); // This will trigger the 'end' event
         } else {
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
+            // If anything else is speaking, cancel it
+            if (synth.speaking) {
+                synth.cancel();
             }
+            
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.onstart = () => setIsPlaying(true);
-            utterance.onend = () => {
-                setIsPlaying(false);
+            
+            utterance.onstart = () => {
+                setIsPlaying(true);
             };
-            utterance.onerror = () => setIsPlaying(false);
+
+            // The 'end' event fires for both completion and cancellation
+            utterance.onend = (event) => {
+                setIsPlaying(false);
+                if (onEnd) onEnd(event);
+            };
+            
+            utterance.onerror = (event) => {
+                console.error("SpeechSynthesis Error", event);
+                setIsPlaying(false);
+                if (onEnd) onEnd(event);
+            };
+            
+            if (onBoundary) {
+                utterance.addEventListener('boundary', onBoundary);
+            }
             
             utteranceRef.current = utterance;
-            window.speechSynthesis.speak(utterance);
+            synth.speak(utterance);
         }
-    }, [isPlaying, text]);
+    }, [isPlaying, text, onBoundary, onEnd]);
     
-    // Cleanup speech on unmount
     React.useEffect(() => {
+        // Cleanup on unmount
         return () => {
             if (typeof window !== 'undefined' && window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
         };
     }, []);
-
-    // Effect to track external speech synthesis state
-    React.useEffect(() => {
-        const onSynthStateChange = () => {
-             if (typeof window !== 'undefined' && window.speechSynthesis) {
-                setIsPlaying(window.speechSynthesis.speaking);
-             }
-        };
-        
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            const synth = window.speechSynthesis;
-            // Use a simple interval to check speaking state, as events can be unreliable
-            const intervalId = setInterval(onSynthStateChange, 250);
-
-            return () => {
-                clearInterval(intervalId);
-            }
-        }
-    }, []);
-
-
+    
     return (
         <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}

@@ -13,9 +13,11 @@ const splitIntoSentences = (text: string): string[] => {
 
 interface ScrollableTextDisplayProps {
   text: string;
+  onBoundary: (event: SpeechSynthesisEvent) => void;
+  onEnd: (event: SpeechSynthesisEvent) => void;
 }
 
-export function ScrollableTextDisplay({ text }: ScrollableTextDisplayProps) {
+export function ScrollableTextDisplay({ text, onBoundary, onEnd }: ScrollableTextDisplayProps) {
     const [sentences, setSentences] = React.useState<string[]>([]);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
@@ -27,43 +29,27 @@ export function ScrollableTextDisplay({ text }: ScrollableTextDisplayProps) {
         setCurrentSentenceIndex(-1);
     }, [text]);
 
-    React.useEffect(() => {
-        const handleBoundary = (event: SpeechSynthesisEvent) => {
-            if (event.name === 'sentence') {
-                let charIndex = event.charIndex;
-                let currentLength = 0;
-                for (let i = 0; i < sentences.length; i++) {
-                    const sentenceLength = sentences[i].length;
-                    if (charIndex >= currentLength && charIndex < currentLength + sentenceLength) {
-                        setCurrentSentenceIndex(i);
-                        return;
-                    }
-                    currentLength += sentenceLength + 1; // +1 for the space
+    const handleBoundary = React.useCallback((event: SpeechSynthesisEvent) => {
+        if (event.name === 'sentence') {
+            let charIndex = event.charIndex;
+            let currentLength = 0;
+            for (let i = 0; i < sentences.length; i++) {
+                const sentenceLength = sentences[i].length;
+                if (charIndex >= currentLength && charIndex < currentLength + sentenceLength) {
+                    setCurrentSentenceIndex(i);
+                    return;
                 }
+                // +1 for the space that joins sentences
+                currentLength += sentenceLength + 1; 
             }
-        };
-
-        const handleEnd = () => {
-            setCurrentSentenceIndex(-1);
-        };
-        
-        // This effect will re-run if text changes, attaching listeners to the new utterance
-        // We assume only one utterance is created at a time by the SpeechPlayer
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            // Because we can't reliably get the utterance object here,
-            // we have to rely on the fact that the SpeechPlayer creates a new one each time.
-            // A more robust solution might involve a global state manager for the utterance.
-            // For now, this is a pragmatic way to re-attach listeners.
-            const synth = window.speechSynthesis;
-            const checkAndAttach = () => {
-                // This is a workaround. We can't directly access the utterance created in another component.
-                // Instead, we listen for speech to start and then try to attach. This is not ideal.
-                // A better architecture would use context or a state management library.
-            };
-            checkAndAttach();
         }
+        if (onBoundary) onBoundary(event);
+    }, [sentences, onBoundary]);
 
-    }, [text, sentences]);
+    const handleEnd = React.useCallback((event: SpeechSynthesisEvent) => {
+        setCurrentSentenceIndex(-1);
+        if (onEnd) onEnd(event);
+    }, [onEnd]);
 
     React.useEffect(() => {
         if (currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
@@ -75,9 +61,7 @@ export function ScrollableTextDisplay({ text }: ScrollableTextDisplayProps) {
                 const viewportHeight = viewportElement.clientHeight;
                 const viewportScrollTop = viewportElement.scrollTop;
 
-                // Check if the sentence is not fully visible
                 if (sentenceTop < viewportScrollTop || (sentenceTop + sentenceHeight) > (viewportScrollTop + viewportHeight)) {
-                    // Scroll to the center of the viewport
                     viewportElement.scrollTo({
                         top: sentenceTop - (viewportHeight / 2) + (sentenceHeight / 2),
                         behavior: 'smooth',
@@ -106,3 +90,9 @@ export function ScrollableTextDisplay({ text }: ScrollableTextDisplayProps) {
         </div>
     );
 }
+
+// Dummy placeholder for when the text-to-speech handlers aren't needed
+const dummyHandlers = {
+  onBoundary: () => {},
+  onEnd: () => {}
+};
