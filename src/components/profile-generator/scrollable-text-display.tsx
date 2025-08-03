@@ -16,14 +16,14 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
 
   React.useEffect(() => {
     // Break the text into sentences
-    const sentenceEndings = /[.!?]+/;
+    const sentenceEndings = /(?<=[.!?])\s+/;
     const parts = text.split(sentenceEndings);
     let currentPos = 0;
     const result: Sentence[] = [];
 
     for (let i = 0; i < parts.length; i++) {
       if (parts[i]) {
-        const sentenceText = parts[i] + (text.substring(currentPos + parts[i].length, text.length).match(sentenceEndings)?.[0] || '');
+        const sentenceText = parts[i];
         result.push({
           text: sentenceText.trim(),
           start: currentPos,
@@ -58,7 +58,7 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
     setCurrentSentenceIndex(-1);
   };
 
-  if (!text) {
+  if (!text || typeof text !== 'string') {
     return <p className="text-slate-400">No information available.</p>;
   }
 

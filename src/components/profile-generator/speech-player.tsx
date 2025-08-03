@@ -18,20 +18,21 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
   const { toast } = useToast();
 
   const handleStop = React.useCallback(() => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    const synth = window.speechSynthesis;
-    if (synth.speaking || synth.paused) {
-      synth.cancel();
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+      setIsPaused(false);
+      if (onEnd) onEnd();
     }
-    // State cleanup is now handled in the onend/onerror handlers
-  }, []);
-
+  }, [onEnd]);
+  
   React.useEffect(() => {
     // Cleanup on unmount
     return () => {
       handleStop();
     };
   }, [handleStop]);
+
 
   const handlePlayPause = React.useCallback(() => {
     if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -40,12 +41,14 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
 
     const synth = window.speechSynthesis;
 
-    if (isPlaying && !isPaused) { // Is speaking, and we want to pause
+    if (synth.speaking && !isPaused) { // Is speaking, and we want to pause
         synth.pause();
         setIsPaused(true);
-    } else if (isPlaying && isPaused) { // Is paused, and we want to resume
+        setIsPlaying(false);
+    } else if (synth.paused && isPaused) { // Is paused, and we want to resume
         synth.resume();
         setIsPaused(false);
+        setIsPlaying(true);
     } else { // Not speaking, start a new utterance
         if (synth.speaking) { // If something else is speaking, stop it first
             synth.cancel();
@@ -80,16 +83,16 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         synth.speak(utterance);
     }
 
-  }, [text, onBoundary, onEnd, toast, isPlaying, isPaused]);
+  }, [text, onBoundary, onEnd, toast, isPaused]);
 
 
   return (
     <div className="flex items-center gap-2 mb-4">
       <Button onClick={handlePlayPause} variant="outline" size="sm">
-        {isPlaying && !isPaused ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-        {isPlaying ? (isPaused ? 'Resume' : 'Pause') : 'Play'}
+        {isPlaying ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+        {isPlaying ? 'Pause' : (isPaused ? 'Resume' : 'Play')}
       </Button>
-      <Button onClick={handleStop} variant="outline" size="sm" disabled={!isPlaying}>
+      <Button onClick={handleStop} variant="outline" size="sm" disabled={!isPlaying && !isPaused}>
         <RotateCcw className="h-4 w-4 mr-2" />
         Stop
       </Button>
