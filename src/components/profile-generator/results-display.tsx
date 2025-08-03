@@ -51,8 +51,14 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAs
         const text = signData[activeSubTab as keyof NewAstroSignData] || `No data for ${activeSubTab}.`;
         return (
             <div className="relative mt-4">
-                <div className="absolute top-0 right-0 z-10"><SpeechPlayer text={text} /></div>
-                <ScrollableTextDisplay text={text} />
+                <ScrollableTextDisplay 
+                    text={text} 
+                    renderPlayer={(onBoundary, onEnd) => (
+                        <div className="absolute top-0 right-0 z-10">
+                            <SpeechPlayer text={text} onBoundary={onBoundary} onEnd={onEnd} />
+                        </div>
+                    )}
+                />
             </div>
         );
     };

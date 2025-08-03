@@ -6,6 +6,8 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { SpeechPlayer } from './speech-player';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="glass-card p-4 flex items-center space-x-4">
@@ -26,9 +28,14 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
                     <Wand2 className="h-5 w-5" /> {title}
                 </AccordionTrigger>
                 <AccordionContent>
-                    <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
-                        {meaning}
-                    </div>
+                    <ScrollableTextDisplay 
+                        text={meaning} 
+                        renderPlayer={(onBoundary, onEnd) => (
+                             <div className="absolute top-0 right-0 z-10">
+                                <SpeechPlayer text={meaning} onBoundary={onBoundary} onEnd={onEnd} />
+                            </div>
+                        )}
+                    />
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -49,7 +56,7 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                     <AccordionItem value={arrow.name} key={arrow.name}>
                         <AccordionTrigger className="text-left">Arrow of Strength: {arrow.name}</AccordionTrigger>
                         <AccordionContent>
-                            <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+                             <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
                         </AccordionContent>
                     </AccordionItem>
                 ))}

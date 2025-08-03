@@ -5,8 +5,15 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from "lucide-react";
 
-export function SpeechPlayer({ text }: { text: string }) {
+interface SpeechPlayerProps {
+    text: string;
+    onBoundary: (event: SpeechSynthesisEvent) => void;
+    onEnd: () => void;
+}
+
+export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
+    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
     const handlePlayPause = React.useCallback(() => {
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -20,11 +27,17 @@ export function SpeechPlayer({ text }: { text: string }) {
             }
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.onstart = () => setIsPlaying(true);
-            utterance.onend = () => setIsPlaying(false);
+            utterance.onend = () => {
+                setIsPlaying(false);
+                onEnd();
+            };
             utterance.onerror = () => setIsPlaying(false);
+            utterance.addEventListener('boundary', onBoundary);
+            
+            utteranceRef.current = utterance;
             window.speechSynthesis.speak(utterance);
         }
-    }, [isPlaying, text]);
+    }, [isPlaying, text, onBoundary, onEnd]);
     
     // Cleanup speech on unmount
     React.useEffect(() => {
@@ -38,17 +51,18 @@ export function SpeechPlayer({ text }: { text: string }) {
     // Effect to track external speech synthesis state
     React.useEffect(() => {
         const onSynthStateChange = () => {
-            setIsPlaying(window.speechSynthesis.speaking);
+             if (typeof window !== 'undefined' && window.speechSynthesis) {
+                setIsPlaying(window.speechSynthesis.speaking);
+             }
         };
         
         if (typeof window !== 'undefined' && window.speechSynthesis) {
-            window.speechSynthesis.addEventListener('voiceschanged', onSynthStateChange);
-            // In some browsers, a timeout is needed to check the initial state
-            const timer = setTimeout(() => onSynthStateChange(), 100);
+            const synth = window.speechSynthesis;
+            // Use a simple interval to check speaking state, as events can be unreliable
+            const intervalId = setInterval(onSynthStateChange, 250);
 
             return () => {
-                window.speechSynthesis.removeEventListener('voiceschanged', onSynthStateChange);
-                clearTimeout(timer);
+                clearInterval(intervalId);
             }
         }
     }, []);

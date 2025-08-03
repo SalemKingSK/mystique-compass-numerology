@@ -108,20 +108,28 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
         return (
           <div className="space-y-4">
             <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><BookOpen className="h-5 w-5" /> Your Animal Sign: The {sign}</h3>
-            <div className="relative">
-                 <div className="absolute top-0 right-0 z-10"><SpeechPlayer text={introduction || ''} /></div>
-                 <ScrollableTextDisplay text={introduction || "No introduction available."} />
-            </div>
+             <ScrollableTextDisplay 
+                text={introduction || "No introduction available."} 
+                renderPlayer={(onBoundary, onEnd) => (
+                    <div className="absolute top-0 right-0 z-10">
+                        <SpeechPlayer text={introduction || ''} onBoundary={onBoundary} onEnd={onEnd} />
+                    </div>
+                )}
+             />
           </div>
         );
       case 'element':
         return (
           <div className="space-y-4">
             <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {element}</h3>
-            <div className="relative">
-                 <div className="absolute top-0 right-0 z-10"><SpeechPlayer text={signElementData || ''} /></div>
-                <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
-            </div>
+            <ScrollableTextDisplay 
+                text={signElementData || `No specific data for the ${element} element.`} 
+                renderPlayer={(onBoundary, onEnd) => (
+                    <div className="absolute top-0 right-0 z-10">
+                        <SpeechPlayer text={signElementData || ''} onBoundary={onBoundary} onEnd={onEnd} />
+                    </div>
+                )}
+             />
           </div>
         );
       case 'compatibility':
