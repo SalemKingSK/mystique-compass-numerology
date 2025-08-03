@@ -1,6 +1,6 @@
 // src/lib/numerology.ts
-import type { AstroInsightInput } from '@/lib/astrology';
-import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS } from './numerology/data';
+import type { AstroInsightInput } from './astrology';
+import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
 import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
 
 // --- HELPER FUNCTIONS ---

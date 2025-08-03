@@ -4,7 +4,8 @@
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
-import { Wand2, BrainCircuit, Sparkles, Grid } from "lucide-react";
+import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
+import { REPEATED_NUMBER_MEANINGS } from '@/lib/numerology/data/repetitionMeanings';
 
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
@@ -53,6 +54,37 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
     );
 };
 
+const RepetitionMeaningsDisplay = ({ numberCounts }: { numberCounts: { [key: string]: number } }) => {
+  const repetitions = Object.entries(numberCounts)
+    .map(([number, count]) => {
+      const key = `${number}_${Math.min(count, 5)}`; // Cap count at 5 as per data structure
+      const meaning = REPEATED_NUMBER_MEANINGS[key];
+      return { number, count, meaning };
+    })
+    .filter(item => item.meaning)
+    .sort((a,b) => parseInt(a.number) - parseInt(b.number));
+
+  if (repetitions.length === 0) return null;
+
+  return (
+    <div className="glass-card p-4 space-y-3">
+      <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+        <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
+      </h3>
+      <div className="space-y-3">
+        {repetitions.map(({ number, count, meaning }) => (
+          <div key={number} className="p-2 rounded-md bg-black/20">
+            <p className="font-semibold text-purple-200">
+              Number {number} (appears {count} time{count > 1 ? 's' : ''})
+            </p>
+            <p className="text-xs text-white/70">{meaning}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 
 export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const {
@@ -70,6 +102,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         reducedCompoundMeaning,
         karmicFateNum,
         karmicFateMeaning,
+        numberCounts,
     } = numerology;
     
   return (
@@ -97,6 +130,8 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         </div>
       </div>
       
+      <RepetitionMeaningsDisplay numberCounts={numberCounts} />
+
       <ArrowsDisplay arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} />
 
       {kuaAttributes && (
