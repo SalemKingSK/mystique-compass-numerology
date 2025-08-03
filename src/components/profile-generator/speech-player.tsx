@@ -94,9 +94,8 @@ export const SpeechPlayer: React.FC<Props> = ({ text, lang = 'en-US' }) => {
             };
 
             utterance.onerror = (event) => {
-                // This flag distinguishes user cancellation from genuine errors.
                 if (userInitiatedStop.current && (event.error === 'canceled' || event.error === 'interrupted')) {
-                    userInitiatedStop.current = false; // Reset flag
+                    userInitiatedStop.current = false; 
                     return;
                 }
                 
@@ -119,7 +118,7 @@ export const SpeechPlayer: React.FC<Props> = ({ text, lang = 'en-US' }) => {
             synth.speak(utterance);
             setIsPlaying(true);
             setIsPaused(false);
-            setActiveSentenceIndex(0); // Start highlighting from the first sentence
+            setActiveSentenceIndex(0);
         }
     }, [text, lang, toast, isPlaying, isPaused]);
 
@@ -150,7 +149,7 @@ export const SpeechPlayer: React.FC<Props> = ({ text, lang = 'en-US' }) => {
                   ref={(el) => { if(el) sentenceRefs.current[idx] = el; }}
                   className={idx === activeSentenceIndex ? 'reading' : ''}
                 >
-                  {sentence + ' '}
+                  {sentence}
                 </span>
               ))}
             </div>
