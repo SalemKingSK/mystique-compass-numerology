@@ -1,102 +1,129 @@
 
 'use client';
 
-import * as React from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 
-interface SpeechPlayerProps {
+interface Props {
   text: string;
-  onBoundary: (event: SpeechSynthesisEvent) => void;
-  onEnd: () => void;
+  lang?: string;
 }
 
-export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [isPaused, setIsPaused] = React.useState(false);
-  const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
-  const isCancelingRef = React.useRef(false);
+export const SpeechPlayer: React.FC<Props> = ({ text, lang = 'en-US' }) => {
+  const [activeSentenceIndex, setActiveSentenceIndex] = useState(-1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const sentencesRef = useRef<string[]>([]);
   const { toast } = useToast();
 
-  const handleStop = React.useCallback(() => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      isCancelingRef.current = true;
-      window.speechSynthesis.cancel();
-    }
-  }, []);
-
-  React.useEffect(() => {
-    return () => {
-      handleStop();
+  useEffect(() => {
+    const handleVoicesChanged = () => {
+        // Voices loaded
     };
-  }, [handleStop]);
-  
-  const handlePlayPause = React.useCallback(() => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    
+    // Split text into sentences and store in ref
+    sentencesRef.current = text.match(/[^.!?]+[.!?]+/g) || [text];
+
+    window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+    
+    // Cleanup on unmount
+    return () => {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+    };
+  }, [text]);
+
+  const handlePlayPause = useCallback(() => {
+    const synth = window.speechSynthesis;
+    if (!synth) {
       toast({
-        variant: 'destructive',
-        title: 'Unsupported Browser',
-        description: 'Your browser does not support text-to-speech.',
+        variant: "destructive",
+        title: "Speech Synthesis not supported",
+        description: "Your browser does not support the Web Speech API.",
       });
       return;
     }
 
-    const synth = window.speechSynthesis;
-
-    if (synth.speaking && !isPaused) {
+    if (synth.speaking && !synth.paused) {
       synth.pause();
       setIsPlaying(false);
       setIsPaused(true);
-    } else if (synth.speaking && isPaused) {
+    } else if (synth.paused) {
       synth.resume();
       setIsPlaying(true);
       setIsPaused(false);
     } else {
-      isCancelingRef.current = false;
+      // Create and configure a new utterance
       const utterance = new SpeechSynthesisUtterance(text);
-      utteranceRef.current = utterance;
-
-      utterance.onboundary = onBoundary;
+      utterance.lang = lang;
       
+      utterance.onboundary = (event) => {
+        const charIndex = event.charIndex;
+        let cumulativeLength = 0;
+        const sentenceIndex = sentencesRef.current.findIndex(sentence => {
+          cumulativeLength += sentence.length;
+          return charIndex < cumulativeLength;
+        });
+        if (sentenceIndex !== -1) {
+          setActiveSentenceIndex(sentenceIndex);
+        }
+      };
+
       utterance.onend = () => {
         setIsPlaying(false);
         setIsPaused(false);
+        setActiveSentenceIndex(-1);
         utteranceRef.current = null;
-        if (onEnd) onEnd();
       };
-      
+
       utterance.onerror = (event) => {
-        if (!isCancelingRef.current && event.error !== 'canceled') {
+        if (event.error !== 'canceled') {
           console.error("SpeechSynthesis Error", event);
-          toast({
+           toast({
             variant: 'destructive',
             title: 'Speech Error',
-            description: 'Could not generate audio. Please try again.',
+            description: 'An unexpected error occurred during speech synthesis.',
           });
         }
         setIsPlaying(false);
         setIsPaused(false);
+        setActiveSentenceIndex(-1);
         utteranceRef.current = null;
-        if(onEnd) onEnd(); 
       };
 
+      utteranceRef.current = utterance;
+      synth.speak(utterance);
       setIsPlaying(true);
       setIsPaused(false);
-      synth.speak(utterance);
     }
-  }, [text, isPlaying, isPaused, onBoundary, onEnd, toast]);
+  }, [text, lang, toast]);
+  
+  const handleStop = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsPlaying(false);
+    setIsPaused(false);
+    setActiveSentenceIndex(-1);
+    utteranceRef.current = null;
+  }, []);
 
   return (
-    <div className="flex items-center gap-2 mb-4">
-      <Button onClick={handlePlayPause} variant="outline" size="sm">
-        {isPlaying ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-        {isPlaying ? 'Pause' : (isPaused ? 'Resume' : 'Play')}
-      </Button>
-      <Button onClick={handleStop} variant="outline" size="sm" disabled={!isPlaying && !isPaused}>
-        <RotateCcw className="h-4 w-4 mr-2" />
-        Stop
-      </Button>
+    <div className="space-y-4">
+        <div className="flex items-center gap-2">
+            <Button onClick={handlePlayPause} variant="outline" size="sm">
+                {isPlaying ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                {isPlaying ? 'Pause' : (isPaused ? 'Resume' : 'Play')}
+            </Button>
+            <Button onClick={handleStop} variant="outline" size="sm" disabled={!isPlaying && !isPaused}>
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Stop
+            </Button>
+        </div>
+      <ScrollableTextDisplay text={text} activeSentenceIndex={activeSentenceIndex} />
     </div>
   );
-}
+};

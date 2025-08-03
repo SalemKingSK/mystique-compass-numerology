@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ScrollableTextDisplay } from './scrollable-text-display';
+import { SpeechPlayer } from './speech-player';
 
 
 // --- SUB-COMPONENTS ---
@@ -37,7 +37,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
                     <AccordionTrigger>With the {sign}</AccordionTrigger>
                     <AccordionContent>
-                        <ScrollableTextDisplay text={String(text)} />
+                        <SpeechPlayer text={String(text)} />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -61,7 +61,7 @@ function FutureDisplay({ futures }: { futures: any }) {
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
                         <AccordionTrigger>{year} - Year of the {data.year}</AccordionTrigger>
                         <AccordionContent>
-                          <ScrollableTextDisplay text={text} />
+                          <SpeechPlayer text={text} />
                         </AccordionContent>
                     </AccordionItem>
                 )
@@ -97,12 +97,12 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     {
       key: 'introduction',
       title: `Your Animal Sign: The ${sign}`,
-      component: <ScrollableTextDisplay text={introduction || "No introduction available."} />,
+      component: <SpeechPlayer text={introduction || "No introduction available."} />,
     },
     {
       key: 'element',
       title: `Your Element: The ${element}`,
-      component: <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />,
+      component: <SpeechPlayer text={signElementData || `No specific data for the ${element} element.`} />,
     },
     {
       key: 'compatibility',

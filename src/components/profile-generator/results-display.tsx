@@ -15,7 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { ScrollableTextDisplay } from './scrollable-text-display';
+import { SpeechPlayer } from './speech-player';
 
 
 // --- SUB-COMPONENTS ---
@@ -98,7 +98,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                                                 <tab.icon className="h-6 w-6" /> {tab.name}
                                             </h3>
                                         </div>
-                                        <ScrollableTextDisplay text={String(text)} />
+                                        <SpeechPlayer text={String(text)} />
                                     </ScrollArea>
                                 </div>
                             </CarouselItem>

@@ -1,87 +1,38 @@
 
 'use client';
 
-import * as React from 'react';
-import { SpeechPlayer } from './speech-player';
+import React, { useEffect, useRef } from 'react';
 
-type Sentence = {
+interface Props {
   text: string;
-  start: number;
-  end: number;
-};
+  activeSentenceIndex: number;
+}
 
-export function ScrollableTextDisplay({ text }: { text: string }) {
-  const [sentences, setSentences] = React.useState<Sentence[]>([]);
-  const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
-  const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
+export const ScrollableTextDisplay: React.FC<Props> = ({ text, activeSentenceIndex }) => {
+  // Regex to split text into sentences, keeping the punctuation.
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sentenceRefs = useRef<Array<HTMLSpanElement | null>>([]);
 
-  React.useEffect(() => {
-    if (!text) return;
-    const sentenceEndings = /(?<=[.!?])\s+/;
-    const parts = text.split(sentenceEndings);
-    let currentPos = 0;
-    const result: Sentence[] = [];
-
-    for (let i = 0; i < parts.length; i++) {
-      const sentenceText = parts[i];
-      if (sentenceText) {
-        result.push({
-          text: sentenceText.trim(),
-          start: currentPos,
-          end: currentPos + sentenceText.length,
-        });
-        currentPos += sentenceText.length;
-      }
+  useEffect(() => {
+    const activeEl = sentenceRefs.current[activeSentenceIndex];
+    if (activeEl && containerRef.current) {
+      // Scroll the active sentence into the center of the container.
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    setSentences(result.filter(s => s.text.length > 0));
-    sentenceRefs.current = new Array(result.length);
-    setCurrentSentenceIndex(-1);
-  }, [text]);
-
-  React.useEffect(() => {
-    if (currentSentenceIndex > -1 && sentenceRefs.current[currentSentenceIndex]) {
-      sentenceRefs.current[currentSentenceIndex]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest',
-      });
-    }
-  }, [currentSentenceIndex]);
-
-  const handleBoundary = (event: SpeechSynthesisEvent) => {
-    const charIndex = event.charIndex;
-    const sentenceIdx = sentences.findIndex(s => charIndex >= s.start && charIndex < s.end);
-    if (sentenceIdx !== -1) {
-      setCurrentSentenceIndex(sentenceIdx);
-    }
-  };
-
-  const handleEnd = () => {
-    setCurrentSentenceIndex(-1);
-  };
-
-  if (!text || typeof text !== 'string') {
-    return <p className="text-slate-400">No information available.</p>;
-  }
+  }, [activeSentenceIndex]);
 
   return (
-    <div className="space-y-4">
-      <SpeechPlayer
-        text={text}
-        onBoundary={handleBoundary}
-        onEnd={handleEnd}
-      />
-      <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">
-        {sentences.map((sentence, index) => (
-          <span
-            key={index}
-            ref={(el) => (sentenceRefs.current[index] = el)}
-            className={index === currentSentenceIndex ? 'reading' : ''}
-          >
-            {sentence.text}{' '}
-          </span>
-        ))}
-      </div>
+    <div className="scroll-container" ref={containerRef}>
+      {sentences.map((sentence, idx) => (
+        <span
+          key={idx}
+          ref={(el) => (sentenceRefs.current[idx] = el)}
+          className={idx === activeSentenceIndex ? 'reading' : ''}
+        >
+          {sentence}
+        </span>
+      ))}
     </div>
   );
-}
+};
