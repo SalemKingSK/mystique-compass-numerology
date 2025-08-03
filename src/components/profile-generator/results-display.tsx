@@ -3,28 +3,29 @@
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import type { AstroInsightOutput, NumerologyData, NewAstroSignData } from './types';
+import type { AstroInsightOutput, NumerologyData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
-import { ArrowLeft, History, Users, Home, Heart, BookUser, Briefcase } from "lucide-react";
+import { ArrowLeft, History, BookUser, Heart, Home, Users, Briefcase } from "lucide-react";
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { SpeechPlayer } from './speech-player';
+
 
 // --- SUB-COMPONENTS ---
 
 type ArcCategory = {
   name: string;
-  key: keyof NewAstroSignData;
+  key: keyof AstroInsightOutput['signData'];
   icon: React.ElementType;
 };
 
 const NEW_ASTRO_TABS: ArcCategory[] = [
-  { name: "Description", key: "description", icon: BookUser },
-  { name: "Love", key: "love", icon: Heart },
-  { name: "Compatibilities", key: "compatibilities", icon: Users },
-  { name: "Home & Family", key: "homeAndFamily", icon: Home },
-  { name: "Profession", key: "profession", icon: Briefcase },
-];
+    { name: "Description", key: "description", icon: BookUser },
+    { name: "Love", key: "love", icon: Heart },
+    { name: "Home & Family", key: "homeAndFamily", icon: Home },
+    { name: "Compatibilities", key: "compatibilities", icon: Users },
+    { name: "Profession", key: "profession", icon: Briefcase },
+  ];
 
 function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
   return (
@@ -41,75 +42,56 @@ function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onCli
   )
 }
 
-function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string, setActiveTab: (tab: string) => void, tabs: ArcCategory[] }) {
-  const activeIndex = tabs.findIndex(tab => tab.key === activeTab);
-
-  return (
-    <div className="relative w-full h-48 my-8 flex justify-center items-center overflow-hidden">
-      {tabs.map((tab, index) => {
-        const isActive = activeIndex === index;
-        const angle = (index - activeIndex) * 25; // degrees between items
-
-        return (
-          <div
-            key={tab.name}
-            className="absolute transition-all duration-500 ease-in-out"
-            style={{
-              transform: `rotate(${angle}deg) translateY(-90px) rotate(${-angle}deg)`,
-              transformOrigin: 'bottom center',
-            }}
-          >
-            <button
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 group ${
-                isActive ? 'text-primary' : 'text-purple-200/60 scale-90 hover:scale-95'
-              }`}
-            >
-              <div
-                className={`flex flex-col items-center p-2 rounded-lg transition-all duration-300 ${
-                  isActive ? 'bg-primary/10 animate-arrow-pulse' : 'group-hover:bg-primary/5'
-                }`}
-              >
-                <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
-                <span className={`transition-all duration-300 text-xl ${isActive ? 'font-bold' : 'font-semibold'}`}>
-                  {tab.name}
-                </span>
-              </div>
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAstroSignData }) {
-    const [activeSubTab, setActiveSubTab] = React.useState<keyof NewAstroSignData>('description');
-
-    const renderContent = () => {
-        const text = signData[activeSubTab] || `No data for ${activeSubTab}.`;
-        
-        return (
-            <div className="relative mt-4 glass-card p-4">
-                 <ScrollableTextDisplay 
-                    text={text} 
-                    renderPlayer={(onBoundary, onEnd) => (
-                        <div className="absolute top-0 right-0 z-10">
-                            <SpeechPlayer text={text} onBoundary={onBoundary} onEnd={onEnd} />
-                        </div>
-                    )}
-                />
-            </div>
-        );
+function NewAstroSignDetails({ sign, signData }: { sign: string, signData: AstroInsightOutput['signData'] }) {
+    const [pages, setPages] = React.useState(NEW_ASTRO_TABS.map(tab => tab.key));
+  
+    const handleClick = (pageKey: keyof AstroInsightOutput['signData']) => {
+      if (pages[0] === pageKey) return;
+      setPages(prevPages => {
+        const newPages = prevPages.filter(p => p !== pageKey);
+        return [pageKey, ...newPages];
+      });
     };
-
+  
     return (
-        <div className="glass-card p-4">
-             <h3 className="font-semibold text-lg text-primary text-center mb-2">{sign}</h3>
-            <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab as (tab: string) => void} tabs={NEW_ASTRO_TABS} />
-            <div className="mt-4 min-h-[250px]">
-                {renderContent()}
-            </div>
+        <div className="relative w-full min-h-[500px] flex items-center justify-center">
+            <AnimatePresence>
+                {pages.map((pageKey, index) => {
+                    const pageData = NEW_ASTRO_TABS.find(tab => tab.key === pageKey);
+                    if (!pageData) return null;
+
+                    const text = signData[pageKey] || `No data for ${pageData.name}.`;
+                    const isActive = index === 0;
+
+                    return (
+                        <motion.div
+                            key={pageKey}
+                            className="absolute w-[340px] h-[420px] rounded-2xl paper-page"
+                            onClick={() => handleClick(pageKey)}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{
+                                x: isActive ? 0 : index * 12,
+                                y: isActive ? 0 : index * 12,
+                                rotate: isActive ? 0 : index * 2,
+                                zIndex: pages.length - index,
+                                scale: 1,
+                                opacity: 1,
+                            }}
+                            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                        >
+                            <div className="p-5 text-zinc-800 h-full overflow-y-auto">
+                                <h2 className="text-2xl font-bold text-[--purple-dark] border-b-2 border-purple-200 pb-2 mb-3 flex items-center gap-2">
+                                    <pageData.icon className="h-6 w-6" /> {pageData.name}
+                                </h2>
+                                <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                                    {text}
+                                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })}
+            </AnimatePresence>
         </div>
     );
 }
@@ -120,8 +102,8 @@ function ResultsHeader({ name, newAstroSign, onTabClick, activeTab }: { name: st
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center">
             {name}
         </h1>
-        <div className='flex justify-between items-center w-full max-w-lg mx-auto mt-6'>
-             <div className="w-2/5">
+        <div className='relative flex justify-center items-center w-full max-w-lg mx-auto mt-6'>
+             <div className="absolute left-0 w-2/5">
                 <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro Insights</AnimatedTab>
              </div>
               <div className="mt-[-2rem]">
@@ -129,7 +111,7 @@ function ResultsHeader({ name, newAstroSign, onTabClick, activeTab }: { name: st
                         {newAstroSign}
                 </AnimatedTab>
               </div>
-             <div className="w-2/5">
+             <div className="absolute right-0 w-2/5">
                 <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numerology Report</AnimatedTab>
              </div>
         </div>

@@ -42,6 +42,12 @@
     --color-violet-hsl: 300 100% 60%;
     --bg-dark-hsl: 240 10% 3.9%;
 
+    /* New colors for stacked paper */
+    --purple-dark: #4B0082;
+    --purple-light: #F7F5FA;
+    --paper-shadow: rgba(0, 0, 0, 0.1);
+    --body-bg: #e9e9f0;
+
     --arc-selected-bg: 273 100% 12%; /* #2C003E - Darkest Purple */
     --arc-selected-fg: 240 67% 94%; /* #E6E6FA - Bright Lavender/White */
     --arc-unselected-fg: 260 58% 64%; /* #9370DB - Muted Lavender */
@@ -193,4 +199,30 @@
   75% {
     filter: drop-shadow(0 0 4px hsl(108 27% 67%));
   }
+}
+
+/* Stacked Paper Styles */
+.paper-page {
+  background-color: var(--purple-light);
+  border: 3px solid var(--purple-dark);
+  box-shadow: 0 5px 20px var(--paper-shadow);
+  cursor: pointer;
+}
+
+/* The Dog-Ear Fold Effect */
+.paper-page::before {
+  content: '';
+  position: absolute;
+  top: -3px; /* Align with outer border */
+  right: -3px;
+  border-width: 0 30px 30px 0; /* Creates the triangle shape */
+  border-style: solid;
+  border-color: transparent var(--purple-dark); /* Match body bg and border color */
+  border-radius: 0 12px 0 0;
+  box-shadow: -3px 3px 5px -2px rgba(0,0,0,0.1);
+  transition: border-color 0.3s;
+}
+
+.paper-page:hover::before {
+    border-left-color: rgba(220, 220, 240, 0.5);
 }

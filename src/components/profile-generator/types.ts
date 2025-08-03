@@ -1,5 +1,3 @@
-
-
 // src/components/profile-generator/types.ts
 
 // This is the data that the user provides
@@ -19,15 +17,6 @@ export interface ZodiacData {
 }
 
 // Data for the combined "New Astrology" signs
-export interface NewAstroSignData {
-  description?: string;
-  love?: string;
-  compatibilities?: string;
-  homeAndFamily?: string;
-  profession?: string;
-}
-
-// This is the data returned from the astrology calculation
 export interface AstroInsightOutput {
   name: string;
   western_sign: string;
@@ -35,7 +24,13 @@ export interface AstroInsightOutput {
   element: string; // e.g., "Wood"
   new_astrology_sign: string; // e.g. "Pisces/Snake"
   zodiacData: ZodiacData; // Holds all data for the Chinese sign
-  signData: NewAstroSignData; // Holds all data for the combined New Astrology sign
+  signData: {
+    description?: string;
+    love?: string;
+    compatibilities?: string;
+    homeAndFamily?: string;
+    profession?: string;
+  }; 
 }
 
 // This is the data returned from the numerology calculation
@@ -66,5 +61,3 @@ export interface NumerologyData {
   arrowsOfStrength: ArrowData[];
   arrowsOfWeakness: ArrowData[];
 }
-
-
