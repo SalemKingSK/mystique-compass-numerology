@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -14,33 +15,61 @@ interface SpeechPlayerProps {
 export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isPaused, setIsPaused] = React.useState(false);
+  const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
   const { toast } = useToast();
+
+  const handleStop = React.useCallback(() => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const synth = window.speechSynthesis;
+    if (synth.speaking || synth.paused) {
+      synth.cancel();
+    }
+    // The onend event will handle resetting the state
+  }, []);
+
+  React.useEffect(() => {
+    // Cleanup on unmount
+    return () => {
+      handleStop();
+    };
+  }, [handleStop]);
 
   const handlePlayPause = React.useCallback(() => {
     if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     const synth = window.speechSynthesis;
 
-    if (synth.speaking) {
-      if (synth.paused) {
+    if (isPlaying) {
+      if (isPaused) {
         synth.resume();
         setIsPaused(false);
       } else {
         synth.pause();
         setIsPaused(true);
       }
-      setIsPlaying(true);
       return;
     }
-
+    
+    // Stop any currently playing speech before starting a new one
+    if (synth.speaking) {
+      synth.cancel();
+    }
+    
     const utterance = new SpeechSynthesisUtterance(text);
+    utteranceRef.current = utterance;
+
     utterance.onboundary = onBoundary;
+
     utterance.onend = () => {
       setIsPlaying(false);
       setIsPaused(false);
-      onEnd();
+      utteranceRef.current = null;
+      if (onEnd) onEnd();
     };
+    
     utterance.onerror = (event) => {
+        // A "canceled" error is expected when we call synth.cancel(). 
+        // We don't need to log this as a real error.
         if (event.error !== 'canceled') {
           console.error("SpeechSynthesis Error", event);
           toast({
@@ -49,46 +78,24 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
             description: 'Could not generate audio. Please try again.',
           });
         }
-      setIsPlaying(false);
-      setIsPaused(false);
-      onEnd();
+       // The onend event will fire after an error, so state cleanup is handled there.
     };
-
-    synth.speak(utterance);
+    
     setIsPlaying(true);
     setIsPaused(false);
-  }, [text, onBoundary, onEnd, toast]);
+    synth.speak(utterance);
 
-  const handleStop = React.useCallback(() => {
-     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-     window.speechSynthesis.cancel();
-     setIsPlaying(false);
-     setIsPaused(false);
-     onEnd();
-  }, [onEnd]);
-
-  // Cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-       if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) {
-           window.speechSynthesis.cancel();
-       }
-    };
-  }, []);
-
-  if (typeof window === 'undefined' || !window.speechSynthesis) {
-    return null; // Don't render the player if the API is not supported.
-  }
+  }, [text, onBoundary, onEnd, toast, isPlaying, isPaused]);
 
   return (
     <div className="flex items-center gap-2 mb-4">
       <Button onClick={handlePlayPause} variant="outline" size="sm">
         {isPlaying && !isPaused ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-        {isPlaying && !isPaused ? 'Pause' : 'Play'}
+        {isPlaying ? (isPaused ? 'Resume' : 'Pause') : 'Play'}
       </Button>
       <Button onClick={handleStop} variant="outline" size="sm" disabled={!isPlaying}>
         <RotateCcw className="h-4 w-4 mr-2" />
-        Reset
+        Stop
       </Button>
     </div>
   );
