@@ -28,7 +28,7 @@ type ArcCategory = {
 const NEW_ASTRO_TABS: ArcCategory[] = [
     { name: "Description", key: "description", icon: BookUser },
     { name: "Love", key: "love", icon: Heart },
-    { name: "Home & Family", key: "homeAndFamily", icon: Home },
+    { name: "Family", key: "homeAndFamily", icon: Home },
     { name: "Compatibilities", key: "compatibilities", icon: Users },
     { name: "Profession", key: "profession", icon: Briefcase },
 ];
@@ -69,6 +69,21 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
 
     return (
         <div className="glass-card p-4">
+             <div className="py-2 text-center text-sm text-muted-foreground">
+                <div className="flex justify-center gap-1 md:gap-2">
+                    {NEW_ASTRO_TABS.map((tab, index) => (
+                        <Button
+                            key={tab.key}
+                            variant={current === index ? 'default' : 'outline'}
+                            size="sm"
+                            className="h-auto py-1 px-2 text-xs md:h-9 md:px-3 md:text-sm"
+                            onClick={() => scrollTo(index)}
+                        >
+                            {tab.name}
+                        </Button>
+                    ))}
+                </div>
+            </div>
             <Carousel setApi={setApi} className="w-full">
                 <CarouselContent>
                     {NEW_ASTRO_TABS.map((tab) => {
@@ -90,21 +105,6 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                 <CarouselPrevious />
                 <CarouselNext />
             </Carousel>
-             <div className="py-2 text-center text-sm text-muted-foreground">
-                <div className="flex justify-center gap-1 md:gap-2">
-                    {NEW_ASTRO_TABS.map((tab, index) => (
-                        <Button
-                            key={tab.key}
-                            variant={current === index ? 'default' : 'outline'}
-                            size="sm"
-                            className="h-auto py-1 px-2 text-xs md:h-9 md:px-3 md:text-sm"
-                            onClick={() => scrollTo(index)}
-                        >
-                            {tab.name}
-                        </Button>
-                    ))}
-                </div>
-            </div>
         </div>
     );
 }
