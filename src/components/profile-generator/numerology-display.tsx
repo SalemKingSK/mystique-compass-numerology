@@ -55,7 +55,14 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                     <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
                         <AccordionTrigger className="text-left">Arrow of Strength: {arrow.name}</AccordionTrigger>
                         <AccordionContent>
-                             <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+                           <ScrollableTextDisplay 
+                                text={arrow.description} 
+                                renderPlayer={(onBoundary, onEnd) => (
+                                    <div className="absolute top-0 right-0 z-10">
+                                        <SpeechPlayer text={arrow.description} onBoundary={onBoundary} onEnd={onEnd} />
+                                    </div>
+                                )}
+                            />
                         </AccordionContent>
                     </AccordionItem>
                 ))}
@@ -63,7 +70,14 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                     <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
                         <AccordionTrigger className="text-left">Arrow of Weakness: {arrow.name}</AccordionTrigger>
                         <AccordionContent>
-                             <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+                            <ScrollableTextDisplay 
+                                text={arrow.description} 
+                                renderPlayer={(onBoundary, onEnd) => (
+                                    <div className="absolute top-0 right-0 z-10">
+                                        <SpeechPlayer text={arrow.description} onBoundary={onBoundary} onEnd={onEnd} />
+                                    </div>
+                                )}
+                            />
                         </AccordionContent>
                     </AccordionItem>
                 ))}
@@ -94,7 +108,14 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
                  <AccordionItem value={`number-${number}`} key={number} className="glass-card px-4">
                     <AccordionTrigger>Number {number} (appears {count} time{count > 1 ? 's' : ''})</AccordionTrigger>
                     <AccordionContent>
-                         <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning}</p>
+                         <ScrollableTextDisplay 
+                            text={meaning || ''} 
+                            renderPlayer={(onBoundary, onEnd) => (
+                                <div className="absolute top-0 right-0 z-10">
+                                    <SpeechPlayer text={meaning || ''} onBoundary={onBoundary} onEnd={onEnd} />
+                                </div>
+                            )}
+                        />
                     </AccordionContent>
                 </AccordionItem>
             ))}

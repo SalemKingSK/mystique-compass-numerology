@@ -44,7 +44,14 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
                     <AccordionTrigger>With the {sign}</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{String(text)}</p>
+                        <ScrollableTextDisplay 
+                            text={String(text)} 
+                            renderPlayer={(onBoundary, onEnd) => (
+                                <div className="absolute top-0 right-0 z-10">
+                                    <SpeechPlayer text={String(text)} onBoundary={onBoundary} onEnd={onEnd} />
+                                </div>
+                            )}
+                        />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -65,7 +72,14 @@ function FutureDisplay({ futures }: { futures: any }) {
                 <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
                     <AccordionTrigger>{year} - Year of the {futures[year].year}</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{futures[year].prediction}</p>
+                        <ScrollableTextDisplay 
+                            text={futures[year].prediction} 
+                            renderPlayer={(onBoundary, onEnd) => (
+                                <div className="absolute top-0 right-0 z-10">
+                                    <SpeechPlayer text={futures[year].prediction} onBoundary={onBoundary} onEnd={onEnd} />
+                                </div>
+                            )}
+                        />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -78,7 +92,6 @@ function FutureDisplay({ futures }: { futures: any }) {
 export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const [api, setApi] = React.useState<any>(null);
   const [current, setCurrent] = React.useState(0);
-  const [count, setCount] = React.useState(0);
 
   const { zodiacData, sign, element } = insight;
   const { introduction, elements, compatibilities, futures } = zodiacData;
@@ -87,7 +100,6 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
 
   React.useEffect(() => {
     if (!api) return;
-    setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap());
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap());
