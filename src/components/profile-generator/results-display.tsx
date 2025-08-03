@@ -91,12 +91,13 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                 <CarouselNext />
             </Carousel>
              <div className="py-2 text-center text-sm text-muted-foreground">
-                <div className="flex justify-center gap-2">
+                <div className="flex justify-center gap-1 md:gap-2">
                     {NEW_ASTRO_TABS.map((tab, index) => (
                         <Button
                             key={tab.key}
                             variant={current === index ? 'default' : 'outline'}
                             size="sm"
+                            className="h-auto py-1 px-2 text-xs md:h-9 md:px-3 md:text-sm"
                             onClick={() => scrollTo(index)}
                         >
                             {tab.name}
