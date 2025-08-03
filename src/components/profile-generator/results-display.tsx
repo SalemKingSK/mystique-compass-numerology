@@ -4,10 +4,14 @@
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import type { AstroInsightOutput, NumerologyData } from './types';
+import type { AstroInsightOutput, NumerologyData, NewAstroSignData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
 import { ArrowLeft, History } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { ScrollableTextDisplay } from './scrollable-text-display';
+import { Briefcase, Heart, Home, Info, Users } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 
 function TabButton({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
@@ -25,20 +29,94 @@ function TabButton({ isActive, onClick, children }: { isActive: boolean, onClick
     )
 }
 
-function ResultsHeader({ onReset, onHistoryOpen, name, newAstrologySign }: { onReset: () => void; onHistoryOpen: () => void; name: string; newAstrologySign: string; }) {
+function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAstroSignData }) {
+  if (!signData || Object.keys(signData).length === 0) {
+    return (
+      <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
+        <DialogHeader>
+          <DialogTitle className="text-3xl font-bold text-center text-purple-300">
+            {sign.replace('/', ' / ')}
+          </DialogTitle>
+          <div className="pt-8 text-center text-slate-400">
+            Detailed information for {sign} is not yet available.
+          </div>
+        </DialogHeader>
+      </DialogContent>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-between mb-6 p-4 rounded-xl bg-black/20">
-      <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white">
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back
-      </Button>
-      <div className="text-center">
-         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider">
-            {name}
-         </h1>
+    <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
+      <DialogHeader>
+        <DialogTitle className="text-3xl font-bold text-center text-purple-300">
+            {sign.replace('/', ' / ')}
+        </DialogTitle>
+        <DialogDescription className="text-center text-slate-400">
+          A detailed look into the combined traits of your unique astrological sign.
+        </DialogDescription>
+      </DialogHeader>
+
+      <Tabs defaultValue="description" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto sm:h-12">
+          <TabsTrigger value="description">Description</TabsTrigger>
+          <TabsTrigger value="love">Love</TabsTrigger>
+          <TabsTrigger value="homeAndFamily">Home & Family</TabsTrigger>
+          <TabsTrigger value="profession">Profession</TabsTrigger>
+          <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
+        </TabsList>
+        
+        <div className="h-72 w-full pt-4">
+          <TabsContent value="description">
+             <ScrollableTextDisplay text={signData.description || ''} icon={<Info className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
+          </TabsContent>
+
+          <TabsContent value="love">
+             <ScrollableTextDisplay text={signData.love || ''} icon={<Heart className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
+          </TabsContent>
+
+          <TabsContent value="homeAndFamily">
+             <ScrollableTextDisplay text={signData.homeAndFamily || ''} icon={<Home className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
+          </TabsContent>
+
+          <TabsContent value="profession">
+            <ScrollableTextDisplay text={signData.profession || ''} icon={<Briefcase className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
+          </TabsContent>
+
+          <TabsContent value="compatibilities">
+            <ScrollableTextDisplay text={signData.compatibilities || ''} icon={<Users className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
+          </TabsContent>
+        </div>
+      </Tabs>
+    </DialogContent>
+  );
+}
+
+
+function ResultsHeader({ onReset, onHistoryOpen, name, newAstrologySign, signData }: { onReset: () => void; onHistoryOpen: () => void; name: string; newAstrologySign: string; signData: NewAstroSignData; }) {
+  return (
+    <div className="flex flex-col items-center justify-between mb-6 p-4 rounded-xl bg-black/20">
+      <div className='w-full flex items-center justify-between'>
+        <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+        </Button>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider">
+              {name}
+          </h1>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onHistoryOpen} className="text-white/80 hover:text-white">
+          <History className="h-5 w-5" />
+        </Button>
       </div>
-      <Button variant="ghost" size="icon" onClick={onHistoryOpen} className="text-white/80 hover:text-white">
-        <History className="h-5 w-5" />
-      </Button>
+
+       <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" className="text-lg text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200 mt-2">
+                {newAstrologySign}
+            </Button>
+          </DialogTrigger>
+          <NewAstroSignDetails sign={newAstrologySign} signData={signData} />
+      </Dialog>
     </div>
   );
 }
@@ -56,7 +134,13 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
       className="results-background w-full"
     >
       <div className="max-w-4xl mx-auto p-4">
-        <ResultsHeader onReset={onReset} onHistoryOpen={onHistoryOpen} name={insight.name} newAstrologySign={insight.new_astrology_sign} />
+        <ResultsHeader 
+            onReset={onReset} 
+            onHistoryOpen={onHistoryOpen} 
+            name={insight.name} 
+            newAstrologySign={insight.new_astrology_sign}
+            signData={insight.signData}
+        />
 
         <div className="flex justify-center space-x-4 mb-6">
             <TabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</TabButton>

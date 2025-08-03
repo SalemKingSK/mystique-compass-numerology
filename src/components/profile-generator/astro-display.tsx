@@ -16,40 +16,41 @@ import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
-    if (!compatibilities || Object.keys(compatibilities).length === 0) return <p className="text-slate-400">No compatibility information available.</p>;
+    if (!compatibilities || Object.keys(compatibilities).length === 0) {
+        return <p className="text-slate-400">No compatibility information available.</p>;
+    }
 
-    const compatibilityText = Object.entries(compatibilities).map(([sign, text]) => `${sign}:\n${text}`).join('\n\n');
-    
     return (
-        <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-                <AccordionTrigger>View Compatibility Details</AccordionTrigger>
-                <AccordionContent>
-                    <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
-                        {compatibilityText}
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
+        <Accordion type="multiple" className="w-full space-y-1">
+            {Object.entries(compatibilities).map(([sign, text]) => (
+                <AccordionItem value={sign} key={sign}>
+                    <AccordionTrigger>With the {sign}</AccordionTrigger>
+                    <AccordionContent>
+                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{String(text)}</p>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
         </Accordion>
     );
 }
 
 function FutureDisplay({ futures }: { futures: any }) {
-    if (!futures || Object.keys(futures).length === 0) return <p className="text-slate-400">No future predictions available.</p>;
+    if (!futures || Object.keys(futures).length === 0) {
+        return <p className="text-slate-400">No future predictions available.</p>;
+    }
 
     const sortedYears = Object.keys(futures).sort((a, b) => parseInt(a) - parseInt(b));
-    const futureText = sortedYears.map(year => `*${year} - Year of the ${futures[year].year}*\n${futures[year].prediction}`).join('\n\n');
     
     return (
-        <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-                <AccordionTrigger>View Future Predictions</AccordionTrigger>
-                <AccordionContent>
-                     <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
-                        {futureText}
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
+        <Accordion type="multiple" className="w-full space-y-1">
+            {sortedYears.map(year => (
+                <AccordionItem value={year} key={year}>
+                    <AccordionTrigger>{year} - Year of the {futures[year].year}</AccordionTrigger>
+                    <AccordionContent>
+                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{futures[year].prediction}</p>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
         </Accordion>
     );
 }
@@ -126,17 +127,6 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
 
   return (
     <div className="space-y-4">
-      <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-white tracking-wide">{insight.name}</h2>
-            <Dialog>
-                 <DialogTrigger asChild>
-                    <Button variant="ghost" className="text-lg text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200">
-                        {insight.new_astrology_sign}
-                    </Button>
-                </DialogTrigger>
-                <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />
-            </Dialog>
-      </div>
       
       <Tabs defaultValue="introduction" className="w-full glass-card p-4">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto bg-black/20">
@@ -179,3 +169,4 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     </div>
   );
 }
+

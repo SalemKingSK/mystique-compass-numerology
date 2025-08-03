@@ -20,20 +20,18 @@ const InfoCard = ({ title, value, icon }: { title: string, value: string | numbe
 const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null }) => {
     if (!meaning) return null;
     return (
-        <div className="glass-card p-4 space-y-2">
-            <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                    <AccordionTrigger className="font-semibold text-lg text-primary flex items-center gap-2">
-                        <Wand2 className="h-5 w-5" /> {title}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
-                           {meaning}
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-        </div>
+        <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+                <AccordionTrigger className="font-semibold text-lg text-primary flex items-center gap-2">
+                    <Wand2 className="h-5 w-5" /> {title}
+                </AccordionTrigger>
+                <AccordionContent>
+                    <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
+                        {meaning}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
     );
 }
 
@@ -119,8 +117,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         numberCounts,
         repeatedNumberMeanings
     } = numerology;
-    
-  const compoundFateText = `${compoundMeaning}${reducedCompoundNum ? `\n\nInherent Fate: ${reducedCompoundNum}\n${reducedCompoundMeaning}` : ''}`;
 
   return (
     <div className="space-y-4">
@@ -133,8 +129,9 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <LoShuGrid gridData={loShuGrid} arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} />
         <div className="space-y-4">
-           <FateDisplay title={`Compound Fate: ${compoundNum}`} meaning={compoundFateText} />
-           <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} />
+           {compoundMeaning && <FateDisplay title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} />}
+           {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} />}
+           {karmicFateMeaning && <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} />}
         </div>
       </div>
       
