@@ -100,9 +100,9 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Users className="h-5 w-5" /> Compatibilities</h3>
-                        <SpeechPlayer text={signData.compatibilities || ''} />
+                        <SpeechPlayer text={typeof signData.compatibilities === 'string' ? signData.compatibilities : JSON.stringify(signData.compatibilities, null, 2)} />
                     </div>
-                    <p className="text-slate-300 leading-relaxed">{signData.compatibilities}</p>
+                    <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{typeof signData.compatibilities === 'string' ? signData.compatibilities : JSON.stringify(signData.compatibilities, null, 2)}</p>
                 </div>
             </TabsContent>
         </ScrollArea>
