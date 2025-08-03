@@ -5,7 +5,6 @@ import * as React from 'react';
 import { BookOpen, Leaf, Users, Forward } from "lucide-react";
 import type { AstroInsightOutput } from './types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { SpeechPlayer } from './speech-player';
 import {
   Carousel,
   CarouselContent,
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 
 // --- SUB-COMPONENTS ---
@@ -36,12 +36,9 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <div className="flex justify-between items-center w-full">
-                       <AccordionTrigger>With the {sign}</AccordionTrigger>
-                       <SpeechPlayer text={String(text)} />
-                    </div>
+                    <AccordionTrigger>With the {sign}</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{String(text)}</p>
+                        <ScrollableTextDisplay text={String(text)} />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -63,12 +60,9 @@ function FutureDisplay({ futures }: { futures: any }) {
                 const text = data.prediction;
                 return (
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                        <div className="flex justify-between items-center w-full">
-                           <AccordionTrigger>{year} - Year of the {data.year}</AccordionTrigger>
-                           <SpeechPlayer text={text} />
-                        </div>
+                        <AccordionTrigger>{year} - Year of the {data.year}</AccordionTrigger>
                         <AccordionContent>
-                           <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{text}</p>
+                          <ScrollableTextDisplay text={text} />
                         </AccordionContent>
                     </AccordionItem>
                 )
@@ -104,26 +98,22 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     {
       key: 'introduction',
       title: `Your Animal Sign: The ${sign}`,
-      component: <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{introduction || "No introduction available."}</p>,
-      textToSpeak: introduction || ''
+      component: <ScrollableTextDisplay text={introduction || "No introduction available."} />,
     },
     {
       key: 'element',
       title: `Your Element: The ${element}`,
-      component: <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{signElementData || `No specific data for the ${element} element.`}</p>,
-      textToSpeak: signElementData || ''
+      component: <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />,
     },
     {
       key: 'compatibility',
       title: `Compatibility Guide`,
       component: <CompatibilityDisplay compatibilities={compatibilities} />,
-      textToSpeak: null
     },
     {
       key: 'future',
       title: `Future Outlook`,
       component: <FutureDisplay futures={futures} />,
-      textToSpeak: null
     }
   ]
 
@@ -158,7 +148,6 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                                       <h3 className="text-xl font-bold text-primary flex items-center gap-2">
                                           <TabIcon className="h-6 w-6" /> {item.title}
                                       </h3>
-                                      {item.textToSpeak && <SpeechPlayer text={item.textToSpeak} />}
                                   </div>
                                   <div>{item.component}</div>
                               </ScrollArea>

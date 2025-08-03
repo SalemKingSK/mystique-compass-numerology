@@ -1,82 +1,95 @@
-// src/components/profile-generator/speech-player.tsx
 'use client';
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Loader } from "lucide-react";
-import { getSpeechAction } from '@/app/actions';
+import { Play, Pause, RotateCcw } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 
 interface SpeechPlayerProps {
-    text: string;
+  text: string;
+  onBoundary: (event: SpeechSynthesisEvent) => void;
+  onEnd: () => void;
 }
 
-export function SpeechPlayer({ text }: SpeechPlayerProps) {
-    const [isPlaying, setIsPlaying] = React.useState(false);
-    const [isFetching, setIsFetching] = React.useState(false);
-    const audioRef = React.useRef<HTMLAudioElement | null>(null);
-    const { toast } = useToast();
+export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [isPaused, setIsPaused] = React.useState(false);
+  const { toast } = useToast();
 
-    React.useEffect(() => {
-        const audio = audioRef.current;
-        if (audio) {
-            const onEnded = () => setIsPlaying(false);
-            audio.addEventListener('ended', onEnded);
-            return () => {
-                audio.removeEventListener('ended', onEnded);
-            };
-        }
-    }, [audioRef.current]);
+  const handlePlayPause = React.useCallback(() => {
+    if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
-    const handlePlayPause = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const synth = window.speechSynthesis;
 
-        if (isFetching) return;
-        
-        if (isPlaying && audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-            setIsPlaying(false);
-            return;
-        }
-        
-        if (audioRef.current && audioRef.current.src && !isPlaying) {
-             audioRef.current.play();
-             setIsPlaying(true);
-             return;
-        }
-
-        setIsFetching(true);
-        const result = await getSpeechAction(text);
-        setIsFetching(false);
-
-        if (result.success && result.audioUrl) {
-            const audio = new Audio(result.audioUrl);
-            audioRef.current = audio;
-            audio.play();
-            setIsPlaying(true);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Speech Error',
-                description: result.error || 'Could not generate audio.',
-            });
-            setIsPlaying(false);
-        }
-    };
-    
-    let buttonIcon = <Play className="h-5 w-5" />;
-    if (isFetching) {
-        buttonIcon = <Loader className="h-5 w-5 animate-spin" />;
-    } else if (isPlaying) {
-        buttonIcon = <Pause className="h-5 w-5" />;
+    if (synth.speaking) {
+      if (synth.paused) {
+        synth.resume();
+        setIsPaused(false);
+      } else {
+        synth.pause();
+        setIsPaused(true);
+      }
+      setIsPlaying(true);
+      return;
     }
 
-    return (
-        <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200" disabled={isFetching}>
-            {buttonIcon}
-            <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
-        </Button>
-    );
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onboundary = onBoundary;
+    utterance.onend = () => {
+      setIsPlaying(false);
+      setIsPaused(false);
+      onEnd();
+    };
+    utterance.onerror = (event) => {
+        if (event.error !== 'canceled') {
+          console.error("SpeechSynthesis Error", event);
+          toast({
+            variant: 'destructive',
+            title: 'Speech Error',
+            description: 'Could not generate audio. Please try again.',
+          });
+        }
+      setIsPlaying(false);
+      setIsPaused(false);
+      onEnd();
+    };
+
+    synth.speak(utterance);
+    setIsPlaying(true);
+    setIsPaused(false);
+  }, [text, onBoundary, onEnd, toast]);
+
+  const handleStop = React.useCallback(() => {
+     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+     window.speechSynthesis.cancel();
+     setIsPlaying(false);
+     setIsPaused(false);
+     onEnd();
+  }, [onEnd]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+       if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) {
+           window.speechSynthesis.cancel();
+       }
+    };
+  }, []);
+
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
+    return null; // Don't render the player if the API is not supported.
+  }
+
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Button onClick={handlePlayPause} variant="outline" size="sm">
+        {isPlaying && !isPaused ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+        {isPlaying && !isPaused ? 'Pause' : 'Play'}
+      </Button>
+      <Button onClick={handleStop} variant="outline" size="sm" disabled={!isPlaying}>
+        <RotateCcw className="h-4 w-4 mr-2" />
+        Reset
+      </Button>
+    </div>
+  );
 }

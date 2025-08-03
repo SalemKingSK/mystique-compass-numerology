@@ -6,7 +6,7 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { SpeechPlayer } from './speech-player';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="glass-card p-4 flex items-center space-x-4">
@@ -23,16 +23,13 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
     return (
         <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="glass-card px-4">
-                <div className="flex justify-between items-center w-full">
-                    <AccordionTrigger>
-                        <span className="font-semibold text-lg text-primary flex items-center gap-2">
-                            <Wand2 className="h-5 w-5" /> {title}
-                        </span>
-                    </AccordionTrigger>
-                    <SpeechPlayer text={meaning} />
-                </div>
+                <AccordionTrigger>
+                    <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                        <Wand2 className="h-5 w-5" /> {title}
+                    </span>
+                </AccordionTrigger>
                 <AccordionContent>
-                   <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning}</p>
+                   <ScrollableTextDisplay text={meaning} />
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -45,14 +42,11 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
     const ArrowItem = ({ arrow, type }: { arrow: ArrowData, type: 'Strength' | 'Weakness' }) => {
         return (
             <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
-                <div className="flex justify-between items-center w-full">
-                    <AccordionTrigger>
-                        <span className="text-left">Arrow of {type}: {arrow.name}</span>
-                    </AccordionTrigger>
-                    <SpeechPlayer text={arrow.description} />
-                </div>
+                <AccordionTrigger>
+                    <span className="text-left">Arrow of {type}: {arrow.name}</span>
+                </AccordionTrigger>
                 <AccordionContent>
-                   <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+                   <ScrollableTextDisplay text={arrow.description} />
                 </AccordionContent>
             </AccordionItem>
         );
@@ -87,14 +81,11 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
   const RepetitionItem = ({ number, count, meaning }: { number: string, count: number, meaning: string }) => {
       return (
            <AccordionItem value={`number-${number}`} key={number} className="glass-card px-4">
-              <div className="flex justify-between items-center w-full">
-                  <AccordionTrigger>
-                     <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
-                  </AccordionTrigger>
-                  <SpeechPlayer text={meaning || ''} />
-              </div>
+              <AccordionTrigger>
+                 <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
+              </AccordionTrigger>
               <AccordionContent>
-                   <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning || ''}</p>
+                   <ScrollableTextDisplay text={meaning || ''} />
               </AccordionContent>
           </AccordionItem>
       );
