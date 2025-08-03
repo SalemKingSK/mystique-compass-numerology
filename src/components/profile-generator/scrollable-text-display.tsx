@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -16,7 +17,6 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
 
   React.useEffect(() => {
     if (!text) return;
-    // Break the text into sentences
     const sentenceEndings = /(?<=[.!?])\s+/;
     const parts = text.split(sentenceEndings);
     let currentPos = 0;
@@ -35,7 +35,7 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
     }
     setSentences(result.filter(s => s.text.length > 0));
     sentenceRefs.current = new Array(result.length);
-    setCurrentSentenceIndex(-1); // Reset index when text changes
+    setCurrentSentenceIndex(-1);
   }, [text]);
 
   React.useEffect(() => {
