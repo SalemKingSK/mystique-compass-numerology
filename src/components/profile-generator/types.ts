@@ -59,5 +59,3 @@ export interface NumerologyData {
   arrowsOfStrength: ArrowData[];
   arrowsOfWeakness: ArrowData[];
 }
-
-    

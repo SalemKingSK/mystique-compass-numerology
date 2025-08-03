@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import type { AstroInsightOutput, NumerologyData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
-import { Home, Grid, Wand2, BrainCircuit, Sparkles, ArrowLeft, History } from "lucide-react";
+import { ArrowLeft, History } from "lucide-react";
 
 
 function TabButton({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
