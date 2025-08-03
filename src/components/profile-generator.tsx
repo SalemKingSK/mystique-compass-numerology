@@ -454,7 +454,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                 </DialogDescription>
             </DialogHeader>
             <Tabs defaultValue="description" className="w-full">
-                 <TabsList className="h-auto flex flex-wrap justify-center bg-transparent p-0">
+                 <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 h-auto flex-wrap justify-center bg-transparent p-0">
                     <TabsTrigger value="description" className="flex-1 min-w-[120px]">Description</TabsTrigger>
                     <TabsTrigger value="love" className="flex-1 min-w-[120px]">Love</TabsTrigger>
                     <TabsTrigger value="compatibilities" className="flex-1 min-w-[120px]">Compatibilities</TabsTrigger>
@@ -522,7 +522,8 @@ function ResultsDisplay({
   const [activeTab, setActiveTab] = React.useState('astro');
 
   const newAstroSignKey = insight.new_astrology_sign.replace(/ /g, '').replace(/\//g, '');
-  const newAstroData = NEW_ASTROLOGY_DATA[newAstroSignKey];
+  const newAstroData = NEW_ASTROLOGY_DATA[newAstroSignKey as keyof typeof NEW_ASTROLOGY_DATA];
+
 
   return (
     <motion.div 
@@ -543,11 +544,10 @@ function ResultsDisplay({
                          <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block">
                              <div className={cn(
                                 "animated-border absolute inset-0 z-0",
-                                activeTab !== 'new-astro' && "hidden"
+                                activeTab === 'new-astro' && "hidden"
                              )} />
                              <Button
                                 variant="ghost"
-                                onClick={() => setActiveTab('new-astro')}
                                 className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-300 hover:bg-black/40 hover:text-white text-lg"
                              >
                                 {insight.new_astrology_sign}
@@ -588,11 +588,6 @@ function ResultsDisplay({
                     )}
                     {activeTab === 'numerology' && numerology && (
                         <NumerologyDisplay numerology={numerology} />
-                    )}
-                    {activeTab === 'new-astro' && newAstroData && (
-                        <p className="text-center text-gray-400 p-8">
-                            Select the button above to explore detailed interpretations of your combined sign.
-                        </p>
                     )}
                 </motion.div>
             </AnimatePresence>
@@ -823,5 +818,3 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
-
-    
