@@ -425,71 +425,7 @@ const TabButton = ({
     </div>
 );
 
-function CelestialArcNav({
-  categories,
-  onSelectCategory,
-  activeCategory,
-}: {
-  categories: string[];
-  onSelectCategory: (category: string) => void;
-  activeCategory: string;
-}) {
-  const activeIndex = categories.indexOf(activeCategory);
-  
-  const arcItems = categories.map((category, index) => {
-    const angle = (index - activeIndex) * 25 - 0;
-    return { category, angle };
-  });
-
-  return (
-    <div className="relative h-28 w-full flex items-center justify-center mb-6">
-      <div className="absolute w-full h-[200px] -top-16">
-        {arcItems.map(({ category, angle }) => {
-            const isActive = category === activeCategory;
-            return (
-              <motion.div
-                key={category}
-                className="absolute w-full h-full"
-                animate={{ rotate: angle }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                style={{ transformOrigin: 'bottom center' }}
-              >
-                <div
-                  onClick={() => onSelectCategory(category)}
-                  className={cn(
-                    "absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer transition-all duration-300",
-                    "text-center whitespace-nowrap px-3 py-1 rounded-md",
-                     isActive ? 'font-bold text-secondary text-lg' : 'text-gray-400 text-sm'
-                  )}
-                >
-                  {category}
-                </div>
-              </motion.div>
-            )
-        })}
-      </div>
-    </div>
-  );
-}
-
-
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
-    const [activeTab, setActiveTab] = React.useState("Description");
-
-    const categories = ["Description", "Love", "Compatibilities", "Home & Family", "Profession"];
-
-    const getContentForTab = (tab: string) => {
-      if (!signData) return "No content available.";
-      switch (tab.toLowerCase()) {
-        case 'description': return signData.description;
-        case 'love': return signData.love;
-        case 'compatibilities': return signData.compatibilities;
-        case 'home & family': return signData.homeAndFamily;
-        case 'profession': return signData.profession;
-        default: return "No content available.";
-      }
-    };
-
     if (!signData) {
         return (
              <DialogContent className="max-w-2xl">
@@ -508,39 +444,61 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
     
     return (
         <DialogContent className="max-w-3xl min-h-[550px]">
-            <DialogHeader>
-                <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
+            <DialogHeader className="text-center">
+                <DialogTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
                 </DialogTitle>
-                 <DialogDescription className="text-center text-gray-400 !mt-2">
+                 <DialogDescription className="!mt-2">
                     A detailed look into the combined traits of your unique astrological sign.
                 </DialogDescription>
             </DialogHeader>
 
-            <CelestialArcNav
-              categories={categories}
-              onSelectCategory={setActiveTab}
-              activeCategory={activeTab}
-            />
+            <Tabs defaultValue="description" className="w-full mt-4">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 h-auto">
+                    <TabsTrigger value="description">Description</TabsTrigger>
+                    <TabsTrigger value="love">Love</TabsTrigger>
+                    <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
+                    <TabsTrigger value="home">Home & Family</TabsTrigger>
+                    <TabsTrigger value="profession">Profession</TabsTrigger>
+                </TabsList>
 
-            <div className="mt-8 min-h-[250px] glass-card p-4">
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={activeTab}
+                        key={sign}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
+                        className="mt-4"
                     >
-                        <ScrollArea className="h-72 pr-3">
-                           <SpeechPlayer 
-                                text={getContentForTab(activeTab)} 
-                                elementId={`new-astro-${activeTab.toLowerCase()}-speech`} 
-                           />
-                        </ScrollArea>
+                        <TabsContent value="description" className="glass-card p-4">
+                            <ScrollArea className="h-80 pr-3">
+                                <SpeechPlayer text={signData.description} elementId="new-astro-desc-speech" />
+                            </ScrollArea>
+                        </TabsContent>
+                        <TabsContent value="love" className="glass-card p-4">
+                            <ScrollArea className="h-80 pr-3">
+                                <SpeechPlayer text={signData.love} elementId="new-astro-love-speech" />
+                            </ScrollArea>
+                        </TabsContent>
+                        <TabsContent value="compatibilities" className="glass-card p-4">
+                             <ScrollArea className="h-80 pr-3">
+                                <SpeechPlayer text={signData.compatibilities} elementId="new-astro-comp-speech" />
+                            </ScrollArea>
+                        </TabsContent>
+                        <TabsContent value="home" className="glass-card p-4">
+                            <ScrollArea className="h-80 pr-3">
+                                <SpeechPlayer text={signData.homeAndFamily} elementId="new-astro-home-speech" />
+                            </ScrollArea>
+                        </TabsContent>
+                        <TabsContent value="profession" className="glass-card p-4">
+                            <ScrollArea className="h-80 pr-3">
+                                <SpeechPlayer text={signData.profession} elementId="new-astro-prof-speech" />
+                            </ScrollArea>
+                        </TabsContent>
                     </motion.div>
                 </AnimatePresence>
-            </div>
+            </Tabs>
         </DialogContent>
     );
 }
