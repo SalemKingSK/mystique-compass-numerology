@@ -454,11 +454,11 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
             </DialogHeader>
 
             <Tabs defaultValue="description" className="w-full mt-4">
-                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 h-auto">
+                 <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 h-auto">
                     <TabsTrigger value="description">Description</TabsTrigger>
                     <TabsTrigger value="love">Love</TabsTrigger>
                     <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
-                    <TabsTrigger value="home">Home & Family</TabsTrigger>
+                    <TabsTrigger value="home">Home &amp; Family</TabsTrigger>
                     <TabsTrigger value="profession">Profession</TabsTrigger>
                 </TabsList>
 
@@ -545,14 +545,14 @@ function ResultsDisplay({
                 
                 <Dialog>
                     <DialogTrigger asChild>
-                       <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block cursor-pointer">
+                       <button className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block cursor-pointer group">
                             <div className="animated-border absolute inset-0 z-0"/>
                             <div
-                                className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-300 hover:bg-black/40 hover:text-white text-lg px-4 py-2"
+                                className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 group-hover:bg-black/40 text-gray-300 group-hover:text-white text-lg px-4 py-2"
                             >
                                 {insight.new_astrology_sign}
                             </div>
-                        </div>
+                        </button>
                     </DialogTrigger>
                     {newAstroData && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />}
                 </Dialog>
@@ -818,3 +818,5 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
+
+    
