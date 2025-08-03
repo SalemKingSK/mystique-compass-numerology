@@ -398,13 +398,22 @@ const TabButton = ({
   onClick: () => void;
   className?: string;
 }) => (
-    <div className={cn("relative p-0.5 overflow-hidden rounded-xl", className)}>
+    <div className={cn("relative p-0.5 overflow-hidden rounded-xl", isActive ? "bg-transparent" : "", className)}>
+         {isActive && (
+            <div
+                className="animated-border absolute inset-0 z-0"
+                style={{
+                    background: 'conic-gradient(from var(--angle), var(--gradient-start), var(--gradient-mid1), var(--gradient-mid2), var(--gradient-end), var(--gradient-start))',
+                    animation: 'border-flow 8s linear infinite',
+                }}
+              />
+        )}
         <Button
             onClick={onClick}
             className={cn(
             "w-full relative z-10 transition-all duration-300 rounded-lg",
             isActive
-                ? "bg-primary/10 text-secondary font-bold"
+                ? "bg-background/80 text-secondary font-bold"
                 : "bg-black/20 text-gray-400 hover:bg-black/40 hover:text-white"
             )}
             variant="ghost"
@@ -412,24 +421,6 @@ const TabButton = ({
         >
             {label}
         </Button>
-        <AnimatePresence>
-            {isActive && (
-                 <motion.div
-                    className="absolute inset-0 z-0"
-                    layoutId="active-tab-border"
-                    initial={{ opacity: 0 }}
-                    animate={{ 
-                        opacity: 1, 
-                        '--angle': '360deg',
-                        transition: { duration: 8, ease: 'linear', repeat: Infinity } 
-                    } as any}
-                    style={{
-                        background: 'conic-gradient(from var(--angle), var(--gradient-start), var(--gradient-mid1), var(--gradient-mid2), var(--gradient-end), var(--gradient-start))',
-                        animation: 'border-flow 8s linear infinite',
-                    }}
-                  />
-            )}
-        </AnimatePresence>
     </div>
 );
 
@@ -443,43 +434,40 @@ function CelestialArcNav({
   activeCategory: string;
 }) {
   const activeIndex = categories.indexOf(activeCategory);
+  
+  // Calculate the rotation for each item to be on an arc
+  const arcItems = categories.map((category, index) => {
+    const angle = (index - activeIndex) * 25 - 0; // Adjust multiplier for spread, and offset
+    return { category, angle };
+  });
 
   return (
-    <div className="relative h-24 w-full flex items-center justify-center mb-4">
-      {categories.map((category, index) => {
-        const angle = (index - activeIndex) * 30; // Adjust angle for spacing
-        const isCenter = index === activeIndex;
-
-        return (
-          <motion.div
-            key={category}
-            onClick={() => onSelectCategory(category)}
-            className="absolute cursor-pointer text-center"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{
-              opacity: 1,
-              scale: isCenter ? 1.25 : 0.8,
-              rotate: angle,
-              transformOrigin: 'bottom center',
-              y: -80, // Adjust vertical position of the arc
-            }}
-            transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-            }}
-          >
-            <span
-              className={cn(
-                'transition-colors duration-300',
-                isCenter ? 'font-bold text-secondary' : 'text-gray-400'
-              )}
-            >
-              {category}
-            </span>
-          </motion.div>
-        );
-      })}
+    <div className="relative h-28 w-full flex items-center justify-center mb-6">
+      <div className="absolute w-full h-[200px] -top-16">
+        {arcItems.map(({ category, angle }, index) => {
+            const isActive = category === activeCategory;
+            return (
+              <motion.div
+                key={category}
+                className="absolute w-full h-full"
+                animate={{ rotate: angle }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{ transformOrigin: 'bottom center' }}
+              >
+                <div
+                  onClick={() => onSelectCategory(category)}
+                  className={cn(
+                    "absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer transition-all duration-300",
+                    "text-center whitespace-nowrap px-3 py-1 rounded-md",
+                     isActive ? 'font-bold text-secondary text-lg' : 'text-gray-400 text-sm'
+                  )}
+                >
+                  {category}
+                </div>
+              </motion.div>
+            )
+        })}
+      </div>
     </div>
   );
 }
@@ -494,9 +482,9 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
       switch (tab.toLowerCase()) {
         case 'description': return signData.description;
         case 'love': return signData.love;
+        case 'compatibilities': return signData.compatibilities;
         case 'home & family': return signData.homeAndFamily;
         case 'profession': return signData.profession;
-        case 'compatibilities': return signData.compatibilities;
         default: return "No content available.";
       }
     };
@@ -518,7 +506,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
     }
     
     return (
-        <DialogContent className="max-w-3xl min-h-[500px]">
+        <DialogContent className="max-w-3xl min-h-[550px]">
             <DialogHeader>
                 <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
@@ -598,14 +586,13 @@ function ResultsDisplay({
                 
                 <Dialog>
                     <DialogTrigger asChild>
-                       <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block">
-                             <div className={cn("animated-border absolute inset-0 z-0")}/>
-                             <Button
-                                variant="ghost"
-                                className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-300 hover:bg-black/40 hover:text-white text-lg"
-                             >
+                       <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block cursor-pointer">
+                            <div className="animated-border absolute inset-0 z-0"/>
+                            <div
+                                className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-300 hover:bg-black/40 hover:text-white text-lg px-4 py-2"
+                            >
                                 {insight.new_astrology_sign}
-                            </Button>
+                            </div>
                         </div>
                     </DialogTrigger>
                     {newAstroData && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />}
@@ -873,4 +860,5 @@ export function ProfileGenerator() {
   );
 }
 
+    
     
