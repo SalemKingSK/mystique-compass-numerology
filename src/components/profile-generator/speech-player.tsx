@@ -1,4 +1,3 @@
-
 // src/components/profile-generator/speech-player.tsx
 'use client';
 
@@ -14,32 +13,20 @@ interface SpeechPlayerProps {
 
 export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
+    // utteranceRef is not strictly needed anymore for state checking but can be useful for debugging
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
     React.useEffect(() => {
-        const synth = window.speechSynthesis;
-
-        const handleSpeakingState = () => {
-             const isCurrentlySpeaking = synth.speaking && utteranceRef.current === synth.getUtterances().find(u => u === utteranceRef.current);
-             if (isCurrentlySpeaking !== isPlaying) {
-                 setIsPlaying(isCurrentlySpeaking);
-             }
-        };
-
-        const interval = setInterval(handleSpeakingState, 250);
-        
         // Cleanup on unmount
         return () => {
-            clearInterval(interval);
-            if (synth.speaking && utteranceRef.current) {
-                synth.cancel();
+            if (window.speechSynthesis?.speaking) {
+                window.speechSynthesis.cancel();
             }
         };
-    }, [isPlaying]);
-
+    }, []);
 
     const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
-        if(e) {
+        if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
@@ -49,8 +36,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         const synth = window.speechSynthesis;
 
         if (isPlaying) {
-            synth.cancel();
-            setIsPlaying(false);
+            synth.cancel(); // This will trigger the 'onend' event, which resets the state
             return;
         }
 
@@ -82,7 +68,11 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
             setIsPlaying(true);
         };
         
-        synth.speak(utterance);
+        // Use a brief timeout to ensure the synth is ready after a potential cancel
+        setTimeout(() => {
+            synth.speak(utterance);
+        }, 100);
+
 
     }, [text, onBoundary, onEnd, isPlaying]);
 
@@ -93,4 +83,3 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         </Button>
     );
 }
-
