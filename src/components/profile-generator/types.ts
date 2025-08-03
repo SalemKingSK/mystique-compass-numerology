@@ -21,14 +21,11 @@ export interface AstroInsightOutput {
   luckyNumber: number;
   luckyColor: string;
   signData: {
-    introduction: string;
-    elements: any;
-    compatibilities: any;
-    futures: any;
-    description?: string;
-    love?: string;
-    homeAndFamily?: string;
-    profession?: string;
+    description: string;
+    love: string;
+    compatibilities: string;
+    homeAndFamily: string;
+    profession: string;
   };
 }
 

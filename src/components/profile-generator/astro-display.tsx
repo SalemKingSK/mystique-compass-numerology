@@ -24,7 +24,7 @@ import { SpeechPlayer } from './speech-player';
 
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
-  if (!signData || Object.keys(signData).length === 0) {
+  if (!signData || Object.keys(signData).length === 0 || !signData.description) {
     return (
       <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
         <DialogHeader>
@@ -100,9 +100,9 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Users className="h-5 w-5" /> Compatibilities</h3>
-                        <SpeechPlayer text={typeof signData.compatibilities === 'string' ? signData.compatibilities : JSON.stringify(signData.compatibilities, null, 2)} />
+                        <SpeechPlayer text={signData.compatibilities || ''} />
                     </div>
-                    <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{typeof signData.compatibilities === 'string' ? signData.compatibilities : JSON.stringify(signData.compatibilities, null, 2)}</p>
+                    <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{signData.compatibilities}</p>
                 </div>
             </TabsContent>
         </ScrollArea>

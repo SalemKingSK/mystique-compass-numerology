@@ -1,5 +1,5 @@
 // src/lib/astrology.ts
-import { zodiacData } from '@/lib/zodiac';
+import { NEW_ASTROLOGY_DATA } from './new-astrology';
 
 export interface AstroInsightInput {
   name: string;
@@ -10,10 +10,11 @@ export interface AstroInsightInput {
 }
 
 const SignDataSchema = {
-    introduction: "",
-    elements: {},
-    compatibilities: {},
-    futures: {},
+    description: "",
+    love: "",
+    compatibilities: "",
+    homeAndFamily: "",
+    profession: ""
 };
 
 export interface AstroInsightOutput {
@@ -149,7 +150,7 @@ export const CHINESE_CALENDAR = [
     { "year": 2015, "title": "Wood Goat", "start": "2015-02-19", "end": "2016-02-07" },
     { "year": 2016, "title": "Fire Monkey", "start": "2016-02-08", "end": "2017-01-27" },
     { "year": 2017, "title": "Fire Rooster", "start": "2017-01-28", "end": "2018-02-15" },
-    { "year": 2018, "title": "Earth Dog", "start": "2018-02-16", "end": "2019-02-04" },
+    { "year": 2018, "title": "Earth Dog", "start": "1918-02-16", "end": "2019-02-04" },
     { "year": 2019, "title": "Earth Pig", "start": "2019-02-05", "end": "2020-01-24" },
     { "year": 2020, "title": "Metal Rat", "start": "2020-01-25", "end": "2021-02-11" },
     { "year": 2021, "title": "Metal Ox", "start": "2021-02-12", "end": "2022-01-31" },
@@ -229,11 +230,8 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
     const { sign, element } = getChineseZodiacSign(day, month, year);
     const new_astrology_sign = `${western_sign}/${sign}`;
 
-    // 2. Get the entire data object for that sign
-    const signData = (zodiacData as any)[sign];
-    if (!signData) {
-      throw new Error(`No zodiac data found for sign: ${sign}`);
-    }
+    // 2. Get the entire data object for that sign from the NEW_ASTROLOGY_DATA
+    const signData = (NEW_ASTROLOGY_DATA as any)[new_astrology_sign] || {};
 
     // 3. Generate deterministic reading
     const reading = generateReading(name, sign, western_sign);
@@ -250,6 +248,12 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
         reading,
         luckyNumber,
         luckyColor,
-        signData: signData,
+        signData: {
+            description: signData.description || '',
+            love: signData.love || '',
+            compatibilities: signData.compatibilities || '',
+            homeAndFamily: signData.homeAndFamily || '',
+            profession: signData.profession || '',
+        },
     };
 }
