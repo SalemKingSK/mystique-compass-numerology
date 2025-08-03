@@ -428,12 +428,12 @@ const TabButton = ({
 
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
-    if (!signData) {
+    if (!signData || Object.keys(signData).length === 0) {
         return (
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-4xl glass-card">
                 <DialogHeader>
                     <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
-                        {sign}
+                        {sign.replace('/', ' / ')}
                     </DialogTitle>
                 </DialogHeader>
                 <div className="text-center text-gray-400 py-8">
@@ -447,7 +447,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         <DialogContent className="max-w-4xl min-h-[580px] flex flex-col glass-card">
             <DialogHeader>
                 <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
-                    {sign}
+                    {sign.replace('/', ' / ')}
                 </DialogTitle>
                  <DialogDescription className="!mt-2 text-center">
                     A detailed look into the combined traits of your unique astrological sign.
@@ -459,7 +459,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                         <TabsTrigger value="description">Description</TabsTrigger>
                         <TabsTrigger value="love">Love</TabsTrigger>
                         <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
-                        <TabsTrigger value="home">Home & Family</TabsTrigger>
+                        <TabsTrigger value="homeAndFamily">Home &amp; Family</TabsTrigger>
                         <TabsTrigger value="profession">Profession</TabsTrigger>
                     </TabsList>
                     
@@ -473,7 +473,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                         <TabsContent value="compatibilities">
                             <SpeechPlayer text={signData.compatibilities || 'Not available.'} elementId="new-astro-comp" />
                         </TabsContent>
-                        <TabsContent value="home">
+                        <TabsContent value="homeAndFamily">
                             <SpeechPlayer text={signData.homeAndFamily || 'Not available.'} elementId="new-astro-home" />
                         </TabsContent>
                         <TabsContent value="profession">
@@ -802,5 +802,7 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
+
+    
 
     
