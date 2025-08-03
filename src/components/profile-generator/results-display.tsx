@@ -18,10 +18,10 @@ function TabButton({ isActive, onClick, children }: { isActive: boolean, onClick
     return (
         <button
             onClick={onClick}
-            className={`px-4 py-2 w-1/3 text-base md:text-lg font-medium rounded-lg transition-all duration-300 ease-in-out transform
+            className={`px-4 py-2.5 w-1/3 text-base md:text-lg font-medium transition-colors duration-300
                 ${isActive
-                    ? 'bg-purple-500/30 text-white shadow-lg scale-105 border border-purple-400/50'
-                    : 'text-purple-200/70 hover:bg-purple-500/10 hover:text-white'
+                    ? 'text-white'
+                    : 'text-purple-200/70 hover:text-white'
                 }`}
         >
             {children}
@@ -119,7 +119,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
         <ResultsHeader name={insight.name} />
 
         <div className="animated-border mb-6">
-            <div className='flex justify-center space-x-0 bg-background/80 p-1 rounded-2xl'>
+            <div className='flex justify-center divide-x divide-white/10 bg-background/80 p-1 rounded-lg'>
                  <TabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</TabButton>
                  <TabButton isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology</TabButton>
                  <TabButton isActive={activeTab === 'new-astro'} onClick={() => setActiveTab('new-astro')}>{insight.new_astrology_sign}</TabButton>
