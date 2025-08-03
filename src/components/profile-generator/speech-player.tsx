@@ -20,36 +20,36 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         const synth = window.speechSynthesis;
 
         const handleSpeakingState = () => {
-            // Only update state if this component's utterance is the one being spoken
-            if (utteranceRef.current && synth.speaking !== isPlaying) {
-                 setIsPlaying(synth.speaking);
-            } else if (!synth.speaking && isPlaying) {
-                 setIsPlaying(false);
-            }
+             const isCurrentlySpeaking = synth.speaking && utteranceRef.current === synth.getUtterances().find(u => u === utteranceRef.current);
+             if (isCurrentlySpeaking !== isPlaying) {
+                 setIsPlaying(isCurrentlySpeaking);
+             }
         };
 
         const interval = setInterval(handleSpeakingState, 250);
-
+        
+        // Cleanup on unmount
         return () => {
             clearInterval(interval);
-            // Cleanup on unmount
             if (synth.speaking && utteranceRef.current) {
                 synth.cancel();
             }
         };
     }, [isPlaying]);
 
-    const handlePlayPause = React.useCallback((e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
 
-        if (!text || text.trim() === '') return; // Prevent speaking empty text
+    const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
+        if(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+        if (!text || text.trim() === '' || typeof window === 'undefined' || !window.speechSynthesis) return;
+        
         const synth = window.speechSynthesis;
 
         if (isPlaying) {
-            synth.cancel(); 
+            synth.cancel();
             setIsPlaying(false);
             return;
         }
@@ -58,31 +58,31 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         if (synth.speaking) {
             synth.cancel();
         }
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance;
+        
+        utterance.onboundary = (event) => {
+            if (onBoundary) onBoundary(event);
+        };
+        
+        utterance.onend = (event) => {
+            if (onEnd) onEnd(event);
+            setIsPlaying(false);
+            utteranceRef.current = null;
+        };
 
-        setTimeout(() => {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utteranceRef.current = utterance;
+        utterance.onerror = (event) => {
+            console.error("SpeechSynthesis Error", event);
+            setIsPlaying(false);
+            utteranceRef.current = null;
+        };
 
-            if (onBoundary) utterance.onboundary = onBoundary;
-            
-            utterance.onend = (event) => {
-                if (onEnd) onEnd(event);
-                setIsPlaying(false);
-                utteranceRef.current = null;
-            };
-
-            utterance.onerror = (event) => {
-                console.error("SpeechSynthesis Error", event);
-                setIsPlaying(false);
-                utteranceRef.current = null;
-            };
-
-            utterance.onstart = () => {
-                setIsPlaying(true);
-            };
-
-            synth.speak(utterance);
-        }, 100); 
+        utterance.onstart = () => {
+            setIsPlaying(true);
+        };
+        
+        synth.speak(utterance);
 
     }, [text, onBoundary, onEnd, isPlaying]);
 
@@ -93,3 +93,4 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         </Button>
     );
 }
+
