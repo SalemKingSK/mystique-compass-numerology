@@ -1,4 +1,3 @@
-
 // src/components/profile-generator/speech-player.tsx
 'use client';
 
@@ -8,23 +7,36 @@ import { Play, Pause } from "lucide-react";
 
 interface SpeechPlayerProps {
     text: string;
+    onBoundary?: (event: SpeechSynthesisEvent) => void;
+    onEnd?: (event: SpeechSynthesisEvent) => void;
 }
 
-export function SpeechPlayer({ text }: SpeechPlayerProps) {
+export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
-    // Effect to clean up speech synthesis on component unmount
     React.useEffect(() => {
         const synth = window.speechSynthesis;
-        return () => {
-            if (utteranceRef.current) {
-                utteranceRef.current.onend = null;
-                utteranceRef.current.onerror = null;
-            }
-            synth.cancel();
+
+        const handleSpeakingState = () => {
+            // Check if the specific utterance is still speaking
+             const isCurrentlySpeaking = synth.speaking && utteranceRef.current && utteranceRef.current.text === text;
+             if (isCurrentlySpeaking !== isPlaying) {
+                 setIsPlaying(isCurrentlySpeaking);
+             }
         };
-    }, []);
+
+        // Check the state periodically
+        const interval = setInterval(handleSpeakingState, 500);
+
+        return () => {
+            clearInterval(interval);
+            if (synth.speaking && utteranceRef.current && utteranceRef.current.text === text) {
+                synth.cancel();
+            }
+        };
+    }, [text, isPlaying]);
+
 
     const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
         if (e) {
@@ -36,8 +48,9 @@ export function SpeechPlayer({ text }: SpeechPlayerProps) {
         
         const synth = window.speechSynthesis;
 
-        if (isPlaying) {
-            synth.cancel(); // This will trigger the onend event
+        if (synth.speaking) {
+            synth.cancel();
+            setIsPlaying(false);
             return;
         }
         
@@ -46,31 +59,37 @@ export function SpeechPlayer({ text }: SpeechPlayerProps) {
              return;
         }
         
-        // Ensure any previous speech is stopped before starting a new one.
-        // This prevents overlapping event listeners.
         synth.cancel();
         
         const utterance = new SpeechSynthesisUtterance(text);
         utteranceRef.current = utterance;
         
-        utterance.onstart = () => {
-            setIsPlaying(true);
-        };
+        utterance.onboundary = onBoundary || null;
 
         utterance.onend = () => {
             setIsPlaying(false);
+            if(onEnd) onEnd(new SpeechSynthesisEvent('end'));
             utteranceRef.current = null;
         };
 
         utterance.onerror = (event) => {
-            console.error("SpeechSynthesis Error", event);
+            // This is a common browser behavior. When we call synth.cancel(),
+            // it sometimes triggers `onerror` with "canceled". We don't want to log this as an error.
+            if (event.error !== 'canceled') {
+              console.error("SpeechSynthesis Error", event);
+            }
             setIsPlaying(false);
+            if(onEnd) onEnd(new SpeechSynthesisEvent('end')); // also treat as end
             utteranceRef.current = null;
         };
+        
+        utterance.onstart = () => {
+            setIsPlaying(true);
+        }
 
         synth.speak(utterance);
 
-    }, [text, isPlaying]);
+    }, [text, onBoundary, onEnd]);
 
     return (
         <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
