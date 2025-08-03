@@ -45,7 +45,7 @@ function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string,
   const activeIndex = tabs.findIndex(tab => tab.key === activeTab);
 
   return (
-    <div className="relative w-full h-48 my-4 flex justify-center items-center overflow-hidden">
+    <div className="relative w-full h-48 my-8 flex justify-center items-center overflow-hidden">
       {tabs.map((tab, index) => {
         const isActive = activeIndex === index;
         const angle = (index - activeIndex) * 25; // degrees between items
@@ -55,7 +55,7 @@ function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string,
             key={tab.name}
             className="absolute transition-all duration-500 ease-in-out"
             style={{
-              transform: `rotate(${angle}deg) translateY(-120px) rotate(${-angle}deg)`,
+              transform: `rotate(${angle}deg) translateY(-90px) rotate(${-angle}deg)`,
               transformOrigin: 'bottom center',
             }}
           >
@@ -71,7 +71,7 @@ function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string,
                 }`}
               >
                 <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
-                <span className={`transition-all duration-300 text-lg ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                <span className={`transition-all duration-300 text-xl ${isActive ? 'font-bold' : 'font-semibold'}`}>
                   {tab.name}
                 </span>
               </div>
