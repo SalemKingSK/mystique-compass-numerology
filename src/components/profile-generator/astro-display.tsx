@@ -36,7 +36,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger>
+                    <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
                         <div className="flex justify-between items-center w-full">
                             <span>With the {sign}</span>
                             <SpeechPlayer text={String(text)} />
@@ -65,7 +65,7 @@ function FutureDisplay({ futures }: { futures: any }) {
                 const text = data.prediction;
                 return (
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                        <AccordionTrigger>
+                        <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
                              <div className="flex justify-between items-center w-full">
                                 <span>{year} - Year of the {data.year}</span>
                                 <SpeechPlayer text={text} />

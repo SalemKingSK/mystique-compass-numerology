@@ -7,26 +7,37 @@ import { Play, Pause } from "lucide-react";
 
 interface SpeechPlayerProps {
     text: string;
-    onBoundary?: (event: SpeechSynthesisEvent) => void;
-    onEnd?: (event: SpeechSynthesisEvent) => void;
 }
 
-export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
+export function SpeechPlayer({ text }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
+    // Effect to check speaking state globally
+    React.useEffect(() => {
+        const synth = window.speechSynthesis;
+        const interval = setInterval(() => {
+            if (utteranceRef.current && !synth.speaking && isPlaying) {
+                setIsPlaying(false);
+            }
+        }, 250);
+
+        return () => clearInterval(interval);
+    }, [isPlaying]);
+
     const handlePlayPause = React.useCallback((e: React.MouseEvent) => {
-        e.stopPropagation(); // Stop click from propagating to parent (like AccordionTrigger)
+        e.stopPropagation(); 
         
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
         const synth = window.speechSynthesis;
 
         if (synth.speaking && utteranceRef.current) {
-            synth.cancel(); // This will trigger the 'end' event
+            synth.cancel();
+            setIsPlaying(false);
+            utteranceRef.current = null;
             return;
         }
-
-        // If something else is speaking (from another component instance), cancel it.
+        
         if (synth.speaking) {
             synth.cancel();
         }
@@ -38,28 +49,21 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
             setIsPlaying(true);
         };
 
-        utterance.onend = (event) => {
+        utterance.onend = () => {
             setIsPlaying(false);
             utteranceRef.current = null;
-            if (onEnd) onEnd(event);
         };
         
         utterance.onerror = (event) => {
             console.error("SpeechSynthesis Error", event);
             setIsPlaying(false);
             utteranceRef.current = null;
-            if (onEnd) onEnd(event);
         };
-        
-        if (onBoundary) {
-            utterance.addEventListener('boundary', onBoundary);
-        }
         
         synth.speak(utterance);
 
-    }, [text, onBoundary, onEnd]);
+    }, [text]);
 
-    // Effect to clean up speech synthesis on component unmount
     React.useEffect(() => {
         const synth = window.speechSynthesis;
         return () => {

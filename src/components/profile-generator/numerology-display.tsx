@@ -23,7 +23,7 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
     return (
         <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="glass-card px-4">
-                <AccordionTrigger>
+                <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
                     <div className="flex justify-between items-center w-full">
                         <span className="font-semibold text-lg text-primary flex items-center gap-2">
                             <Wand2 className="h-5 w-5" /> {title}
@@ -45,7 +45,7 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
     const ArrowItem = ({ arrow, type }: { arrow: ArrowData, type: 'Strength' | 'Weakness' }) => {
         return (
             <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
-                <AccordionTrigger>
+                <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
                     <div className="flex justify-between items-center w-full">
                         <span className="text-left">Arrow of {type}: {arrow.name}</span>
                          <SpeechPlayer text={arrow.description} />
@@ -87,7 +87,7 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
   const RepetitionItem = ({ number, count, meaning }: { number: string, count: number, meaning: string }) => {
       return (
            <AccordionItem value={`number-${number}`} key={number} className="glass-card px-4">
-              <AccordionTrigger>
+              <AccordionTrigger onClick={(e) => { if(e.target instanceof HTMLButtonElement) e.preventDefault() }}>
                   <div className="flex justify-between items-center w-full">
                      <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
                      <SpeechPlayer text={meaning || ''} />
