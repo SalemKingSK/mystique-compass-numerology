@@ -428,86 +428,38 @@ const TabButton = ({
 
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
-
     if (!signData) {
         return (
-             <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                         {sign}
                     </DialogTitle>
                 </DialogHeader>
                 <div className="text-center text-gray-400 py-8">
-                    <p>No detailed information available for {sign}.</p>
-                    <p>Content is being prepared.</p>
+                    <p>Detailed information for {sign} is not yet available.</p>
                 </div>
             </DialogContent>
         );
     }
     
+    // We will replace this with a real tabbed view in the next steps
     return (
         <DialogContent className="max-w-4xl min-h-[580px] flex flex-col">
-            <DialogHeader className="text-center">
-                <DialogTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
+            <DialogHeader>
+                <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
                 </DialogTitle>
-                <DialogDescription className="!mt-2">
-                    A detailed look into the combined traits of your unique astrological sign.
+                 <DialogDescription className="!mt-2">
+                    Details Not Available
                 </DialogDescription>
             </DialogHeader>
-
-            <Tabs defaultValue="description" className="w-full flex-grow flex flex-col">
-                <TabsList className="grid w-full grid-cols-3 md:grid-cols-5">
-                    <TabsTrigger value="description">Description</TabsTrigger>
-                    <TabsTrigger value="love">Love</TabsTrigger>
-                    <TabsTrigger value="compatibilities">Compatibility</TabsTrigger>
-                    <TabsTrigger value="homeAndFamily">Home & Family</TabsTrigger>
-                    <TabsTrigger value="profession">Profession</TabsTrigger>
-                </TabsList>
-                <div className="flex-grow mt-4 glass-card p-4">
-                    <AnimatePresence mode="wait">
-                        <TabsContent value="description" className="h-full">
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
-                                <ScrollArea className="h-full pr-3">
-                                    <SpeechPlayer text={signData.description} elementId="desc-speech" />
-                                </ScrollArea>
-                            </motion.div>
-                        </TabsContent>
-                        <TabsContent value="love" className="h-full">
-                           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
-                                <ScrollArea className="h-full pr-3">
-                                    <SpeechPlayer text={signData.love} elementId="love-speech" />
-                                </ScrollArea>
-                            </motion.div>
-                        </TabsContent>
-                        <TabsContent value="compatibilities" className="h-full">
-                           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
-                                <ScrollArea className="h-full pr-3">
-                                    <SpeechPlayer text={signData.compatibilities} elementId="compat-speech" />
-                                </ScrollArea>
-                            </motion.div>
-                        </TabsContent>
-                        <TabsContent value="homeAndFamily" className="h-full">
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
-                                <ScrollArea className="h-full pr-3">
-                                    <SpeechPlayer text={signData.homeAndFamily} elementId="home-speech" />
-                                </ScrollArea>
-                            </motion.div>
-                        </TabsContent>
-                        <TabsContent value="profession" className="h-full">
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
-                                <ScrollArea className="h-full pr-3">
-                                    <SpeechPlayer text={signData.profession} elementId="prof-speech" />
-                                </ScrollArea>
-                            </motion.div>
-                        </TabsContent>
-                    </AnimatePresence>
-                </div>
-            </Tabs>
+            <div className="flex-grow mt-4 glass-card p-4 text-center text-gray-400">
+                Detailed information for {sign} is not yet available.
+            </div>
         </DialogContent>
     );
 }
-
 
 function ResultsHistoryButton({ onHistoryOpen }: { onHistoryOpen: () => void }) {
     return(
@@ -517,6 +469,7 @@ function ResultsHistoryButton({ onHistoryOpen }: { onHistoryOpen: () => void }) 
     </Button>
     )
 };
+
 
 function ResultsDisplay({
   insight,
@@ -560,16 +513,7 @@ function ResultsDisplay({
                             </div>
                         </button>
                     </DialogTrigger>
-                    {newAstroData ? (
-                         <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
-                    ) : (
-                         <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Details Not Available</DialogTitle>
-                            </DialogHeader>
-                            <p>Detailed information for {insight.new_astrology_sign} is not yet available.</p>
-                        </DialogContent>
-                    )}
+                    <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
                 </Dialog>
             </header>
 
@@ -838,3 +782,6 @@ export function ProfileGenerator() {
 
     
 
+
+
+    
