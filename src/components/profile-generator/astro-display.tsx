@@ -6,62 +6,31 @@ import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 // --- SUB-COMPONENTS ---
 
 type ArcCategory = {
   name: string;
   icon: React.ElementType;
+  key: 'introduction' | 'element' | 'compatibility' | 'future';
 };
 
 const TABS: ArcCategory[] = [
-  { name: "Introduction", icon: BookOpen },
-  { name: "Element", icon: Leaf },
-  { name: "Compatibility", icon: Users },
-  { name: "Future", icon: Forward },
+  { name: "Introduction", icon: BookOpen, key: 'introduction' },
+  { name: "Element", icon: Leaf, key: 'element' },
+  { name: "Compatibility", icon: Users, key: 'compatibility' },
+  { name: "Future", icon: Forward, key: 'future' },
 ];
-
-function CelestialArcNav({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: string) => void }) {
-  const activeIndex = TABS.findIndex(tab => tab.name.toLowerCase() === activeTab);
-
-  return (
-    <div className="relative w-full h-48 my-8 flex justify-center items-center overflow-hidden">
-      {TABS.map((tab, index) => {
-        const isActive = activeIndex === index;
-        const angle = (index - activeIndex) * 25; // 25 degrees between items
-
-        return (
-          <div
-            key={tab.name}
-            className="absolute transition-all duration-500 ease-in-out"
-            style={{
-              transform: `rotate(${angle}deg) translateY(-90px) rotate(${-angle}deg)`,
-              transformOrigin: 'bottom center',
-            }}
-          >
-            <button
-              onClick={() => setActiveTab(tab.name.toLowerCase())}
-              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 group ${
-                isActive ? 'text-primary' : 'text-purple-200/60 scale-90 hover:scale-95'
-              }`}
-            >
-              <div
-                className={`flex flex-col items-center p-2 rounded-lg transition-all duration-300 ${
-                  isActive ? 'bg-primary/10 animate-arrow-pulse' : 'group-hover:bg-primary/5'
-                }`}
-              >
-                <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
-                <span className={`transition-all duration-300 text-xl ${isActive ? 'font-bold' : 'font-semibold'}`}>
-                  {tab.name}
-                </span>
-              </div>
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
@@ -72,7 +41,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
-                <AccordionItem value={sign} key={sign} className="glass-card px-4">
+                <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
                     <AccordionTrigger>With the {sign}</AccordionTrigger>
                     <AccordionContent>
                         <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{String(text)}</p>
@@ -93,7 +62,7 @@ function FutureDisplay({ futures }: { futures: any }) {
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {sortedYears.map(year => (
-                <AccordionItem value={year} key={year} className="glass-card px-4">
+                <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
                     <AccordionTrigger>{year} - Year of the {futures[year].year}</AccordionTrigger>
                     <AccordionContent>
                         <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{futures[year].prediction}</p>
@@ -107,67 +76,104 @@ function FutureDisplay({ futures }: { futures: any }) {
 // --- MAIN COMPONENT ---
 
 export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
-  const [activeSubTab, setActiveSubTab] = React.useState('introduction');
+  const [api, setApi] = React.useState<any>(null);
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
+
   const { zodiacData, sign, element } = insight;
   const { introduction, elements, compatibilities, futures } = zodiacData;
 
   const signElementData = elements?.[element as keyof typeof elements];
 
-  const renderContent = () => {
-    switch (activeSubTab) {
-      case 'introduction':
-        return (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><BookOpen className="h-5 w-5" /> Your Animal Sign: The {sign}</h3>
-             <ScrollableTextDisplay 
-                text={introduction || "No introduction available."} 
-                renderPlayer={(onBoundary, onEnd) => (
-                    <div className="absolute top-0 right-0 z-10">
-                        <SpeechPlayer text={introduction || ''} onBoundary={onBoundary} onEnd={onEnd} />
-                    </div>
-                )}
-             />
-          </div>
-        );
-      case 'element':
-        return (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {element}</h3>
-            <ScrollableTextDisplay 
-                text={signElementData || `No specific data for the ${element} element.`} 
-                renderPlayer={(onBoundary, onEnd) => (
-                    <div className="absolute top-0 right-0 z-10">
-                        <SpeechPlayer text={signElementData || ''} onBoundary={onBoundary} onEnd={onEnd} />
-                    </div>
-                )}
-             />
-          </div>
-        );
-      case 'compatibility':
-        return (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Users className="h-5 w-5" /> Compatibility Guide</h3>
-            <CompatibilityDisplay compatibilities={compatibilities} />
-          </div>
-        );
-      case 'future':
-        return (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Forward className="h-5 w-5" /> Future Outlook</h3>
-            <FutureDisplay futures={futures} />
-          </div>
-        );
-      default:
-        return null;
+  React.useEffect(() => {
+    if (!api) return;
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  const scrollTo = (index: number) => {
+    api?.scrollTo(index);
+  };
+  
+  const contentMap = {
+    introduction: {
+      title: `Your Animal Sign: The ${sign}`,
+      content: (
+        <ScrollableTextDisplay 
+            text={introduction || "No introduction available."} 
+            renderPlayer={(onBoundary, onEnd) => (
+                <div className="absolute top-0 right-0 z-10">
+                    <SpeechPlayer text={introduction || ''} onBoundary={onBoundary} onEnd={onEnd} />
+                </div>
+            )}
+         />
+      )
+    },
+    element: {
+      title: `Your Element: The ${element}`,
+      content: (
+        <ScrollableTextDisplay 
+            text={signElementData || `No specific data for the ${element} element.`} 
+            renderPlayer={(onBoundary, onEnd) => (
+                <div className="absolute top-0 right-0 z-10">
+                    <SpeechPlayer text={signElementData || ''} onBoundary={onBoundary} onEnd={onEnd} />
+                </div>
+            )}
+         />
+      )
+    },
+    compatibility: {
+      title: `Compatibility Guide`,
+      content: <CompatibilityDisplay compatibilities={compatibilities} />
+    },
+    future: {
+      title: `Future Outlook`,
+      content: <FutureDisplay futures={futures} />
     }
   }
 
+
   return (
     <div className="w-full glass-card p-4">
-      <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} />
-      <div className="mt-4 min-h-[300px]">
-        {renderContent()}
+      <div className="py-2 text-center text-sm text-muted-foreground">
+        <div className="flex justify-center gap-1 md:gap-2">
+            {TABS.map((tab, index) => (
+                <Button
+                    key={tab.key}
+                    variant={current === index ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-auto py-1 px-2 text-xs md:h-9 md:px-3 md:text-sm"
+                    onClick={() => scrollTo(index)}
+                >
+                    {tab.name}
+                </Button>
+            ))}
+        </div>
       </div>
+      <Carousel setApi={setApi} className="w-full">
+          <CarouselContent>
+              {TABS.map((tab) => {
+                   const item = contentMap[tab.key];
+                   return (
+                      <CarouselItem key={tab.key}>
+                          <div className="p-1 h-96">
+                              <ScrollArea className="h-full w-full rounded-md p-4 bg-black/20">
+                                  <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
+                                      <tab.icon className="h-6 w-6" /> {item.title}
+                                  </h3>
+                                  <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{item.content}</div>
+                              </ScrollArea>
+                          </div>
+                      </CarouselItem>
+                   )
+              })}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+      </Carousel>
     </div>
   );
 }
