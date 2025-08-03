@@ -5,8 +5,7 @@ import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
-import { ScrollableTextDisplay } from './scrollable-text-display';
-
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="glass-card p-4 flex items-center space-x-4">
@@ -22,25 +21,24 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
     if (!meaning) return null;
     return (
         <div className="glass-card p-4 space-y-2">
-            <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
-                <Wand2 className="h-5 w-5" /> {title}
-            </h3>
-            <ScrollableTextDisplay text={meaning} />
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger className="font-semibold text-lg text-primary flex items-center gap-2">
+                        <Wand2 className="h-5 w-5" /> {title}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
+                           {meaning}
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
         </div>
     );
 }
 
 const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrength: ArrowData[], arrowsOfWeakness: ArrowData[] }) => {
-    const allArrows = [
-        ...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as 'strength' | 'weakness' })),
-        ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as 'strength' | 'weakness' })),
-    ];
-
-    if (allArrows.length === 0) return null;
-    
-    const arrowText = allArrows.map(arrow => 
-        `${arrow.type === 'strength' ? 'Arrow of Strength' : 'Arrow of Weakness'}: ${arrow.name}\n${arrow.description}`
-    ).join('\n\n');
+    if (arrowsOfStrength.length === 0 && arrowsOfWeakness.length === 0) return null;
 
     return (
         <div className="glass-card p-4 space-y-3">
@@ -48,7 +46,24 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 Arrows of Power
             </h3>
-            <ScrollableTextDisplay text={arrowText} />
+            <Accordion type="multiple" className="w-full space-y-1">
+                 {arrowsOfStrength.map(arrow => (
+                    <AccordionItem value={arrow.name} key={arrow.name}>
+                        <AccordionTrigger className="text-left">Arrow of Strength: {arrow.name}</AccordionTrigger>
+                        <AccordionContent>
+                            <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+                 {arrowsOfWeakness.map(arrow => (
+                    <AccordionItem value={arrow.name} key={arrow.name}>
+                        <AccordionTrigger className="text-left">Arrow of Weakness: {arrow.name}</AccordionTrigger>
+                        <AccordionContent>
+                             <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+            </Accordion>
         </div>
     );
 };
@@ -64,18 +79,22 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
     .sort((a,b) => parseInt(a.number) - parseInt(b.number));
 
   if (repetitions.length === 0) return null;
-
-  const repetitionText = repetitions.map(({ number, count, meaning }) => 
-    `Number ${number} (appears ${count} time${count > 1 ? 's' : ''}):\n${meaning}`
-  ).join('\n\n');
-
-
+  
   return (
     <div className="glass-card p-4 space-y-3">
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
-       <ScrollableTextDisplay text={repetitionText} />
+       <Accordion type="multiple" className="w-full space-y-1">
+            {repetitions.map(({ number, count, meaning }) => (
+                 <AccordionItem value={`number-${number}`} key={number}>
+                    <AccordionTrigger>Number {number} (appears {count} time{count > 1 ? 's' : ''})</AccordionTrigger>
+                    <AccordionContent>
+                         <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning}</p>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+        </Accordion>
     </div>
   );
 };
@@ -147,4 +166,3 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     </div>
   );
 }
-

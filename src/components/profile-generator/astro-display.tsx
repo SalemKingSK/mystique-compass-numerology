@@ -8,13 +8,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, Leaf, Users, Forward, Info, Heart, Home, Briefcase } from "lucide-react";
 import type { AstroInsightOutput, NewAstroSignData } from './types';
-import { SpeechPlayer } from './speech-player';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '../ui/button';
 import { ScrollableTextDisplay } from './scrollable-text-display';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) return <p className="text-slate-400">No compatibility information available.</p>;
@@ -22,7 +21,16 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     const compatibilityText = Object.entries(compatibilities).map(([sign, text]) => `${sign}:\n${text}`).join('\n\n');
     
     return (
-        <ScrollableTextDisplay text={compatibilityText} />
+        <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+                <AccordionTrigger>View Compatibility Details</AccordionTrigger>
+                <AccordionContent>
+                    <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
+                        {compatibilityText}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
     );
 }
 
@@ -33,7 +41,16 @@ function FutureDisplay({ futures }: { futures: any }) {
     const futureText = sortedYears.map(year => `*${year} - Year of the ${futures[year].year}*\n${futures[year].prediction}`).join('\n\n');
     
     return (
-      <ScrollableTextDisplay text={futureText} />
+        <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+                <AccordionTrigger>View Future Predictions</AccordionTrigger>
+                <AccordionContent>
+                     <div className="text-slate-300 whitespace-pre-wrap leading-relaxed h-60 overflow-y-auto">
+                        {futureText}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
     );
 }
 
