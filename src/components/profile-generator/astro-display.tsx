@@ -4,7 +4,6 @@
 import * as React from 'react';
 import { BookOpen, Leaf, Users, Forward } from "lucide-react";
 import type { AstroInsightOutput } from './types';
-import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
 import {
@@ -42,7 +41,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
                        <SpeechPlayer text={String(text)} />
                     </div>
                     <AccordionContent>
-                        <ScrollableTextDisplay text={String(text)} />
+                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{String(text)}</p>
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -69,7 +68,7 @@ function FutureDisplay({ futures }: { futures: any }) {
                            <SpeechPlayer text={text} />
                         </div>
                         <AccordionContent>
-                           <ScrollableTextDisplay text={text} />
+                           <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{text}</p>
                         </AccordionContent>
                     </AccordionItem>
                 )
@@ -105,13 +104,13 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     {
       key: 'introduction',
       title: `Your Animal Sign: The ${sign}`,
-      component: <ScrollableTextDisplay text={introduction || "No introduction available."} />,
+      component: <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{introduction || "No introduction available."}</p>,
       textToSpeak: introduction || ''
     },
     {
       key: 'element',
       title: `Your Element: The ${element}`,
-      component: <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />,
+      component: <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{signElementData || `No specific data for the ${element} element.`}</p>,
       textToSpeak: signElementData || ''
     },
     {
@@ -161,7 +160,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                                       </h3>
                                       {item.textToSpeak && <SpeechPlayer text={item.textToSpeak} />}
                                   </div>
-                                  <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{item.component}</div>
+                                  <div>{item.component}</div>
                               </ScrollArea>
                           </div>
                       </CarouselItem>

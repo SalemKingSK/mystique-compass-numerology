@@ -7,7 +7,6 @@ import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
-import { ScrollableTextDisplay } from './scrollable-text-display';
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="glass-card p-4 flex items-center space-x-4">
@@ -33,7 +32,7 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
                     <SpeechPlayer text={meaning} />
                 </div>
                 <AccordionContent>
-                    <ScrollableTextDisplay text={meaning} />
+                   <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning}</p>
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -53,7 +52,7 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                     <SpeechPlayer text={arrow.description} />
                 </div>
                 <AccordionContent>
-                   <ScrollableTextDisplay text={arrow.description}/>
+                   <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
                 </AccordionContent>
             </AccordionItem>
         );
@@ -95,7 +94,7 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
                   <SpeechPlayer text={meaning || ''} />
               </div>
               <AccordionContent>
-                   <ScrollableTextDisplay text={meaning || ''} />
+                   <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning || ''}</p>
               </AccordionContent>
           </AccordionItem>
       );

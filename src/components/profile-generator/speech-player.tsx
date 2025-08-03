@@ -3,91 +3,79 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Loader } from "lucide-react";
+import { getSpeechAction } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface SpeechPlayerProps {
     text: string;
-    onBoundary?: (event: SpeechSynthesisEvent) => void;
-    onEnd?: (event: SpeechSynthesisEvent) => void;
 }
 
-export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
+export function SpeechPlayer({ text }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
-    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+    const [isFetching, setIsFetching] = React.useState(false);
+    const audioRef = React.useRef<HTMLAudioElement | null>(null);
+    const { toast } = useToast();
 
-    // Effect for cleaning up when the component unmounts
     React.useEffect(() => {
-        const synth = window.speechSynthesis;
-        return () => {
-            if (synth.speaking && utteranceRef.current && utteranceRef.current.text === text) {
-                synth.cancel();
-            }
-        };
-    }, [text]);
-
-
-    const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
+        const audio = audioRef.current;
+        if (audio) {
+            const onEnded = () => setIsPlaying(false);
+            audio.addEventListener('ended', onEnded);
+            return () => {
+                audio.removeEventListener('ended', onEnded);
+            };
         }
+    }, [audioRef.current]);
 
-        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const handlePlayPause = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isFetching) return;
         
-        const synth = window.speechSynthesis;
-
-        if (isPlaying) {
-            synth.cancel();
+        if (isPlaying && audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
             setIsPlaying(false);
-            utteranceRef.current = null;
             return;
         }
         
-        if (!text || text.trim() === '') {
-             console.log("No text to speak.");
+        if (audioRef.current && audioRef.current.src && !isPlaying) {
+             audioRef.current.play();
+             setIsPlaying(true);
              return;
         }
-        
-        // Cancel any other playing speech before starting a new one
-        if(synth.speaking) {
-            synth.cancel();
-        }
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance;
-        
-        if(onBoundary) {
-            utterance.onboundary = onBoundary;
-        }
 
-        utterance.onend = () => {
-            setIsPlaying(false);
-            if(onEnd) onEnd(new SpeechSynthesisEvent('end'));
-            utteranceRef.current = null;
-        };
+        setIsFetching(true);
+        const result = await getSpeechAction(text);
+        setIsFetching(false);
 
-        utterance.onerror = (event) => {
-            // This is a common browser behavior. When we call synth.cancel(),
-            // it sometimes triggers `onerror` with "canceled". We don't want to log this as an error.
-            if (event.error !== 'canceled') {
-              console.error("SpeechSynthesis Error", event);
-            }
-            setIsPlaying(false);
-            if(onEnd) onEnd(new SpeechSynthesisEvent('end')); // also treat as end
-            utteranceRef.current = null;
-        };
-        
-        utterance.onstart = () => {
+        if (result.success && result.audioUrl) {
+            const audio = new Audio(result.audioUrl);
+            audioRef.current = audio;
+            audio.play();
             setIsPlaying(true);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Speech Error',
+                description: result.error || 'Could not generate audio.',
+            });
+            setIsPlaying(false);
         }
-
-        synth.speak(utterance);
-
-    }, [text, onBoundary, onEnd, isPlaying]);
+    };
+    
+    let buttonIcon = <Play className="h-5 w-5" />;
+    if (isFetching) {
+        buttonIcon = <Loader className="h-5 w-5 animate-spin" />;
+    } else if (isPlaying) {
+        buttonIcon = <Pause className="h-5 w-5" />;
+    }
 
     return (
-        <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
-            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+        <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200" disabled={isFetching}>
+            {buttonIcon}
             <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
         </Button>
     );
