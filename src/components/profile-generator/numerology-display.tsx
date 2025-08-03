@@ -6,6 +6,7 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
 import { REPEATED_NUMBER_MEANINGS } from '@/lib/numerology/data/repetitionMeanings';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
@@ -22,8 +23,18 @@ const FateDisplay = ({ karmicFateNum, karmicFateMeaning }: { karmicFateNum: numb
     if (!karmicFateMeaning) return null;
     return (
         <div className="glass-card p-4 space-y-2">
-            <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Wand2 className="h-5 w-5" /> Karmic Fate Number: {karmicFateNum}</h3>
-            <p className="text-white/80 text-sm leading-relaxed">{karmicFateMeaning}</p>
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="karmic-fate" className="border-b-0">
+                    <AccordionTrigger className="text-purple-200 font-semibold text-lg py-2">
+                         <div className="flex items-center gap-2">
+                            <Wand2 className="h-5 w-5" /> Karmic Fate Number: {karmicFateNum}
+                         </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <p className="text-white/80 text-sm leading-relaxed">{karmicFateMeaning}</p>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
         </div>
     );
 }
@@ -71,16 +82,18 @@ const RepetitionMeaningsDisplay = ({ numberCounts }: { numberCounts: { [key: str
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
-      <div className="space-y-3">
+       <Accordion type="single" collapsible className="w-full">
         {repetitions.map(({ number, count, meaning }) => (
-          <div key={number} className="p-2 rounded-md bg-black/20">
-            <p className="font-semibold text-purple-200">
-              Number {number} (appears {count} time{count > 1 ? 's' : ''})
-            </p>
-            <p className="text-xs text-white/70">{meaning}</p>
-          </div>
+            <AccordionItem value={number} key={number}>
+                <AccordionTrigger className="text-purple-200 font-semibold">
+                    Number {number} (appears {count} time{count > 1 ? 's' : ''})
+                </AccordionTrigger>
+                <AccordionContent>
+                    <p className="text-sm text-white/80 leading-relaxed">{meaning}</p>
+                </AccordionContent>
+            </AccordionItem>
         ))}
-      </div>
+      </Accordion>
     </div>
   );
 };
