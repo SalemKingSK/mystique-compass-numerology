@@ -415,18 +415,92 @@ const TabButton = ({
         <AnimatePresence>
             {isActive && (
                  <motion.div
-                    className="animated-border absolute inset-0 z-0"
+                    className="absolute inset-0 z-0"
                     layoutId="active-tab-border"
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 1, transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] } }}
-                    exit={{ opacity: 0, transition: { duration: 0.3, ease: 'easeOut' } }}
+                    animate={{ 
+                        opacity: 1, 
+                        '--angle': '360deg',
+                        transition: { duration: 8, ease: 'linear', repeat: Infinity } 
+                    } as any}
+                    style={{
+                        background: 'conic-gradient(from var(--angle), var(--gradient-start), var(--gradient-mid1), var(--gradient-mid2), var(--gradient-end), var(--gradient-start))',
+                        animation: 'border-flow 8s linear infinite',
+                    }}
                   />
             )}
         </AnimatePresence>
     </div>
 );
 
+function CelestialArcNav({
+  categories,
+  onSelectCategory,
+  activeCategory,
+}: {
+  categories: string[];
+  onSelectCategory: (category: string) => void;
+  activeCategory: string;
+}) {
+  const activeIndex = categories.indexOf(activeCategory);
+
+  return (
+    <div className="relative h-24 w-full flex items-center justify-center mb-4">
+      {categories.map((category, index) => {
+        const angle = (index - activeIndex) * 30; // Adjust angle for spacing
+        const isCenter = index === activeIndex;
+
+        return (
+          <motion.div
+            key={category}
+            onClick={() => onSelectCategory(category)}
+            className="absolute cursor-pointer text-center"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{
+              opacity: 1,
+              scale: isCenter ? 1.25 : 0.8,
+              rotate: angle,
+              transformOrigin: 'bottom center',
+              y: -80, // Adjust vertical position of the arc
+            }}
+            transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+            }}
+          >
+            <span
+              className={cn(
+                'transition-colors duration-300',
+                isCenter ? 'font-bold text-secondary' : 'text-gray-400'
+              )}
+            >
+              {category}
+            </span>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
+
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
+    const [activeTab, setActiveTab] = React.useState("Description");
+
+    const categories = ["Description", "Love", "Compatibilities", "Home & Family", "Profession"];
+
+    const getContentForTab = (tab: string) => {
+      switch (tab.toLowerCase()) {
+        case 'description': return signData.description;
+        case 'love': return signData.love;
+        case 'home & family': return signData.homeAndFamily;
+        case 'profession': return signData.profession;
+        case 'compatibilities': return signData.compatibilities;
+        default: return "No content available.";
+      }
+    };
+
     if (!signData) {
         return (
              <DialogContent className="max-w-2xl">
@@ -442,9 +516,9 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
             </DialogContent>
         );
     }
-
+    
     return (
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl min-h-[500px]">
             <DialogHeader>
                 <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
@@ -453,60 +527,43 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                     A detailed look into the combined traits of your unique astrological sign.
                 </DialogDescription>
             </DialogHeader>
-            <Tabs defaultValue="description" className="w-full">
-                 <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 h-auto flex-wrap justify-center bg-transparent p-0">
-                    <TabsTrigger value="description" className="flex-1 min-w-[120px]">Description</TabsTrigger>
-                    <TabsTrigger value="love" className="flex-1 min-w-[120px]">Love</TabsTrigger>
-                    <TabsTrigger value="compatibilities" className="flex-1 min-w-[120px]">Compatibilities</TabsTrigger>
-                    <TabsTrigger value="homeAndFamily" className="flex-1 min-w-[120px]">Home & Family</TabsTrigger>
-                    <TabsTrigger value="profession" className="flex-1 min-w-[120px]">Profession</TabsTrigger>
-                </TabsList>
-                <TabsContent value="description">
-                    <div className="glass-card p-4 min-h-[300px]">
+
+            <CelestialArcNav
+              categories={categories}
+              onSelectCategory={setActiveTab}
+              activeCategory={activeTab}
+            />
+
+            <div className="mt-8 min-h-[250px] glass-card p-4">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                    >
                         <ScrollArea className="h-72 pr-3">
-                           <SpeechPlayer text={signData.description} elementId="new-astro-desc-speech" />
+                           <SpeechPlayer 
+                                text={getContentForTab(activeTab)} 
+                                elementId={`new-astro-${activeTab.toLowerCase()}-speech`} 
+                           />
                         </ScrollArea>
-                    </div>
-                </TabsContent>
-                <TabsContent value="love">
-                    <div className="glass-card p-4 min-h-[300px]">
-                        <ScrollArea className="h-72 pr-3">
-                            <SpeechPlayer text={signData.love} elementId="new-astro-love-speech" />
-                        </ScrollArea>
-                    </div>
-                </TabsContent>
-                <TabsContent value="compatibilities">
-                    <div className="glass-card p-4 min-h-[300px]">
-                        <ScrollArea className="h-72 pr-3">
-                           <SpeechPlayer text={signData.compatibilities} elementId="new-astro-comp-speech" />
-                        </ScrollArea>
-                    </div>
-                </TabsContent>
-                <TabsContent value="homeAndFamily">
-                     <div className="glass-card p-4 min-h-[300px]">
-                        <ScrollArea className="h-72 pr-3">
-                            <SpeechPlayer text={signData.homeAndFamily} elementId="new-astro-home-speech" />
-                        </ScrollArea>
-                    </div>
-                </TabsContent>
-                <TabsContent value="profession">
-                     <div className="glass-card p-4 min-h-[300px]">
-                        <ScrollArea className="h-72 pr-3">
-                            <SpeechPlayer text={signData.profession} elementId="new-astro-prof-speech" />
-                        </ScrollArea>
-                    </div>
-                </TabsContent>
-            </Tabs>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
         </DialogContent>
     );
 }
 
-const ResultsHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
+function ResultsHistoryButton({ onHistoryOpen }: { onHistoryOpen: () => void }) {
+    return(
     <Button variant="outline" size="icon" className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg text-primary bg-background/70 backdrop-blur-sm" onClick={onHistoryOpen}>
       <History className="h-7 w-7"/>
       <span className="sr-only">Open History</span>
     </Button>
-  );
+    )
+};
 
 function ResultsDisplay({
   insight,
@@ -541,11 +598,8 @@ function ResultsDisplay({
                 
                 <Dialog>
                     <DialogTrigger asChild>
-                         <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block">
-                             <div className={cn(
-                                "animated-border absolute inset-0 z-0",
-                                activeTab === 'new-astro' && "hidden"
-                             )} />
+                       <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block">
+                             <div className={cn("animated-border absolute inset-0 z-0")}/>
                              <Button
                                 variant="ghost"
                                 className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-300 hover:bg-black/40 hover:text-white text-lg"
@@ -818,3 +872,5 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
+
+    
