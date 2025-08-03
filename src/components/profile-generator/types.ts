@@ -1,4 +1,3 @@
-
 // src/components/profile-generator/types.ts
 
 // This is the data that the user provides
@@ -10,23 +9,20 @@ export interface AstroInsightInput {
   gender: string;
 }
 
+export interface ZodiacData {
+  introduction?: string;
+  elements?: { [key: string]: string };
+  compatibilities?: { [key: string]: string };
+  futures?: { [key: string]: { year: string; element: string; prediction: string } };
+}
+
 // This is the data returned from the astrology calculation
 export interface AstroInsightOutput {
   name: string;
   western_sign: string;
-  new_astrology_sign: string;
-  sign: string;
-  element: string;
-  reading: string;
-  luckyNumber: number;
-  luckyColor: string;
-  signData: {
-    description: string;
-    love: string;
-    compatibilities: string;
-    homeAndFamily: string;
-    profession: string;
-  };
+  sign: string; // e.g., "Pig"
+  element: string; // e.g., "Wood"
+  zodiacData: ZodiacData; // Holds all data for the Chinese sign
 }
 
 // This is the data returned from the numerology calculation

@@ -22,6 +22,8 @@ interface NewAstrologySign {
   profession: string;
 }
 
+// This file remains for now but is no longer the primary data source
+// for the Astro Insights tab.
 export const NEW_ASTROLOGY_DATA: { [key: string]: NewAstrologySign } = {
   ...aries,
   ...taurus,
