@@ -8,6 +8,7 @@ import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { cn } from '@/lib/utils';
+import { SpeechPlayer } from './speech-player';
 
 // --- SUB-COMPONENTS ---
 
@@ -26,23 +27,22 @@ const arcItemVariants = cva(
   }
 );
 
-function CelestialArcNav({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: string) => void }) {
-  const tabs = ["Introduction", "Element", "Compatibility", "Future"];
+function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string, setActiveTab: (tab: string) => void, tabs: string[] }) {
   
   return (
     <div className="flex justify-center items-center gap-6 my-8">
       {tabs.map((tab, index) => {
-        const isSelected = activeTab === tab.toLowerCase();
+        const isSelected = activeTab === tab.toLowerCase().replace(' & ', 'and');
         const isOffset = index === 1 || index === 2;
         return (
           <div
             key={tab}
             className={cn(
               arcItemVariants({ variant: isSelected ? 'selected' : 'unselected' }),
-              isOffset && 'transform translateY(8px)'
+              isOffset && tabs.length > 3 && 'transform translateY(8px)'
             )}
-            style={{ transform: isOffset ? 'translateY(8px)' : 'none' }}
-            onClick={() => setActiveTab(tab.toLowerCase())}
+            style={{ transform: isOffset && tabs.length > 3 ? 'translateY(8px)' : 'none' }}
+            onClick={() => setActiveTab(tab.toLowerCase().replace(' & ', 'and'))}
           >
             {tab}
           </div>
@@ -100,6 +100,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const { introduction, elements, compatibilities, futures } = zodiacData;
 
   const signElementData = elements?.[element as keyof typeof elements];
+  const TABS = ["Introduction", "Element", "Compatibility", "Future"];
 
   const renderContent = () => {
     switch (activeSubTab) {
@@ -107,14 +108,20 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
         return (
           <div className="space-y-4">
             <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><BookOpen className="h-5 w-5" /> Your Animal Sign: The {sign}</h3>
-            <ScrollableTextDisplay text={introduction || "No introduction available."} />
+            <div className="relative">
+                 <div className="absolute top-0 right-0 z-10"><SpeechPlayer text={introduction || ''} /></div>
+                 <ScrollableTextDisplay text={introduction || "No introduction available."} />
+            </div>
           </div>
         );
       case 'element':
         return (
           <div className="space-y-4">
             <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {element}</h3>
-            <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
+            <div className="relative">
+                 <div className="absolute top-0 right-0 z-10"><SpeechPlayer text={signElementData || ''} /></div>
+                <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
+            </div>
           </div>
         );
       case 'compatibility':
@@ -138,10 +145,12 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
 
   return (
     <div className="w-full glass-card p-4">
-      <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} />
+      <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} tabs={TABS} />
       <div className="mt-4 min-h-[250px]">
         {renderContent()}
       </div>
     </div>
   );
 }
+
+export { CelestialArcNav };

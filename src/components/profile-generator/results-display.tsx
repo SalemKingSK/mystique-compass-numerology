@@ -5,22 +5,21 @@ import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import type { AstroInsightOutput, NumerologyData, NewAstroSignData } from './types';
-import { AstroDisplay } from './astro-display';
+import { AstroDisplay, CelestialArcNav } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
-import { ArrowLeft, History, Info, Heart, Home, Briefcase, Users } from "lucide-react";
+import { ArrowLeft, History } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from '@/lib/utils';
 import { ScrollableTextDisplay } from './scrollable-text-display';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-
+import { SpeechPlayer } from './speech-player';
 
 const mainTabVariants = cva(
-    "py-3 px-6 rounded-full text-base font-medium cursor-pointer transition-colors duration-300",
+    "py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 text-white relative",
     {
         variants: {
             variant: {
-                selected: "bg-[hsl(var(--main-tab-selected-bg))] text-[hsl(var(--main-tab-selected-fg))] font-bold border-2 border-[hsl(var(--main-tab-selected-bg))]",
-                unselected: "bg-transparent text-[hsl(var(--main-tab-unselected-border))] border-2 border-[hsl(var(--main-tab-unselected-border))]"
+                selected: "text-yellow-300",
+                unselected: "text-white/70"
             }
         },
         defaultVariants: {
@@ -29,74 +28,56 @@ const mainTabVariants = cva(
     }
 );
 
-function MainTabButton({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
-    return (
-        <button
-            onClick={onClick}
-            className={cn(mainTabVariants({ variant: isActive ? 'selected' : 'unselected' }))}
-        >
-            {children}
-        </button>
-    )
+function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
+  return (
+    <div className="animated-border">
+      <button
+          onClick={onClick}
+          className={cn(mainTabVariants({ variant: isActive ? 'selected' : 'unselected' }), "w-full h-full rounded-lg")}
+      >
+          {children}
+          {isActive && <motion.div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-300" layoutId="underline" />}
+      </button>
+    </div>
+  )
 }
+
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAstroSignData }) {
-  if (!signData || Object.keys(signData).length === 0) {
-    return (
-      <div className="glass-card p-4 text-center text-slate-400">
-        Detailed information for {sign} is not yet available.
-      </div>
-    );
-  }
+    const [activeSubTab, setActiveSubTab] = React.useState('description');
+    const TABS = ["Description", "Love", "Compatibilities", "Home & Family", "Profession"];
 
-  return (
-    <div className="glass-card p-4">
-        <h3 className="text-2xl font-bold text-center text-purple-300 mb-4">
-            {sign.replace('/', ' / ')}
-        </h3>
-        
-        <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto sm:h-12 bg-black/20">
-            <TabsTrigger value="description">Description</TabsTrigger>
-            <TabsTrigger value="love">Love</TabsTrigger>
-            <TabsTrigger value="homeAndFamily">Home & Family</TabsTrigger>
-            <TabsTrigger value="profession">Profession</TabsTrigger>
-            <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
-            </TabsList>
-            
-            <div className="mt-4 min-h-[250px]">
-                <TabsContent value="description">
-                    <ScrollableTextDisplay text={signData.description || ''} icon={<Info className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-                </TabsContent>
-
-                <TabsContent value="love">
-                    <ScrollableTextDisplay text={signData.love || ''} icon={<Heart className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-                </TabsContent>
-
-                <TabsContent value="homeAndFamily">
-                    <ScrollableTextDisplay text={signData.homeAndFamily || ''} icon={<Home className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-                </TabsContent>
-
-                <TabsContent value="profession">
-                    <ScrollableTextDisplay text={signData.profession || ''} icon={<Briefcase className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-                </TabsContent>
-
-                <TabsContent value="compatibilities">
-                    <ScrollableTextDisplay text={signData.compatibilities || ''} icon={<Users className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />} />
-                </TabsContent>
+    const renderContent = () => {
+        const text = signData[activeSubTab as keyof NewAstroSignData] || `No data for ${activeSubTab}.`;
+        return (
+            <div className="relative mt-4">
+                <div className="absolute top-0 right-0 z-10"><SpeechPlayer text={text} /></div>
+                <ScrollableTextDisplay text={text} />
             </div>
-        </Tabs>
-    </div>
-  );
+        );
+    };
+
+    return (
+        <div className="glass-card p-4">
+            <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} tabs={TABS} />
+            <div className="mt-4 min-h-[250px]">
+                {renderContent()}
+            </div>
+        </div>
+    );
 }
 
-
-function ResultsHeader({ name }: { name: string }) {
+function ResultsHeader({ name, newAstroSign, onNewAstroClick }: { name: string, newAstroSign: string, onNewAstroClick: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center">
             {name}
         </h1>
+        <div className="mt-4">
+           <AnimatedTab isActive={false} onClick={onNewAstroClick}>
+                {newAstroSign}
+            </AnimatedTab>
+        </div>
     </div>
   );
 }
@@ -127,14 +108,19 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
       className="results-background w-full min-h-screen flex flex-col p-4"
     >
       <div className="w-full max-w-4xl mx-auto flex-grow">
-        <ResultsHeader name={insight.name} />
+        <ResultsHeader 
+            name={insight.name} 
+            newAstroSign={insight.new_astrology_sign}
+            onNewAstroClick={() => setActiveTab('new-astro')}
+        />
         
-        <div className="animated-border mb-6">
-            <div className='flex justify-center divide-x divide-white/10 bg-background/80 p-1 rounded-lg'>
-                 <MainTabButton isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</MainTabButton>
-                 <MainTabButton isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology Report</MainTabButton>
-                 <MainTabButton isActive={activeTab === 'new-astro'} onClick={() => setActiveTab('new-astro')}>New Astrology</MainTabButton>
-            </div>
+        <div className='flex justify-between items-center w-full max-w-md mx-auto mb-6'>
+             <div className="w-2/5">
+                <AnimatedTab isActive={activeTab === 'astro'} onClick={() => setActiveTab('astro')}>Astro Insights</AnimatedTab>
+             </div>
+             <div className="w-2/5">
+                <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => setActiveTab('numerology')}>Numerology Report</AnimatedTab>
+             </div>
         </div>
 
         <AnimatePresence mode="wait">

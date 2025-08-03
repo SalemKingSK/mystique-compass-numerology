@@ -36,9 +36,11 @@
     --radius: 0.75rem;
 
     /* Custom Colors from Screenshot */
-    --main-tab-selected-bg: 48 100% 50%; /* #FFD700 - Golden Yellow */
-    --main-tab-selected-fg: 276 38% 15%; /* #301934 - Dark Purple */
-    --main-tab-unselected-border: 245 100% 88%; /* #BDB2FF - Light Lavender */
+    --color-pink-hsl: 330 100% 60%;
+    --color-purple-hsl: 270 100% 60%;
+    --color-orange-hsl: 30 100% 60%;
+    --color-violet-hsl: 300 100% 60%;
+    --bg-dark-hsl: 240 10% 3.9%;
 
     --arc-selected-bg: 273 100% 12%; /* #2C003E - Darkest Purple */
     --arc-selected-fg: 240 67% 94%; /* #E6E6FA - Bright Lavender/White */
@@ -113,17 +115,17 @@
 .animated-border::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -2px;
   border-radius: inherit;
   background: conic-gradient(
     from var(--angle),
-    hsl(var(--color-quaternary-hsl)),
-    hsl(var(--color-primary-hsl)),
-    hsl(var(--color-secondary-hsl)),
-    hsl(var(--color-tertiary-hsl)),
-    hsl(var(--color-quaternary-hsl))
+    hsl(var(--color-pink-hsl)),
+    hsl(var(--color-purple-hsl)),
+    hsl(var(--color-orange-hsl)),
+    hsl(var(--color-violet-hsl)),
+    hsl(var(--color-pink-hsl))
   );
-  animation: border-flow 8s linear infinite;
+  animation: border-flow 6s linear infinite;
   z-index: -1;
 }
 

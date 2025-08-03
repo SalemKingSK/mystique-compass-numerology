@@ -8,28 +8,51 @@ import { Play, Pause } from "lucide-react";
 export function SpeechPlayer({ text }: { text: string }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
 
+    const handlePlayPause = React.useCallback(() => {
+        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+        if (isPlaying) {
+            window.speechSynthesis.cancel();
+            setIsPlaying(false);
+        } else {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onstart = () => setIsPlaying(true);
+            utterance.onend = () => setIsPlaying(false);
+            utterance.onerror = () => setIsPlaying(false);
+            window.speechSynthesis.speak(utterance);
+        }
+    }, [isPlaying, text]);
+    
+    // Cleanup speech on unmount
     React.useEffect(() => {
-        // Stop speech when component unmounts or text changes
         return () => {
-            if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) {
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
         };
-    }, [text]);
+    }, []);
 
-    const handlePlayPause = () => {
+    // Effect to track external speech synthesis state
+    React.useEffect(() => {
+        const onSynthStateChange = () => {
+            setIsPlaying(window.speechSynthesis.speaking);
+        };
+        
         if (typeof window !== 'undefined' && window.speechSynthesis) {
-            if (isPlaying) {
-                window.speechSynthesis.cancel();
-                setIsPlaying(false);
-            } else {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.onend = () => setIsPlaying(false);
-                window.speechSynthesis.speak(utterance);
-                setIsPlaying(true);
+            window.speechSynthesis.addEventListener('voiceschanged', onSynthStateChange);
+            // In some browsers, a timeout is needed to check the initial state
+            const timer = setTimeout(() => onSynthStateChange(), 100);
+
+            return () => {
+                window.speechSynthesis.removeEventListener('voiceschanged', onSynthStateChange);
+                clearTimeout(timer);
             }
         }
-    };
+    }, []);
+
 
     return (
         <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
