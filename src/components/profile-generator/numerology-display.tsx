@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -23,7 +22,7 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
     if (!meaning) return null;
     return (
         <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
+            <AccordionItem value="item-1" className="glass-card px-4">
                 <AccordionTrigger className="font-semibold text-lg text-primary flex items-center gap-2">
                     <Wand2 className="h-5 w-5" /> {title}
                 </AccordionTrigger>
@@ -53,7 +52,7 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
             </h3>
             <Accordion type="multiple" className="w-full space-y-1">
                  {arrowsOfStrength.map(arrow => (
-                    <AccordionItem value={arrow.name} key={arrow.name}>
+                    <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
                         <AccordionTrigger className="text-left">Arrow of Strength: {arrow.name}</AccordionTrigger>
                         <AccordionContent>
                              <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
@@ -61,7 +60,7 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                     </AccordionItem>
                 ))}
                  {arrowsOfWeakness.map(arrow => (
-                    <AccordionItem value={arrow.name} key={arrow.name}>
+                    <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
                         <AccordionTrigger className="text-left">Arrow of Weakness: {arrow.name}</AccordionTrigger>
                         <AccordionContent>
                              <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{arrow.description}</p>
@@ -92,7 +91,7 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
       </h3>
        <Accordion type="multiple" className="w-full space-y-1">
             {repetitions.map(({ number, count, meaning }) => (
-                 <AccordionItem value={`number-${number}`} key={number}>
+                 <AccordionItem value={`number-${number}`} key={number} className="glass-card px-4">
                     <AccordionTrigger>Number {number} (appears {count} time{count > 1 ? 's' : ''})</AccordionTrigger>
                     <AccordionContent>
                          <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{meaning}</p>

@@ -1,56 +1,62 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, Leaf, Users, Forward } from "lucide-react";
-import { cva } from "class-variance-authority";
-
+import { BookOpen, Leaf, Users, Forward, Milestone } from "lucide-react";
 import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { cn } from '@/lib/utils';
 import { SpeechPlayer } from './speech-player';
 
 // --- SUB-COMPONENTS ---
 
-const arcItemVariants = cva(
-  "cursor-pointer font-medium text-sm transition-all",
-  {
-    variants: {
-      variant: {
-        selected: "bg-[hsl(var(--arc-selected-bg))] text-[hsl(var(--arc-selected-fg))] font-bold py-2 px-4 rounded-2xl",
-        unselected: "text-[hsl(var(--arc-unselected-fg))]",
-      },
-    },
-    defaultVariants: {
-      variant: "unselected",
-    },
-  }
-);
+type ArcCategory = {
+  name: string;
+  icon: React.ElementType;
+};
 
-function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string, setActiveTab: (tab: string) => void, tabs: string[] }) {
-  
+const TABS: ArcCategory[] = [
+  { name: "Introduction", icon: BookOpen },
+  { name: "Element", icon: Leaf },
+  { name: "Compatibility", icon: Users },
+  { name: "Future", icon: Forward },
+];
+
+function CelestialArcNav({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: string) => void }) {
+  const activeIndex = TABS.findIndex(tab => tab.name.toLowerCase() === activeTab);
+
   return (
-    <div className="flex justify-center items-center gap-6 my-8">
-      {tabs.map((tab, index) => {
-        const isSelected = activeTab === tab.toLowerCase().replace(' & ', 'and');
-        const isOffset = index === 1 || index === 2;
+    <div className="relative w-full h-36 my-4 flex justify-center items-center overflow-hidden">
+      {TABS.map((tab, index) => {
+        const isActive = activeIndex === index;
+        const angle = (index - activeIndex) * 25; // 25 degrees between items
+
         return (
           <div
-            key={tab}
-            className={cn(
-              arcItemVariants({ variant: isSelected ? 'selected' : 'unselected' }),
-              isOffset && tabs.length > 3 && 'transform translateY(8px)'
-            )}
-            style={{ transform: isOffset && tabs.length > 3 ? 'translateY(8px)' : 'none' }}
-            onClick={() => setActiveTab(tab.toLowerCase().replace(' & ', 'and'))}
+            key={tab.name}
+            className="absolute transition-all duration-500 ease-in-out"
+            style={{
+              transform: `rotate(${angle}deg) translateY(-80px) rotate(${-angle}deg)`,
+              transformOrigin: 'bottom center',
+            }}
           >
-            {tab}
+            <button
+              onClick={() => setActiveTab(tab.name.toLowerCase())}
+              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 ${
+                isActive ? 'text-primary scale-110' : 'text-purple-200/60 scale-90'
+              }`}
+            >
+              <tab.icon className={`h-6 w-6 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
+              <span className={`transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium'}`}>
+                {tab.name}
+              </span>
+            </button>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
+
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {
@@ -60,7 +66,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
-                <AccordionItem value={sign} key={sign}>
+                <AccordionItem value={sign} key={sign} className="glass-card px-4">
                     <AccordionTrigger>With the {sign}</AccordionTrigger>
                     <AccordionContent>
                         <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{String(text)}</p>
@@ -81,7 +87,7 @@ function FutureDisplay({ futures }: { futures: any }) {
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {sortedYears.map(year => (
-                <AccordionItem value={year} key={year}>
+                <AccordionItem value={year} key={year} className="glass-card px-4">
                     <AccordionTrigger>{year} - Year of the {futures[year].year}</AccordionTrigger>
                     <AccordionContent>
                         <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{futures[year].prediction}</p>
@@ -100,7 +106,6 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const { introduction, elements, compatibilities, futures } = zodiacData;
 
   const signElementData = elements?.[element as keyof typeof elements];
-  const TABS = ["Introduction", "Element", "Compatibility", "Future"];
 
   const renderContent = () => {
     switch (activeSubTab) {
@@ -153,8 +158,8 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
 
   return (
     <div className="w-full glass-card p-4">
-      <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} tabs={TABS} />
-      <div className="mt-4 min-h-[250px]">
+      <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} />
+      <div className="mt-4 min-h-[300px]">
         {renderContent()}
       </div>
     </div>
