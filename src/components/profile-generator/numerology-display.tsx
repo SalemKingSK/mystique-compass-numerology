@@ -23,18 +23,16 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
     return (
         <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="glass-card px-4">
-                <AccordionTrigger className="font-semibold text-lg text-primary flex items-center gap-2">
-                    <Wand2 className="h-5 w-5" /> {title}
+                <AccordionTrigger>
+                    <div className="flex justify-between items-center w-full">
+                        <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                            <Wand2 className="h-5 w-5" /> {title}
+                        </span>
+                        <SpeechPlayer text={meaning} />
+                    </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                    <ScrollableTextDisplay 
-                        text={meaning} 
-                        renderPlayer={(onBoundary, onEnd) => (
-                             <div className="absolute top-0 right-0 z-10">
-                                <SpeechPlayer text={meaning} onBoundary={onBoundary} onEnd={onEnd} />
-                            </div>
-                        )}
-                    />
+                    <ScrollableTextDisplay text={meaning} />
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -53,31 +51,27 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
             <Accordion type="multiple" className="w-full space-y-1">
                  {arrowsOfStrength.map(arrow => (
                     <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
-                        <AccordionTrigger className="text-left">Arrow of Strength: {arrow.name}</AccordionTrigger>
+                        <AccordionTrigger>
+                            <div className="flex justify-between items-center w-full">
+                                <span className="text-left">Arrow of Strength: {arrow.name}</span>
+                                <SpeechPlayer text={arrow.description} />
+                            </div>
+                        </AccordionTrigger>
                         <AccordionContent>
-                           <ScrollableTextDisplay 
-                                text={arrow.description} 
-                                renderPlayer={(onBoundary, onEnd) => (
-                                    <div className="absolute top-0 right-0 z-10">
-                                        <SpeechPlayer text={arrow.description} onBoundary={onBoundary} onEnd={onEnd} />
-                                    </div>
-                                )}
-                            />
+                           <ScrollableTextDisplay text={arrow.description} />
                         </AccordionContent>
                     </AccordionItem>
                 ))}
                  {arrowsOfWeakness.map(arrow => (
                     <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
-                        <AccordionTrigger className="text-left">Arrow of Weakness: {arrow.name}</AccordionTrigger>
+                        <AccordionTrigger>
+                            <div className="flex justify-between items-center w-full">
+                                <span className="text-left">Arrow of Weakness: {arrow.name}</span>
+                                <SpeechPlayer text={arrow.description} />
+                            </div>
+                        </AccordionTrigger>
                         <AccordionContent>
-                            <ScrollableTextDisplay 
-                                text={arrow.description} 
-                                renderPlayer={(onBoundary, onEnd) => (
-                                    <div className="absolute top-0 right-0 z-10">
-                                        <SpeechPlayer text={arrow.description} onBoundary={onBoundary} onEnd={onEnd} />
-                                    </div>
-                                )}
-                            />
+                            <ScrollableTextDisplay text={arrow.description} />
                         </AccordionContent>
                     </AccordionItem>
                 ))}
@@ -106,16 +100,14 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
        <Accordion type="multiple" className="w-full space-y-1">
             {repetitions.map(({ number, count, meaning }) => (
                  <AccordionItem value={`number-${number}`} key={number} className="glass-card px-4">
-                    <AccordionTrigger>Number {number} (appears {count} time{count > 1 ? 's' : ''})</AccordionTrigger>
+                    <AccordionTrigger>
+                        <div className="flex justify-between items-center w-full">
+                           <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
+                           <SpeechPlayer text={meaning || ''} />
+                        </div>
+                    </AccordionTrigger>
                     <AccordionContent>
-                         <ScrollableTextDisplay 
-                            text={meaning || ''} 
-                            renderPlayer={(onBoundary, onEnd) => (
-                                <div className="absolute top-0 right-0 z-10">
-                                    <SpeechPlayer text={meaning || ''} onBoundary={onBoundary} onEnd={onEnd} />
-                                </div>
-                            )}
-                        />
+                         <ScrollableTextDisplay text={meaning || ''} />
                     </AccordionContent>
                 </AccordionItem>
             ))}

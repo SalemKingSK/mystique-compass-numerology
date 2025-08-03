@@ -7,11 +7,9 @@ import { Play, Pause } from "lucide-react";
 
 interface SpeechPlayerProps {
     text: string;
-    onBoundary: (event: SpeechSynthesisEvent) => void;
-    onEnd: () => void;
 }
 
-export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
+export function SpeechPlayer({ text }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
@@ -29,15 +27,13 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
             utterance.onstart = () => setIsPlaying(true);
             utterance.onend = () => {
                 setIsPlaying(false);
-                onEnd();
             };
             utterance.onerror = () => setIsPlaying(false);
-            utterance.addEventListener('boundary', onBoundary);
             
             utteranceRef.current = utterance;
             window.speechSynthesis.speak(utterance);
         }
-    }, [isPlaying, text, onBoundary, onEnd]);
+    }, [isPlaying, text]);
     
     // Cleanup speech on unmount
     React.useEffect(() => {

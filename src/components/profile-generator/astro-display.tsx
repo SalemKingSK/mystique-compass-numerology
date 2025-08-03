@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, Leaf, Users, Forward } from "lucide-react";
+import { BookOpen, Leaf, Users, Forward, Play, Pause } from "lucide-react";
 import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -42,16 +42,14 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger>With the {sign}</AccordionTrigger>
+                    <AccordionTrigger>
+                      <div className="flex justify-between items-center w-full">
+                        <span>With the {sign}</span>
+                        <SpeechPlayer text={String(text)} />
+                      </div>
+                    </AccordionTrigger>
                     <AccordionContent>
-                        <ScrollableTextDisplay 
-                            text={String(text)} 
-                            renderPlayer={(onBoundary, onEnd) => (
-                                <div className="absolute top-0 right-0 z-10">
-                                    <SpeechPlayer text={String(text)} onBoundary={onBoundary} onEnd={onEnd} />
-                                </div>
-                            )}
-                        />
+                        <ScrollableTextDisplay text={String(text)} />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -70,16 +68,14 @@ function FutureDisplay({ futures }: { futures: any }) {
         <Accordion type="multiple" className="w-full space-y-1">
             {sortedYears.map(year => (
                 <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger>{year} - Year of the {futures[year].year}</AccordionTrigger>
+                    <AccordionTrigger>
+                        <div className="flex justify-between items-center w-full">
+                          <span>{year} - Year of the {futures[year].year}</span>
+                          <SpeechPlayer text={futures[year].prediction} />
+                        </div>
+                    </AccordionTrigger>
                     <AccordionContent>
-                        <ScrollableTextDisplay 
-                            text={futures[year].prediction} 
-                            renderPlayer={(onBoundary, onEnd) => (
-                                <div className="absolute top-0 right-0 z-10">
-                                    <SpeechPlayer text={futures[year].prediction} onBoundary={onBoundary} onEnd={onEnd} />
-                                </div>
-                            )}
-                        />
+                        <ScrollableTextDisplay text={futures[year].prediction} />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -114,44 +110,34 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     introduction: {
       title: `Your Animal Sign: The ${sign}`,
       content: (
-        <ScrollableTextDisplay 
-            text={introduction || "No introduction available."} 
-            renderPlayer={(onBoundary, onEnd) => (
-                <div className="absolute top-0 right-0 z-10">
-                    <SpeechPlayer text={introduction || ''} onBoundary={onBoundary} onEnd={onEnd} />
-                </div>
-            )}
-         />
-      )
+        <ScrollableTextDisplay text={introduction || "No introduction available."} />
+      ),
+      textToSpeak: introduction || ''
     },
     element: {
       title: `Your Element: The ${element}`,
       content: (
-        <ScrollableTextDisplay 
-            text={signElementData || `No specific data for the ${element} element.`} 
-            renderPlayer={(onBoundary, onEnd) => (
-                <div className="absolute top-0 right-0 z-10">
-                    <SpeechPlayer text={signElementData || ''} onBoundary={onBoundary} onEnd={onEnd} />
-                </div>
-            )}
-         />
-      )
+        <ScrollableTextDisplay text={signElementData || `No specific data for the ${element} element.`} />
+      ),
+      textToSpeak: signElementData || ''
     },
     compatibility: {
       title: `Compatibility Guide`,
-      content: <CompatibilityDisplay compatibilities={compatibilities} />
+      content: <CompatibilityDisplay compatibilities={compatibilities} />,
+      textToSpeak: null
     },
     future: {
       title: `Future Outlook`,
-      content: <FutureDisplay futures={futures} />
+      content: <FutureDisplay futures={futures} />,
+      textToSpeak: null
     }
   }
 
 
   return (
     <div className="w-full glass-card p-4">
-      <div className="py-2 text-center text-sm text-muted-foreground">
-        <div className="flex justify-center gap-1 md:gap-2">
+       <div className="py-2 text-center text-sm text-muted-foreground">
+        <div className="flex justify-center gap-1 md:gap-2 mb-4">
             {TABS.map((tab, index) => (
                 <Button
                     key={tab.key}
@@ -160,6 +146,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                     className="h-auto py-1 px-2 text-xs md:h-9 md:px-3 md:text-sm"
                     onClick={() => scrollTo(index)}
                 >
+                    <tab.icon className="h-4 w-4 mr-1.5" />
                     {tab.name}
                 </Button>
             ))}
@@ -173,9 +160,12 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                       <CarouselItem key={tab.key}>
                           <div className="p-1 h-96">
                               <ScrollArea className="h-full w-full rounded-md p-4 bg-black/20">
-                                  <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
-                                      <tab.icon className="h-6 w-6" /> {item.title}
-                                  </h3>
+                                  <div className="flex justify-between items-center mb-2">
+                                      <h3 className="text-xl font-bold text-primary flex items-center gap-2">
+                                          <tab.icon className="h-6 w-6" /> {item.title}
+                                      </h3>
+                                      {item.textToSpeak && <SpeechPlayer text={item.textToSpeak} />}
+                                  </div>
                                   <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{item.content}</div>
                               </ScrollArea>
                           </div>
