@@ -27,14 +27,14 @@ export const SpeechPlayer: React.FC<Props> = ({ text, lang = 'en-US' }) => {
 
     // Splitting text into sentences
     useEffect(() => {
-        sentencesRef.current = text.match(/[^.!?]+[.!?]+/g) || [text];
+        sentencesRef.current = text.match(/[^.!?\n]+[.!?\n]+/g) || [text];
         setActiveSentenceIndex(-1); // Reset on new text
         setIsPlaying(false);
         setIsPaused(false);
 
         // Cleanup on unmount or text change
         return () => {
-            if (window.speechSynthesis.speaking) {
+            if (window.speechSynthesis?.speaking) {
                 userInitiatedStop.current = true;
                 window.speechSynthesis.cancel();
             }
@@ -73,7 +73,7 @@ export const SpeechPlayer: React.FC<Props> = ({ text, lang = 'en-US' }) => {
             utterance.lang = lang;
             
             utterance.onboundary = (event) => {
-                if (event.name === 'sentence') {
+                if (event.name === 'sentence' || event.name === 'word') {
                     const charIndex = event.charIndex;
                     let cumulativeLength = 0;
                     const sentenceIndex = sentencesRef.current.findIndex(sentence => {
