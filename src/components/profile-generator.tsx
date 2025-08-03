@@ -22,7 +22,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose 
 import LoShuGrid from '@/components/lo-shu-grid';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { NEW_ASTROLOGY_DATA } from '@/lib/new-astrology';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 
 function SpeechPlayer({ text, elementId }: { text: string; elementId: string }) {
@@ -429,39 +428,6 @@ const TabButton = ({
 
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
-    const [api, setApi] = React.useState<CarouselApi>()
-    const [current, setCurrent] = React.useState(0)
-    const [activeContent, setActiveContent] = React.useState(signData.description);
-    const [activeTitle, setActiveTitle] = React.useState("Description");
-    const [activeElementId, setActiveElementId] = React.useState("desc");
-
-
-    const categories = React.useMemo(() => [
-        { key: 'description', title: "Description", icon: <FileText/>, content: signData.description, elementId: 'desc-speech' },
-        { key: 'love', title: "Love", icon: <Heart/>, content: signData.love, elementId: 'love-speech' },
-        { key: 'compatibilities', title: "Compatibility", icon: <Users/>, content: signData.compatibilities, elementId: 'comp-speech' },
-        { key: 'homeAndFamily', title: "Home & Family", icon: <Home/>, content: signData.homeAndFamily, elementId: 'home-speech' },
-        { key: 'profession', title: "Profession", icon: <Briefcase/>, content: signData.profession, elementId: 'prof-speech' },
-    ], [signData]);
-
-    React.useEffect(() => {
-        if (!api) { return }
-        
-        setCurrent(api.selectedScrollSnap())
-
-        const handleSelect = () => {
-            const newIndex = api.selectedScrollSnap();
-            setCurrent(newIndex);
-            setActiveTitle(categories[newIndex].title);
-            setActiveContent(categories[newIndex].content);
-            setActiveElementId(categories[newIndex].elementId);
-        }
-        api.on("select", handleSelect)
-
-        return () => {
-          api.off("select", handleSelect)
-        }
-    }, [api, categories])
 
     if (!signData) {
         return (
@@ -490,47 +456,58 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                 </DialogDescription>
             </DialogHeader>
 
-            <div className="flex-grow flex flex-col justify-between">
-                <Carousel setApi={setApi} className="w-full">
-                    <CarouselContent>
-                        {categories.map((category, index) => (
-                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                                <div className={cn(
-                                    "p-1 h-full transition-all duration-300",
-                                    current === index ? "" : "opacity-50 scale-90"
-                                )}>
-                                    <div className="glass-card flex flex-col items-center justify-center p-6 h-full text-center">
-                                       <div className="text-secondary mb-2">{React.cloneElement(category.icon, { size: 32 })}</div>
-                                        <p className="font-semibold text-lg">{category.title}</p>
-                                    </div>
-                                </div>
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                </Carousel>
-
-                <div className="mt-4 flex-grow glass-card p-4">
+            <Tabs defaultValue="description" className="w-full flex-grow flex flex-col">
+                <TabsList className="grid w-full grid-cols-3 md:grid-cols-5">
+                    <TabsTrigger value="description">Description</TabsTrigger>
+                    <TabsTrigger value="love">Love</TabsTrigger>
+                    <TabsTrigger value="compatibilities">Compatibility</TabsTrigger>
+                    <TabsTrigger value="homeAndFamily">Home & Family</TabsTrigger>
+                    <TabsTrigger value="profession">Profession</TabsTrigger>
+                </TabsList>
+                <div className="flex-grow mt-4 glass-card p-4">
                     <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTitle}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="h-full"
-                        >
-                            <ScrollArea className="h-64 pr-3">
-                                <SpeechPlayer text={activeContent} elementId={activeElementId} />
-                            </ScrollArea>
-                        </motion.div>
+                        <TabsContent value="description" className="h-full">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                                <ScrollArea className="h-full pr-3">
+                                    <SpeechPlayer text={signData.description} elementId="desc-speech" />
+                                </ScrollArea>
+                            </motion.div>
+                        </TabsContent>
+                        <TabsContent value="love" className="h-full">
+                           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                                <ScrollArea className="h-full pr-3">
+                                    <SpeechPlayer text={signData.love} elementId="love-speech" />
+                                </ScrollArea>
+                            </motion.div>
+                        </TabsContent>
+                        <TabsContent value="compatibilities" className="h-full">
+                           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                                <ScrollArea className="h-full pr-3">
+                                    <SpeechPlayer text={signData.compatibilities} elementId="compat-speech" />
+                                </ScrollArea>
+                            </motion.div>
+                        </TabsContent>
+                        <TabsContent value="homeAndFamily" className="h-full">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                                <ScrollArea className="h-full pr-3">
+                                    <SpeechPlayer text={signData.homeAndFamily} elementId="home-speech" />
+                                </ScrollArea>
+                            </motion.div>
+                        </TabsContent>
+                        <TabsContent value="profession" className="h-full">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                                <ScrollArea className="h-full pr-3">
+                                    <SpeechPlayer text={signData.profession} elementId="prof-speech" />
+                                </ScrollArea>
+                            </motion.div>
+                        </TabsContent>
                     </AnimatePresence>
                 </div>
-            </div>
+            </Tabs>
         </DialogContent>
     );
 }
+
 
 function ResultsHistoryButton({ onHistoryOpen }: { onHistoryOpen: () => void }) {
     return(
