@@ -9,7 +9,6 @@ import { NumerologyDisplay } from './numerology-display';
 import { ArrowLeft, History, Users, Home, Heart, BookUser, Briefcase } from "lucide-react";
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { SpeechPlayer } from './speech-player';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 // --- SUB-COMPONENTS ---
 
@@ -49,7 +48,7 @@ function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string,
     <div className="relative w-full h-48 my-4 flex justify-center items-center overflow-hidden">
       {tabs.map((tab, index) => {
         const isActive = activeIndex === index;
-        const angle = (index - activeIndex) * 22;
+        const angle = (index - activeIndex) * 25; // degrees between items
 
         return (
           <div
@@ -62,14 +61,20 @@ function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string,
           >
             <button
               onClick={() => setActiveTab(tab.key)}
-              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 ${
-                isActive ? 'text-primary scale-110' : 'text-purple-200/60 scale-90'
+              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 group ${
+                isActive ? 'text-primary' : 'text-purple-200/60 scale-90 hover:scale-95'
               }`}
             >
-              <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
-              <span className={`transition-all duration-300 text-lg ${isActive ? 'font-bold' : 'font-medium'}`}>
-                {tab.name}
-              </span>
+              <div
+                className={`flex flex-col items-center p-2 rounded-lg transition-all duration-300 ${
+                  isActive ? 'bg-primary/10 animate-arrow-pulse' : 'group-hover:bg-primary/5'
+                }`}
+              >
+                <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
+                <span className={`transition-all duration-300 text-lg ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                  {tab.name}
+                </span>
+              </div>
             </button>
           </div>
         );
@@ -79,18 +84,10 @@ function CelestialArcNav({ activeTab, setActiveTab, tabs }: { activeTab: string,
 }
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAstroSignData }) {
-    const [activeSubTab, setActiveSubTab] = React.useState('description');
+    const [activeSubTab, setActiveSubTab] = React.useState<keyof NewAstroSignData>('description');
 
     const renderContent = () => {
-        const text = signData[activeSubTab as keyof NewAstroSignData] || `No data for ${activeSubTab}.`;
-        
-        if (activeSubTab === 'compatibilities') {
-             return (
-                 <div className="relative mt-4 glass-card p-4">
-                    <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{text}</p>
-                 </div>
-             )
-        }
+        const text = signData[activeSubTab] || `No data for ${activeSubTab}.`;
         
         return (
             <div className="relative mt-4 glass-card p-4">
@@ -109,7 +106,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAs
     return (
         <div className="glass-card p-4">
              <h3 className="font-semibold text-lg text-primary text-center mb-2">{sign}</h3>
-            <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab} tabs={NEW_ASTRO_TABS} />
+            <CelestialArcNav activeTab={activeSubTab} setActiveTab={setActiveSubTab as (tab: string) => void} tabs={NEW_ASTRO_TABS} />
             <div className="mt-4 min-h-[250px]">
                 {renderContent()}
             </div>

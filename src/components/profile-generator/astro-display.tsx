@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, Leaf, Users, Forward, Milestone } from "lucide-react";
+import { BookOpen, Leaf, Users, Forward } from "lucide-react";
 import type { AstroInsightOutput } from './types';
 import { ScrollableTextDisplay } from './scrollable-text-display';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -41,14 +41,20 @@ function CelestialArcNav({ activeTab, setActiveTab }: { activeTab: string, setAc
           >
             <button
               onClick={() => setActiveTab(tab.name.toLowerCase())}
-              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 ${
-                isActive ? 'text-primary scale-110' : 'text-purple-200/60 scale-90'
+              className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 group ${
+                isActive ? 'text-primary' : 'text-purple-200/60 scale-90 hover:scale-95'
               }`}
             >
-              <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
-              <span className={`transition-all duration-300 text-lg ${isActive ? 'font-bold' : 'font-medium'}`}>
-                {tab.name}
-              </span>
+              <div
+                className={`flex flex-col items-center p-2 rounded-lg transition-all duration-300 ${
+                  isActive ? 'bg-primary/10 animate-arrow-pulse' : 'group-hover:bg-primary/5'
+                }`}
+              >
+                <tab.icon className={`h-8 w-8 transition-all duration-300 ${isActive ? 'mb-1' : ''}`} />
+                <span className={`transition-all duration-300 text-lg ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                  {tab.name}
+                </span>
+              </div>
             </button>
           </div>
         );
@@ -165,5 +171,3 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     </div>
   );
 }
-
-export { CelestialArcNav };
