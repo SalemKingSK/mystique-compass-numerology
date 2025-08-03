@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -443,19 +442,42 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
         );
     }
     
-    // We will replace this with a real tabbed view in the next steps
     return (
         <DialogContent className="max-w-4xl min-h-[580px] flex flex-col">
             <DialogHeader>
                 <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--color-primary-hsl))] via-[hsl(var(--color-quaternary-hsl))] to-[hsl(var(--color-secondary-hsl))]">
                     {sign}
                 </DialogTitle>
-                 <DialogDescription className="!mt-2">
-                    Details Not Available
+                 <DialogDescription className="!mt-2 text-center">
+                    A detailed look into the combined traits of your unique astrological sign.
                 </DialogDescription>
             </DialogHeader>
-            <div className="flex-grow mt-4 glass-card p-4 text-center text-gray-400">
-                Detailed information for {sign} is not yet available.
+            <div className="flex-grow mt-4">
+                <Tabs defaultValue="description" className="w-full">
+                    <TabsList className="flex flex-wrap h-auto justify-center gap-1 sm:gap-2 bg-transparent">
+                        <TabsTrigger value="description" className="flex-1 min-w-[120px] whitespace-normal">Description</TabsTrigger>
+                        <TabsTrigger value="love" className="flex-1 min-w-[120px] whitespace-normal">Love</TabsTrigger>
+                        <TabsTrigger value="compatibilities" className="flex-1 min-w-[120px] whitespace-normal">Compatibilities</TabsTrigger>
+                        <TabsTrigger value="home" className="flex-1 min-w-[120px] whitespace-normal">Home & Family</TabsTrigger>
+                        <TabsTrigger value="profession" className="flex-1 min-w-[120px] whitespace-normal">Profession</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="description" className="mt-4">
+                        <p>Description placeholder...</p>
+                    </TabsContent>
+                    <TabsContent value="love" className="mt-4">
+                        <p>Love placeholder...</p>
+                    </TabsContent>
+                    <TabsContent value="compatibilities" className="mt-4">
+                        <p>Compatibilities placeholder...</p>
+                    </TabsContent>
+                    <TabsContent value="home" className="mt-4">
+                        <p>Home & Family placeholder...</p>
+                    </TabsContent>
+                    <TabsContent value="profession" className="mt-4">
+                        <p>Profession placeholder...</p>
+                    </TabsContent>
+                </Tabs>
             </div>
         </DialogContent>
     );
@@ -777,11 +799,5 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
-
-    
-
-    
-
-
 
     
