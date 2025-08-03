@@ -1,3 +1,4 @@
+
 // src/components/profile-generator/speech-player.tsx
 'use client';
 
@@ -13,53 +14,64 @@ interface SpeechPlayerProps {
 
 export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
-    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
-
-    React.useEffect(() => {
-        if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
-
-        const synth = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(text);
-
-        utterance.onboundary = (event) => onBoundary?.(event);
-        utterance.onstart = () => setIsPlaying(true);
-        utterance.onend = (event) => {
-            setIsPlaying(false);
-            onEnd?.(event);
-        };
-        utterance.onerror = (event) => {
-            console.error("SpeechSynthesis Error", event);
-            setIsPlaying(false);
-        };
-
-        utteranceRef.current = utterance;
-
-        // Cleanup on unmount
-        return () => {
-            synth.cancel();
-        };
-    }, [text, onBoundary, onEnd]);
-
-
+    
+    // We'll manage the utterance directly within the play function
+    // to avoid stale references.
+    
     const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        
-        const synth = window.speechSynthesis;
-        const utterance = utteranceRef.current;
 
-        if (!utterance) return;
-        
+        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+        const synth = window.speechSynthesis;
+
         if (synth.speaking) {
-            // If it's speaking, always cancel, which will trigger onend and reset state
-            synth.cancel();
-        } else {
-            // If not speaking, start speaking this utterance
-            synth.speak(utterance);
+            synth.cancel(); 
+            setIsPlaying(false);
+            return;
         }
 
+        if (!text) {
+             console.log("No text to speak.");
+             return;
+        }
+        
+        // Create a new utterance each time play is clicked
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        utterance.onstart = () => {
+            setIsPlaying(true);
+        };
+
+        utterance.onend = (event) => {
+            setIsPlaying(false);
+            if (onEnd) onEnd(event);
+        };
+
+        utterance.onboundary = (event) => {
+            if(onBoundary) onBoundary(event);
+        };
+
+        utterance.onerror = (event) => {
+            console.error("SpeechSynthesis Error", event);
+            setIsPlaying(false);
+        };
+
+        synth.speak(utterance);
+
+    }, [text, onBoundary, onEnd]);
+    
+    // Effect to clean up speech synthesis on component unmount
+    React.useEffect(() => {
+        const synth = window.speechSynthesis;
+        return () => {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+        };
     }, []);
 
     return (
