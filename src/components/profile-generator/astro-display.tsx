@@ -17,43 +17,11 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Info, Heart, Users, Home, Briefcase, Mic, Sparkles, Play, Pause } from "lucide-react";
+import { Info, Heart, Users, Home, Briefcase, Sparkles } from "lucide-react";
 import type { AstroInsightOutput } from './types';
 import { Button } from '@/components/ui/button';
+import { SpeechPlayer } from './speech-player';
 
-function SpeechPlayer({ text }: { text: string }) {
-    const [isPlaying, setIsPlaying] = React.useState(false);
-
-    React.useEffect(() => {
-        // Stop speech when component unmounts or text changes
-        return () => {
-            if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) {
-                window.speechSynthesis.cancel();
-            }
-        };
-    }, [text]);
-
-    const handlePlayPause = () => {
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            if (isPlaying) {
-                window.speechSynthesis.cancel();
-                setIsPlaying(false);
-            } else {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.onend = () => setIsPlaying(false);
-                window.speechSynthesis.speak(utterance);
-                setIsPlaying(true);
-            }
-        }
-    };
-
-    return (
-        <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
-            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
-        </Button>
-    );
-}
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }) {
   if (!signData || Object.keys(signData).length === 0) {
