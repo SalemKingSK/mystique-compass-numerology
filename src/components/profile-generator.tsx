@@ -560,7 +560,16 @@ function ResultsDisplay({
                             </div>
                         </button>
                     </DialogTrigger>
-                    {newAstroData && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />}
+                    {newAstroData ? (
+                         <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />
+                    ) : (
+                         <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Details Not Available</DialogTitle>
+                            </DialogHeader>
+                            <p>Detailed information for {insight.new_astrology_sign} is not yet available.</p>
+                        </DialogContent>
+                    )}
                 </Dialog>
             </header>
 
@@ -828,3 +837,4 @@ export function ProfileGenerator() {
     
 
     
+
