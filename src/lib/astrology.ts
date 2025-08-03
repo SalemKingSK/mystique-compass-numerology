@@ -1,7 +1,9 @@
 // src/lib/astrology.ts
 import { CHINESE_CALENDAR } from './new-astrology/chinese-calendar';
-import type { AstroInsightInput, AstroInsightOutput } from '@/components/profile-generator/types';
+import type { AstroInsightInput, AstroInsightOutput, NewAstroSignData } from '@/components/profile-generator/types';
 import { zodiacData } from './zodiac';
+import { NEW_ASTROLOGY_DATA } from './new-astrology';
+
 
 // Helper function to get the Western Zodiac sign
 export const getWesternZodiacSign = (day: number, month: number): string => {
@@ -57,14 +59,20 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
     const western_sign = getWesternZodiacSign(day, month);
     const { sign, element } = getChineseZodiacSign(day, month, year);
     
-    // Fetch the data for the specific Chinese zodiac sign (e.g., "Pig")
+    // Data for the Chinese Zodiac sub-tabs
     const signDataForZodiac = zodiacData[sign as keyof typeof zodiacData] || {};
+    
+    // Data for the "New Astrology" combined sign modal
+    const newAstrologySignKey = `${western_sign}/${sign}`;
+    const signDataForNewAstrology: NewAstroSignData = NEW_ASTROLOGY_DATA[newAstrologySignKey as keyof typeof NEW_ASTROLOGY_DATA] || {};
 
     return {
         name,
         western_sign,
         sign,
         element,
+        new_astrology_sign: newAstrologySignKey,
         zodiacData: signDataForZodiac,
+        signData: signDataForNewAstrology,
     };
 }

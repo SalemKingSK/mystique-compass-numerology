@@ -9,12 +9,13 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookOpen, Leaf, Users, Forward } from "lucide-react";
-import type { AstroInsightOutput, ZodiacData } from './types';
+import { BookOpen, Leaf, Users, Forward, Info, Heart, Home, Briefcase, Mic } from "lucide-react";
+import type { AstroInsightOutput, NewAstroSignData } from './types';
 import { SpeechPlayer } from './speech-player';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '../ui/button';
 
-// Sub-component for displaying a single element's data
 function ElementDisplay({ elementName, elementData }: { elementName: string, elementData: any }) {
     if (!elementData) return null;
     return (
@@ -25,7 +26,6 @@ function ElementDisplay({ elementName, elementData }: { elementName: string, ele
     );
 }
 
-// Sub-component for displaying future predictions
 function FutureDisplay({ futures }: { futures: any }) {
     if (!futures || Object.keys(futures).length === 0) return <p className="text-slate-400">No future predictions available.</p>;
 
@@ -45,7 +45,6 @@ function FutureDisplay({ futures }: { futures: any }) {
     );
 }
 
-// Sub-component for compatibilities
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {
         return <p className="text-slate-400">No compatibility information available.</p>;
@@ -65,20 +64,105 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     );
 }
 
+
+function NewAstroSignDetails({ sign, signData }: { sign: string, signData: NewAstroSignData }) {
+  if (!signData || Object.keys(signData).length === 0) {
+    return (
+      <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
+        <DialogHeader>
+          <DialogTitle className="text-3xl font-bold text-center text-purple-300">
+            {sign.replace('/', ' / ')}
+          </DialogTitle>
+          <div className="pt-8 text-center text-slate-400">
+            Detailed information for {sign} is not yet available.
+          </div>
+        </DialogHeader>
+      </DialogContent>
+    );
+  }
+
+  return (
+    <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-sm text-white border-slate-700">
+      <DialogHeader>
+        <DialogTitle className="text-3xl font-bold text-center text-purple-300">
+            {sign.replace('/', ' / ')}
+        </DialogTitle>
+        <DialogDescription className="text-center text-slate-400">
+          A detailed look into the combined traits of your unique astrological sign.
+        </DialogDescription>
+      </DialogHeader>
+
+      <Tabs defaultValue="description" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto sm:h-12">
+          <TabsTrigger value="description">Description</TabsTrigger>
+          <TabsTrigger value="love">Love</TabsTrigger>
+          <TabsTrigger value="homeAndFamily">Home & Family</TabsTrigger>
+          <TabsTrigger value="profession">Profession</TabsTrigger>
+          <TabsTrigger value="compatibilities">Compatibilities</TabsTrigger>
+        </TabsList>
+        
+        <ScrollArea className="h-72 w-full p-4">
+          <TabsContent value="description">
+            <div className="flex items-start space-x-4">
+              <Info className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />
+              <p className="text-slate-300 whitespace-pre-wrap">{signData.description}</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="love">
+            <div className="flex items-start space-x-4">
+              <Heart className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />
+              <p className="text-slate-300 whitespace-pre-wrap">{signData.love}</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="homeAndFamily">
+            <div className="flex items-start space-x-4">
+              <Home className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />
+              <p className="text-slate-300 whitespace-pre-wrap">{signData.homeAndFamily}</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="profession">
+            <div className="flex items-start space-x-4">
+              <Briefcase className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />
+              <p className="text-slate-300 whitespace-pre-wrap">{signData.profession}</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="compatibilities">
+            <div className="flex items-start space-x-4">
+              <Users className="h-5 w-5 mt-1 text-purple-300 flex-shrink-0" />
+              <p className="text-slate-300 whitespace-pre-wrap">{signData.compatibilities}</p>
+            </div>
+          </TabsContent>
+        </ScrollArea>
+      </Tabs>
+    </DialogContent>
+  );
+}
+
+
 export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
-  const { sign, name, western_sign, zodiacData } = insight;
+  const { zodiacData, sign, element } = insight;
   const { introduction, elements, compatibilities, futures } = zodiacData;
 
-  // Find the element data for the user's specific sign element
-  const signElementData = elements?.[insight.element as keyof typeof elements];
+  const signElementData = elements?.[element as keyof typeof elements];
 
   return (
     <div className="space-y-4">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-white">{name}</h2>
-        <p className="text-lg text-purple-100/80">{western_sign} / {sign}</p>
-      </div>
-
+      <Dialog>
+        <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold text-white tracking-wide">{insight.name}</h2>
+             <DialogTrigger asChild>
+                <Button variant="ghost" className="text-lg text-purple-300/80 hover:bg-purple-500/10 hover:text-purple-200">
+                    {insight.new_astrology_sign}
+                </Button>
+            </DialogTrigger>
+        </div>
+         <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />
+      </Dialog>
+      
       <Tabs defaultValue="introduction" className="w-full glass-card p-4">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto bg-black/20">
           <TabsTrigger value="introduction">Introduction</TabsTrigger>
@@ -101,10 +185,10 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
           <TabsContent value="element">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {insight.element}</h3>
+                  <h3 className="font-semibold text-lg text-primary flex items-center gap-2"><Leaf className="h-5 w-5" /> Your Element: The {element}</h3>
                   <SpeechPlayer text={signElementData || ''} />
               </div>
-              <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{signElementData || `No specific data for the ${insight.element} element.`}</p>
+              <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{signElementData || `No specific data for the ${element} element.`}</p>
             </div>
           </TabsContent>
 
