@@ -3,6 +3,7 @@
 
 import * as React from 'react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { SpeechPlayer } from './speech-player';
 
 const splitIntoSentences = (text: string): string[] => {
     if (!text) return [];
@@ -13,15 +14,13 @@ const splitIntoSentences = (text: string): string[] => {
 
 interface ScrollableTextDisplayProps {
   text: string;
-  onBoundary: (event: SpeechSynthesisEvent) => void;
-  onEnd: (event: SpeechSynthesisEvent) => void;
 }
 
-export function ScrollableTextDisplay({ text, onBoundary, onEnd }: ScrollableTextDisplayProps) {
+export function ScrollableTextDisplay({ text }: ScrollableTextDisplayProps) {
     const [sentences, setSentences] = React.useState<string[]>([]);
     const [currentSentenceIndex, setCurrentSentenceIndex] = React.useState(-1);
     const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
-    const scrollViewportRef = React.useRef<HTMLDivElement | null>(null);
+    const scrollViewportRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         setSentences(splitIntoSentences(text));
@@ -43,13 +42,11 @@ export function ScrollableTextDisplay({ text, onBoundary, onEnd }: ScrollableTex
                 currentLength += sentenceLength + 1; 
             }
         }
-        if (onBoundary) onBoundary(event);
-    }, [sentences, onBoundary]);
+    }, [sentences]);
 
     const handleEnd = React.useCallback((event: SpeechSynthesisEvent) => {
         setCurrentSentenceIndex(-1);
-        if (onEnd) onEnd(event);
-    }, [onEnd]);
+    }, []);
 
     React.useEffect(() => {
         if (currentSentenceIndex !== -1 && sentenceRefs.current[currentSentenceIndex]) {
@@ -73,7 +70,10 @@ export function ScrollableTextDisplay({ text, onBoundary, onEnd }: ScrollableTex
     
     return (
         <div className="relative">
-            <ScrollArea className="h-60 w-full" viewportRef={scrollViewportRef}>
+             <div className="absolute top-0 right-0 z-10">
+                <SpeechPlayer text={text} onBoundary={handleBoundary} onEnd={handleEnd} />
+            </div>
+            <ScrollArea className="h-full w-full" viewportRef={scrollViewportRef}>
                 <div className="text-slate-300 whitespace-pre-wrap leading-relaxed p-1">
                     {sentences.map((sentence, index) => (
                         <span 
