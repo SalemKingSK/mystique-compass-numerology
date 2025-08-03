@@ -15,25 +15,23 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isPaused, setIsPaused] = React.useState(false);
   const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+  const isCancelingRef = React.useRef(false); // Flag to track intentional cancellation
   const { toast } = useToast();
 
   const handleStop = React.useCallback(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
+      isCancelingRef.current = true;
       window.speechSynthesis.cancel();
+      // State updates will be handled by the utterance's onend/onerror handlers
     }
-    setIsPlaying(false);
-    setIsPaused(false);
-    utteranceRef.current = null;
-    if (onEnd) onEnd();
-  }, [onEnd]);
-  
+  }, []);
+
   React.useEffect(() => {
     // Cleanup on unmount
     return () => {
       handleStop();
     };
   }, [handleStop]);
-
 
   const handlePlayPause = React.useCallback(() => {
     if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -42,50 +40,59 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
 
     const synth = window.speechSynthesis;
 
-    if (synth.speaking && !isPaused) { // Is speaking, and we want to pause
+    if (synth.speaking && !synth.paused) { // Is speaking, so pause
+        isCancelingRef.current = false; // It's a pause, not a full cancel
         synth.pause();
         setIsPaused(true);
         setIsPlaying(false);
-    } else if (synth.paused && isPaused) { // Is paused, and we want to resume
+    } else if (synth.paused) { // Is paused, so resume
+        isCancelingRef.current = false;
         synth.resume();
         setIsPaused(false);
         setIsPlaying(true);
-    } else { // Not speaking, start a new utterance
+    } else { // Not speaking, start new
         if (synth.speaking) { // If something else is speaking, stop it first
+            isCancelingRef.current = true;
             synth.cancel();
         }
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance;
         
-        utterance.onboundary = onBoundary;
+        // Use a timeout to allow the cancel command to process fully
+        setTimeout(() => {
+            isCancelingRef.current = false;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utteranceRef.current = utterance;
+            
+            utterance.onboundary = onBoundary;
 
-        utterance.onend = () => {
-            setIsPlaying(false);
+            utterance.onend = () => {
+                setIsPlaying(false);
+                setIsPaused(false);
+                utteranceRef.current = null;
+                if (onEnd) onEnd();
+            };
+            
+            utterance.onerror = (event) => {
+                if (!isCancelingRef.current && event.error !== 'canceled') {
+                  console.error("SpeechSynthesis Error", event);
+                  toast({
+                    variant: 'destructive',
+                    title: 'Speech Error',
+                    description: 'Could not generate audio. Please try again.',
+                  });
+                }
+                // Always clean up state on error
+                setIsPlaying(false);
+                setIsPaused(false);
+                utteranceRef.current = null;
+                if(onEnd) onEnd(); 
+            };
+            
+            setIsPlaying(true);
             setIsPaused(false);
-            utteranceRef.current = null;
-            if (onEnd) onEnd();
-        };
-        
-        utterance.onerror = (event) => {
-            if (event.error !== 'canceled') {
-              console.error("SpeechSynthesis Error", event);
-              toast({
-                variant: 'destructive',
-                title: 'Speech Error',
-                description: 'Could not generate audio. Please try again.',
-              });
-            }
-            // onend will also fire, cleaning up state.
-        };
-        
-        setIsPlaying(true);
-        setIsPaused(false);
-        synth.speak(utterance);
+            synth.speak(utterance);
+        }, 100); // A small delay is often sufficient
     }
-
-  }, [text, onBoundary, onEnd, toast, isPaused, isPlaying]);
-
+  }, [text, onBoundary, onEnd, toast]);
 
   return (
     <div className="flex items-center gap-2 mb-4">
