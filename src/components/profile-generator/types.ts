@@ -1,3 +1,4 @@
+
 // src/components/profile-generator/types.ts
 
 // This is the data that the user provides
@@ -60,6 +61,8 @@ export interface NumerologyData {
   auspiciousDirections: { [key: string]: string };
   loShuGrid: (string | null)[][];
   numberCounts: { [key: string]: number };
+  repeatedNumberMeanings: { [key: string]: string };
   arrowsOfStrength: ArrowData[];
   arrowsOfWeakness: ArrowData[];
 }
+

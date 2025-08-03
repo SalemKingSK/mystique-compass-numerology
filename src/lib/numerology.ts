@@ -1,3 +1,4 @@
+
 // src/lib/numerology.ts
 import type { AstroInsightInput } from './astrology';
 import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
@@ -89,6 +90,7 @@ export interface NumerologyData {
   auspiciousDirections: { [key: string]: string };
   loShuGrid: (string | null)[][];
   numberCounts: { [key: string]: number };
+  repeatedNumberMeanings: { [key: string]: string };
   arrowsOfStrength: ArrowData[];
   arrowsOfWeakness: ArrowData[];
 }
@@ -141,7 +143,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   if (firstReduction >= 10) {
       reducedCompoundNum = firstReduction;
-      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inner Essence number ${reducedCompoundNum}.`;
+      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inherent Fate number ${reducedCompoundNum}.`;
   }
   
   const karmicFateNum = calculateKarmicFate(day, month, year);
@@ -191,6 +193,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     kuaNum,
     loShuGrid,
     numberCounts,
+    repeatedNumberMeanings: REPEATED_NUMBER_MEANINGS,
     compoundNum,
     compoundMeaning,
     reducedCompoundNum,
@@ -203,3 +206,4 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     auspiciousDirections: auspiciousDirections || {},
   };
 };
+

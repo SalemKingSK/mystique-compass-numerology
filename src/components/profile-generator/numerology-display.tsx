@@ -5,8 +5,7 @@ import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
-import { REPEATED_NUMBER_MEANINGS } from '@/lib/numerology/data/repetitionMeanings';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
@@ -19,22 +18,14 @@ const InfoCard = ({ title, value, icon }: { title: string, value: string | numbe
     </div>
 );
 
-const FateDisplay = ({ karmicFateNum, karmicFateMeaning }: { karmicFateNum: number | null, karmicFateMeaning: string | null }) => {
-    if (!karmicFateMeaning) return null;
+const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null }) => {
+    if (!meaning) return null;
     return (
         <div className="glass-card p-4 space-y-2">
-            <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="karmic-fate" className="border-b-0">
-                    <AccordionTrigger className="text-purple-200 font-semibold text-lg py-2">
-                         <div className="flex items-center gap-2">
-                            <Wand2 className="h-5 w-5" /> Karmic Fate Number: {karmicFateNum}
-                         </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <p className="text-white/80 text-sm leading-relaxed">{karmicFateMeaning}</p>
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
+            <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
+                <Wand2 className="h-5 w-5" /> {title}
+            </h3>
+            <ScrollableTextDisplay text={meaning} />
         </div>
     );
 }
@@ -46,6 +37,10 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
     ];
 
     if (allArrows.length === 0) return null;
+    
+    const arrowText = allArrows.map(arrow => 
+        `${arrow.type === 'strength' ? 'Arrow of Strength' : 'Arrow of Weakness'}: ${arrow.name}\n${arrow.description}`
+    ).join('\n\n');
 
     return (
         <div className="glass-card p-4 space-y-3">
@@ -53,23 +48,16 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 Arrows of Power
             </h3>
-            <div className="space-y-2">
-                {allArrows.map((arrow, index) => (
-                    <div key={index} className={`p-2 rounded-md ${arrow.type === 'strength' ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
-                        <p className={`font-semibold ${arrow.type === 'strength' ? 'text-green-300' : 'text-red-300'}`}>{arrow.name}</p>
-                        <p className="text-xs text-white/70">{arrow.description}</p>
-                    </div>
-                ))}
-            </div>
+            <ScrollableTextDisplay text={arrowText} />
         </div>
     );
 };
 
-const RepetitionMeaningsDisplay = ({ numberCounts }: { numberCounts: { [key: string]: number } }) => {
+const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: { [key: string]: number }, meanings: {[key:string]: string} }) => {
   const repetitions = Object.entries(numberCounts)
     .map(([number, count]) => {
       const key = `${number}_${Math.min(count, 5)}`; // Cap count at 5 as per data structure
-      const meaning = REPEATED_NUMBER_MEANINGS[key];
+      const meaning = meanings[key];
       return { number, count, meaning };
     })
     .filter(item => item.meaning)
@@ -77,23 +65,17 @@ const RepetitionMeaningsDisplay = ({ numberCounts }: { numberCounts: { [key: str
 
   if (repetitions.length === 0) return null;
 
+  const repetitionText = repetitions.map(({ number, count, meaning }) => 
+    `Number ${number} (appears ${count} time${count > 1 ? 's' : ''}):\n${meaning}`
+  ).join('\n\n');
+
+
   return (
     <div className="glass-card p-4 space-y-3">
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
-       <Accordion type="single" collapsible className="w-full">
-        {repetitions.map(({ number, count, meaning }) => (
-            <AccordionItem value={number} key={number}>
-                <AccordionTrigger className="text-purple-200 font-semibold">
-                    Number {number} (appears {count} time{count > 1 ? 's' : ''})
-                </AccordionTrigger>
-                <AccordionContent>
-                    <p className="text-sm text-white/80 leading-relaxed">{meaning}</p>
-                </AccordionContent>
-            </AccordionItem>
-        ))}
-      </Accordion>
+       <ScrollableTextDisplay text={repetitionText} />
     </div>
   );
 };
@@ -116,8 +98,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         karmicFateNum,
         karmicFateMeaning,
         numberCounts,
+        repeatedNumberMeanings
     } = numerology;
     
+  const compoundFateText = `${compoundMeaning}${reducedCompoundNum ? `\n\nInherent Fate: ${reducedCompoundNum}\n${reducedCompoundMeaning}` : ''}`;
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -129,21 +114,12 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <LoShuGrid gridData={loShuGrid} arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} />
         <div className="space-y-4">
-          <FateDisplay karmicFateNum={karmicFateNum} karmicFateMeaning={karmicFateMeaning} />
-          <div className="glass-card p-4 space-y-2">
-            <h3 className="font-semibold text-lg text-primary">Compound Number: {compoundNum}</h3>
-            <p className="text-white/80 text-sm">{compoundMeaning}</p>
-            {reducedCompoundNum && (
-                <>
-                    <h4 className="font-semibold pt-2 text-primary/80">Inner Essence: {reducedCompoundNum}</h4>
-                    <p className="text-white/70 text-xs">{reducedCompoundMeaning}</p>
-                </>
-            )}
-          </div>
+           <FateDisplay title={`Compound Fate: ${compoundNum}`} meaning={compoundFateText} />
+           <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} />
         </div>
       </div>
       
-      <RepetitionMeaningsDisplay numberCounts={numberCounts} />
+      <RepetitionMeaningsDisplay numberCounts={numberCounts} meanings={repeatedNumberMeanings}/>
 
       <ArrowsDisplay arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} />
 
@@ -171,3 +147,4 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     </div>
   );
 }
+
