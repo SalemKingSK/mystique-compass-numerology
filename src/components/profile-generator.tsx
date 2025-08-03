@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -20,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { REPEATED_NUMBER_MEANINGS, NUMBER_MEANINGS } from '@/lib/numerology/data';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import LoShuGrid from '@/components/lo-shu-grid';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { NEW_ASTROLOGY_DATA } from '@/lib/new-astrology';
 
 
@@ -455,12 +454,12 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                 </DialogDescription>
             </DialogHeader>
             <Tabs defaultValue="description" className="w-full">
-                 <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 gap-2">
-                    <TabsTrigger value="description" className="text-xs sm:text-sm">Description</TabsTrigger>
-                    <TabsTrigger value="love" className="text-xs sm:text-sm">Love</TabsTrigger>
-                    <TabsTrigger value="compatibilities" className="text-xs sm:text-sm">Compatibilities</TabsTrigger>
-                    <TabsTrigger value="homeAndFamily" className="text-xs sm:text-sm">Home & Family</TabsTrigger>
-                    <TabsTrigger value="profession" className="text-xs sm:text-sm">Profession</TabsTrigger>
+                 <TabsList className="h-auto flex flex-wrap justify-center bg-transparent p-0">
+                    <TabsTrigger value="description" className="flex-1 min-w-[120px]">Description</TabsTrigger>
+                    <TabsTrigger value="love" className="flex-1 min-w-[120px]">Love</TabsTrigger>
+                    <TabsTrigger value="compatibilities" className="flex-1 min-w-[120px]">Compatibilities</TabsTrigger>
+                    <TabsTrigger value="homeAndFamily" className="flex-1 min-w-[120px]">Home & Family</TabsTrigger>
+                    <TabsTrigger value="profession" className="flex-1 min-w-[120px]">Profession</TabsTrigger>
                 </TabsList>
                 <TabsContent value="description">
                     <div className="glass-card p-4 min-h-[300px]">
@@ -522,7 +521,8 @@ function ResultsDisplay({
 }) {
   const [activeTab, setActiveTab] = React.useState('astro');
 
-  const newAstroData = NEW_ASTROLOGY_DATA[insight.new_astrology_sign.replace(/\s+/g, '')];
+  const newAstroSignKey = insight.new_astrology_sign.replace(/ /g, '').replace(/\//g, '');
+  const newAstroData = NEW_ASTROLOGY_DATA[newAstroSignKey];
 
   return (
     <motion.div 
@@ -540,12 +540,17 @@ function ResultsDisplay({
                 
                 <Dialog>
                     <DialogTrigger asChild>
-                         <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block animated-border">
+                         <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block">
+                             <div className={cn(
+                                "animated-border absolute inset-0 z-0",
+                                activeTab !== 'new-astro' && "hidden"
+                             )} />
                              <Button
                                 variant="ghost"
-                                className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-400 hover:bg-black/40 hover:text-white"
+                                onClick={() => setActiveTab('new-astro')}
+                                className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-300 hover:bg-black/40 hover:text-white text-lg"
                              >
-                                <p className="text-lg text-gray-300">{insight.new_astrology_sign}</p>
+                                {insight.new_astrology_sign}
                             </Button>
                         </div>
                     </DialogTrigger>
@@ -583,6 +588,11 @@ function ResultsDisplay({
                     )}
                     {activeTab === 'numerology' && numerology && (
                         <NumerologyDisplay numerology={numerology} />
+                    )}
+                    {activeTab === 'new-astro' && newAstroData && (
+                        <p className="text-center text-gray-400 p-8">
+                            Select the button above to explore detailed interpretations of your combined sign.
+                        </p>
                     )}
                 </motion.div>
             </AnimatePresence>
@@ -813,3 +823,5 @@ export function ProfileGenerator() {
     </Sheet>
   );
 }
+
+    
