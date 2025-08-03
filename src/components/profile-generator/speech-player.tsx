@@ -20,10 +20,11 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
   const handleStop = React.useCallback(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
-      setIsPlaying(false);
-      setIsPaused(false);
-      if (onEnd) onEnd();
     }
+    setIsPlaying(false);
+    setIsPaused(false);
+    utteranceRef.current = null;
+    if (onEnd) onEnd();
   }, [onEnd]);
   
   React.useEffect(() => {
@@ -83,7 +84,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         synth.speak(utterance);
     }
 
-  }, [text, onBoundary, onEnd, toast, isPaused]);
+  }, [text, onBoundary, onEnd, toast, isPaused, isPlaying]);
 
 
   return (

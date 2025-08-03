@@ -15,6 +15,7 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
   const sentenceRefs = React.useRef<(HTMLSpanElement | null)[]>([]);
 
   React.useEffect(() => {
+    if (!text) return;
     // Break the text into sentences
     const sentenceEndings = /(?<=[.!?])\s+/;
     const parts = text.split(sentenceEndings);
@@ -22,8 +23,8 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
     const result: Sentence[] = [];
 
     for (let i = 0; i < parts.length; i++) {
-      if (parts[i]) {
-        const sentenceText = parts[i];
+      const sentenceText = parts[i];
+      if (sentenceText) {
         result.push({
           text: sentenceText.trim(),
           start: currentPos,
@@ -34,6 +35,7 @@ export function ScrollableTextDisplay({ text }: { text: string }) {
     }
     setSentences(result.filter(s => s.text.length > 0));
     sentenceRefs.current = new Array(result.length);
+    setCurrentSentenceIndex(-1); // Reset index when text changes
   }, [text]);
 
   React.useEffect(() => {
