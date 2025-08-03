@@ -8,16 +8,24 @@ import { Play, Pause } from "lucide-react";
 
 interface SpeechPlayerProps {
     text: string;
-    onBoundary?: (e: SpeechSynthesisEvent) => void;
-    onEnd?: (e: SpeechSynthesisEvent) => void;
 }
 
-export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
+export function SpeechPlayer({ text }: SpeechPlayerProps) {
     const [isPlaying, setIsPlaying] = React.useState(false);
-    
-    // We'll manage the utterance directly within the play function
-    // to avoid stale references.
-    
+    const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+
+    // Effect to clean up speech synthesis on component unmount
+    React.useEffect(() => {
+        const synth = window.speechSynthesis;
+        return () => {
+            if (utteranceRef.current) {
+                utteranceRef.current.onend = null;
+                utteranceRef.current.onerror = null;
+            }
+            synth.cancel();
+        };
+    }, []);
+
     const handlePlayPause = React.useCallback((e?: React.MouseEvent) => {
         if (e) {
             e.preventDefault();
@@ -25,54 +33,44 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         }
 
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
-
+        
         const synth = window.speechSynthesis;
 
-        if (synth.speaking) {
-            synth.cancel(); 
-            setIsPlaying(false);
+        if (isPlaying) {
+            synth.cancel(); // This will trigger the onend event
             return;
         }
-
-        if (!text) {
+        
+        if (!text || text.trim() === '') {
              console.log("No text to speak.");
              return;
         }
         
-        // Create a new utterance each time play is clicked
+        // Ensure any previous speech is stopped before starting a new one.
+        // This prevents overlapping event listeners.
+        synth.cancel();
+        
         const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance;
         
         utterance.onstart = () => {
             setIsPlaying(true);
         };
 
-        utterance.onend = (event) => {
+        utterance.onend = () => {
             setIsPlaying(false);
-            if (onEnd) onEnd(event);
-        };
-
-        utterance.onboundary = (event) => {
-            if(onBoundary) onBoundary(event);
+            utteranceRef.current = null;
         };
 
         utterance.onerror = (event) => {
             console.error("SpeechSynthesis Error", event);
             setIsPlaying(false);
+            utteranceRef.current = null;
         };
 
         synth.speak(utterance);
 
-    }, [text, onBoundary, onEnd]);
-    
-    // Effect to clean up speech synthesis on component unmount
-    React.useEffect(() => {
-        const synth = window.speechSynthesis;
-        return () => {
-            if (synth.speaking) {
-                synth.cancel();
-            }
-        };
-    }, []);
+    }, [text, isPlaying]);
 
     return (
         <Button onClick={handlePlayPause} variant="ghost" size="icon" className="text-purple-300 hover:text-purple-200">
