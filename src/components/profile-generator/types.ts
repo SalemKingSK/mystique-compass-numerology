@@ -1,4 +1,5 @@
 
+
 // src/components/profile-generator/types.ts
 
 // This is the data that the user provides
@@ -65,4 +66,5 @@ export interface NumerologyData {
   arrowsOfStrength: ArrowData[];
   arrowsOfWeakness: ArrowData[];
 }
+
 
