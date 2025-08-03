@@ -7,8 +7,14 @@ import type { AstroInsightOutput, NumerologyData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
 import { ArrowLeft, History, BookUser, Heart, Home, Users, Briefcase } from "lucide-react";
-import { ScrollableTextDisplay } from './scrollable-text-display';
-import { SpeechPlayer } from './speech-player';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 
 // --- SUB-COMPONENTS ---
@@ -25,7 +31,7 @@ const NEW_ASTRO_TABS: ArcCategory[] = [
     { name: "Home & Family", key: "homeAndFamily", icon: Home },
     { name: "Compatibilities", key: "compatibilities", icon: Users },
     { name: "Profession", key: "profession", icon: Briefcase },
-  ];
+];
 
 function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
   return (
@@ -42,56 +48,62 @@ function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onCli
   )
 }
 
+
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: AstroInsightOutput['signData'] }) {
-    const [pages, setPages] = React.useState(NEW_ASTRO_TABS.map(tab => tab.key));
-  
-    const handleClick = (pageKey: keyof AstroInsightOutput['signData']) => {
-      if (pages[0] === pageKey) return;
-      setPages(prevPages => {
-        const newPages = prevPages.filter(p => p !== pageKey);
-        return [pageKey, ...newPages];
-      });
-    };
-  
+    const [api, setApi] = React.useState<any>(null);
+    const [current, setCurrent] = React.useState(0);
+    const [count, setCount] = React.useState(0);
+
+    React.useEffect(() => {
+        if (!api) return;
+        setCount(api.scrollSnapList().length);
+        setCurrent(api.selectedScrollSnap());
+        api.on("select", () => {
+            setCurrent(api.selectedScrollSnap());
+        });
+    }, [api]);
+    
+    const scrollTo = (index: number) => {
+        api?.scrollTo(index);
+    }
+
     return (
-        <div className="relative w-full min-h-[500px] flex items-center justify-center">
-            <AnimatePresence>
-                {pages.map((pageKey, index) => {
-                    const pageData = NEW_ASTRO_TABS.find(tab => tab.key === pageKey);
-                    if (!pageData) return null;
-
-                    const text = signData[pageKey] || `No data for ${pageData.name}.`;
-                    const isActive = index === 0;
-
-                    return (
-                        <motion.div
-                            key={pageKey}
-                            className="absolute w-[340px] h-[420px] rounded-2xl paper-page"
-                            onClick={() => handleClick(pageKey)}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{
-                                x: isActive ? 0 : index * 12,
-                                y: isActive ? 0 : index * 12,
-                                rotate: isActive ? 0 : index * 2,
-                                zIndex: pages.length - index,
-                                scale: 1,
-                                opacity: 1,
-                            }}
-                            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                        >
-                            <div className="p-5 text-zinc-800 h-full overflow-y-auto">
-                                <h2 className="text-2xl font-bold text-[--purple-dark] border-b-2 border-purple-200 pb-2 mb-3 flex items-center gap-2">
-                                    <pageData.icon className="h-6 w-6" /> {pageData.name}
-                                </h2>
-                                <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                                    {text}
+        <div className="glass-card p-4">
+            <Carousel setApi={setApi} className="w-full">
+                <CarouselContent>
+                    {NEW_ASTRO_TABS.map((tab) => {
+                         const text = signData[tab.key] || `No data for ${tab.name}.`;
+                         return (
+                            <CarouselItem key={tab.key}>
+                                <div className="p-1 h-96">
+                                    <ScrollArea className="h-full w-full rounded-md p-4 bg-black/20">
+                                        <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
+                                            <tab.icon className="h-6 w-6" /> {tab.name}
+                                        </h3>
+                                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{text}</p>
+                                    </ScrollArea>
                                 </div>
-                            </div>
-                        </motion.div>
-                    );
-                })}
-            </AnimatePresence>
+                            </CarouselItem>
+                         )
+                    })}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
+             <div className="py-2 text-center text-sm text-muted-foreground">
+                <div className="flex justify-center gap-2">
+                    {NEW_ASTRO_TABS.map((tab, index) => (
+                        <Button
+                            key={tab.key}
+                            variant={current === index ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => scrollTo(index)}
+                        >
+                            {tab.name}
+                        </Button>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
@@ -102,18 +114,18 @@ function ResultsHeader({ name, newAstroSign, onTabClick, activeTab }: { name: st
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center">
             {name}
         </h1>
-        <div className='relative flex justify-center items-center w-full max-w-lg mx-auto mt-6'>
-             <div className="absolute left-0 w-2/5">
-                <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro Insights</AnimatedTab>
-             </div>
-              <div className="mt-[-2rem]">
-                <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
-                        {newAstroSign}
-                </AnimatedTab>
-              </div>
-             <div className="absolute right-0 w-2/5">
-                <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numerology Report</AnimatedTab>
-             </div>
+        <div className='relative flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-6 space-y-4'>
+             <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
+                {newAstroSign}
+             </AnimatedTab>
+            <div className="flex justify-between w-full">
+                <div className="w-2/5">
+                    <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro Insights</AnimatedTab>
+                </div>
+                <div className="w-2/5">
+                    <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numerology Report</AnimatedTab>
+                </div>
+            </div>
         </div>
     </div>
   );
