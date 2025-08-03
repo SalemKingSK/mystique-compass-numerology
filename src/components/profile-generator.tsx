@@ -421,7 +421,6 @@ const TabButton = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] } }}
                     exit={{ opacity: 0, transition: { duration: 0.3, ease: 'easeOut' } }}
-                    style={{ '--angle': '0deg' } as React.CSSProperties}
                   />
             )}
         </AnimatePresence>
@@ -456,7 +455,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: any }
                 </DialogDescription>
             </DialogHeader>
             <Tabs defaultValue="description" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 gap-2">
+                 <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 gap-2">
                     <TabsTrigger value="description" className="text-xs sm:text-sm">Description</TabsTrigger>
                     <TabsTrigger value="love" className="text-xs sm:text-sm">Love</TabsTrigger>
                     <TabsTrigger value="compatibilities" className="text-xs sm:text-sm">Compatibilities</TabsTrigger>
@@ -541,17 +540,13 @@ function ResultsDisplay({
                 
                 <Dialog>
                     <DialogTrigger asChild>
-                         <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block">
+                         <div className="relative p-0.5 overflow-hidden rounded-xl mt-2 inline-block animated-border">
                              <Button
                                 variant="ghost"
                                 className="relative z-10 transition-all duration-300 rounded-lg bg-black/20 text-gray-400 hover:bg-black/40 hover:text-white"
                              >
                                 <p className="text-lg text-gray-300">{insight.new_astrology_sign}</p>
                             </Button>
-                            <motion.div
-                                className="animated-border absolute inset-0 z-0"
-                                style={{ '--angle': '0deg' } as React.CSSProperties}
-                            />
                         </div>
                     </DialogTrigger>
                     {newAstroData && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={newAstroData} />}
@@ -605,6 +600,16 @@ function ResultsDisplay({
 
 const HISTORY_KEY = 'mystiqueCompassHistory';
 const MAX_HISTORY_SIZE = 21;
+
+
+function FormHistoryButton({ onHistoryOpen }: { onHistoryOpen: () => void }) {
+    return(
+    <Button variant="ghost" size="icon" className="absolute top-4 right-4 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
+        <History className="h-6 w-6"/>
+        <span className="sr-only">Open History</span>
+    </Button>
+    )
+};
 
 
 export function ProfileGenerator() {
@@ -711,13 +716,6 @@ export function ProfileGenerator() {
     setFormData(item);
     processRequest(item);
   }
-
-    const FormHistoryButton = ({ onHistoryOpen }: { onHistoryOpen: () => void }) => (
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4 text-gray-400 hover:text-white" onClick={onHistoryOpen}>
-            <History className="h-6 w-6"/>
-            <span className="sr-only">Open History</span>
-        </Button>
-    );
 
   return (
     <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
