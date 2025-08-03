@@ -23,6 +23,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
     if (synth.speaking || synth.paused) {
       synth.cancel();
     }
+    // State cleanup is now handled in the onend/onerror handlers
   }, []);
 
   React.useEffect(() => {
@@ -39,18 +40,16 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
 
     const synth = window.speechSynthesis;
 
-    if (synth.speaking && !isPaused) {
-        // Is speaking, and we want to pause
+    if (isPlaying && !isPaused) { // Is speaking, and we want to pause
         synth.pause();
         setIsPaused(true);
-        setIsPlaying(true); // Still "playing" in a paused state
-    } else if (synth.paused && isPaused) {
-        // Is paused, and we want to resume
+    } else if (isPlaying && isPaused) { // Is paused, and we want to resume
         synth.resume();
         setIsPaused(false);
-    } else {
-        // Not speaking, start a new utterance
-        handleStop(); // Stop any residual speech
+    } else { // Not speaking, start a new utterance
+        if (synth.speaking) { // If something else is speaking, stop it first
+            synth.cancel();
+        }
 
         const utterance = new SpeechSynthesisUtterance(text);
         utteranceRef.current = utterance;
@@ -81,7 +80,7 @@ export function SpeechPlayer({ text, onBoundary, onEnd }: SpeechPlayerProps) {
         synth.speak(utterance);
     }
 
-  }, [text, onBoundary, onEnd, toast, isPlaying, isPaused, handleStop]);
+  }, [text, onBoundary, onEnd, toast, isPlaying, isPaused]);
 
 
   return (
