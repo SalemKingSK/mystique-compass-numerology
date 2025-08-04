@@ -9,6 +9,7 @@ interface LoShuGridProps {
   arrows: (ArrowData & { type: 'strength' | 'weakness' })[];
   onNumberClick?: (number: string) => void;
   onArrowClick?: (arrowName: string) => void;
+  title: string;
 }
 
 // Central repository for all possible arrow path coordinates (start, end)
@@ -28,7 +29,7 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
 };
 
 
-const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberClick, onArrowClick }) => {
+const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberClick, onArrowClick, title }) => {
   if (!gridData || gridData.length !== 3) {
     return <p>Grid data is not available.</p>;
   }
@@ -54,7 +55,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
     <div className="relative aspect-square w-full max-w-[400px] mx-auto glass-card p-4">
         <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M3 3v18h18" /><path d="M7 16v-4h4" /><path d="m15.5 15.5-8-8" /></svg>
-            Lo Shu Grid
+            {title}
         </h3>
       
       {/* 1. The Grid of Numbers (the base layer) */}
@@ -131,7 +132,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
           const isClickable = !!onArrowClick;
           
           return (
-             <g key={uniqueId} onClick={isClickable ? () => onArrowClick!(arrow.name) : undefined} style={{ cursor: isClickable ? 'pointer' : 'default' }}>
+             <g key={uniqueId} onClick={isClickable ? () => onArrowClick!(arrow.name) : undefined} className={isClickable ? "cursor-pointer" : ""}>
                 <line
                     x1={pathInfo.x1} y1={pathInfo.y1}
                     x2={pathInfo.x2} y2={pathInfo.y2}

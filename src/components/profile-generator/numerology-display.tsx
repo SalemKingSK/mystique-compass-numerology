@@ -15,7 +15,7 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
         className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square ${onClick ? 'transition-all duration-300 hover:bg-purple-500/20 cursor-pointer' : ''}`}
         onClick={onClick}
     >
-        <div className="flex items-center gap-2 text-purple-300/80">
+        <div className="flex items-center gap-2 text-purple-200/80">
             {icon}
             <p className="text-base font-medium">{title}</p>
         </div>
@@ -324,12 +324,20 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LoShuGrid 
-            gridData={loShuGrid} 
-            arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} 
-            onNumberClick={handleGridNumberClick} 
-            onArrowClick={handleArrowClick}
-        />
+        <div className="flex flex-col gap-4">
+            <LoShuGrid 
+                title="Lo Shu Grid - Numbers"
+                gridData={loShuGrid} 
+                arrows={[]} 
+                onNumberClick={handleGridNumberClick} 
+            />
+             <LoShuGrid 
+                title="Lo Shu Grid - Arrows"
+                gridData={loShuGrid} 
+                arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} 
+                onArrowClick={handleArrowClick}
+            />
+        </div>
         <div className="space-y-4">
            {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>}
            {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={false} onToggle={() => {}}/>}
