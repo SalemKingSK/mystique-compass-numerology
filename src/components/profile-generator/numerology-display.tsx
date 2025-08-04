@@ -244,7 +244,15 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     }
     
     const handleScrollAndOpen = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
-        setOpenSections(prev => prev.includes(sectionId) ? prev : [...prev, sectionId]);
+        // Use a functional update to ensure we have the latest state
+        setOpenSections(prev => {
+            if (prev.includes(sectionId)) {
+                return prev; // It's already open, no change needed
+            }
+            return [...prev, sectionId]; // Add the new section to be opened
+        });
+
+        // The scroll needs to happen after the state update has rendered
         setTimeout(() => {
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
@@ -292,7 +300,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleScrollAndOpen(psychicRef, psychicId)} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
-        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
+        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, `compound-${compoundNum}`)}/>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
