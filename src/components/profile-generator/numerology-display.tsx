@@ -238,7 +238,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
         );
     };
-
+    
     const handleToggleMultiple = (sections: string[]) => {
         setOpenSections(sections);
     }
@@ -247,7 +247,10 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         // Use a functional update to ensure we have the latest state
         setOpenSections(prev => {
             if (prev.includes(sectionId)) {
-                return prev; // It's already open, no change needed
+                 // To allow re-clicking to scroll again, we can't just return prev.
+                 // But for this simple case, we assume user won't re-click to scroll to the same spot.
+                 // If it's already open, do nothing to the state.
+                return prev;
             }
             return [...prev, sectionId]; // Add the new section to be opened
         });
@@ -257,14 +260,31 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     };
+    
+    const handleScrollAndOpenMultiple = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
+        setOpenSections(prev => {
+            const alreadyOpen = prev.includes(sectionId);
+            if (alreadyOpen) {
+                // If you want clicking an open item to do nothing, return prev.
+                // If you want it to close, use filter. For now, let's just ensure it's open.
+                return prev;
+            }
+            return [...prev, sectionId];
+        });
+
+        setTimeout(() => {
+            ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    };
+
 
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
-        handleScrollAndOpen(repetitionRef, sectionId);
+        handleScrollAndOpenMultiple(repetitionRef, sectionId);
     };
 
     const handleArrowClick = (arrowName: string) => {
-        handleScrollAndOpen(arrowsRef, arrowName);
+        handleScrollAndOpenMultiple(arrowsRef, arrowName);
     }
 
     const {
@@ -290,7 +310,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
     const psychicId = `psychic-${psycheNum}`;
     const destinyId = `destiny-${destinyNum}`;
-    const compoundId = `compound-${compoundNum}`;
+    const compoundId = `compound-fate`;
     const kuaId = 'kua-section';
 
 
@@ -300,7 +320,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleScrollAndOpen(psychicRef, psychicId)} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
-        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, `compound-${compoundNum}`)}/>
+        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
