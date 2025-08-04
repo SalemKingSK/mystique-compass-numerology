@@ -11,7 +11,7 @@ import { SpeechPlayer } from './speech-player';
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
     <div 
-        className="glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square transition-all duration-300 hover:bg-purple-500/20 cursor-pointer"
+        className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square ${onClick ? 'transition-all duration-300 hover:bg-purple-500/20 cursor-pointer' : ''}`}
         onClick={onClick}
     >
         <div className="flex items-center gap-2 text-purple-300/80">
@@ -121,7 +121,8 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
     );
 };
 
-const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: { [key: string]: number }, meanings: {[key:string]: string} }) => {
+const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCounts: { [key: string]: number }, meanings: {[key:string]: string} }>(
+    ({ numberCounts, meanings }, ref) => {
   const repetitions = Object.entries(numberCounts)
     .map(([number, count]) => {
       const key = `${number}_${Math.min(count, 5)}`; // Cap count at 5 as per data structure
@@ -147,7 +148,7 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
   }
 
   return (
-    <div className="glass-card p-4 space-y-3">
+    <div className="glass-card p-4 space-y-3" ref={ref}>
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
@@ -158,7 +159,8 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
         </Accordion>
     </div>
   );
-};
+});
+RepetitionMeaningsDisplay.displayName = 'RepetitionMeaningsDisplay';
 
 const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, auspiciousDirections: any }>(
     ({ kuaAttributes, auspiciousDirections }, ref) => {
@@ -197,16 +199,31 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const destinyRef = React.useRef<HTMLDivElement>(null);
     const compoundRef = React.useRef<HTMLDivElement>(null);
     const kuaRef = React.useRef<HTMLDivElement>(null);
+    const repetitionRef = React.useRef<HTMLDivElement>(null);
 
     const handleScrollTo = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         // Programmatically click the trigger inside the target section
-        const trigger = ref.current?.querySelector('[data-radix-collection-item]');
-        if (trigger instanceof HTMLElement && trigger.getAttribute('data-state') === 'closed') {
-            trigger.click();
-        }
+        setTimeout(() => {
+            const trigger = ref.current?.querySelector('[data-radix-collection-item]');
+            if (trigger instanceof HTMLElement && trigger.getAttribute('data-state') === 'closed') {
+                trigger.click();
+            }
+        }, 500); // Delay to allow scroll to finish
     };
     
+    const handleGridNumberClick = (number: string) => {
+        if (!repetitionRef.current) return;
+        
+        repetitionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+            const trigger = repetitionRef.current?.querySelector(`[data-radix-collection-item][value="number-${number}"]`);
+            if (trigger instanceof HTMLElement && trigger.getAttribute('data-state') === 'closed') {
+                trigger.click();
+            }
+        }, 500);
+    };
+
     const {
         psycheNum,
         destinyNum,
@@ -238,7 +255,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LoShuGrid gridData={loShuGrid} arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} />
+        <LoShuGrid gridData={loShuGrid} arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} onNumberClick={handleGridNumberClick} />
         <div className="space-y-4">
            {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} />}
            {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} />}
@@ -250,7 +267,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
       {destinyMeaning && <DestinyMeaningDisplay ref={destinyRef} number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} />}
       
-      <RepetitionMeaningsDisplay numberCounts={numberCounts} meanings={repeatedNumberMeanings}/>
+      <RepetitionMeaningsDisplay ref={repetitionRef} numberCounts={numberCounts} meanings={repeatedNumberMeanings}/>
 
       <ArrowsDisplay arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} />
       

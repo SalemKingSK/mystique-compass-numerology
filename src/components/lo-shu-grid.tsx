@@ -7,6 +7,7 @@ import type { ArrowData } from '@/lib/numerology';
 interface LoShuGridProps {
   gridData: (string | null)[][];
   arrows: (ArrowData & { type: 'strength' | 'weakness' })[];
+  onNumberClick?: (number: string) => void;
 }
 
 // Central repository for all possible arrow path coordinates (start, end)
@@ -26,7 +27,7 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
 };
 
 
-const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
+const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberClick }) => {
   if (!gridData || gridData.length !== 3) {
     return <p>Grid data is not available.</p>;
   }
@@ -57,18 +58,23 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [] }) => {
       
       {/* 1. The Grid of Numbers (the base layer) */}
       <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2">
-        {gridData.flat().map((cell, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square"
-          >
-            {cell ? (
-              <span className="truncate">{cell}</span>
-            ) : (
-              <span className="opacity-20">{[ '4', '9', '2', '3', '5', '7', '8', '1', '6' ][index]}</span>
-            )}
-          </div>
-        ))}
+        {gridData.flat().map((cell, index) => {
+           const number = cell ? cell.charAt(0) : null;
+           const isClickable = !!number && onNumberClick;
+           return (
+              <div
+                key={index}
+                className={`flex items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
+                onClick={isClickable ? () => onNumberClick(number!) : undefined}
+              >
+                {cell ? (
+                  <span className="truncate">{cell}</span>
+                ) : (
+                  <span className="opacity-20">{[ '4', '9', '2', '3', '5', '7', '8', '1', '6' ][index]}</span>
+                )}
+              </div>
+           )
+        })}
       </div>
 
       {/* 2. The SVG Overlay for drawing arrows (sits on top of the grid) */}
