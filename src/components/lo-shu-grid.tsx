@@ -8,6 +8,7 @@ interface LoShuGridProps {
   gridData: (string | null)[][];
   arrows: (ArrowData & { type: 'strength' | 'weakness' })[];
   onNumberClick?: (number: string) => void;
+  onArrowClick?: (arrowName: string) => void;
 }
 
 // Central repository for all possible arrow path coordinates (start, end)
@@ -27,7 +28,7 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
 };
 
 
-const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberClick }) => {
+const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberClick, onArrowClick }) => {
   if (!gridData || gridData.length !== 3) {
     return <p>Grid data is not available.</p>;
   }
@@ -79,7 +80,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
 
       {/* 2. The SVG Overlay for drawing arrows (sits on top of the grid) */}
       <svg
-        className="absolute top-0 left-0 w-full h-full pointer-events-none p-4"
+        className="absolute top-0 left-0 w-full h-full p-4"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
@@ -127,21 +128,29 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
           const uniqueId = `${arrow.name.replace(/\s+/g, '-')}-${index}`;
           const gradientId = `gradient-${uniqueId}`;
           const markerId = `marker-${uniqueId}`;
+          const isClickable = !!onArrowClick;
           
           return (
-             <line
-                key={uniqueId}
-                x1={pathInfo.x1} y1={pathInfo.y1}
-                x2={pathInfo.x2} y2={pathInfo.y2}
-                stroke={`url(#${gradientId})`}
-                strokeWidth="1.5" // Thinner line
-                strokeLinecap="round"
-                markerEnd={`url(#${markerId})`}
-                style={{
-                    animation: `arrow-pulse 4s infinite ${index * 0.3}s ease-in-out`,
-                    strokeDasharray: isStrength ? 'none' : '3 3' // More subtle dash for weakness
-                }}
-              />
+             <g key={uniqueId} onClick={isClickable ? () => onArrowClick!(arrow.name) : undefined} style={{ cursor: isClickable ? 'pointer' : 'default' }}>
+                <line
+                    x1={pathInfo.x1} y1={pathInfo.y1}
+                    x2={pathInfo.x2} y2={pathInfo.y2}
+                    stroke="transparent"
+                    strokeWidth="8"
+                />
+                <line
+                    x1={pathInfo.x1} y1={pathInfo.y1}
+                    x2={pathInfo.x2} y2={pathInfo.y2}
+                    stroke={`url(#${gradientId})`}
+                    strokeWidth="1.5" // Thinner line
+                    strokeLinecap="round"
+                    markerEnd={`url(#${markerId})`}
+                    style={{
+                        animation: `arrow-pulse 4s infinite ${index * 0.3}s ease-in-out`,
+                        strokeDasharray: isStrength ? 'none' : '3 3' // More subtle dash for weakness
+                    }}
+                />
+            </g>
           );
         })}
       </svg>
