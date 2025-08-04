@@ -253,12 +253,12 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
         setOpenSections(prev => {
-           const alreadyOpen = prev.includes(sectionId);
-           if (alreadyOpen) {
-               return prev.filter(s => s !== sectionId);
-           } else {
-               return [...prev, sectionId];
-           }
+            const isOpen = prev.includes(sectionId);
+            if (isOpen) {
+                return prev.filter(s => s !== sectionId);
+            } else {
+                return [...prev, sectionId];
+            }
         });
 
         setTimeout(() => {
@@ -268,10 +268,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
     const handleArrowClick = (arrowName: string) => {
        setOpenSections(prev => {
-            if (!prev.includes(arrowName)) {
+            if (prev.includes(arrowName)) {
+                return prev.filter(s => s !== arrowName);
+            } else {
                 return [...prev, arrowName];
             }
-            return prev.filter(s => s !== arrowName); // Allow toggling off
         });
         setTimeout(() => {
             arrowsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -317,15 +318,10 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-4">
             <LoShuGrid 
-                title="Lo Shu Grid - Numbers"
-                gridData={loShuGrid} 
-                arrows={[]} 
-                onNumberClick={handleGridNumberClick} 
-            />
-             <LoShuGrid 
-                title="Lo Shu Grid - Arrows"
+                title="Lo Shu Grid"
                 gridData={loShuGrid} 
                 arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} 
+                onNumberClick={handleGridNumberClick} 
                 onArrowClick={handleArrowClick}
             />
         </div>

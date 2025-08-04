@@ -81,7 +81,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
 
       {/* 2. The SVG Overlay for drawing arrows (sits on top of the grid) */}
       <svg
-        className="absolute top-0 left-0 w-full h-full p-4"
+        className="absolute top-0 left-0 w-full h-full p-4 pointer-events-none"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
@@ -132,7 +132,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
           const isClickable = !!onArrowClick;
           
           return (
-             <g key={uniqueId} onClick={isClickable ? () => onArrowClick!(arrow.name) : undefined} className={isClickable ? "cursor-pointer" : ""}>
+             <g key={uniqueId} onClick={isClickable ? () => onArrowClick!(arrow.name) : undefined} className={`${isClickable ? "cursor-pointer" : ""} pointer-events-auto`}>
                 <line
                     x1={pathInfo.x1} y1={pathInfo.y1}
                     x2={pathInfo.x2} y2={pathInfo.y2}
