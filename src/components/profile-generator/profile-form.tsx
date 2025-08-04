@@ -34,11 +34,15 @@ export function ProfileForm({
 }: ProfileFormProps) {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      <header className="text-center pt-8">
+          <h1 className="text-4xl font-bold text-white">Mystique Compass</h1>
+          <p className="text-white/70 mt-2">Giving your life a meaning.</p>
+      </header>
       <div className="flex-grow flex items-center justify-center">
         <form onSubmit={onSubmit} className="space-y-6 w-full glass-card p-6 md:p-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">
-                Mystique Compass
+                Generate Profile
             </h2>
             <Button
               type="button"
