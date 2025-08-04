@@ -239,12 +239,29 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         );
     };
     
-    const handleToggleMultiple = (sections: string[]) => {
-        setOpenSections(sections);
-    }
+    const handleToggleMultiple = (newSections: string[]) => {
+        setOpenSections(newSections);
+    };
     
     const handleScrollAndOpen = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
+        // Always add the section to open it, don't toggle
         setOpenSections(prev => {
+            if (prev.includes(sectionId)) {
+                return prev;
+            }
+            return [...prev, sectionId];
+        });
+
+        setTimeout(() => {
+            ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+    };
+    
+    const handleGridNumberClick = (number: string) => {
+        const sectionId = `number-${number}`;
+        // For single-item accordions, this will open one at a time.
+        // For multiple, we want to add to the list.
+         setOpenSections(prev => {
             if (!prev.includes(sectionId)) {
                 return [...prev, sectionId];
             }
@@ -252,17 +269,24 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         });
 
         setTimeout(() => {
-            ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            repetitionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             setTimeout(() => {
+                // To-do: scroll the inner accordion item into view if needed
+            }, 200)
+
         }, 100);
-    };
-    
-    const handleGridNumberClick = (number: string) => {
-        const sectionId = `number-${number}`;
-        handleScrollAndOpen(repetitionRef, sectionId);
     };
 
     const handleArrowClick = (arrowName: string) => {
-        handleScrollAndOpen(arrowsRef, arrowName);
+       setOpenSections(prev => {
+            if (!prev.includes(arrowName)) {
+                return [...prev, arrowName];
+            }
+            return prev;
+        });
+        setTimeout(() => {
+            arrowsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
     }
 
     const {
@@ -298,7 +322,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleScrollAndOpen(psychicRef, psychicId)} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
-        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
+        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, "item-1")}/>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -317,7 +341,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             />
         </div>
         <div className="space-y-4">
-           {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>}
+           {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes("item-1")} onToggle={() => handleToggle("item-1")}/>}
            {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={false} onToggle={() => {}}/>}
            {karmicFateMeaning && <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={false} onToggle={() => {}} />}
         </div>
