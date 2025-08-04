@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -8,7 +9,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from '@/components/ui/button';
 
-// We will create these components and types in the next steps
 import type { AstroInsightInput, AstroInsightOutput, NumerologyData } from './types';
 import { ProfileForm } from './profile-form';
 import { ResultsDisplay } from './results-display';
@@ -139,7 +139,6 @@ export function ProfileGenerator() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="glass-card p-6 md:p-8"
           >
             <ProfileForm 
               formData={formData}

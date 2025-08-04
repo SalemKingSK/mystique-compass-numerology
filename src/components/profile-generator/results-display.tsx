@@ -158,13 +158,18 @@ function ResultsHeader({ name, newAstroSign, onTabClick, activeTab }: { name: st
 
 function ResultsFooter({ onReset, onHistoryOpen }: { onReset: () => void; onHistoryOpen: () => void; }) {
     return (
-        <div className="flex items-center justify-between mt-8 w-full max-w-4xl mx-auto px-4">
-            <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-            <Button variant="ghost" onClick={onHistoryOpen} className="text-white/80 hover:text-white">
-                <History className="mr-2 h-5 w-5" /> History
-            </Button>
+        <div className="flex flex-col items-center justify-center mt-8 w-full max-w-4xl mx-auto px-4">
+             <div className="flex items-center justify-between w-full">
+                <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+                <Button variant="ghost" onClick={onHistoryOpen} className="text-white/80 hover:text-white">
+                    <History className="mr-2 h-5 w-5" /> History
+                </Button>
+            </div>
+             <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">
+                {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
+            </footer>
         </div>
     );
 }

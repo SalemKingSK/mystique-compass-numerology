@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Mystique Compass Astrology & Numerology',
+  title: 'Mystique Compass',
   description: 'Giving your Life a meaning.',
 };
 
