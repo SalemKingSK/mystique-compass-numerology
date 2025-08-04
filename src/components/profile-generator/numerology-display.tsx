@@ -7,6 +7,7 @@ import type { NumerologyData, ArrowData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -22,6 +23,25 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
     </div>
 );
 
+const AccordionContentWithPlayer = ({ text }: { text: string }) => {
+    const [activeSentenceIndex, setActiveSentenceIndex] = React.useState(-1);
+    const sentences = React.useMemo(() => text.match(/[^.!?\n]+[.!?\n]+/g) || [text], [text]);
+    return (
+        <div className="space-y-4">
+            <SpeechPlayer 
+                text={text} 
+                sentences={sentences}
+                onBoundary={setActiveSentenceIndex}
+                onEnd={() => setActiveSentenceIndex(-1)}
+            />
+            <ScrollableTextDisplay 
+                text={text}
+                sentences={sentences}
+                activeSentenceIndex={activeSentenceIndex}
+            />
+        </div>
+    )
+}
 
 const FateDisplay = React.forwardRef<HTMLDivElement, { title: string, meaning: string | null, open: boolean, onToggle: () => void }>(
   ({ title, meaning, open, onToggle }, ref) => {
@@ -36,7 +56,7 @@ const FateDisplay = React.forwardRef<HTMLDivElement, { title: string, meaning: s
                         </span>
                     </AccordionTrigger>
                     <AccordionContent>
-                       <SpeechPlayer text={meaning} />
+                       <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
@@ -60,7 +80,7 @@ const PsychicMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
                         </h3>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <SpeechPlayer text={meaning} />
+                        <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
@@ -82,7 +102,7 @@ const DestinyMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
                         </h3>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <SpeechPlayer text={meaning} />
+                        <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
@@ -101,7 +121,7 @@ const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrengt
                     <span className="text-left">Arrow of {type}: {arrow.name}</span>
                 </AccordionTrigger>
                 <AccordionContent>
-                   <SpeechPlayer text={arrow.description} />
+                   <AccordionContentWithPlayer text={arrow.description} />
                 </AccordionContent>
             </AccordionItem>
         );
@@ -142,7 +162,7 @@ const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCount
                  <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
               </AccordionTrigger>
               <AccordionContent>
-                   <SpeechPlayer text={meaning || ''} />
+                   <AccordionContentWithPlayer text={meaning || ''} />
               </AccordionContent>
           </AccordionItem>
       );

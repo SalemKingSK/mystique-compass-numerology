@@ -16,6 +16,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { SpeechPlayer } from './speech-player';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 
 // --- SUB-COMPONENTS ---
@@ -49,6 +50,25 @@ function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onCli
   )
 }
 
+function AccordionContentWithPlayer({ text }: { text: string }) {
+    const [activeSentenceIndex, setActiveSentenceIndex] = React.useState(-1);
+    const sentences = React.useMemo(() => text.match(/[^.!?\n]+[.!?\n]+/g) || [text], [text]);
+    return (
+        <div className="space-y-4">
+            <SpeechPlayer 
+                text={text} 
+                sentences={sentences}
+                onBoundary={setActiveSentenceIndex}
+                onEnd={() => setActiveSentenceIndex(-1)}
+            />
+            <ScrollableTextDisplay 
+                text={text}
+                sentences={sentences}
+                activeSentenceIndex={activeSentenceIndex}
+            />
+        </div>
+    )
+}
 
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: AstroInsightOutput['signData'] }) {
     const [api, setApi] = React.useState<any>(null);
@@ -99,7 +119,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                                                 <tab.icon className="h-6 w-6" /> {tab.name}
                                             </h3>
                                         </div>
-                                        <SpeechPlayer text={String(text)} />
+                                        <AccordionContentWithPlayer text={String(text)} />
                                     </ScrollArea>
                                 </div>
                             </CarouselItem>

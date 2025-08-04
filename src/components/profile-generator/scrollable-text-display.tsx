@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useEffect, useRef } from 'react';
 
@@ -25,6 +24,10 @@ export const ScrollableTextDisplay: React.FC<Props> = ({ text, activeSentenceInd
       });
     }
   }, [activeSentenceIndex]);
+
+  if (!text) {
+    return null;
+  }
 
   return (
     <div className="scroll-container" ref={containerRef}>

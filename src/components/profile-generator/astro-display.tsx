@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SpeechPlayer } from './speech-player';
+import { ScrollableTextDisplay } from './scrollable-text-display';
 
 
 // --- SUB-COMPONENTS ---
@@ -26,6 +27,26 @@ const TABS: { name: string; icon: React.ElementType }[] = [
 ];
 
 
+function AccordionContentWithPlayer({ text }: { text: string }) {
+    const [activeSentenceIndex, setActiveSentenceIndex] = React.useState(-1);
+    const sentences = React.useMemo(() => text.match(/[^.!?\n]+[.!?\n]+/g) || [text], [text]);
+    return (
+        <div className="space-y-4">
+            <SpeechPlayer 
+                text={text} 
+                sentences={sentences}
+                onBoundary={setActiveSentenceIndex}
+                onEnd={() => setActiveSentenceIndex(-1)}
+            />
+            <ScrollableTextDisplay 
+                text={text}
+                sentences={sentences}
+                activeSentenceIndex={activeSentenceIndex}
+            />
+        </div>
+    )
+}
+
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {
         return <p className="text-slate-400">No compatibility information available.</p>;
@@ -37,7 +58,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
                     <AccordionTrigger>With the {sign}</AccordionTrigger>
                     <AccordionContent>
-                        <SpeechPlayer text={String(text)} />
+                        <AccordionContentWithPlayer text={String(text)} />
                     </AccordionContent>
                 </AccordionItem>
             ))}
@@ -61,7 +82,7 @@ function FutureDisplay({ futures }: { futures: any }) {
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
                         <AccordionTrigger>{year} - Year of the {data.year}</AccordionTrigger>
                         <AccordionContent>
-                          <SpeechPlayer text={text} />
+                          <AccordionContentWithPlayer text={text} />
                         </AccordionContent>
                     </AccordionItem>
                 )
@@ -97,12 +118,12 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
     {
       key: 'introduction',
       title: `Your Animal Sign: The ${sign}`,
-      component: <SpeechPlayer text={introduction || "No introduction available."} />,
+      component: <AccordionContentWithPlayer text={introduction || "No introduction available."} />,
     },
     {
       key: 'element',
       title: `Your Element: The ${element}`,
-      component: <SpeechPlayer text={signElementData || `No specific data for the ${element} element.`} />,
+      component: <AccordionContentWithPlayer text={signElementData || `No specific data for the ${element} element.`} />,
     },
     {
       key: 'compatibility',
