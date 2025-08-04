@@ -126,10 +126,10 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                     key={tab.name}
                     variant={current === index ? 'default' : 'outline'}
                     size="sm"
-                    className="h-auto py-1 px-2 text-xs md:h-9 md:px-3 md:text-sm"
+                    className="h-auto py-2 px-3 flex flex-col items-center justify-center text-xs md:text-sm"
                     onClick={() => scrollTo(index)}
                 >
-                    <tab.icon className="h-4 w-4 mr-1.5" />
+                    <tab.icon className="h-4 w-4 mb-1" />
                     {tab.name}
                 </Button>
             ))}
