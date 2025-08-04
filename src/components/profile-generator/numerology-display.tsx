@@ -244,47 +244,25 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     }
     
     const handleScrollAndOpen = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
-        // Use a functional update to ensure we have the latest state
         setOpenSections(prev => {
-            if (prev.includes(sectionId)) {
-                 // To allow re-clicking to scroll again, we can't just return prev.
-                 // But for this simple case, we assume user won't re-click to scroll to the same spot.
-                 // If it's already open, do nothing to the state.
-                return prev;
+            if (!prev.includes(sectionId)) {
+                return [...prev, sectionId];
             }
-            return [...prev, sectionId]; // Add the new section to be opened
+            return prev;
         });
 
-        // The scroll needs to happen after the state update has rendered
         setTimeout(() => {
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     };
     
-    const handleScrollAndOpenMultiple = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
-        setOpenSections(prev => {
-            const alreadyOpen = prev.includes(sectionId);
-            if (alreadyOpen) {
-                // If you want clicking an open item to do nothing, return prev.
-                // If you want it to close, use filter. For now, let's just ensure it's open.
-                return prev;
-            }
-            return [...prev, sectionId];
-        });
-
-        setTimeout(() => {
-            ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-    };
-
-
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
-        handleScrollAndOpenMultiple(repetitionRef, sectionId);
+        handleScrollAndOpen(repetitionRef, sectionId);
     };
 
     const handleArrowClick = (arrowName: string) => {
-        handleScrollAndOpenMultiple(arrowsRef, arrowName);
+        handleScrollAndOpen(arrowsRef, arrowName);
     }
 
     const {
