@@ -3,19 +3,21 @@
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
-import { Wand2, BrainCircuit, Sparkles, Grid, Layers } from "lucide-react";
+import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
 
+
 const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
-    <div className="glass-card p-4 flex items-center space-x-4">
-        <div className="text-primary">{icon}</div>
-        <div>
-            <p className="text-sm text-purple-200/70">{title}</p>
-            <p className="text-xl font-bold">{value}</p>
+    <div className="glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square">
+        <div className="flex items-center gap-2 text-purple-300/80">
+            {icon}
+            <p className="text-base font-medium">{title}</p>
         </div>
+        <p className="text-5xl font-bold text-yellow-300 mt-2">{value}</p>
     </div>
 );
+
 
 const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null }) => {
     if (!meaning) return null;
@@ -127,10 +129,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-8 w-8" />} />
-        <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-8 w-8" />} />
-        <InfoCard title="Kua Number" value={kuaNum} icon={<Grid className="h-8 w-8" />} />
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+        <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} />
+        <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} />
+        <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} />
+        <InfoCard title="Fate Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
