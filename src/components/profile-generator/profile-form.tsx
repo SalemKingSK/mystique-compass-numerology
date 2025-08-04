@@ -35,7 +35,7 @@ export function ProfileForm({
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <header className="text-center pt-8">
-          <h1 className="text-4xl font-bold text-white">Mystique Compass</h1>
+          <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-500">Mystique Compass</h1>
           <p className="text-white/70 mt-2">Giving your life a meaning.</p>
       </header>
       <div className="flex-grow flex items-center justify-center">
