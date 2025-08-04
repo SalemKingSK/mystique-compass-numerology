@@ -9,8 +9,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { SpeechPlayer } from './speech-player';
 
 
-const InfoCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
-    <div className="glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square">
+const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
+    <div 
+        className="glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square transition-all duration-300 hover:bg-purple-500/20 cursor-pointer"
+        onClick={onClick}
+    >
         <div className="flex items-center gap-2 text-purple-300/80">
             {icon}
             <p className="text-base font-medium">{title}</p>
@@ -20,29 +23,36 @@ const InfoCard = ({ title, value, icon }: { title: string, value: string | numbe
 );
 
 
-const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null }) => {
+const FateDisplay = React.forwardRef<HTMLDivElement, { title: string, meaning: string | null }>(
+  ({ title, meaning }, ref) => {
     if (!meaning) return null;
     return (
-        <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1" className="glass-card px-4">
-                <AccordionTrigger>
-                    <span className="font-semibold text-lg text-primary flex items-center gap-2">
-                        <Wand2 className="h-5 w-5" /> {title}
-                    </span>
-                </AccordionTrigger>
-                <AccordionContent>
-                   <SpeechPlayer text={meaning} />
-                </AccordionContent>
-            </AccordionItem>
-        </Accordion>
-    );
-}
-
-const PsychicMeaningDisplay = ({ number, title, meaning }: { number: number, title: string, meaning: string }) => {
-    if (!meaning) return null;
-    return (
-        <div className="glass-card p-4 space-y-3">
+        <div ref={ref}>
             <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1" className="glass-card px-4">
+                    <AccordionTrigger>
+                        <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                            <Wand2 className="h-5 w-5" /> {title}
+                        </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                       <SpeechPlayer text={meaning} />
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
+    );
+  }
+);
+FateDisplay.displayName = 'FateDisplay';
+
+
+const PsychicMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number, title: string, meaning: string }>(
+    ({ number, title, meaning }, ref) => {
+    if (!meaning) return null;
+    return (
+        <div className="glass-card p-4 space-y-3" ref={ref}>
+            <Accordion type="single" collapsible className="w-full" id="psychic-meaning-section">
                 <AccordionItem value={`psychic-${number}`} className="border-b-0">
                     <AccordionTrigger>
                         <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
@@ -56,13 +66,15 @@ const PsychicMeaningDisplay = ({ number, title, meaning }: { number: number, tit
             </Accordion>
         </div>
     );
-}
+});
+PsychicMeaningDisplay.displayName = 'PsychicMeaningDisplay';
 
-const DestinyMeaningDisplay = ({ number, title, meaning }: { number: number, title: string, meaning: string }) => {
+const DestinyMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number, title: string, meaning: string }>(
+    ({ number, title, meaning }, ref) => {
     if (!meaning) return null;
     return (
-        <div className="glass-card p-4 space-y-3">
-            <Accordion type="single" collapsible className="w-full">
+        <div className="glass-card p-4 space-y-3" ref={ref}>
+            <Accordion type="single" collapsible className="w-full" id="destiny-meaning-section">
                 <AccordionItem value={`destiny-${number}`} className="border-b-0">
                     <AccordionTrigger>
                         <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
@@ -76,7 +88,8 @@ const DestinyMeaningDisplay = ({ number, title, meaning }: { number: number, tit
             </Accordion>
         </div>
     );
-}
+});
+DestinyMeaningDisplay.displayName = 'DestinyMeaningDisplay';
 
 const ArrowsDisplay = ({ arrowsOfStrength, arrowsOfWeakness }: { arrowsOfStrength: ArrowData[], arrowsOfWeakness: ArrowData[] }) => {
     if (arrowsOfStrength.length === 0 && arrowsOfWeakness.length === 0) return null;
@@ -147,8 +160,53 @@ const RepetitionMeaningsDisplay = ({ numberCounts, meanings }: { numberCounts: {
   );
 };
 
+const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, auspiciousDirections: any }>(
+    ({ kuaAttributes, auspiciousDirections }, ref) => {
+        return (
+            <div ref={ref}>
+            {kuaAttributes && (
+                <div className="glass-card p-4 space-y-2">
+                    <h3 className="font-semibold text-lg text-primary">Kua Attributes</h3>
+                    <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                        <div><p className="text-purple-200/70 text-xs">Element</p><p>{kuaAttributes.element}</p></div>
+                        <div><p className="text-purple-200/70 text-xs">Colors</p><p>{kuaAttributes.colors}</p></div>
+                        <div><p className="text-purple-200/70 text-xs">Season</p><p>{kuaAttributes.season}</p></div>
+                    </div>
+                </div>
+            )}
+            {auspiciousDirections && (
+                <div className="glass-card p-4 space-y-2 mt-4">
+                    <h3 className="font-semibold text-lg text-primary">Auspicious Directions</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-sm">
+                        <div><p className="text-purple-200/70 text-xs">Success</p><p>{auspiciousDirections.Success}</p></div>
+                        <div><p className="text-purple-200/70 text-xs">Health</p><p>{auspiciousDirections.Health}</p></div>
+                        <div><p className="text-purple-200/70 text-xs">Family</p><p>{auspiciousDirections.Family}</p></div>
+                        <div><p className="text-purple-200/70 text-xs">Personal Growth</p><p>{auspiciousDirections['Personal-Growth']}</p></div>
+                    </div>
+                </div>
+            )}
+            </div>
+        )
+    }
+);
+KuaDisplay.displayName = 'KuaDisplay';
+
 
 export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
+    const psychicRef = React.useRef<HTMLDivElement>(null);
+    const destinyRef = React.useRef<HTMLDivElement>(null);
+    const compoundRef = React.useRef<HTMLDivElement>(null);
+    const kuaRef = React.useRef<HTMLDivElement>(null);
+
+    const handleScrollTo = (ref: React.RefObject<HTMLDivElement>) => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Programmatically click the trigger inside the target section
+        const trigger = ref.current?.querySelector('[data-radix-collection-item]');
+        if (trigger instanceof HTMLElement && trigger.getAttribute('data-state') === 'closed') {
+            trigger.click();
+        }
+    };
+    
     const {
         psycheNum,
         destinyNum,
@@ -173,50 +231,33 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} />
-        <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} />
-        <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} />
-        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} />
+        <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleScrollTo(psychicRef)} />
+        <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollTo(destinyRef)} />
+        <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollTo(kuaRef)} />
+        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollTo(compoundRef)}/>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <LoShuGrid gridData={loShuGrid} arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} />
         <div className="space-y-4">
-           {compoundMeaning && <FateDisplay title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} />}
+           {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} />}
            {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} />}
            {karmicFateMeaning && <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} />}
         </div>
       </div>
       
-      {psychicMeaning && <PsychicMeaningDisplay number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} />}
+      {psychicMeaning && <PsychicMeaningDisplay ref={psychicRef} number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} />}
 
-      {destinyMeaning && <DestinyMeaningDisplay number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} />}
+      {destinyMeaning && <DestinyMeaningDisplay ref={destinyRef} number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} />}
       
       <RepetitionMeaningsDisplay numberCounts={numberCounts} meanings={repeatedNumberMeanings}/>
 
       <ArrowsDisplay arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} />
+      
+      <div ref={kuaRef}>
+          <KuaDisplay kuaAttributes={kuaAttributes} auspiciousDirections={auspiciousDirections} />
+      </div>
 
-      {kuaAttributes && (
-         <div className="glass-card p-4 space-y-2">
-            <h3 className="font-semibold text-lg text-primary">Kua Attributes</h3>
-            <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                <div><p className="text-purple-200/70 text-xs">Element</p><p>{kuaAttributes.element}</p></div>
-                <div><p className="text-purple-200/70 text-xs">Colors</p><p>{kuaAttributes.colors}</p></div>
-                <div><p className="text-purple-200/70 text-xs">Season</p><p>{kuaAttributes.season}</p></div>
-            </div>
-         </div>
-      )}
-      {auspiciousDirections && (
-          <div className="glass-card p-4 space-y-2">
-            <h3 className="font-semibold text-lg text-primary">Auspicious Directions</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-sm">
-                <div><p className="text-purple-200/70 text-xs">Success</p><p>{auspiciousDirections.Success}</p></div>
-                <div><p className="text-purple-200/70 text-xs">Health</p><p>{auspiciousDirections.Health}</p></div>
-                <div><p className="text-purple-200/70 text-xs">Family</p><p>{auspiciousDirections.Family}</p></div>
-                <div><p className="text-purple-200/70 text-xs">Personal Growth</p><p>{auspiciousDirections['Personal-Growth']}</p></div>
-            </div>
-          </div>
-      )}
     </div>
   );
 }
