@@ -242,13 +242,9 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const handleToggleMultiple = (newSections: string[]) => {
         setOpenSections(newSections);
     };
-    
+
     const handleScrollAndOpen = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
-        setOpenSections(prev => {
-             // For single accordions, replace the array with the new sectionId
-             // This ensures only one is open at a time, but also handles opening it.
-             return [sectionId];
-        });
+        handleToggle(sectionId); // Use the single-toggle logic
         setTimeout(() => {
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 150);
@@ -256,14 +252,13 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
-         setOpenSections(prev => {
-            const alreadyOpen = prev.includes(sectionId);
-            // If it's for the multiple accordion, we toggle it within the array
-            if(alreadyOpen) {
-                return prev.filter(s => s !== sectionId);
-            } else {
-                return [...prev, sectionId];
-            }
+        setOpenSections(prev => {
+           const alreadyOpen = prev.includes(sectionId);
+           if (alreadyOpen) {
+               return prev.filter(s => s !== sectionId);
+           } else {
+               return [...prev, sectionId];
+           }
         });
 
         setTimeout(() => {
