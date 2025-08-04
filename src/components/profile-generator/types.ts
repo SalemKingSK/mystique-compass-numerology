@@ -49,6 +49,7 @@ export interface NumerologyData {
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
   psychicMeaning: { title: string; description: string; };
+  destinyMeaning: { title: string; description: string; };
   kuaNum: number;
   kuaAttributes: {
     element: string;
