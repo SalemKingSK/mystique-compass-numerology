@@ -1,7 +1,7 @@
 
 // src/lib/numerology.ts
 import type { AstroInsightInput } from './astrology';
-import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
+import { COMPOUND_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
 import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
 
 // --- HELPER FUNCTIONS ---
@@ -81,6 +81,7 @@ export interface NumerologyData {
   reducedCompoundMeaning: string | null;
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
+  psychicMeaning: { title: string; description: string; };
   kuaNum: number;
   kuaAttributes: {
     element: string;
@@ -186,6 +187,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     auspiciousDirections = gender.toLowerCase() === 'male' ? KUA_DIRECTIONS[5].male : KUA_DIRECTIONS[5].female;
   }
 
+  const psychicMeaning = PSYCHIC_NUMBER_MEANINGS[psycheNum as keyof typeof PSYCHIC_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this psychic number.'};
 
   return {
     psycheNum,
@@ -200,6 +202,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     reducedCompoundMeaning,
     karmicFateNum,
     karmicFateMeaning,
+    psychicMeaning,
     arrowsOfStrength: arrows.strength,
     arrowsOfWeakness: arrows.weakness,
     kuaAttributes: kuaAttributes || {},

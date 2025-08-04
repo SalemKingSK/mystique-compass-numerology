@@ -48,6 +48,7 @@ export interface NumerologyData {
   reducedCompoundMeaning: string | null;
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
+  psychicMeaning: { title: string; description: string; };
   kuaNum: number;
   kuaAttributes: {
     element: string;

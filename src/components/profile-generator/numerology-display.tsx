@@ -1,9 +1,10 @@
+// src/components/profile-generator/numerology-display.tsx
 'use client';
 
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData } from './types';
-import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull } from "lucide-react";
+import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
 
@@ -34,6 +35,26 @@ const FateDisplay = ({ title, meaning }: { title: string, meaning: string | null
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
+    );
+}
+
+const PsychicMeaningDisplay = ({ number, title, meaning }: { number: number, title: string, meaning: string }) => {
+    if (!meaning) return null;
+    return (
+        <div className="glass-card p-4 space-y-3">
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value={`psychic-${number}`} className="border-b-0">
+                    <AccordionTrigger>
+                        <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
+                            <BookUser className="h-5 w-5" /> Psychic Number {number}: {title}
+                        </h3>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <SpeechPlayer text={meaning} />
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
     );
 }
 
@@ -124,12 +145,13 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         karmicFateNum,
         karmicFateMeaning,
         numberCounts,
-        repeatedNumberMeanings
+        repeatedNumberMeanings,
+        psychicMeaning
     } = numerology;
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} />
@@ -144,6 +166,8 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
            {karmicFateMeaning && <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} />}
         </div>
       </div>
+      
+      {psychicMeaning && <PsychicMeaningDisplay number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} />}
       
       <RepetitionMeaningsDisplay numberCounts={numberCounts} meanings={repeatedNumberMeanings}/>
 
