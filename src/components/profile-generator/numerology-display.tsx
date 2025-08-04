@@ -235,7 +235,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
     const handleToggle = (section: string) => {
         setOpenSections(prev => 
-            prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
+            prev.includes(section) ? prev.filter(s => s !== section) : [section] // For single accordions
         );
     };
     
@@ -244,14 +244,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     };
     
     const handleScrollAndOpen = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
-        // Always add the section to open it, don't toggle
         setOpenSections(prev => {
-            if (prev.includes(sectionId)) {
-                return prev;
-            }
-            return [...prev, sectionId];
+             // For single accordions, replace the array with the new sectionId
+             // This ensures only one is open at a time, but also handles opening it.
+             return [sectionId];
         });
-
         setTimeout(() => {
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 150);
@@ -259,21 +256,18 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
-        // For single-item accordions, this will open one at a time.
-        // For multiple, we want to add to the list.
          setOpenSections(prev => {
-            if (!prev.includes(sectionId)) {
+            const alreadyOpen = prev.includes(sectionId);
+            // If it's for the multiple accordion, we toggle it within the array
+            if(alreadyOpen) {
+                return prev.filter(s => s !== sectionId);
+            } else {
                 return [...prev, sectionId];
             }
-            return prev;
         });
 
         setTimeout(() => {
             repetitionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-             setTimeout(() => {
-                // To-do: scroll the inner accordion item into view if needed
-            }, 200)
-
         }, 100);
     };
 
@@ -282,7 +276,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             if (!prev.includes(arrowName)) {
                 return [...prev, arrowName];
             }
-            return prev;
+            return prev.filter(s => s !== arrowName); // Allow toggling off
         });
         setTimeout(() => {
             arrowsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -312,7 +306,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
     const psychicId = `psychic-${psycheNum}`;
     const destinyId = `destiny-${destinyNum}`;
-    const compoundId = `compound-fate`;
+    const compoundId = `item-1`; // The fate accordions are single-item
     const kuaId = 'kua-section';
 
 
@@ -322,7 +316,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleScrollAndOpen(psychicRef, psychicId)} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
-        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, "item-1")}/>
+        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -341,7 +335,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             />
         </div>
         <div className="space-y-4">
-           {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes("item-1")} onToggle={() => handleToggle("item-1")}/>}
+           {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>}
            {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={false} onToggle={() => {}}/>}
            {karmicFateMeaning && <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={false} onToggle={() => {}} />}
         </div>
