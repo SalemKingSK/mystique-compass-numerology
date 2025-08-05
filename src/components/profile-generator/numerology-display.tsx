@@ -43,13 +43,13 @@ const AccordionContentWithPlayer = ({ text }: { text: string }) => {
     )
 }
 
-const FateDisplay = React.forwardRef<HTMLDivElement, { title: string, meaning: string | null, open: boolean, onToggle: () => void }>(
-  ({ title, meaning, open, onToggle }, ref) => {
+const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string, meaning: string | null, open: boolean, onToggle: () => void }>(
+  ({ id, title, meaning, open, onToggle }, ref) => {
     if (!meaning) return null;
     return (
         <div ref={ref}>
-            <Accordion type="single" collapsible className="w-full" value={open ? "item-1" : ""} onValueChange={onToggle}>
-                <AccordionItem value="item-1" className="glass-card px-4">
+            <Accordion type="single" collapsible className="w-full" value={open ? id : ""} onValueChange={onToggle}>
+                <AccordionItem value={id} className="glass-card px-4">
                     <AccordionTrigger>
                         <span className="font-semibold text-lg text-primary flex items-center gap-2">
                             <Wand2 className="h-5 w-5" /> {title}
@@ -229,13 +229,15 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const psychicRef = React.useRef<HTMLDivElement>(null);
     const destinyRef = React.useRef<HTMLDivElement>(null);
     const compoundRef = React.useRef<HTMLDivElement>(null);
+    const inherentRef = React.useRef<HTMLDivElement>(null);
+    const karmicRef = React.useRef<HTMLDivElement>(null);
     const kuaRef = React.useRef<HTMLDivElement>(null);
     const repetitionRef = React.useRef<HTMLDivElement>(null);
     const arrowsRef = React.useRef<HTMLDivElement>(null);
 
     const handleToggle = (section: string) => {
         setOpenSections(prev => 
-            prev.includes(section) ? prev.filter(s => s !== section) : [section] // For single accordions
+            prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
         );
     };
     
@@ -244,7 +246,9 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     };
 
     const handleScrollAndOpen = (ref: React.RefObject<HTMLDivElement>, sectionId: string) => {
-        handleToggle(sectionId); // Use the single-toggle logic
+        if (!openSections.includes(sectionId)) {
+          handleToggle(sectionId);
+        }
         setTimeout(() => {
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 150);
@@ -254,29 +258,24 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         const sectionId = `number-${number}`;
         setOpenSections(prev => {
             const isOpen = prev.includes(sectionId);
-            if (isOpen) {
-                return prev.filter(s => s !== sectionId);
-            } else {
-                return [...prev, sectionId];
-            }
+            const newOpenSections = isOpen ? prev.filter(s => s !== sectionId) : [...prev, sectionId];
+            setTimeout(() => {
+                repetitionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            return newOpenSections;
         });
-
-        setTimeout(() => {
-            repetitionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
     };
 
     const handleArrowClick = (arrowName: string) => {
        setOpenSections(prev => {
-            if (prev.includes(arrowName)) {
-                return prev.filter(s => s !== arrowName);
-            } else {
-                return [...prev, arrowName];
-            }
+            const newOpenSections = prev.includes(arrowName)
+                ? prev.filter(s => s !== arrowName)
+                : [...prev, arrowName];
+            setTimeout(() => {
+                arrowsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            return newOpenSections;
         });
-        setTimeout(() => {
-            arrowsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
     }
 
     const {
@@ -302,7 +301,9 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
     const psychicId = `psychic-${psycheNum}`;
     const destinyId = `destiny-${destinyNum}`;
-    const compoundId = `item-1`; // The fate accordions are single-item
+    const compoundId = `compound-fate`;
+    const inherentId = `inherent-fate`;
+    const karmicId = `karmic-fate`;
     const kuaId = 'kua-section';
 
 
@@ -316,20 +317,24 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-4">
-            <LoShuGrid 
-                title="Lo Shu Grid"
-                gridData={loShuGrid} 
-                arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} 
-                onNumberClick={handleGridNumberClick} 
-                onArrowClick={handleArrowClick}
-            />
-        </div>
-        <div className="space-y-4">
-           {compoundMeaning && <FateDisplay ref={compoundRef} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>}
-           {reducedCompoundMeaning && <FateDisplay title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={false} onToggle={() => {}}/>}
-           {karmicFateMeaning && <FateDisplay title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={false} onToggle={() => {}} />}
-        </div>
+        <LoShuGrid 
+            title="Lo Shu Grid - Numbers"
+            gridData={loShuGrid} 
+            arrows={[]}
+            onNumberClick={handleGridNumberClick} 
+        />
+        <LoShuGrid 
+            title="Lo Shu Grid - Arrows"
+            gridData={loShuGrid} 
+            arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} 
+            onArrowClick={handleArrowClick}
+        />
+      </div>
+      
+      <div className="space-y-4">
+         <FateDisplay ref={compoundRef} id={compoundId} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>
+         <FateDisplay ref={inherentRef} id={inherentId} title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={openSections.includes(inherentId)} onToggle={() => handleToggle(inherentId)} />
+         <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} />
       </div>
       
       {psychicMeaning && <PsychicMeaningDisplay ref={psychicRef} number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} open={openSections.includes(psychicId)} onToggle={() => handleToggle(psychicId)} />}

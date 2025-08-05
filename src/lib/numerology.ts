@@ -1,4 +1,3 @@
-
 // src/lib/numerology.ts
 import type { AstroInsightInput } from './astrology';
 import { COMPOUND_NUMBER_MEANINGS, DESTINY_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
@@ -143,7 +142,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
 
-  if (firstReduction >= 10) {
+  if (firstReduction >= 10 && firstReduction !== compoundNum) {
       reducedCompoundNum = firstReduction;
       reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inherent Fate number ${reducedCompoundNum}.`;
   }
