@@ -54,7 +54,7 @@ export function ProfileForm({
         person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
       );
       setSearchResults(results.slice(0, 50)); // Limit results for performance
-      if (results.length > 0 && !isPopoverOpen) {
+      if (results.length > 0) {
         setIsPopoverOpen(true);
       }
     } else {
@@ -63,7 +63,7 @@ export function ProfileForm({
         setIsPopoverOpen(false);
       }
     }
-  }, [searchQuery, isPopoverOpen]);
+  }, [searchQuery]);
 
   const handleSelectPerson = (person: FamousPerson) => {
     onFamousPersonSelect(person);
