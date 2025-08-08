@@ -45,6 +45,7 @@ export function ProfileForm({
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<FamousPerson[]>([]);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -66,6 +67,13 @@ export function ProfileForm({
     setSearchQuery('');
     setIsSearchOpen(false);
   };
+  
+  const handleWrapperBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setIsSearchOpen(false);
+    }
+  };
+
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
@@ -90,48 +98,48 @@ export function ProfileForm({
               <span className="sr-only">View History</span>
             </Button>
           </div>
-
-          <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-            <PopoverTrigger asChild>
-              <div className="space-y-2">
-                <Label htmlFor="search">Search Famous Person, Country, Sport...</Label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
-                  <Input
-                    id="search"
-                    name="search"
-                    placeholder="e.g., Albert Einstein, Tennis, Canada"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onBlur={() => setIsSearchOpen(false)}
-                    className="pl-10"
-                    autoComplete="off"
-                  />
+          <div onBlur={handleWrapperBlur}>
+            <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+              <PopoverTrigger asChild>
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search Famous Person, Country, Sport...</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                    <Input
+                      id="search"
+                      name="search"
+                      ref={searchInputRef}
+                      placeholder="e.g., Albert Einstein, Tennis, Canada"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                      autoComplete="off"
+                    />
+                  </div>
                 </div>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
-                {searchResults.length > 0 ? (
-                    <div className="max-h-60 overflow-y-auto">
-                        {searchResults.map((person) => (
-                        <div
-                            key={person.name}
-                            onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleSelectPerson(person)
-                            }}
-                            className="p-3 hover:bg-white/10 cursor-pointer text-sm"
-                        >
-                            {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
-                        </div>
-                        ))}
-                    </div>
-                ) : (
-                     <div className="p-3 text-sm text-center text-white/50">No results found.</div>
-                )}
-            </PopoverContent>
-          </Popover>
-
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
+                  {searchResults.length > 0 ? (
+                      <div className="max-h-60 overflow-y-auto">
+                          {searchResults.map((person) => (
+                          <div
+                              key={person.name}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleSelectPerson(person)
+                              }}
+                              className="p-3 hover:bg-white/10 cursor-pointer text-sm"
+                          >
+                              {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+                          </div>
+                          ))}
+                      </div>
+                  ) : (
+                       <div className="p-3 text-sm text-center text-white/50">No results found.</div>
+                  )}
+              </PopoverContent>
+            </Popover>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
