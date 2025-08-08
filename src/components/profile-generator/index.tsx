@@ -14,7 +14,6 @@ import { ProfileForm } from './profile-form';
 import { ResultsDisplay } from './results-display';
 
 const HISTORY_KEY = 'mystiqueCompassHistory';
-const MAX_HISTORY_SIZE = 21;
 
 export function ProfileGenerator() {
   const { toast } = useToast();
@@ -40,9 +39,6 @@ export function ProfileGenerator() {
   const addToHistory = (newItem: AstroInsightInput) => {
     setHistory(prevHistory => {
         const newHistory = [newItem, ...prevHistory.filter(item => item.name !== newItem.name)];
-        if (newHistory.length > MAX_HISTORY_SIZE) {
-            newHistory.pop();
-        }
         try {
             localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
         } catch (e) {
