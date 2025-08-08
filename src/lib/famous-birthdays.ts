@@ -215,5 +215,37 @@ export const famousBirthdays: FamousPerson[] = [
   { name: 'Christopher Nolan', day: 30, month: 7, year: 1970 },
   { name: 'Greta Gerwig', day: 4, month: 8, year: 1983 },
   { name: 'Bong Joon Ho', day: 14, month: 9, year: 1969 },
-  { name: 'Spike Lee', day: 20, month: 3, year: 1957 }
+  { name: 'Spike Lee', day: 20, month: 3, year: 1957 },
+  // Second-in-command and prominent political figures
+  { name: 'Kamala Harris', day: 20, month: 10, year: 1964 },
+  { name: 'Mike Pence', day: 7, month: 6, year: 1959 },
+  { name: 'Al Gore', day: 31, month: 3, year: 1948 },
+  { name: 'Dick Cheney', day: 30, month: 1, year: 1941 },
+  { name: 'Keir Starmer', day: 2, month: 9, year: 1962 }, // UK Opposition Leader
+  { name: 'Mitch McConnell', day: 20, month: 2, year: 1942 },
+  { name: 'Nancy Pelosi', day: 26, month: 3, year: 1940 },
+  { name: 'Alexei Navalny', day: 4, month: 6, year: 1976 },
+  { name: 'Marine Le Pen', day: 5, month: 8, year: 1968 },
+  { name: 'Javier Milei', day: 22, month: 10, year: 1970 },
+  { name: 'Yair Lapid', day: 5, month: 11, year: 1963 },
+  { name: 'Anwar Ibrahim', day: 10, month: 8, year: 1947 },
+  { name: 'Cristina Fernández de Kirchner', day: 19, month: 2, year: 1953 },
+  // Royalty
+  { name: 'William, Prince of Wales', day: 21, month: 6, year: 1982 },
+  { name: 'Catherine, Princess of Wales', day: 9, month: 1, year: 1982 },
+  { name: 'Harry, Duke of Sussex', day: 15, month: 9, year: 1984 },
+  { name: 'Meghan, Duchess of Sussex', day: 4, month: 8, year: 1981 },
+  { name: 'Queen Rania of Jordan', day: 31, month: 8, year: 1970 },
+  { name: 'King Abdullah II of Jordan', day: 30, month: 1, year: 1962 },
+  { name: 'Emperor Naruhito', day: 23, month: 2, year: 1960 },
+  { name: 'Empress Masako', day: 9, month: 12, year: 1963 },
+  { name: 'King Felipe VI of Spain', day: 30, month: 1, year: 1968 },
+  { name: 'Queen Letizia of Spain', day: 15, month: 9, year: 1972 },
+  { name: 'Crown Princess Victoria of Sweden', day: 14, month: 7, year: 1977 },
+  { name: 'King Willem-Alexander of the Netherlands', day: 27, month: 4, year: 1967 },
+  { name: 'Queen Máxima of the Netherlands', day: 17, month: 5, year: 1971 },
+  { name: 'Prince Albert II of Monaco', day: 14, month: 3, year: 1958 },
+  { name: 'Princess Charlene of Monaco', day: 25, month: 1, year: 1978 },
+  { name: 'King Frederik X of Denmark', day: 26, month: 5, year: 1968 },
+  { name: 'Queen Mary of Denmark', day: 5, month: 2, year: 1972 }
 ];
