@@ -72,6 +72,7 @@ export interface ArrowData {
     numbers: number[];
 }
 export interface NumerologyData {
+  birthDay: number;
   psycheNum: number;
   destinyNum: number;
   compoundNum: number;
@@ -81,6 +82,7 @@ export interface NumerologyData {
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
   psychicMeaning: { title: string; description: string; };
+  specialTraitMeaning: string | null;
   destinyMeaning: { title: string; description: string; };
   kuaNum: number;
   kuaAttributes: {
@@ -189,8 +191,14 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   const psychicMeaning = PSYCHIC_NUMBER_MEANINGS[psycheNum as keyof typeof PSYCHIC_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this psychic number.'};
   const destinyMeaning = DESTINY_NUMBER_MEANINGS[destinyNum as keyof typeof DESTINY_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this destiny number.'};
+  
+  const specialTraitMeaning = (day >= 10 && day <= 31) 
+    ? (COMPOUND_NUMBER_MEANINGS[day as keyof typeof COMPOUND_NUMBER_MEANINGS] || null) 
+    : null;
+
 
   return {
+    birthDay: day,
     psycheNum,
     destinyNum,
     kuaNum,
@@ -204,6 +212,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     karmicFateNum,
     karmicFateMeaning,
     psychicMeaning,
+    specialTraitMeaning,
     destinyMeaning,
     arrowsOfStrength: arrows.strength,
     arrowsOfWeakness: arrows.weakness,

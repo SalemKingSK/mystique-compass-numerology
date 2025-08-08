@@ -89,6 +89,29 @@ const PsychicMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
 });
 PsychicMeaningDisplay.displayName = 'PsychicMeaningDisplay';
 
+const SpecialTraitDisplay = React.forwardRef<HTMLDivElement, { number: number, meaning: string | null, open: boolean, onToggle: () => void }>(
+  ({ number, meaning, open, onToggle }, ref) => {
+    if (!meaning) return null;
+    return (
+        <div ref={ref}>
+            <Accordion type="single" collapsible className="w-full" value={open ? `special-trait-${number}` : ""} onValueChange={onToggle}>
+                <AccordionItem value={`special-trait-${number}`} className="glass-card px-4">
+                    <AccordionTrigger>
+                        <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                            <Star className="h-5 w-5" /> Special Trait of Birth Day {number}
+                        </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                       <AccordionContentWithPlayer text={meaning} />
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
+    );
+  }
+);
+SpecialTraitDisplay.displayName = 'SpecialTraitDisplay';
+
 const DestinyMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number, title: string, meaning: string, open: boolean, onToggle: () => void }>(
     ({ number, title, meaning, open, onToggle }, ref) => {
     if (!meaning) return null;
@@ -227,6 +250,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const [openSections, setOpenSections] = React.useState<string[]>([]);
     
     const psychicRef = React.useRef<HTMLDivElement>(null);
+    const specialTraitRef = React.useRef<HTMLDivElement>(null);
     const destinyRef = React.useRef<HTMLDivElement>(null);
     const compoundRef = React.useRef<HTMLDivElement>(null);
     const inherentRef = React.useRef<HTMLDivElement>(null);
@@ -254,6 +278,14 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         }, 150);
     };
     
+    const handlePsycheClick = () => {
+        if (specialTraitRef.current) {
+            handleScrollAndOpen(specialTraitRef, `special-trait-${birthDay}`);
+        } else if (psychicRef.current) {
+            handleScrollAndOpen(psychicRef, `psychic-${psycheNum}`);
+        }
+    };
+    
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
         setOpenSections(prev => {
@@ -279,6 +311,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     }
 
     const {
+        birthDay,
         psycheNum,
         destinyNum,
         kuaNum,
@@ -296,10 +329,12 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         numberCounts,
         repeatedNumberMeanings,
         psychicMeaning,
+        specialTraitMeaning,
         destinyMeaning,
     } = numerology;
 
     const psychicId = `psychic-${psycheNum}`;
+    const specialTraitId = `special-trait-${birthDay}`;
     const destinyId = `destiny-${destinyNum}`;
     const compoundId = `compound-fate`;
     const inherentId = `inherent-fate`;
@@ -310,7 +345,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleScrollAndOpen(psychicRef, psychicId)} />
+        <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={handlePsycheClick} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
         <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
@@ -333,11 +368,13 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       
       <div className="space-y-4">
          <FateDisplay ref={compoundRef} id={compoundId} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>
-         <FateDisplay ref={inherentRef} id={inherentId} title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={openSections.includes(inherentId)} onToggle={() => handleToggle(inherentId)} />
-         <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} />
+         {reducedCompoundNum && <FateDisplay ref={inherentRef} id={inherentId} title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={openSections.includes(inherentId)} onToggle={() => handleToggle(inherentId)} />}
+         {karmicFateNum && <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} />}
       </div>
       
       {psychicMeaning && <PsychicMeaningDisplay ref={psychicRef} number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} open={openSections.includes(psychicId)} onToggle={() => handleToggle(psychicId)} />}
+
+      {specialTraitMeaning && <SpecialTraitDisplay ref={specialTraitRef} number={birthDay} meaning={specialTraitMeaning} open={openSections.includes(specialTraitId)} onToggle={() => handleToggle(specialTraitId)} />}
 
       {destinyMeaning && <DestinyMeaningDisplay ref={destinyRef} number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} open={openSections.includes(destinyId)} onToggle={() => handleToggle(destinyId)} />}
       

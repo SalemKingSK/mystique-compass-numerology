@@ -40,6 +40,7 @@ export interface ArrowData {
     numbers: number[];
 }
 export interface NumerologyData {
+  birthDay: number;
   psycheNum: number;
   destinyNum: number;
   compoundNum: number;
@@ -49,6 +50,7 @@ export interface NumerologyData {
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
   psychicMeaning: { title: string; description: string; };
+  specialTraitMeaning: string | null;
   destinyMeaning: { title: string; description: string; };
   kuaNum: number;
   kuaAttributes: {
