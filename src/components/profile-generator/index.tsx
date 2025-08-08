@@ -59,7 +59,7 @@ export function ProfileGenerator() {
     setFormData({ name: '', day: 0, month: 0, year: 0, gender: '' });
   };
   
-  const processRequest = (data: AstroInsightInput) => {
+  const processRequest = React.useCallback((data: AstroInsightInput) => {
     setError(null);
     if (!data.name || !data.day || !data.month || !data.year || !data.gender) {
       toast({
@@ -88,7 +88,7 @@ export function ProfileGenerator() {
             });
         }
     });
-  }
+  }, [toast]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,13 +103,15 @@ export function ProfileGenerator() {
   };
   
   const handleFamousPersonSelect = (person: FamousPerson) => {
-    setFormData(prev => ({
-        ...prev,
+    const personData: AstroInsightInput = {
         name: person.name,
         day: person.day,
         month: person.month,
         year: person.year,
-    }));
+        gender: person.gender,
+    }
+    setFormData(personData);
+    processRequest(personData);
   }
 
   const handleHistoryClick = (item: AstroInsightInput) => {

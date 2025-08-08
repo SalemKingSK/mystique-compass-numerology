@@ -14,11 +14,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import type { AstroInsightInput } from './types';
-import { famousBirthdays, type FamousPerson } from '@/lib/famous-birthdays';
+import type { FamousPerson } from '@/lib/famous-birthdays';
+import { famousBirthdays } from '@/lib/famous-birthdays';
 
 interface ProfileFormProps {
-  formData: AstroInsightInput;
+  formData: {
+    name: string;
+    day: number;
+    month: number;
+    year: number;
+    gender: string;
+  };
   isPending: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onHistoryOpen: () => void;
@@ -47,13 +53,17 @@ export function ProfileForm({
         person.name.toLowerCase().includes(lowerCaseQuery) ||
         person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
       );
-      setSearchResults(results);
-      setIsPopoverOpen(results.length > 0);
+      setSearchResults(results.slice(0, 50)); // Limit results for performance
+      if (results.length > 0 && !isPopoverOpen) {
+        setIsPopoverOpen(true);
+      }
     } else {
       setSearchResults([]);
-      setIsPopoverOpen(false);
+      if (isPopoverOpen) {
+        setIsPopoverOpen(false);
+      }
     }
-  }, [searchQuery]);
+  }, [searchQuery, isPopoverOpen]);
 
   const handleSelectPerson = (person: FamousPerson) => {
     onFamousPersonSelect(person);

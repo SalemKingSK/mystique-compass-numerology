@@ -1,7 +1,5 @@
 // src/components/profile-generator/types.ts
 
-import type { famousBirthdays } from "@/lib/famous-birthdays";
-
 // This is the data that the user provides
 export interface AstroInsightInput {
   name: string;
@@ -68,4 +66,11 @@ export interface NumerologyData {
   arrowsOfWeakness: ArrowData[];
 }
 
-export type FamousPerson = (typeof famousBirthdays)[number];
+export interface FamousPerson {
+  name: string;
+  day: number;
+  month: number;
+  year: number;
+  gender: 'male' | 'female' | 'other';
+  tags: string[];
+}
