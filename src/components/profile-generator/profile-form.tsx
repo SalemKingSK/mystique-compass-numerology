@@ -67,13 +67,6 @@ export function ProfileForm({
     setSearchQuery('');
     setIsSearchOpen(false);
   };
-  
-  const handleWrapperBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      setIsSearchOpen(false);
-    }
-  };
-
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
@@ -98,7 +91,7 @@ export function ProfileForm({
               <span className="sr-only">View History</span>
             </Button>
           </div>
-          <div onBlur={handleWrapperBlur}>
+          <div>
             <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
               <PopoverTrigger asChild>
                 <div className="space-y-2">
