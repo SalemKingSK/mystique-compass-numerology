@@ -44,6 +44,7 @@ export function ProfileForm({
 }: ProfileFormProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<FamousPerson[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -53,14 +54,17 @@ export function ProfileForm({
         (person.tags && person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
       );
       setSearchResults(results.slice(0, 50));
+      setIsSearchOpen(true); 
     } else {
       setSearchResults([]);
+      setIsSearchOpen(false);
     }
   }, [searchQuery]);
 
   const handleSelectPerson = (person: FamousPerson) => {
     onFamousPersonSelect(person);
     setSearchQuery('');
+    setIsSearchOpen(false);
   };
 
   return (
@@ -87,7 +91,7 @@ export function ProfileForm({
             </Button>
           </div>
 
-          <Popover>
+          <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
             <PopoverTrigger asChild>
               <div className="space-y-2">
                 <Label htmlFor="search">Search Famous Person, Country, Sport...</Label>
@@ -99,35 +103,33 @@ export function ProfileForm({
                     placeholder="e.g., Albert Einstein, Tennis, Canada"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onBlur={() => setIsSearchOpen(false)}
                     className="pl-10"
                     autoComplete="off"
                   />
                 </div>
               </div>
             </PopoverTrigger>
-            {searchQuery.length > 1 && searchResults.length > 0 && (
-              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                <div className="max-h-60 overflow-y-auto">
-                  {searchResults.map((person) => (
-                    <div
-                      key={person.name}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelectPerson(person)
-                      }}
-                      className="p-3 hover:bg-white/10 cursor-pointer text-sm"
-                    >
-                      {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
+                {searchResults.length > 0 ? (
+                    <div className="max-h-60 overflow-y-auto">
+                        {searchResults.map((person) => (
+                        <div
+                            key={person.name}
+                            onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleSelectPerson(person)
+                            }}
+                            className="p-3 hover:bg-white/10 cursor-pointer text-sm"
+                        >
+                            {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+                        </div>
+                        ))}
                     </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            )}
-             {searchQuery.length > 1 && searchResults.length === 0 && (
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                    <div className="p-3 text-sm text-center text-white/50">No results found.</div>
-                </PopoverContent>
-             )}
+                ) : (
+                     <div className="p-3 text-sm text-center text-white/50">No results found.</div>
+                )}
+            </PopoverContent>
           </Popover>
 
 
