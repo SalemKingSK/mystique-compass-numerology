@@ -44,44 +44,36 @@ export function ProfileForm({
 }: ProfileFormProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<FamousPerson[]>([]);
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (searchQuery.trim().length > 1) {
       const lowerCaseQuery = searchQuery.toLowerCase();
       const results = famousBirthdays.filter(person =>
         person.name.toLowerCase().includes(lowerCaseQuery) ||
-        person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
+        (person.tags && person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
       );
-      setSearchResults(results.slice(0, 50)); // Limit results for performance
-      if (results.length > 0) {
-        setIsPopoverOpen(true);
-      }
+      setSearchResults(results.slice(0, 50));
     } else {
       setSearchResults([]);
-      if (isPopoverOpen) {
-        setIsPopoverOpen(false);
-      }
     }
   }, [searchQuery]);
 
   const handleSelectPerson = (person: FamousPerson) => {
     onFamousPersonSelect(person);
     setSearchQuery('');
-    setIsPopoverOpen(false);
   };
-  
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <header className="text-center pt-8">
-          <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-500">Mystique Compass</h1>
-          <p className="text-white/70 mt-2">Giving your life a meaning.</p>
+        <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-500">Mystique Compass</h1>
+        <p className="text-white/70 mt-2">Giving your life a meaning.</p>
       </header>
       <div className="flex-grow flex items-center justify-center">
         <form onSubmit={onSubmit} className="space-y-6 w-full glass-card p-6 md:p-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">
-                Generate Profile
+              Generate Profile
             </h2>
             <Button
               type="button"
@@ -94,8 +86,8 @@ export function ProfileForm({
               <span className="sr-only">View History</span>
             </Button>
           </div>
-          
-          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+
+          <Popover>
             <PopoverTrigger asChild>
               <div className="space-y-2">
                 <Label htmlFor="search">Search Famous Person, Country, Sport...</Label>
@@ -113,19 +105,29 @@ export function ProfileForm({
                 </div>
               </div>
             </PopoverTrigger>
-            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+            {searchQuery.length > 1 && searchResults.length > 0 && (
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
                 <div className="max-h-60 overflow-y-auto">
-                    {searchResults.map((person) => (
-                      <div
-                        key={person.name}
-                        onClick={() => handleSelectPerson(person)}
-                        className="p-3 hover:bg-white/10 cursor-pointer text-sm"
-                      >
-                        {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
-                      </div>
-                    ))}
+                  {searchResults.map((person) => (
+                    <div
+                      key={person.name}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSelectPerson(person)
+                      }}
+                      className="p-3 hover:bg-white/10 cursor-pointer text-sm"
+                    >
+                      {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+                    </div>
+                  ))}
                 </div>
-            </PopoverContent>
+              </PopoverContent>
+            )}
+             {searchQuery.length > 1 && searchResults.length === 0 && (
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                    <div className="p-3 text-sm text-center text-white/50">No results found.</div>
+                </PopoverContent>
+             )}
           </Popover>
 
 
@@ -210,7 +212,7 @@ export function ProfileForm({
         </form>
       </div>
       <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">
-        {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
+        {"He who knows others is learned;\\nHe who knows himself is wise.\\nLao Tzu, Dao De Jing"}
       </footer>
     </div>
   );
