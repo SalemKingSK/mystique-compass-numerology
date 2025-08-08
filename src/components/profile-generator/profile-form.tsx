@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { History } from 'lucide-react';
+import { History, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { AstroInsightInput } from './types';
+import { famousBirthdays, type FamousPerson } from '@/lib/famous-birthdays';
 
 interface ProfileFormProps {
   formData: AstroInsightInput;
@@ -22,6 +24,7 @@ interface ProfileFormProps {
   onHistoryOpen: () => void;
   onSelectChange: (value: string) => void;
   onFieldChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFamousPersonSelect: (person: FamousPerson) => void;
 }
 
 export function ProfileForm({
@@ -31,7 +34,31 @@ export function ProfileForm({
   onHistoryOpen,
   onSelectChange,
   onFieldChange,
+  onFamousPersonSelect,
 }: ProfileFormProps) {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchResults, setSearchResults] = React.useState<FamousPerson[]>([]);
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      const results = famousBirthdays.filter(person =>
+        person.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResults(results);
+      setIsPopoverOpen(results.length > 0);
+    } else {
+      setSearchResults([]);
+      setIsPopoverOpen(false);
+    }
+  }, [searchQuery]);
+
+  const handleSelectPerson = (person: FamousPerson) => {
+    onFamousPersonSelect(person);
+    setSearchQuery('');
+    setIsPopoverOpen(false);
+  };
+  
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <header className="text-center pt-8">
@@ -55,6 +82,40 @@ export function ProfileForm({
               <span className="sr-only">View History</span>
             </Button>
           </div>
+          
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <PopoverTrigger asChild>
+              <div className="space-y-2">
+                <Label htmlFor="search">Search Famous Person (optional)</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                  <Input
+                    id="search"
+                    name="search"
+                    placeholder="e.g., Albert Einstein"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                <div className="max-h-60 overflow-y-auto">
+                    {searchResults.map((person) => (
+                      <div
+                        key={person.name}
+                        onClick={() => handleSelectPerson(person)}
+                        className="p-3 hover:bg-white/10 cursor-pointer text-sm"
+                      >
+                        {person.name}
+                      </div>
+                    ))}
+                </div>
+            </PopoverContent>
+          </Popover>
+
 
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>

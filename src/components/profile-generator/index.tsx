@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import type { AstroInsightInput, AstroInsightOutput, NumerologyData } from './types';
 import { ProfileForm } from './profile-form';
 import { ResultsDisplay } from './results-display';
+import { FamousPerson } from '@/lib/famous-birthdays';
 
 const HISTORY_KEY = 'mystiqueCompassHistory';
 
@@ -100,6 +101,16 @@ export function ProfileGenerator() {
     };
     processRequest(data);
   };
+  
+  const handleFamousPersonSelect = (person: FamousPerson) => {
+    setFormData(prev => ({
+        ...prev,
+        name: person.name,
+        day: person.day,
+        month: person.month,
+        year: person.year,
+    }));
+  }
 
   const handleHistoryClick = (item: AstroInsightInput) => {
     setIsHistoryOpen(false);
@@ -143,6 +154,7 @@ export function ProfileGenerator() {
               onHistoryOpen={() => setIsHistoryOpen(true)}
               onSelectChange={handleSelectChange}
               onFieldChange={handleChange}
+              onFamousPersonSelect={handleFamousPersonSelect}
             />
           </motion.div>
         )}
