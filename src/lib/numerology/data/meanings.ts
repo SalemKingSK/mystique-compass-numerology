@@ -1,3 +1,4 @@
+
 // src/lib/numerology/data/meanings.ts
 
 export const KUA_DIRECTIONS: { [key: number]: any } = {
@@ -36,7 +37,7 @@ export const COMPOUND_NUMBER_MEANINGS: { [key: number]: string } = {
 The number 1 represents consciousness and the Sun, while 0 signifies infinity (Anant Tattva).
 The qualities of 1 predominantly shape number 10, as it belongs to the 1 series, granting honor, faith, self-assurance, and recognition—whether positive or negative—that varies according to karmic principles.
 The number 1 is considered fortunate, whereas 0 is seen as unfortunate.
-The unfortunate influence of 0 introduces struggles, which foster self-confidence and proper understanding in these psychic individuals, enabling them to stand out.
+The unfortunate influence of 0 introduces struggles, which foster self-confidence and proper understanding in these compound individuals, enabling them to stand out.
 The presence of 0 generates hidden adversaries, but 1 provides the alertness to identify them.
 Thus, 10 symbolizes success attained through persistent effort.
 Remaining introspective and vigilant is the only way to overcome the challenges described.
@@ -48,9 +49,9 @@ In the first book of Moses, Joseph dreamed that the Sun, Moon, and eleven stars 
 In theological texts, 11 is seen as a number of negative omens, sinners, and penance.
 However, in Hindu tradition, 11 is not viewed as negative or sinful but is considered auspicious and dynamic.
 Because the number 1 appears twice, numerologists attribute to it a stubborn, revolutionary, and authoritative character.
-Psychic number 2 individuals who possess the 11 compound number are quick to respond, optimistic, and capable of guiding themselves and others through challenging situations.
+Compound number 2 individuals who possess the 11 compound number are quick to respond, optimistic, and capable of guiding themselves and others through challenging situations.
 With proper guidance and constructive feedback, they can achieve significant success in the material world.
-Although this number is linked to the Moon, and psychic 2 individuals who possess the 11 compound number exhibit all the traits of 2s—such as indecisiveness, periodic separation from their life partner, and emotional fluctuations—they later gain fame and respect.
+Although this number is linked to the Moon, and compound 2 individuals who possess the 11 compound number exhibit all the traits of 2s—such as indecisiveness, periodic separation from their life partner, and emotional fluctuations—they later gain fame and respect.
 Just as numerology gives special attention to this number, calculated as 2 but recognized as 11, those with this number attract and manage to receive special attention in life.
 Number 11 is called a mystic number because its natives have a heightened sensitivity to vibrations and may perceive spirits or ghosts.
 This sensitivity is part of their imaginative and fantasizing nature.
@@ -74,8 +75,8 @@ They should remain vigilant against secret enemies.`,
   12: `This number combines the Sun (1) and the Moon (2), forming a pair of opposites.
 As previously discussed, the numbers 1 and 2 do not form an ideal partnership, as individuals with these numbers often disagree.
 This conflicting dynamic between 1 and 2 creates anxiety for those who possess the 12 compound number.
-Although psychic number 3 individuals are fortunate in receiving help, cooperation, and success in life, this anxiety persists for those who possess the 12 compound number.
-Psychic 3s are known for agreeing to everything and everyone, yet they only act within their capabilities.
+Although compound number 3 individuals are fortunate in receiving help, cooperation, and success in life, this anxiety persists for those who possess the 12 compound number.
+Compound 3s are known for agreeing to everything and everyone, yet they only act within their capabilities.
 As a result, they are notorious for letting down their friends and family.
 Those who possess the 12 compound number experience this issue most acutely.
 They are caught between the stable, resolute nature of 1s and the fluctuating opinions of 2s.
@@ -88,7 +89,7 @@ These individuals enjoy their personal lives and are happy, healthy, and prosper
 They take care of themselves, show interest in cooking, enjoy hosting feasts, have refined tastes, and are philosophical and religious.
 They possess the strength of 1s and the gentleness of 2s.
 They believe in blending ideas and are unconventional, adapting readily to all kinds of situations.`,
-  13: `Psychic number 4 individuals who possess the 13 compound number should remember that they combine 1, ruled by the Sun, and 3, ruled by Jupiter.
+  13: `Compound number 4 individuals who possess the 13 compound number should remember that they combine 1, ruled by the Sun, and 3, ruled by Jupiter.
 In 13, the Sun’s influence disrupts Jupiter, resulting in an easily irritable nature.
 However, it also imparts the qualities of number 1 individuals, as 13 belongs to the 10 series, which is influenced by 1.
 The Sun’s disruption of Jupiter causes events to unfold quickly.
@@ -112,13 +113,13 @@ Rahu is an adversary of the Sun, yet as a half-planet, it must act according to 
 When paired with the Sun, its natural opposite and enemy, Rahu seeks to cause affliction.
 It partially eclipses the Sun’s influence, creating obstacles.
 Those who possess the 14 compound number experience inner conflict.
-Their lives undergo more frequent changes than those of other psychic number 5 individuals.
+Their lives undergo more frequent changes than those of other compound number 5 individuals.
 Rahu is inclined to take risks, and the Sun is unafraid of risks, so those who possess the 14 compound number sometimes take greater risks than other 5s.
 Since 5s are generally prone to gambling, those who possess the 14 compound number engage in riskier gambling or other activities that may lead to financial losses and other issues.
 The number 1 is naturally skilled at accurately assessing the future, but in combination with 4, the number 14 creates problems in this regard.
 Those who possess the 14 compound number repeatedly face challenges due to incorrect predictions about the future.
 They are advised to be cautious with associates and colleagues and to remain calm to achieve their goals.
-The influence of Mercury, which governs their lives as psychic number 5 individuals, makes them fluid and mercurial, and they enjoy living this way.
+The influence of Mercury, which governs their lives as compound number 5 individuals, makes them fluid and mercurial, and they enjoy living this way.
 They are helpful, wise, quick to respond, restless yet cheerful (though less cheerful than those who possess the 23 compound number), and they benefit from gambling and taking risks.
 Due to Rahu’s influence, they are advised to exercise caution during thunderstorms, hurricanes, or other natural calamities.`,
   15: `Number 15 combines the Sun (1) and Mercury (5).
@@ -126,13 +127,13 @@ Both planets are associated with intellect and sharp wit.
 Both are drawn to modernity, material success, and popularity, and both are friendly.
 Those who possess the 15 compound number have a strong preference for luxury and material prosperity.
 They also have a keen interest in literature, fine arts, and music.
-As psychic number 6 individuals, 15 is ruled by Venus.
+As compound number 6 individuals, 15 is ruled by Venus.
 A love for a lavish, uncommitted lifestyle and sensual pleasures shapes the perspective of those with the 15 compound number.
 The Sun brings them popularity.
 Mercury encourages them to travel and move frequently.
 Venus draws them to comfortable, costly, and luxurious environments.
 The Sun’s influence helps them gain cooperation and support.
-Due to Mercury, they are surrounded by recreation and enjoy more festive occasions than other psychic 6 individuals.
+Due to Mercury, they are surrounded by recreation and enjoy more festive occasions than other compound 6 individuals.
 Mercury is delicate, sentimental, and eternally youthful.
 Those who possess the 15 compound number are tender, emotional, attractive, and appear younger than their peers.
 Men with this number explore Tantra, magic, and witchcraft to enhance their ability to enjoy and explore their sensual nature.
@@ -158,7 +159,7 @@ Though they constantly worry about losing their current status, they experience 
 They suffer from their setbacks but persist in their own way.
 They should be cautious of accidents and mishaps in their lives.`,
   17: `This number combines the Sun (1) and the half-planet Ketu (7).
-As a psychic number 8, 17 is ruled by Saturn.
+As a compound number 8, 17 is ruled by Saturn.
 Thus, 17 represents struggle, obstacles, and difficulties.
 Additionally, the Sun and Ketu are enemies, creating inner conflict for those with this number.
 However, this inner conflict fosters genuine understanding, making them more aware, compassionate, loving, and spiritual.
@@ -187,7 +188,7 @@ They are advised to avoid conflicts with family and friends.
 They are materialistic and develop specialized skills to earn money.
 They achieve financial stability after age 40 and are rewarded for their efforts later in life.`,
   19: `This number combines the Sun (1) and Mars (9) and is ruled by the Sun (1).
-Those who possess the 19 compound number are fortunate psychic number 1 individuals.
+Those who possess the 19 compound number are fortunate compound number 1 individuals.
 The Sun and Mars are allies, and the Sun is exalted in Aries, a zodiac sign governed by Mars.
 These individuals are filled with enthusiasm, joy, and inspiration, achieving success in all areas of life.
 They are vibrant and honored by their friends and colleagues.
@@ -205,16 +206,16 @@ However, their efforts and care are not adequately rewarded.
 They face unnecessary delays in their projects and experience anxiety and frustration.
 Their marital lives are often unsuccessful, and they neglect their family members and relatives.
 To find peace and achieve success, they are advised to cultivate interests in spirituality.`,
-  21: `Although those who possess the 21 compound number are psychic number 3s, they differ from other psychic 3s.
+  21: `Although those who possess the 21 compound number are compound number 3s, they differ from other compound 3s.
 The combination of 2 and 1 in 21 is distinct from that in 12.
 Number 21 belongs to the 20 series and is thus more influenced by the number 2, despite being ruled by Jupiter.
 The number 2 imparts gentleness, while 1 provides the potential for success in life.
-They are more social than other psychic number 3 individuals, gaining popularity in various circles and with the opposite sex.
+They are more social than other compound number 3 individuals, gaining popularity in various circles and with the opposite sex.
 They interact more freely than other 3s and successfully overcome challenges to establish themselves in service or business.
 With the number 2, they excel as arbitrators and diplomats; with the number 1, they achieve success and rise.
 In this combination, the 1 supports the 2.
 If these individuals develop a bit of patience, they can become fortunate and make steady progress.`,
-  22: `Psychic number 4 individuals who possess the 22 compound number are more strongly influenced by the number 2, yet they retain all the characteristics of number 4.
+  22: `Compound number 4 individuals who possess the 22 compound number are more strongly influenced by the number 2, yet they retain all the characteristics of number 4.
 They become highly stubborn and are often seen as difficult by their friends and relatives.
 Individuals with this number face separation from their families, and in some cases, men may experience remarriage.
 Number 22 is considered a mystical number in certain circles.
@@ -243,7 +244,7 @@ Their social circle is limited, with few close friends.
 They avoid disputes.
 They tend to be reserved in expressing their emotions.`,
   23: `The combination of the Moon (2) and Jupiter (3) is considered a number of success.
-Those who possess the 23 compound number are psychic number 5s and are ruled by Mercury, making them intelligent, hardworking, well-informed, and curious about everything.
+Those who possess the 23 compound number are compound number 5s and are ruled by Mercury, making them intelligent, hardworking, well-informed, and curious about everything.
 They have strong prospects for success in their professions and gain popularity.
 They receive support from the opposite sex and assistance from authority figures.
 Although they can be somewhat moody, short-tempered, and fond of taking risks, they are well-liked and achieve success in life.
@@ -252,19 +253,19 @@ They earn recognition and fame, rise within their communities, and are known for
   24: `This combination of the Moon (2) and Rahu (4) is considered fortunate because 2 and 4 yield 6, a lucky number.
 Number 6 is ruled by Venus, and when derived from the combination of 2 and 4, the individual is influenced by both 2 and 4 while exhibiting the traits of a 6.
 This specific number 6 is also fortunate due to the harmonious relationship between 2 and 4.
-Although those who possess the 24 compound number share all the qualities of psychic number 6 individuals and are considered 6s, they differ from those who possess the 6 or 15 compound numbers.
+Although those who possess the 24 compound number share all the qualities of compound number 6 individuals and are considered 6s, they differ from those who possess the 6 or 15 compound numbers.
 The number 4 represents difficulty and change, and 2 also signifies change.
 Thus, the lives of those who possess the 24 compound number are marked by frequent changes.
 The influence of 2 makes them helpful and sincere, while 4 makes them strong and persistent.
 They are secretive and capable of keeping others’ confidences.
 They benefit from relationships with the opposite sex but also face failures due to betrayal.
 They are gentle and supportive.
-If their destiny and name numbers align with their psychic number, they can enjoy stable family lives.`,
+If their destiny and name numbers align with their compound number, they can enjoy stable family lives.`,
   25: `The numbers 2 and 5 are not an ideal combination; the relationship between the Moon (2) and Mercury (5) is peculiar.
 The Moon is neutral toward Mercury, but Mercury harbors enmity toward the Moon.
 This unusual dynamic fosters a self-critical nature.
-Number 25, a psychic number 7, is ruled by Ketu.
-Although it brings luck to others, psychic number 7 individuals suffer significantly in their early years.
+Number 25, a compound number 7, is ruled by Ketu.
+Although it brings luck to others, compound number 7 individuals suffer significantly in their early years.
 The numbers 2 and 5 create a fluctuating nature.
 This is intensified by Ketu’s influence, a planet associated with ambiguity.
 Those who possess the 25 compound number are more dreamy, imaginative, artistic, moody, and philosophical than other 7s.
@@ -278,7 +279,7 @@ They are not fortunate in romantic relationships but gain financial benefits thr
 They are advised to avoid risky endeavors.`,
   26: `The combination of 2 and 6, the Moon (2) and Venus (6), makes these individuals reliant on the opposite sex.
 Both 2 and 6 are numbers that depend on others.
-Those who possess the 26 compound number are psychic number 8s.
+Those who possess the 26 compound number are compound number 8s.
 They are ruled by Saturn and are seen as materialistic and fatalistic.
 They face numerous difficulties and opposition, particularly in their early years.
 Both numbers 2 and 6 attract the opposite sex.
@@ -308,7 +309,7 @@ This success comes to those with the 28 compound number after they have faced an
 Those who possess the 28 compound number gain more experience and are gentler, less authoritative, commanding, and demanding than other number 1s.
 They are more inclined to serve and receive greater cooperation and support than other 1s.
 This expands their circle of friends and acquaintances.
-Psychic numbers 2 and 8 individuals are both servants, obstinate, and skilled, resilient fighters.
+Compound numbers 2 and 8 individuals are both servants, obstinate, and skilled, resilient fighters.
 The combination of 2 and 8 in 28 makes these individuals more vulnerable yet successful fighters.
 They lead efforts to advocate justice for the oppressed, becoming effective politicians and political heroes.
 They leave lasting marks on history.
@@ -325,15 +326,14 @@ However, if the destiny or name number is not in harmony, they become involved i
 Although those with the 29 compound number attain high positions in their fields, they feel insecure and lonely.
 The influence of Mars makes them restless and doubtful.
 Men who possess this number should be cautious in choosing life partners, as women are the primary source of problems and sorrows in their lives.
-Women who possess this number should fast on Mondays or Thursdays if they seek a harmonious husband.
-They should strive to understand their partners’ feelings and not focus solely on their own emotional highs and lows.
-Generally, all psychic individuals who possess the 29 compound number are loving and warm-hearted.
+Women who possess this number should strive to understand their partners’ feelings and not focus solely on their own emotional highs and lows.
+Generally, all compound individuals who possess the 29 compound number are loving and warm-hearted.
 They attract individuals with refined aesthetic sensibilities and are favored by those in authority.
 They are advised to avoid irritability and short-temperedness and to adopt spiritual practices and develop genuine faith in God.
 They should work to create a supportive family environment.
 Men with this number should become friendlier and more tolerant with family members and relatives, as they need their support and cooperation.
 They should not delay marriage plans and should marry early, as late marriages bring unhappiness and mental challenges.`,
-  30: `Psychic number 3 individuals who possess the 30 compound number are somewhat less fortunate than other psychic 3s due to the influence of zero.
+  30: `Compound number 3 individuals who possess the 30 compound number are somewhat less fortunate than other compound 3s due to the influence of zero.
 We cannot label them as unlucky, but zero slows their progress and reduces their number of friends.
 However, because 3s are hardworking, those with the 30 compound number can live comfortably and earn sufficient money with minimal effort.
 Like other number 3s, they are social and universal helpers, but their lives are more influenced by the opposite sex.
@@ -360,7 +360,7 @@ They become stubborn, secretive, and commanding.
 They impose their ideas on others.
 The presence of number 3 makes them somewhat selfish, and the presence of 1 makes them authoritative.
 Number 1 also endows them with leadership qualities.
-Although psychic number 3 and 1 individuals are hardworking, social, and extroverted, those who possess the 31 compound number are shy, less social, yet diligent workers.
+Although compound number 3 and 1 individuals are hardworking, social, and extroverted, those who possess the 31 compound number are shy, less social, yet diligent workers.
 They must struggle significantly before gaining recognition in society.
 They embrace modern ideas and rebel against traditional values.
 They are advocates for justice but do not always use just methods to achieve it.
@@ -378,14 +378,14 @@ If they waver, their plans risk being undermined by the stubbornness or folly of
 This combination of the Moon (2) and Rahu (4) is considered fortunate because 2 and 4 yield 6, a lucky number.
 Number 6 is ruled by Venus, and when derived from the combination of 2 and 4, the individual is influenced by both 2 and 4 while exhibiting the traits of a 6.
 This specific number 6 is also fortunate due to the harmonious relationship between 2 and 4.
-Although those who possess the 33 compound number share all the qualities of psychic number 6 individuals and are considered 6s, they differ from those who possess the 6 or 15 compound numbers.
+Although those who possess the 33 compound number share all the qualities of compound number 6 individuals and are considered 6s, they differ from those who possess the 6 or 15 compound numbers.
 The number 4 represents difficulty and change, and 2 also signifies change.
 Thus, the lives of those who possess the 33 compound number are marked by frequent changes.
 The influence of 2 makes them helpful and sincere, while 4 makes them strong and persistent.
 They are secretive and capable of keeping others’ confidences.
 They benefit from relationships with the opposite sex but also face failures due to betrayal.
 They are gentle and supportive.
-If their destiny and name numbers align with their psychic number, they can enjoy stable family lives.
+If their destiny and name numbers align with their compound number, they can enjoy stable family lives.
 The magic of love, the depth of originality and creativity, and the promise of eventual financial success are intensified due to the double 3.
 Individuals whose name equals 33 are more fortunate in all aspects when engaged in a harmonious partnership with the opposite sex, whether in their career, romantic, or marital relationships.
 This number represents a well-deserved karmic reward.
@@ -395,8 +395,8 @@ When paired with a sense of humor and genuine humility, the 33 vibration becomes
 The numbers 2 and 5 are not an ideal combination; the relationship between the Moon (2) and Mercury (5) is peculiar.
 The Moon is neutral toward Mercury, but Mercury harbors enmity toward the Moon.
 This unusual dynamic fosters a self-critical nature.
-Number 34, a psychic number 7, is ruled by Ketu.
-Although it brings luck to others, psychic number 7 individuals suffer significantly in their early years.
+Number 34, a compound number 7, is ruled by Ketu.
+Although it brings luck to others, compound number 7 individuals suffer significantly in their early years.
 The numbers 2 and 5 create a fluctuating nature.
 This is intensified by Ketu’s influence, a planet associated with ambiguity.
 Those who possess the 34 compound number are more dreamy, imaginative, artistic, moody, and philosophical than other 7s.
@@ -411,7 +411,7 @@ They are advised to avoid risky endeavors.`,
   35: `Number 35 has the same meaning as the number 26.
 The combination of 2 and 6, the Moon (2) and Venus (6), makes these individuals reliant on the opposite sex.
 Both 2 and 6 are numbers that depend on others.
-Those who possess the 35 compound number are psychic number 8s.
+Those who possess the 35 compound number are compound number 8s.
 They are ruled by Saturn and are seen as materialistic and fatalistic.
 They face numerous difficulties and opposition, particularly in their early years.
 Both numbers 2 and 6 attract the opposite sex.
@@ -451,9 +451,9 @@ In the first book of Moses, Joseph dreamed that the Sun, Moon, and eleven stars 
 In theological texts, 11 is seen as a number of negative omens, sinners, and penance.
 However, in Hindu tradition, 11 is not viewed as negative or sinful but is considered auspicious and dynamic.
 Because the number 1 appears twice, numerologists attribute to it a stubborn, revolutionary, and authoritative character.
-Psychic number 2 individuals who possess the 38 compound number are quick to respond, optimistic, and capable of guiding themselves and others through challenging situations.
+Compound number 2 individuals who possess the 38 compound number are quick to respond, optimistic, and capable of guiding themselves and others through challenging situations.
 With proper guidance and constructive feedback, they can achieve significant success in the material world.
-Although this number is linked to the Moon, and psychic 2 individuals who possess the 38 compound number exhibit all the traits of 2s—such as indecisiveness, periodic separation from their life partner, and emotional fluctuations—they later gain fame and respect.
+Although this number is linked to the Moon, and compound 2 individuals who possess the 38 compound number exhibit all the traits of 2s—such as indecisiveness, periodic separation from their life partner, and emotional fluctuations—they later gain fame and respect.
 Just as numerology gives special attention to this number, calculated as 2 but recognized as 11, those with this number attract and manage to receive special attention in life.
 Number 38 is called a mystic number because its natives have a heightened sensitivity to vibrations and may perceive spirits or ghosts.
 This sensitivity is part of their imaginative and fantasizing nature.
@@ -485,16 +485,15 @@ However, if the destiny or name number is not in harmony, they become involved i
 Although those with the 38 compound number attain high positions in their fields, they feel insecure and lonely.
 The influence of Mars makes them restless and doubtful.
 Men who possess this number should be cautious in choosing life partners, as women are the primary source of problems and sorrows in their lives.
-Women who possess this number should fast on Mondays or Thursdays if they seek a harmonious husband.
-They should strive to understand their partners’ feelings and not focus solely on their own emotional highs and lows.
-Generally, all psychic individuals who possess the 38 compound number are loving and warm-hearted.
+Women who possess this number should strive to understand their partners’ feelings and not focus solely on their own emotional highs and lows.
+Generally, all compound individuals who possess the 38 compound number are loving and warm-hearted.
 They attract individuals with refined aesthetic sensibilities and are favored by those in authority.
 They are advised to avoid irritability and short-temperedness and to adopt spiritual practices and develop genuine faith in God.
 They should work to create a supportive family environment.
 Men with this number should become friendlier and more tolerant with family members and relatives, as they need their support and cooperation.
 They should not delay marriage plans and should marry early, as late marriages bring unhappiness and mental challenges.`,
   39: `Number 39 has the same meaning as the number 30.
-Psychic number 3 individuals who possess the 39 compound number are somewhat less fortunate than other psychic 3s due to the influence of zero.
+Compound number 3 individuals who possess the 39 compound number are somewhat less fortunate than other compound 3s due to the influence of zero.
 We cannot label them as unlucky, but zero slows their progress and reduces their number of friends.
 However Law, however, because 3s are hardworking, those with the 39 compound number can live comfortably and earn sufficient money with minimal effort.
 Like other number 3s, they are social and universal helpers, but their lives are more influenced by the opposite sex.
@@ -522,7 +521,7 @@ They become stubborn, secretive, and commanding.
 They impose their ideas on others.
 The presence of number 3 makes them somewhat selfish, and the presence of 1 makes them authoritative.
 Number 1 also endows them with leadership qualities.
-Although psychic number 3 and 1 individuals are hardworking, social, and extroverted, those who possess the 40 compound number are shy, less social, yet diligent workers.
+Although compound number 3 and 1 individuals are hardworking, social, and extroverted, those who possess the 40 compound number are shy, less social, yet diligent workers.
 They must struggle significantly before gaining recognition in society.
 They embrace modern ideas and rebel against traditional values.
 They are advocates for justice but do not always use just methods to achieve it.
@@ -541,14 +540,14 @@ If they waver, their plans risk being undermined by the stubbornness or folly of
 This combination of the Moon (2) and Rahu (4) is considered fortunate because 2 and 4 yield 6, a lucky number.
 Number 6 is ruled by Venus, and when derived from the combination of 2 and 4, the individual is influenced by both 2 and 4 while exhibiting the traits of a 6.
 This specific number 6 is also fortunate due to the harmonious relationship between 2 and 4.
-Although those who possess the 42 compound number share all the qualities of psychic number 6 individuals and are considered 6s, they differ from those who possess the 6 or 15 compound numbers.
+Although those who possess the 42 compound number share all the qualities of compound number 6 individuals and are considered 6s, they differ from those who possess the 6 or 15 compound numbers.
 The number 4 represents difficulty and change, and 2 also signifies change.
 Thus, the lives of those who possess the 42 compound number are marked by frequent changes.
 The influence of 2 makes them helpful and sincere, while 4 makes them strong and persistent.
 They are secretive and capable of keeping others’ confidences.
 They benefit from relationships with the opposite sex but also face failures due to betrayal.
 They are gentle and supportive.
-If their destiny and name numbers align with their psychic number, they can enjoy stable family lives.`,
+If their destiny and name numbers align with their compound number, they can enjoy stable family lives.`,
   43: `Ancient traditions regard number 43 as an unfortunate number.
 If an individual’s name equals 43, it is recommended to change the spelling to align with a more fortunate compound number.
 This number is associated with tendencies toward revolution, upheaval, strife, conflict, and war.
@@ -556,7 +555,7 @@ It carries a vibration of repeated disappointment and failure.`,
   44: `Number 44 has the same meaning as the number 26.
 The combination of 2 and 6, the Moon (2) and Venus (6), makes these individuals reliant on the opposite sex.
 Both 2 and 6 are numbers that depend on others.
-Those who possess the 44 compound number are psychic number 8s.
+Those who possess the 44 compound number are compound number 8s.
 They are ruled by Saturn and are seen as materialistic and fatalistic.
 They face numerous difficulties and opposition, particularly in their early years.
 Both numbers 2 and 6 attract the opposite sex.
@@ -601,16 +600,15 @@ However, if the destiny or name number is not in harmony, they become involved i
 Although those with the 47 compound number attain high positions in their fields, they feel insecure and lonely.
 The influence of Mars makes them restless and doubtful.
 Men who possess this number should be cautious in choosing life partners, as women are the primary source of problems and sorrows in their lives.
-Women who possess this number should fast on Mondays or Thursdays if they seek a harmonious husband.
-They should strive to understand their partners’ feelings and not focus solely on their own emotional highs and lows.
-Generally, all psychic individuals who possess the 47 compound number are loving and warm-hearted.
+Women who possess this number should strive to understand their partners’ feelings and not focus solely on their own emotional highs and lows.
+Generally, all compound individuals who possess the 47 compound number are loving and warm-hearted.
 They attract individuals with refined aesthetic sensibilities and are favored by those in authority.
 They are advised to avoid irritability and short-temperedness and to adopt spiritual practices and develop genuine faith in God.
 They should work to create a supportive family environment.
 Men with this number should become friendlier and more tolerant with family members and relatives, as they need their support and cooperation.
 They should not delay marriage plans and should marry early, as late marriages bring unhappiness and mental challenges.`,
   48: `Number 48 has the same meaning as the number 30.
-Psychic number 3 individuals who possess the 48 compound number are somewhat less fortunate than other psychic 3s due to the influence of zero.
+Compound number 3 individuals who possess the 48 compound number are somewhat less fortunate than other compound 3s due to the influence of zero.
 We cannot label them as unlucky, but zero slows their progress and reduces their number of friends.
 However, because 3s are hardworking, those with the 48 compound number can live comfortably and earn sufficient money with minimal effort.
 Like other number 3s, they are social and universal helpers, but their lives are more influenced by the opposite sex.
@@ -638,7 +636,7 @@ They become stubborn, secretive, and commanding.
 They impose their ideas on others.
 The presence of number 3 makes them somewhat selfish, and the presence of 1 makes them authoritative.
 Number 1 also endows them with leadership qualities.
-Although psychic number 3 and 1 individuals are hardworking, social, and extroverted, those who possess the 49 compound number are shy, less social, yet diligent workers.
+Although compound number 3 and 1 individuals are hardworking, social, and extroverted, those who possess the 49 compound number are shy, less social, yet diligent workers.
 They must struggle significantly before gaining recognition in society.
 They embrace modern ideas and rebel against traditional values.
 They are advocates for justice but do not always use just methods to achieve it.
