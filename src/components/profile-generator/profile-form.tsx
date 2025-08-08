@@ -42,8 +42,10 @@ export function ProfileForm({
 
   React.useEffect(() => {
     if (searchQuery.trim().length > 1) {
+      const lowerCaseQuery = searchQuery.toLowerCase();
       const results = famousBirthdays.filter(person =>
-        person.name.toLowerCase().includes(searchQuery.toLowerCase())
+        person.name.toLowerCase().includes(lowerCaseQuery) ||
+        person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
       );
       setSearchResults(results);
       setIsPopoverOpen(results.length > 0);
@@ -86,13 +88,13 @@ export function ProfileForm({
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <div className="space-y-2">
-                <Label htmlFor="search">Search Famous Person (optional)</Label>
+                <Label htmlFor="search">Search Famous Person, Country, Sport...</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                   <Input
                     id="search"
                     name="search"
-                    placeholder="e.g., Albert Einstein"
+                    placeholder="e.g., Albert Einstein, Tennis, Canada"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -109,7 +111,7 @@ export function ProfileForm({
                         onClick={() => handleSelectPerson(person)}
                         className="p-3 hover:bg-white/10 cursor-pointer text-sm"
                       >
-                        {person.name}
+                        {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
                       </div>
                     ))}
                 </div>
