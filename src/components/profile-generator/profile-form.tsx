@@ -1,3 +1,4 @@
+
 // src/components/profile-generator/profile-form.tsx
 'use client';
 
@@ -45,7 +46,6 @@ export function ProfileForm({
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<FamousPerson[]>([]);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -101,10 +101,18 @@ export function ProfileForm({
                     <Input
                       id="search"
                       name="search"
-                      ref={searchInputRef}
                       placeholder="e.g., Albert Einstein, Tennis, Canada"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      onBlur={() => {
+                        // We use a timeout to allow click events on the popover to register
+                        setTimeout(() => setIsSearchOpen(false), 150);
+                      }}
+                      onFocus={() => {
+                         if (searchResults.length > 0) {
+                             setIsSearchOpen(true);
+                         }
+                      }}
                       className="pl-10"
                       autoComplete="off"
                     />
@@ -112,11 +120,11 @@ export function ProfileForm({
                 </div>
               </PopoverTrigger>
               <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
-                  {searchResults.length > 0 ? (
+                  {searchResults.length > 0 && (
                       <div className="max-h-60 overflow-y-auto">
-                          {searchResults.map((person) => (
+                          {searchResults.map((person, index) => (
                           <div
-                              key={person.name}
+                              key={`${person.name}-${index}`}
                               onMouseDown={(e) => {
                                 e.preventDefault();
                                 handleSelectPerson(person)
@@ -127,8 +135,6 @@ export function ProfileForm({
                           </div>
                           ))}
                       </div>
-                  ) : (
-                       <div className="p-3 text-sm text-center text-white/50">No results found.</div>
                   )}
               </PopoverContent>
             </Popover>
@@ -215,7 +221,7 @@ export function ProfileForm({
         </form>
       </div>
       <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">
-        {"He who knows others is learned;\\nHe who knows himself is wise.\\nLao Tzu, Dao De Jing"}
+        {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
       </footer>
     </div>
   );
