@@ -136,7 +136,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     [gridContent['8'] || null, gridContent['1'] || null, gridContent['6'] || null],
   ];
 
-  const birthDigitsRaw = (String(day) + String(month) + String(year)).split('').map(Number);
+  const birthDigitsRaw = (String(day || 0) + String(month || 0) + String(year || 0)).split('').map(Number);
   const compoundNum = birthDigitsRaw.reduce((a, b) => a + b, 0);
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for this compound number (${compoundNum}).`;
   
