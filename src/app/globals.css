@@ -143,18 +143,6 @@
   background: hsl(var(--bg-dark-hsl));
 }
 
-.aura-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  background: linear-gradient(45deg, #1e0033, #3c004a, #0d1a3a, #002d3a);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
-}
-
 .results-background {
     position: relative;
     min-height: 100vh;

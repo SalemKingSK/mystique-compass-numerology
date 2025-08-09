@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import CosmicNebula from '@/components/cosmic-nebula';
 
 export const metadata: Metadata = {
   title: 'Mystique Compass',
@@ -20,7 +21,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <div className="aura-background"></div>
+        <CosmicNebula />
         {children}
         <Toaster />
       </body>
