@@ -1,6 +1,6 @@
 // src/lib/astrology.ts
 import { CHINESE_CALENDAR } from './new-astrology/chinese-calendar';
-import type { AstroInsightInput, AstroInsightOutput, NewAstroSignData } from '@/components/profile-generator/types';
+import type { AstroInsightOutput } from '@/components/profile-generator/types';
 import { zodiacData } from './zodiac';
 import { NEW_ASTROLOGY_DATA } from './new-astrology';
 
@@ -53,7 +53,7 @@ export const getChineseZodiacSign = (day: number, month: number, year: number) =
   return { sign: fallbackSign, element: fallbackElement };
 };
 
-export async function getAstroInsight(input: AstroInsightInput): Promise<AstroInsightOutput> {
+export async function getAstroInsight(input: { name: string; day: number; month: number; year: number; }): Promise<AstroInsightOutput> {
     const { year, month, day, name } = input;
     
     const western_sign = getWesternZodiacSign(day, month);
@@ -64,13 +64,15 @@ export async function getAstroInsight(input: AstroInsightInput): Promise<AstroIn
     
     // Data for the "New Astrology" combined sign modal
     const newAstrologySignKey = `${western_sign}/${sign}`;
-    const signDataForNewAstrology: NewAstroSignData = NEW_ASTROLOGY_DATA[newAstrologySignKey as keyof typeof NEW_ASTROLOGY_DATA] || {};
+    const signDataForNewAstrology = NEW_ASTROLOGY_DATA[newAstrologySignKey as keyof typeof NEW_ASTROLOGY_DATA] || {};
 
     return {
         name,
         western_sign,
         sign,
         element,
+        month,
+        year,
         new_astrology_sign: newAstrologySignKey,
         zodiacData: signDataForZodiac,
         signData: signDataForNewAstrology,

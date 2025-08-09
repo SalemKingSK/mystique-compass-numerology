@@ -133,12 +133,25 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
     );
 }
 
-function ResultsHeader({ name, newAstroSign, onTabClick, activeTab }: { name: string, newAstroSign: string, onTabClick: (tab: string) => void, activeTab: string }) {
+function ResultsHeader({ 
+  name, 
+  newAstroSign, 
+  birthDate,
+  onTabClick, 
+  activeTab 
+}: { 
+  name: string, 
+  newAstroSign: string, 
+  birthDate: string,
+  onTabClick: (tab: string) => void, 
+  activeTab: string 
+}) {
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center">
             {name}
         </h1>
+        <p className="text-sm text-white/50 mt-1">{birthDate}</p>
         <div className='relative flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-6 space-y-4'>
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
                 {newAstroSign}
@@ -187,6 +200,26 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
     };
   }, [activeTab]);
 
+  const getOrdinalSuffix = (day: number) => {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+      case 1:  return "st";
+      case 2:  return "nd";
+      case 3:  return "rd";
+      default: return "th";
+    }
+  };
+
+  const formatDate = () => {
+    const { birthDay } = numerology;
+    const { month, year } = insight;
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
+      
+    const dayWithSuffix = `${birthDay}${getOrdinalSuffix(birthDay)}`;
+    return `Born ${dayWithSuffix} ${monthNames[month - 1]} ${year}`;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -199,6 +232,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
         <ResultsHeader 
             name={insight.name} 
             newAstroSign={insight.new_astrology_sign}
+            birthDate={formatDate()}
             onTabClick={setActiveTab}
             activeTab={activeTab}
         />

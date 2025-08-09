@@ -22,6 +22,8 @@ export interface AstroInsightOutput {
   western_sign: string;
   sign: string; // e.g., "Pig"
   element: string; // e.g., "Wood"
+  month: number;
+  year: number;
   new_astrology_sign: string; // e.g. "Pisces/Snake"
   zodiacData: ZodiacData; // Holds all data for the Chinese sign
   signData: {
