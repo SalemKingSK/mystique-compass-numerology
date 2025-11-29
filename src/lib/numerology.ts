@@ -1,5 +1,5 @@
 // src/lib/numerology.ts
-import type { AstroInsightInput } from './astrology';
+import type { AstroInsightInput } from '@/components/profile-generator/types';
 import { COMPOUND_NUMBER_MEANINGS, DESTINY_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
 import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
 
@@ -35,30 +35,28 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
 };
 
 export const calculateKua = (year: number, gender: string): number => {
-  const yearSum = String(year)
-    .split('')
-    .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-  const reducedYearSum = reduceToSingleDigit(yearSum);
-  
-  let kuaResult: number;
+  const reducedYear = reduceToSingleDigit(
+    String(year).split('').reduce((acc, digit) => acc + parseInt(digit), 0)
+  );
 
-  if (year < 2000) {
-    kuaResult = gender.toLowerCase() === 'male' ? 11 - reducedYearSum : reducedYearSum + 4;
+  let initialKua: number;
+  
+  if (gender.toLowerCase() === 'male') {
+    initialKua = 11 - reducedYear;
   } else {
-    kuaResult = gender.toLowerCase() === 'male' ? 9 - reducedYearSum : reducedYearSum + 6;
+    initialKua = reducedYear + 4;
   }
 
-  let finalKua = reduceToSingleDigit(kuaResult);
-  
-  if (finalKua === 5 && gender.toLowerCase() === 'male') {
-      return 2;
+  let finalKua = reduceToSingleDigit(initialKua);
+
+  // Handle the special case for Kua number 5
+  if (finalKua === 5) {
+    return gender.toLowerCase() === 'male' ? 2 : 8;
   }
-  if (finalKua === 5 && gender.toLowerCase() === 'female') {
-      return 8;
-  }
-  
+
   return finalKua;
 };
+
 
 export const calculateKarmicFate = (day: number, month: number, year: number): number => {
     const sum = day + month + year;
