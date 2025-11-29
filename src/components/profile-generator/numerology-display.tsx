@@ -208,35 +208,27 @@ const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCount
 });
 RepetitionMeaningsDisplay.displayName = 'RepetitionMeaningsDisplay';
 
-const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, auspiciousDirections: any, open: boolean, onToggle: () => void }>(
-    ({ kuaAttributes, auspiciousDirections, open, onToggle }, ref) => {
+const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: boolean, onToggle: () => void }>(
+    ({ kuaAttributes, open, onToggle }, ref) => {
+        if (!kuaAttributes || !kuaAttributes.directions) return null;
+        
         return (
              <div ref={ref}>
                 <Accordion type="single" collapsible value={open ? 'kua-section' : ''} onValueChange={onToggle}>
                     <AccordionItem value="kua-section" className="border-none">
-                        <AccordionContent>
-                            {kuaAttributes && (
-                                <div className="glass-card p-4 space-y-2">
-                                    <h3 className="font-semibold text-lg text-primary">Kua Attributes</h3>
-                                    <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                                        <div><p className="text-purple-200/70 text-xs">Element</p><p>{kuaAttributes.element}</p></div>
-                                        <div><p className="text-purple-200/70 text-xs">Colors</p><p>{kuaAttributes.colors}</p></div>
-                                        <div><p className="text-purple-200/70 text-xs">Season</p><p>{kuaAttributes.season}</p></div>
-                                    </div>
-                                </div>
-                            )}
-                            {auspiciousDirections && (
-                                <div className="glass-card p-4 space-y-2 mt-4">
-                                    <h3 className="font-semibold text-lg text-primary">Auspicious Directions</h3>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-sm">
-                                        <div><p className="text-purple-200/70 text-xs">Success</p><p>{auspiciousDirections.Success}</p></div>
-                                        <div><p className="text-purple-200/70 text-xs">Health</p><p>{auspiciousDirections.Health}</p></div>
-                                        <div><p className="text-purple-200/70 text-xs">Family</p><p>{auspiciousDirections.Family}</p></div>
-                                        <div><p className="text-purple-200/70 text-xs">Personal Growth</p><p>{auspiciousDirections['Personal-Growth']}</p></div>
-                                    </div>
-                                </div>
-                            )}
-                        </AccordionContent>
+                         <div className="glass-card p-4 space-y-3 mt-4">
+                            <h3 className="font-semibold text-lg text-primary mb-2">Feng Shui Compass</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-sm">
+                                <div><p className="text-purple-200/70 text-xs">Success</p><p>{kuaAttributes.directions.Success}</p></div>
+                                <div><p className="text-purple-200/70 text-xs">Health</p><p>{kuaAttributes.directions.Health}</p></div>
+                                <div><p className="text-purple-200/70 text-xs">Family</p><p>{kuaAttributes.directions.Family}</p></div>
+                                <div><p className="text-purple-200/70 text-xs">Personal Growth</p><p>{kuaAttributes.directions['Personal-Growth']}</p></div>
+                            </div>
+                             <div className="grid grid-cols-2 gap-2 text-center text-sm pt-2">
+                                <div><p className="text-purple-200/70 text-xs">Element</p><p>{kuaAttributes.element}</p></div>
+                                <div><p className="text-purple-200/70 text-xs">Lucky Colors</p><p>{kuaAttributes.lucky_colours?.join(', ')}</p></div>
+                            </div>
+                        </div>
                     </AccordionItem>
                 </Accordion>
             </div>
@@ -319,7 +311,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         arrowsOfStrength,
         arrowsOfWeakness,
         kuaAttributes,
-        auspiciousDirections,
         compoundNum,
         compoundMeaning,
         reducedCompoundNum,
@@ -383,7 +374,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       <ArrowsDisplay ref={arrowsRef} arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} openItems={openSections} onToggle={handleToggleMultiple} />
       
       <div ref={kuaRef}>
-          <KuaDisplay kuaAttributes={kuaAttributes} auspiciousDirections={auspiciousDirections} open={openSections.includes(kuaId)} onToggle={() => handleToggle(kuaId)} />
+          <KuaDisplay kuaAttributes={kuaAttributes} open={openSections.includes(kuaId)} onToggle={() => handleToggle(kuaId)} />
       </div>
 
     </div>

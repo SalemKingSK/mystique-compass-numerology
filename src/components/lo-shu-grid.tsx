@@ -12,6 +12,19 @@ interface LoShuGridProps {
   title: string;
 }
 
+const PLANETARY_LABELS: { [key: number]: string } = {
+  4: 'Rahu (Wood)',
+  9: 'Mars (Fire)',
+  2: 'Moon (Earth)',
+  3: 'Jupiter (Wood)',
+  5: 'Mercury (Earth)',
+  7: 'Ketu (Metal)',
+  8: 'Saturn (Earth)',
+  1: 'Sun (Water)',
+  6: 'Venus (Metal)',
+};
+
+
 // Central repository for all possible arrow path coordinates (start, end)
 // These percentages correspond to the center of each grid cell.
 const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: string } } = {
@@ -50,6 +63,8 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
     return directMatch || null;
   }
 
+  const gridOrder = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+
   return (
     // The main container that establishes the coordinate system for the overlay
     <div className="relative aspect-square w-full max-w-[400px] mx-auto glass-card p-4">
@@ -60,20 +75,26 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
       
       {/* 1. The Grid of Numbers (the base layer) */}
       <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2">
-        {gridData.flat().map((cell, index) => {
+        {gridOrder.map((gridNum, index) => {
+           const cell = gridData.flat().find(c => c?.startsWith(String(gridNum)));
            const number = cell ? cell.charAt(0) : null;
            const isClickable = !!number && onNumberClick;
            return (
               <div
                 key={index}
-                className={`flex items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
+                className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
                 onClick={isClickable ? () => onNumberClick(number!) : undefined}
               >
-                {cell ? (
-                  <span className="truncate">{cell}</span>
-                ) : (
-                  <span className="opacity-20">{[ '4', '9', '2', '3', '5', '7', '8', '1', '6' ][index]}</span>
-                )}
+                <div className="flex-grow flex items-center justify-center">
+                    {cell ? (
+                    <span className="truncate">{cell}</span>
+                    ) : (
+                    <span className="opacity-20">{gridNum}</span>
+                    )}
+                </div>
+                <div className="text-[10px] h-4 font-normal text-purple-300/50 mt-1">
+                    {PLANETARY_LABELS[gridNum]}
+                </div>
               </div>
            )
         })}
@@ -159,4 +180,4 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
   );
 };
 
-export default LoShuGrid;
+export default LoShu

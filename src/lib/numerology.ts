@@ -1,6 +1,6 @@
 // src/lib/numerology.ts
 import type { AstroInsightInput } from '@/components/profile-generator/types';
-import { COMPOUND_NUMBER_MEANINGS, DESTINY_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_ATTRIBUTES, KUA_DIRECTIONS, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
+import { COMPOUND_NUMBER_MEANINGS, DESTINY_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_DATA, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
 import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
 
 // --- HELPER FUNCTIONS ---
@@ -85,10 +85,11 @@ export interface NumerologyData {
   kuaNum: number;
   kuaAttributes: {
     element: string;
-    colors: string;
-    season: string;
+    group: string;
+    trigram: string;
+    lucky_colours: string[];
+    directions: { [key: string]: string };
   };
-  auspiciousDirections: { [key: string]: string };
   loShuGrid: (string | null)[][];
   numberCounts: { [key: string]: number };
   repeatedNumberMeanings: { [key: string]: string };
@@ -176,16 +177,13 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   }
 
   const arrows = calculateArrows(loShuGrid);
-
-  let kuaAttributes = KUA_ATTRIBUTES[kuaNum];
-  if(kuaNum === 5) {
-    kuaAttributes = gender.toLowerCase() === 'male' ? KUA_ATTRIBUTES[5].male : KUA_ATTRIBUTES[5].female;
-  }
   
-  let auspiciousDirections = KUA_DIRECTIONS[kuaNum];
-  if(kuaNum === 5) {
-    auspiciousDirections = gender.toLowerCase() === 'male' ? KUA_DIRECTIONS[5].male : KUA_DIRECTIONS[5].female;
+  const originalKua = reduceToSingleDigit(gender.toLowerCase() === 'male' ? 11 - reduceToSingleDigit(year) : reduceToSingleDigit(year) + 4);
+  let kuaLookupKey = originalKua.toString();
+  if (originalKua === 5) {
+      kuaLookupKey = gender.toLowerCase() === 'male' ? '5_male' : '5_female';
   }
+  const kuaAttributes = KUA_DATA[kuaLookupKey] || {};
 
   const psychicMeaning = PSYCHIC_NUMBER_MEANINGS[psycheNum as keyof typeof PSYCHIC_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this psychic number.'};
   const destinyMeaning = DESTINY_NUMBER_MEANINGS[destinyNum as keyof typeof DESTINY_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this destiny number.'};
@@ -214,7 +212,6 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     destinyMeaning,
     arrowsOfStrength: arrows.strength,
     arrowsOfWeakness: arrows.weakness,
-    kuaAttributes: kuaAttributes || {},
-    auspiciousDirections: auspiciousDirections || {},
+    kuaAttributes: kuaAttributes || { directions: {} }
   };
 };
