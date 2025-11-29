@@ -180,4 +180,4 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
   );
 };
 
-export default LoShu
+export default LoShuGrid;

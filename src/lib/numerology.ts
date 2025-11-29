@@ -110,8 +110,7 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const allDigitsForGrid = [
       ...birthDigitsForGrid,
       psycheNum,
-      destinyNum,
-      kuaNum
+      destinyNum
   ];
 
   const numberCounts: { [key: string]: number } = {};
@@ -178,8 +177,8 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   const arrows = calculateArrows(loShuGrid);
   
-  const originalKua = reduceToSingleDigit(gender.toLowerCase() === 'male' ? 11 - reduceToSingleDigit(year) : reduceToSingleDigit(year) + 4);
-  let kuaLookupKey = originalKua.toString();
+  const originalKua = reduceToSingleDigit(year);
+  let kuaLookupKey = calculateKua(year, gender).toString();
   if (originalKua === 5) {
       kuaLookupKey = gender.toLowerCase() === 'male' ? '5_male' : '5_female';
   }
