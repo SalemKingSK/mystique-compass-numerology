@@ -19,7 +19,7 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
             {icon}
             <p className="text-base font-medium">{title}</p>
         </div>
-        <p className="text-5xl font-bold text-yellow-300 mt-2">{value}</p>
+        <p className="text-5xl font-bold text-yellow-300 mt-2">{value || ''}</p>
     </div>
 );
 
@@ -339,7 +339,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={handlePsycheClick} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
-        <InfoCard title="Compound Number" value={compoundNum || ''} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
+        <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -7,6 +7,7 @@ import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowM
 const reduceToSingleDigit = (n: number): number => {
   let num = n;
   while (num > 9) {
+    if (num === 11 || num === 22) return num; // Master numbers are not reduced
     num = String(num)
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
@@ -23,7 +24,10 @@ const reduceOnce = (n: number): number => {
 
 // --- CORE NUMBER CALCULATIONS ---
 export const calculatePsyche = (day: number): number => {
-  return reduceToSingleDigit(day);
+    if (day > 9) {
+         return String(day).split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+    }
+    return day;
 };
 
 export const calculateDestiny = (day: number, month: number, year: number): number => {
@@ -134,8 +138,10 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     [gridContent['8'] || null, gridContent['1'] || null, gridContent['6'] || null],
   ];
 
-  const birthDigitsRaw = (String(day || 0) + String(month || 0) + String(year || 0)).split('').map(Number);
-  const compoundNum = birthDigitsRaw.reduce((a, b) => a + b, 0);
+  const birthDateSum = String(day).split('').reduce((a, b) => a + Number(b), 0) +
+                       String(month).split('').reduce((a, b) => a + Number(b), 0) +
+                       String(year).split('').reduce((a, b) => a + Number(b), 0);
+  const compoundNum = birthDateSum;
   const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for this compound number (${compoundNum}).`;
   
   const firstReduction = reduceOnce(compoundNum);
@@ -177,16 +183,20 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   const arrows = calculateArrows(loShuGrid);
   
-  const originalKua = reduceToSingleDigit(year);
-  let kuaLookupKey = calculateKua(year, gender).toString();
-  if (originalKua === 5) {
-      kuaLookupKey = gender.toLowerCase() === 'male' ? '5_male' : '5_female';
+  let kuaLookupKey = kuaNum.toString();
+  if (kuaNum === 2 && gender.toLowerCase() === 'male' && reduceToSingleDigit(year) === 9) {
+      // Special case for Kua 5 Male (becomes 2)
+      kuaLookupKey = '5_male';
+  } else if (kuaNum === 8 && gender.toLowerCase() === 'female' && reduceToSingleDigit(year) === 6) {
+      // Special case for Kua 5 Female (becomes 8)
+      kuaLookupKey = '5_female';
   }
   const kuaAttributes = KUA_DATA[kuaLookupKey] || {};
 
   const psychicMeaning = PSYCHIC_NUMBER_MEANINGS[psycheNum as keyof typeof PSYCHIC_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this psychic number.'};
   const destinyMeaning = DESTINY_NUMBER_MEANINGS[destinyNum as keyof typeof DESTINY_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this destiny number.'};
   
+  // Special Trait of Birth Day applies only to compound birth days (10-31)
   const specialTraitMeaning = (day >= 10 && day <= 31) 
     ? (COMPOUND_NUMBER_MEANINGS[day as keyof typeof COMPOUND_NUMBER_MEANINGS] || null) 
     : null;
