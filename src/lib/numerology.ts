@@ -5,14 +5,13 @@ import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowM
 
 // --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
-  let num = n;
-  while (num > 9) {
-    if (num === 11 || num === 22) return num; // Master numbers are not reduced
-    num = String(num)
-      .split('')
-      .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-  }
-  return num;
+  if (n <= 9) return n;
+
+  const sum = String(n)
+    .split('')
+    .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+
+  return reduceToSingleDigit(sum);
 };
 
 const reduceOnce = (n: number): number => {
@@ -39,9 +38,7 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
 };
 
 export const calculateKua = (year: number, gender: string): number => {
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((acc, digit) => acc + parseInt(digit), 0)
-  );
+  const reducedYear = reduceToSingleDigit(year);
 
   let initialKua: number;
   
@@ -51,7 +48,7 @@ export const calculateKua = (year: number, gender: string): number => {
     initialKua = reducedYear + 4;
   }
 
-  let finalKua = reduceToSingleDigit(initialKua);
+  const finalKua = reduceToSingleDigit(initialKua);
 
   // Handle the special case for Kua number 5
   if (finalKua === 5) {
@@ -184,13 +181,10 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const arrows = calculateArrows(loShuGrid);
   
   let kuaLookupKey = kuaNum.toString();
-  if (kuaNum === 2 && gender.toLowerCase() === 'male' && reduceToSingleDigit(year) === 9) {
-      // Special case for Kua 5 Male (becomes 2)
-      kuaLookupKey = '5_male';
-  } else if (kuaNum === 8 && gender.toLowerCase() === 'female' && reduceToSingleDigit(year) === 6) {
-      // Special case for Kua 5 Female (becomes 8)
-      kuaLookupKey = '5_female';
+  if (calculateKua(year, gender) === 5) { // The base Kua calculation before conversion
+      kuaLookupKey = gender.toLowerCase() === 'male' ? '5_male' : '5_female';
   }
+  
   const kuaAttributes = KUA_DATA[kuaLookupKey] || {};
 
   const psychicMeaning = PSYCHIC_NUMBER_MEANINGS[psycheNum as keyof typeof PSYCHIC_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this psychic number.'};
