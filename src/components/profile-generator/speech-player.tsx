@@ -52,7 +52,9 @@ export const SpeechPlayer: React.FC<Props> = ({ text, sentences, onBoundary, onE
         };
 
         utterance.onerror = (event) => {
-            if (userInitiatedStop.current && (event.error === 'canceled' || event.error === 'interrupted')) {
+            // These errors are often triggered by non-critical interruptions (e.g., navigation)
+            // and don't need to be logged as errors.
+            if (event.error === 'canceled' || event.error === 'interrupted') {
                 return; 
             }
             console.error("SpeechSynthesis Error:", event);
