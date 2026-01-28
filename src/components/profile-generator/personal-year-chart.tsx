@@ -12,9 +12,7 @@ import {
 } from 'chart.js';
 import type { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import type { PersonalYearData } from './types';
 import { PERSONAL_YEAR_MEANINGS } from '@/lib/numerology/data/personalYearMeanings';
-
 
 ChartJS.register(
   CategoryScale,
@@ -26,6 +24,13 @@ ChartJS.register(
   Title,
   annotationPlugin
 );
+
+interface PersonalYearData {
+  year: number;
+  pyn: number;
+  power: number;
+  meaning: string;
+}
 
 interface PersonalYearChartProps {
   birthDay: number;
@@ -48,8 +53,8 @@ const BASE_POWER: Record<number, number> = {
   9: 10,
 };
 
-/** Tiered growth factor per 9-year cycle (12%) */
-const CYCLE_GROWTH = 0.12;
+/** Vertical separation between 9-year cycles */
+const CYCLE_LIFT = 6;
 
 const reduce = (num: number): number => {
   let n = num;
@@ -66,7 +71,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   onYearSelect,
   selectedPersonalYear,
 }) => {
-  const chartRef = useRef<ChartJS<'line'>>(null);
+  const chartRef = useRef<ChartJS<"line">>(null);
   const [chartData, setChartData] = useState<any>({ datasets: [] });
 
   const now = new Date(2026, 0, 1);
@@ -75,7 +80,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   const effectiveYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
 
   const dataArray = useMemo<PersonalYearData[]>(() => {
-    const start = effectiveYear - 9;
+    const start = effectiveYear - 4;
     const end = effectiveYear + 9;
 
     return Array.from({ length: end - start + 1 }, (_, i) => {
@@ -83,8 +88,8 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
       const pyn = reduce(birthMonth + birthDay + year);
       const cycleIndex = Math.floor((year - birthYear) / 9);
 
-      const base = BASE_POWER[pyn];
-      const power = +(base * (1 + cycleIndex * CYCLE_GROWTH)).toFixed(2);
+      const power =
+        BASE_POWER[pyn] + cycleIndex * CYCLE_LIFT;
 
       return {
         year,
@@ -95,8 +100,6 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
     });
   }, [birthDay, birthMonth, birthYear, effectiveYear]);
 
-  const currentIndex = dataArray.findIndex(d => d.year === effectiveYear);
-
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart) return;
@@ -105,6 +108,8 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
     const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
     gradient.addColorStop(0, 'rgba(128, 0, 255, 0.6)');
     gradient.addColorStop(1, 'rgba(255, 0, 255, 0.05)');
+
+    const currentIndex = dataArray.findIndex(d => d.year === effectiveYear);
 
     setChartData({
       labels: dataArray.map(d => String(d.year)),
@@ -115,10 +120,10 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
           backgroundColor: gradient,
           fill: true,
           tension: 0.45,
-          borderWidth: 7,
-          pointRadius: dataArray.map((_, i) =>
-            i === currentIndex ? 18 : 12
-          ),
+          borderWidth: 6,
+          pointRadius: 6,
+          pointHoverRadius: 10,
+          pointHitRadius: 28,
           pointBackgroundColor: dataArray.map((_, i) =>
             i === currentIndex ? '#ffffff' : '#ff00ff'
           ),
@@ -126,17 +131,15 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
             i === currentIndex ? '#fceabb' : '#ff00ff'
           ),
           pointBorderWidth: dataArray.map((_, i) =>
-            i === currentIndex ? 6 : 4
+            i === currentIndex ? 4 : 3
           ),
-          pointHoverRadius: dataArray.map((_, i) =>
-            i === currentIndex ? 24 : 16
-          ),
-          pointHitRadius: 40,
         },
       ],
     });
-  }, [dataArray, currentIndex]);
+  }, [dataArray, effectiveYear]);
 
+  const currentIndex = dataArray.findIndex(d => d.year === effectiveYear);
+  const currentPower = dataArray[currentIndex]?.power ?? 0;
 
   const options: any = {
     responsive: true,
@@ -150,26 +153,30 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
       const clicked = dataArray[elements[0].index];
       const next =
         selectedPersonalYear?.year === clicked.year ? null : clicked;
-
       onYearSelect(next);
     },
     scales: {
       y: {
         display: false,
-        min: Math.min(...dataArray.map(d => d.power)) - 1,
-        max: Math.max(...dataArray.map(d => d.power)) + 1,
+        min: Math.min(...dataArray.map(d => d.power)) - 2,
+        max: Math.max(...dataArray.map(d => d.power)) + 2,
       },
       x: {
+        offset: false,
         ticks: {
+          autoSkip: false,
           color: '#fceabb',
-          font: { size: 14 },
+          font: { size: 13 },
           maxRotation: 45,
           minRotation: 45,
         },
-        grid: { color: 'rgba(255,255,255,0.08)' },
+        grid: {
+          color: 'rgba(255,255,255,0.06)',
+        },
       },
     },
     plugins: {
+      legend: { display: false },
       title: {
         display: true,
         text: 'Personal Year Cycle',
@@ -187,7 +194,6 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
           },
         },
       },
-      legend: { display: false },
       annotation: {
         annotations: {
           currentLine: {
@@ -201,10 +207,10 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
           currentLabel: {
             type: 'label',
             xValue: effectiveYear,
-            yValue: dataArray.map(d => d.power).reduce((a, b) => Math.max(a, b)) + 2,
+            yValue: currentPower + 1,
             content: `Current Year: ${effectiveYear}`,
-            backgroundColor: 'rgba(0,0,0,0.75)',
-            color: '#fceabb',
+            backgroundColor: '#fceabb',
+            color: '#000',
             font: { size: 14, weight: 'bold' },
             padding: 10,
             borderRadius: 8,

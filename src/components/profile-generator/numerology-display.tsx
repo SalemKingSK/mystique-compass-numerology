@@ -220,9 +220,11 @@ const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: 
 KuaDisplay.displayName = 'KuaDisplay';
 
 
-export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numerology: NumerologyData, birthMonth: number, birthYear: number }) {
+export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const {
         birthDay,
+        birthMonth,
+        birthYear,
         psycheNum,
         destinyNum,
         kuaNum,
