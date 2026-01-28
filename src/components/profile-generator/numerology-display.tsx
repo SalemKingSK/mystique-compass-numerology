@@ -222,6 +222,28 @@ KuaDisplay.displayName = 'KuaDisplay';
 
 
 export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numerology: NumerologyData, birthMonth: number, birthYear: number }) {
+    const {
+        birthDay,
+        psycheNum,
+        destinyNum,
+        kuaNum,
+        loShuGrid,
+        arrowsOfStrength,
+        arrowsOfWeakness,
+        kuaAttributes,
+        compoundNum,
+        compoundMeaning,
+        reducedCompoundNum,
+        reducedCompoundMeaning,
+        karmicFateNum,
+        karmicFateMeaning,
+        numberCounts,
+        repeatedNumberMeanings,
+        psychicMeaning,
+        specialTraitMeaning,
+        destinyMeaning,
+    } = numerology;
+    
     const [openSections, setOpenSections] = React.useState<string[]>([]);
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
 
@@ -313,28 +335,6 @@ export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numer
             return newOpenSections;
         });
     }
-
-    const {
-        birthDay,
-        psycheNum,
-        destinyNum,
-        kuaNum,
-        loShuGrid,
-        arrowsOfStrength,
-        arrowsOfWeakness,
-        kuaAttributes,
-        compoundNum,
-        compoundMeaning,
-        reducedCompoundNum,
-        reducedCompoundMeaning,
-        karmicFateNum,
-        karmicFateMeaning,
-        numberCounts,
-        repeatedNumberMeanings,
-        psychicMeaning,
-        specialTraitMeaning,
-        destinyMeaning,
-    } = numerology;
 
     const psychicId = `psychic-${psycheNum}`;
     const specialTraitId = `special-trait-${birthDay}`;
