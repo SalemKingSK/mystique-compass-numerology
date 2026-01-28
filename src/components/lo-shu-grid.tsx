@@ -4,7 +4,7 @@ import React from 'react';
 import type { ArrowData } from '@/lib/numerology';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Layers } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { AccordionContentWithPlayer } from '@/components/profile-generator/accordion-content-with-player';
 
 // Props for the LoShuGrid component
 interface LoShuGridProps {
@@ -102,9 +102,7 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
               <h4 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
                 <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count > 1 ? 's' : ''})
               </h4>
-              <ScrollArea className="h-40">
-                <p className="text-sm text-muted-foreground">{meaning}</p>
-              </ScrollArea>
+              <AccordionContentWithPlayer text={meaning!} />
             </div>
           </PopoverContent>
         </Popover>
