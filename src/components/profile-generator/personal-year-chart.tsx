@@ -1,7 +1,7 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler } from 'chart.js';
-import { PersonalYearData } from './types';
+import type { PersonalYearData } from './types';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
@@ -22,138 +22,134 @@ interface PersonalYearChartProps {
   birthMonth: number;
   birthYear: number;
   onYearSelect: (data: PersonalYearData | null) => void;
+  selectedPersonalYear: PersonalYearData | null;
 }
 
-export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({ birthDay, birthMonth, birthYear, onYearSelect }) => {
-  const chartRef = React.useRef(null);
+export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({ birthDay, birthMonth, birthYear, onYearSelect, selectedPersonalYear }) => {
   const currentYear = 2026;
-  const startYear = currentYear - 9;
-  const endYear = currentYear + 9;
+  const currentDate = new Date(currentYear, 0, 1);
+  const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
+  const effectiveCurrentYear = currentDate >= birthdayThisYear ? currentYear : currentYear - 1;
 
-  const data: PersonalYearData[] = React.useMemo(() => {
-    const chartData: PersonalYearData[] = [];
-    const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
-    const offsetPerCycle = 3;
+  const startYear = effectiveCurrentYear - 9;
+  const endYear = effectiveCurrentYear + 9;
 
-    const reduce = (num: number): number => {
-      let n = num;
-      while (n > 9) {
-        n = String(n).split('').reduce((a, b) => a + Number(b), 0);
-      }
-      return n || 9;
-    };
+  const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
+  const offsetPerCycle = 3;
 
-    for (let year = startYear; year <= endYear; year++) {
-      const pyn = reduce(birthMonth + birthDay + year);
-      const cycleIndex = Math.floor((year - birthYear) / 9);
-      const basePower = powerMap[pyn];
-      const power = basePower + cycleIndex * offsetPerCycle;
-      chartData.push({ year, pyn, power, meaning: PERSONAL_YEAR_MEANINGS[pyn] });
+  const reduce = (num: number): number => {
+    let n = num;
+    while (n > 9) {
+      n = String(n).split('').reduce((a, b) => a + Number(b), 0);
     }
-    return chartData;
-  }, [birthDay, birthMonth, birthYear, startYear, endYear]);
-
-  const maxPower = Math.max(...data.map(d => d.power)) + 5;
-  const currentIndex = data.findIndex(d => d.year === currentYear);
-
-  const chartData = {
-    labels: data.map(d => d.year),
-    datasets: [
-      {
-        label: 'Power Level',
-        data: data.map(d => d.power),
-        borderColor: '#ff00ff',
-        backgroundColor: 'rgba(255, 0, 255, 0.3)',
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointRadius: data.map((d, i) => i === currentIndex ? 8 : 5),
-        pointBackgroundColor: data.map((d, i) => i === currentIndex ? '#fceabb' : '#ff00ff'),
-        pointBorderColor: data.map((d, i) => i === currentIndex ? '#fff' : '#ff00ff'),
-        pointBorderWidth: 2,
-        pointHitRadius: 20,
-        pointHoverRadius: 10,
-        pointHoverBorderWidth: 3,
-      }
-    ]
+    return n || 9;
   };
 
-  const options: any = {
+  const chartDataArray: PersonalYearData[] = [];
+  for (let year = startYear; year <= endYear; year++) {
+    const pyn = reduce(birthMonth + birthDay + year);
+    const cycleIndex = Math.floor((year - birthYear) / 9);
+    const basePower = powerMap[pyn];
+    const power = basePower + cycleIndex * offsetPerCycle;
+    chartDataArray.push({ year, pyn, power, meaning: PERSONAL_YEAR_MEANINGS[pyn] });
+  }
+
+  const currentIndex = chartDataArray.findIndex(d => d.year === effectiveCurrentYear);
+
+  const maxPower = Math.max(...chartDataArray.map(d => d.power)) + 8;
+
+  const verticalLine = {
+    type: 'line' as const,
+    data: chartDataArray.map((_, i) => i === currentIndex ? maxPower : null),
+    borderColor: '#fceabb',
+    borderDash: [8, 6],
+    borderWidth: 4,
+    pointRadius: 0,
+    pointHoverRadius: 0,
+    datalabels: { display: false },
+    label: `Current Year: ${effectiveCurrentYear}`,
+  };
+
+  const datasets = [
+    {
+      label: 'Power Level',
+      data: chartDataArray.map(d => d.power),
+      borderColor: '#ff00ff',
+      backgroundColor: 'rgba(128, 0, 255, 0.6)',
+      fill: true,
+      tension: 0.4,
+      borderWidth: 7,
+      pointRadius: chartDataArray.map((_, i) => i === currentIndex ? 16 : 11),
+      pointBackgroundColor: chartDataArray.map((_, i) => i === currentIndex ? '#ffffff' : '#ff00ff'),
+      pointBorderColor: '#ff00ff',
+      pointBorderWidth: 4,
+      pointHoverRadius: chartDataArray.map((_, i) => i === currentIndex ? 20 : 15),
+      pointHitRadius: 30
+    },
+    verticalLine
+  ];
+
+  const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
       mode: 'nearest' as const,
-      axis: 'x' as const,
-      intersect: false,
+      intersect: false
     },
     onClick: (event: any, elements: any) => {
-      if (elements.length > 0) {
+      if (elements.length > 0 && elements[0].datasetIndex === 0) { // Only main line
         const index = elements[0].index;
-        onYearSelect(data[index]);
+        const clicked = chartDataArray[index];
+        onYearSelect(selectedPersonalYear?.year === clicked.year ? null : clicked);
       } else {
-        const chart = chartRef.current;
-        if (chart) {
-            const canvasPosition = ChartJS.helpers.getRelativePosition(event, chart);
-            const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
-            // Check if click is outside of plotted area on x-axis
-            if(dataX < 0 || dataX >= data.length) {
-                onYearSelect(null);
-            }
-        }
+        onYearSelect(null);
       }
     },
     scales: {
       y: { display: false, min: 0, max: maxPower },
       x: {
-        ticks: { color: 'hsl(var(--foreground))', font: { size: 12 } },
-        grid: { color: 'hsl(var(--border) / 0.5)' }
+        ticks: {
+          color: '#fceabb',
+          font: { size: 14 },
+          maxRotation: 45,
+          minRotation: 45
+        },
+        grid: { color: '#333333' }
       }
     },
     plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (context: any) => `Personal Year ${data[context.dataIndex].pyn} - Power ${context.parsed.y}`
-        }
-      },
       title: {
         display: true,
         text: 'Personal Year Cycle',
-        color: 'hsl(var(--primary))',
-        font: { size: 18, weight: 'bold' }
+        color: '#fceabb',
+        font: { size: 22, weight: 'bold' }
       },
-      annotation: {
-        annotations: {
-          line1: {
-            type: 'line',
-            yMin: 0,
-            yMax: maxPower,
-            xMin: currentYear,
-            xMax: currentYear,
-            borderColor: '#fceabb',
-            borderWidth: 2,
-            borderDash: [6, 6],
-            label: {
-              content: `Current Year: ${currentYear}`,
-              enabled: true,
-              position: 'start',
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              color: '#fceabb',
-              font: {
-                size: 12,
-                weight: 'bold'
-              }
+      tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleColor: '#ff00ff',
+        bodyColor: '#fceabb',
+        callbacks: {
+          label: (context: any) => {
+            if (context.datasetIndex === 0) {
+              const d = chartDataArray[context.dataIndex];
+              return `Personal Year ${d.pyn} - Power ${d.power}`;
             }
+            return '';
           }
         }
-      }
+      },
+      legend: { display: false }
     }
   };
 
   return (
-    <div className="glass-card p-4 md:p-6 rounded-2xl bg-[#1a1a2e] h-[450px] relative">
-      <Line ref={chartRef} data={chartData} options={options} />
-      <p className="text-xs text-purple-200/70 text-center mt-2 italic">Click any point on the chart for detailed insights</p>
+    <div className="glass-card p-6 rounded-2xl bg-[#0f0f1e]">
+      <div style={{ height: '520px' }}>
+        <Line data={{ labels: chartDataArray.map(d => d.year), datasets }} options={chartOptions} />
+      </div>
+      <p className="text-sm text-purple-200/80 text-center mt-4 italic font-medium">
+        Click any point on the chart for detailed insights
+      </p>
     </div>
   );
 };

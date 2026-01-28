@@ -6,9 +6,10 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { PersonalYearChart, PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
+import { PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
+import { PersonalYearChart } from './personal-year-chart';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -375,10 +376,10 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="mt-8"
+        transition={{ duration: 0.7 }}
+        className="mt-10"
       >
         <PersonalYearChart
           birthDay={birthDay}
