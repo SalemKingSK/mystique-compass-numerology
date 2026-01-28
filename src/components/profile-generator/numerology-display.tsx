@@ -6,10 +6,9 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
-import { motion, AnimatePresence } from 'framer-motion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
-import { PersonalYearChart } from './personal-year-chart';
+import { PersonalYearChart, PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -247,31 +246,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     
     const [openSections, setOpenSections] = React.useState<string[]>([]);
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
-
-    React.useEffect(() => {
-        const currentYear = 2026;
-        const reduce = (num: number): number => {
-            let n = num;
-            while (n > 9) {
-                n = String(n).split('').reduce((a, b) => a + Number(b), 0);
-            }
-            return n || 9;
-        };
-        
-        const pyn = reduce(birthMonth + birthDay + currentYear);
-        const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
-        const offsetPerCycle = 3;
-        const cycleIndex = Math.floor((currentYear - birthYear) / 9);
-        const basePower = powerMap[pyn];
-        const power = basePower + cycleIndex * offsetPerCycle;
-
-        setSelectedPersonalYear({
-          year: currentYear,
-          pyn: pyn,
-          power: power,
-          meaning: PERSONAL_YEAR_MEANINGS[pyn]
-        });
-    }, [birthDay, birthMonth, birthYear]);
 
     const handleYearSelect = (data: PersonalYearData | null) => {
         setSelectedPersonalYear(prev => prev && data && prev.year === data.year ? null : data);

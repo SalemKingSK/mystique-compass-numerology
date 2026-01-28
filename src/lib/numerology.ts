@@ -2,6 +2,7 @@
 import type { AstroInsightInput, PersonalYearData } from '@/components/profile-generator/types';
 import { COMPOUND_NUMBER_MEANINGS, DESTINY_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_DATA, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
 import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
+import { PERSONAL_YEAR_MEANINGS } from '@/components/profile-generator/personal-year-chart';
 
 // --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
