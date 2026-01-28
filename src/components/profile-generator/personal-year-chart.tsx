@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -81,7 +83,8 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   const [selectedYearData, setSelectedYearData] = useState<PersonalYearData | null>(null);
 
   const { cycleData, currentIndex, currentPYN, currentPower } = useMemo(() => {
-    const now = new Date();
+    // Set the app's date to be January 28, 2026
+    const now = new Date('2026-01-28');
     const currentYear = now.getFullYear();
     const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
     const effectiveYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
