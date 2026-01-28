@@ -31,7 +31,7 @@ interface PersonalYearData {
   meaning: string;
 }
 
-interface Props {
+interface PersonalYearChartProps {
   birthDay: number;
   birthMonth: number;
   birthYear: number;
@@ -50,10 +50,10 @@ const PERSONAL_YEAR_MEANINGS: { [key: number]: string } = {
     9: `PERSONAL YEAR 9 — THE PEAK YEAR OF CHANGE We commence by analysing this year first, because it is both the end of the old cycle and the commencement of the new. At the forefront of the major peak in the nine-year Personal Year cycle, it is the year in which change is set into motion. However, many aspects of the changes will not always be realised until later in the year or during the following year. These changes will vary considerably over the lifetime of each person, becoming especially pronounced during the twenty-seven-year duration of developing maturity through the Pyramids. General aspects of the Personal Year (PY) 9 include travel, change of home and or job, and the making of new and exciting friendships, often accompanied by the termination of some older relationships we have since outgrown. It is also an excellent year for squaring old debts and extending the hand of peace to anyone with whom we might be at variance. A strong sense of humanitarian responsibility, tolerance and improved understanding will noticeably prevail during this year. Ruling 9 people will be in no doubt as to the importance of this year, for they will feel its vibrant power in every action. It should be their year of notable success. As the crest of their cycle, it brings them to an increased level of personal responsibility and idealism in whatever humanitarian field they express themselves. Should they be already overly ambitious, this year will strengthen their enthusiasm for egocentric success and could incite them to a degree of recklessness that might lead to extremely painful lessons. Fanaticism, superiority and excessive seriousness can detract the individual from enjoying the excitement of this dramatic year.`
 };
 
-const BASE_POWER: Record<number, number> = {
+const POWER_LEVELS: Record<number, number> = {
   1: 10,
-  2: 5,
-  3: 4,
+  2: 6,
+  3: 5,
   4: 2,
   5: 5,
   6: 8,
@@ -61,8 +61,6 @@ const BASE_POWER: Record<number, number> = {
   8: 7,
   9: 10,
 };
-
-const CYCLE_LIFT = 6;
 
 const reduce = (num: number): number => {
   let n = num;
@@ -72,153 +70,130 @@ const reduce = (num: number): number => {
   return n || 9;
 };
 
-export const PersonalYearChart: React.FC<Props> = ({
+export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   birthDay,
   birthMonth,
   birthYear,
   onYearSelect,
 }) => {
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const chartRef = useRef<ChartJS<'line'>>(null);
+  const chartRef = useRef<ChartJS<'line', number[], number>>(null);
   const [chartData, setChartData] = useState<ChartData<'line'>>({ datasets: [] });
+  const [selectedYearData, setSelectedYearData] = useState<PersonalYearData | null>(null);
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
-  const effectiveYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
+  const { cycleData, currentIndex, currentPYN, currentPower } = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
+    const effectiveYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
 
-  const dataArray = useMemo<PersonalYearData[]>(() => {
-    const start = effectiveYear - 4;
-    const end = effectiveYear + 9;
+    const worldYear = reduce(effectiveYear);
+    const birthSum = reduce(birthDay) + reduce(birthMonth);
+    let currentPYN = reduce(worldYear + birthSum);
+    if (currentPYN === 0) currentPYN = 9;
 
-    return Array.from({ length: end - start + 1 }, (_, i) => {
-      const year = start + i;
-      const pyn = reduce(birthMonth + birthDay + year);
-      const cycleIndex = Math.floor((year - birthYear) / 9);
-      const power = BASE_POWER[pyn] + cycleIndex * CYCLE_LIFT;
+    const cycleData: PersonalYearData[] = [];
+    for (let i = -9; i <= 8; i++) {
+      const yearOffset = i;
+      const displayYear = effectiveYear + yearOffset;
+      let pyn = ((currentPYN + yearOffset - 1) % 9) + 1;
 
-      return {
-        year,
+      const power = POWER_LEVELS[pyn as keyof typeof POWER_LEVELS];
+      cycleData.push({
+        year: displayYear,
         pyn,
         power,
-        meaning: PERSONAL_YEAR_MEANINGS[pyn],
-      };
-    });
-  }, [birthDay, birthMonth, birthYear, effectiveYear]);
-
-  const currentIndex = dataArray.findIndex(d => d.year === effectiveYear);
-  const currentPower = dataArray[currentIndex]?.power ?? 0;
-  
-  useEffect(() => {
-    const chart = chartRef.current;
-    if (!chart) {
-      return;
+        meaning: PERSONAL_YEAR_MEANINGS[pyn as keyof typeof PERSONAL_YEAR_MEANINGS] || '',
+      });
     }
 
-    const gradient = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
-    gradient.addColorStop(0, 'rgba(255, 0, 255, 0.6)');
-    gradient.addColorStop(1, 'rgba(255, 0, 255, 0.05)');
+    const currentIndex = cycleData.findIndex(d => d.year === effectiveYear);
+    const currentPower = cycleData[currentIndex]?.power ?? 0;
+
+    return { cycleData, currentIndex, currentPYN, currentPower };
+  }, [birthDay, birthMonth, birthYear]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    const ctx = chart.ctx;
+    const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+    gradient.addColorStop(0, 'rgba(255,0,255,0.55)');
+    gradient.addColorStop(1, 'rgba(255,0,255,0.05)');
 
     setChartData({
-        labels: dataArray.map(d => d.year),
-        datasets: [
-          {
-            data: dataArray.map(d => d.power),
-            borderColor: '#ff00ff',
-            backgroundColor: gradient,
-            fill: true,
-            tension: 0.45,
-            borderWidth: 6,
-            pointRadius: 6,
-            pointHoverRadius: 10,
-            pointHitRadius: 28,
-            pointBackgroundColor: dataArray.map((_, i) =>
-              i === currentIndex ? '#ffffff' : '#ff00ff'
-            ),
-            pointBorderColor: dataArray.map((_, i) =>
-              i === currentIndex ? '#fceabb' : '#ff00ff'
-            ),
-            pointBorderWidth: dataArray.map((_, i) =>
-              i === currentIndex ? 4 : 3
-            ),
-          },
-        ],
-    })
-
-  }, [dataArray, currentIndex]);
+      labels: cycleData.map(d => d.pyn.toString()),
+      datasets: [
+        {
+          label: 'Proportion of Power',
+          data: cycleData.map(d => d.power),
+          borderColor: '#ff00ff',
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 5,
+          pointRadius: cycleData.map((_, i) => i === currentIndex ? 14 : 8),
+          pointBackgroundColor: cycleData.map((_, i) => i === currentIndex ? '#fceabb' : '#ff00ff'),
+          pointBorderColor: '#ff00ff',
+          pointBorderWidth: 3,
+          pointHitRadius: 30,
+        },
+      ],
+    });
+  }, [cycleData, currentIndex]);
 
   const options: any = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: { mode: 'nearest', intersect: false },
     onClick: (_: any, elements: any[]) => {
-      if (!elements.length) {
-        setSelectedYear(null);
+      if (elements.length > 0) {
+        const idx = elements[0].index;
+        const newSelectedYear = cycleData[idx];
+        setSelectedYearData(newSelectedYear);
+        onYearSelect(newSelectedYear);
+      } else {
+        setSelectedYearData(null);
         onYearSelect(null);
-        return;
       }
-      const clicked = dataArray[elements[0].index];
-      const next = selectedYear === clicked.year ? null : clicked.year;
-      setSelectedYear(next);
-      onYearSelect(next ? clicked : null);
     },
     scales: {
-      y: {
-        display: false,
-        min: Math.min(...dataArray.map(d => d.power)) - 2,
-        max: Math.max(...dataArray.map(d => d.power)) + 2,
-      },
+      y: { display: false, min: 0, max: 12 },
       x: {
-        offset: false,
-        ticks: {
-          autoSkip: false,
-          color: '#fceabb',
-          font: { size: 13 },
-          maxRotation: 45,
-          minRotation: 45,
-        },
-        grid: { color: 'rgba(255,255,255,0.06)' },
+        ticks: { color: '#fceabb', font: { size: 16, weight: 'bold' } },
+        grid: { color: '#333' },
       },
     },
     plugins: {
       legend: { display: false },
-      title: {
-        display: true,
-        text: 'Personal Year Cycle',
-        color: '#fceabb',
-        font: { size: 22, weight: 'bold' },
-      },
+      title: { display: true, text: 'Personal Year Cycle', color: '#fceabb', font: { size: 22 } },
       tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        borderColor: '#ff00ff',
-        borderWidth: 2,
         callbacks: {
           label: (ctx: any) => {
-            const d = dataArray[ctx.dataIndex];
-            return `Personal Year ${d.pyn} • Power ${d.power}`;
+            const d = cycleData[ctx.dataIndex];
+            return `Personal Year ${d.pyn} - Power Level ${d.power}`;
           },
         },
       },
       annotation: {
         annotations: {
-          currentLine: {
+          current: {
             type: 'line',
-            xMin: effectiveYear,
-            xMax: effectiveYear,
+            xMin: currentIndex,
+            xMax: currentIndex,
             borderColor: '#fceabb',
-            borderDash: [10, 8],
+            borderDash: [10, 5],
             borderWidth: 4,
           },
-          currentLabel: {
+          label: {
             type: 'label',
-            xValue: effectiveYear,
+            xValue: currentIndex,
             yValue: currentPower + 1,
-            content: `Current Year: ${effectiveYear}`,
+            content: `Current: ${currentPYN}`,
             backgroundColor: '#fceabb',
             color: '#000',
             font: { size: 14, weight: 'bold' },
-            padding: 10,
-            borderRadius: 8,
+            padding: 8,
           },
         },
       },
@@ -227,11 +202,11 @@ export const PersonalYearChart: React.FC<Props> = ({
 
   return (
     <div className="glass-card p-6 rounded-2xl bg-[#0f0f1e]">
-      <div style={{ height: 520 }}>
+      <div style={{ height: '520px' }}>
         <Line ref={chartRef} data={chartData} options={options} />
       </div>
-      <p className="text-sm text-purple-200/80 text-center mt-4 italic font-medium">
-        Click on a point to see more information about a specific year.
+      <p className="text-sm text-purple-200/80 text-center mt-4 italic">
+        Personal Years cycle 1–9 • Click point for meaning
       </p>
     </div>
   );
