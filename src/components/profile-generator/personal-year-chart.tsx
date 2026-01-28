@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,9 +10,10 @@ import {
   Filler,
   Title,
 } from 'chart.js';
+import type { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import { PERSONAL_YEAR_MEANINGS } from '@/lib/numerology/data/personalYearMeanings';
 import type { PersonalYearData } from './types';
+import { PERSONAL_YEAR_MEANINGS } from '@/lib/numerology/data/personalYearMeanings';
 
 
 ChartJS.register(
@@ -33,8 +34,6 @@ interface PersonalYearChartProps {
   onYearSelect: (data: PersonalYearData | null) => void;
   selectedPersonalYear: PersonalYearData | null;
 }
-
-
 
 /** Core numerology peaks preserved */
 const BASE_POWER: Record<number, number> = {
@@ -67,6 +66,8 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   onYearSelect,
   selectedPersonalYear,
 }) => {
+  const chartRef = useRef<ChartJS<'line'>>(null);
+  const [chartData, setChartData] = useState<any>({ datasets: [] });
 
   const now = new Date(2026, 0, 1);
   const currentYear = now.getFullYear();
@@ -96,13 +97,16 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
 
   const currentIndex = dataArray.findIndex(d => d.year === effectiveYear);
 
-  const chartData = (canvas: HTMLCanvasElement) => {
-    const ctx = canvas.getContext('2d')!;
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    const ctx = chart.ctx;
+    const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
     gradient.addColorStop(0, 'rgba(128, 0, 255, 0.6)');
     gradient.addColorStop(1, 'rgba(255, 0, 255, 0.05)');
 
-    return {
+    setChartData({
       labels: dataArray.map(d => String(d.year)),
       datasets: [
         {
@@ -130,8 +134,9 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
           pointHitRadius: 40,
         },
       ],
-    };
-  };
+    });
+  }, [dataArray, currentIndex]);
+
 
   const options: any = {
     responsive: true,
@@ -212,7 +217,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   return (
     <div className="glass-card p-6 rounded-2xl bg-[#0f0f1e]">
       <div style={{ height: 520 }}>
-        <Line data={chartData} options={options} />
+        <Line ref={chartRef} data={chartData} options={options} />
       </div>
       <p className="text-sm text-purple-200/80 text-center mt-4 italic font-medium">
         Click on a point to see more information about a specific year.
