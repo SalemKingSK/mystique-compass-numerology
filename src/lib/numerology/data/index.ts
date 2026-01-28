@@ -5,3 +5,4 @@ export * from './arrowMeanings';
 export * from './psychicNumberMeanings';
 export * from './destinyNumberMeanings';
 export * from './compoundNumberMeanings';
+export * from './personalYearMeanings';

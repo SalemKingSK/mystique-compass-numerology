@@ -7,8 +7,9 @@ import type { NumerologyData, ArrowData, PersonalYearData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
-import { PersonalYearChart, PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PERSONAL_YEAR_MEANINGS } from '@/lib/numerology/data/personalYearMeanings';
+import { PersonalYearChart } from './personal-year-chart';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -219,11 +220,9 @@ const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: 
 KuaDisplay.displayName = 'KuaDisplay';
 
 
-export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
+export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numerology: NumerologyData, birthMonth: number, birthYear: number }) {
     const {
         birthDay,
-        birthMonth,
-        birthYear,
         psycheNum,
         destinyNum,
         kuaNum,
@@ -276,7 +275,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     }, [birthDay, birthMonth, birthYear]);
 
     const handleYearSelect = (data: PersonalYearData | null) => {
-        setSelectedPersonalYear(prev => prev && data && prev.year === data.year ? null : data);
+        setSelectedPersonalYear(data);
     };
 
     const psychicRef = React.useRef<HTMLDivElement>(null);
