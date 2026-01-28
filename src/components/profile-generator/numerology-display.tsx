@@ -249,10 +249,10 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
 
     React.useEffect(() => {
-        const currentYear = 2026;
-        const currentDate = new Date(currentYear, 0, 1);
+        const now = new Date();
+        const currentYear = now.getFullYear();
         const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
-        const effectiveCurrentYear = currentDate >= birthdayThisYear ? currentYear : currentYear - 1;
+        const effectiveCurrentYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
 
         const reduce = (num: number): number => {
             let n = num;
@@ -272,7 +272,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
           year: effectiveCurrentYear,
           pyn: pyn,
           power: power,
-          meaning: PERSONAL_YEAR_MEANINGS[pyn]
+          meaning: PERSONAL_YEAR_MEANINGS[pyn as keyof typeof PERSONAL_YEAR_MEANINGS]
         });
     }, [birthDay, birthMonth, birthYear]);
 

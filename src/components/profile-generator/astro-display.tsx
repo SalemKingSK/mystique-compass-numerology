@@ -50,11 +50,18 @@ function FutureDisplay({ futures }: { futures: any }) {
         return <p className="text-slate-400">No future predictions available.</p>;
     }
 
-    const sortedYears = Object.keys(futures).sort((a, b) => parseInt(a) - parseInt(b));
+    const currentYear = new Date().getFullYear();
+    const futureYears = Object.keys(futures)
+        .filter(year => parseInt(year) >= currentYear)
+        .sort((a, b) => parseInt(a) - parseInt(b));
+
+    if (futureYears.length === 0) {
+        return <p className="text-slate-400">Future predictions begin from next year.</p>;
+    }
     
     return (
         <Accordion type="multiple" className="w-full space-y-1">
-            {sortedYears.map(year => {
+            {futureYears.map(year => {
                 const data = futures[year];
                 const text = data.prediction;
                 return (

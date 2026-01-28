@@ -74,7 +74,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   const chartRef = useRef<ChartJS<"line">>(null);
   const [chartData, setChartData] = useState<any>({ datasets: [] });
 
-  const now = new Date(2026, 0, 1);
+  const now = new Date();
   const currentYear = now.getFullYear();
   const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
   const effectiveYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
@@ -95,7 +95,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
         year,
         pyn,
         power,
-        meaning: PERSONAL_YEAR_MEANINGS[pyn],
+        meaning: PERSONAL_YEAR_MEANINGS[pyn as keyof typeof PERSONAL_YEAR_MEANINGS],
       };
     });
   }, [birthDay, birthMonth, birthYear, effectiveYear]);
