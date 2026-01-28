@@ -179,7 +179,7 @@ const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCount
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
-       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onValueChange={onToggle}>
+       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onToggle={onToggle}>
             {repetitions.map(({ number, count, meaning }) => (
                  <RepetitionItem key={number} number={number} count={count} meaning={meaning || ''} />
             ))}
@@ -246,6 +246,34 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     
     const [openSections, setOpenSections] = React.useState<string[]>([]);
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
+
+    React.useEffect(() => {
+        const currentYear = 2026;
+        const currentDate = new Date(currentYear, 0, 1);
+        const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
+        const effectiveCurrentYear = currentDate >= birthdayThisYear ? currentYear : currentYear - 1;
+
+        const reduce = (num: number): number => {
+            let n = num;
+            while (n > 9) {
+                n = String(n).split('').reduce((a, b) => a + Number(b), 0);
+            }
+            return n || 9;
+        };
+
+        const pyn = reduce(birthMonth + birthDay + effectiveCurrentYear);
+        const cycleIndex = Math.floor((effectiveCurrentYear - birthYear) / 9);
+        const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
+        const offsetPerCycle = 3;
+        const power = powerMap[pyn] + cycleIndex * offsetPerCycle;
+        
+        setSelectedPersonalYear({
+          year: effectiveCurrentYear,
+          pyn: pyn,
+          power: power,
+          meaning: PERSONAL_YEAR_MEANINGS[pyn]
+        });
+    }, [birthDay, birthMonth, birthYear]);
 
     const handleYearSelect = (data: PersonalYearData | null) => {
         setSelectedPersonalYear(prev => prev && data && prev.year === data.year ? null : data);

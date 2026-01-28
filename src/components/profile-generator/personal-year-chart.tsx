@@ -11,6 +11,7 @@ import {
   Filler,
 } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import { PersonalYearData } from './types';
 
 ChartJS.register(
   CategoryScale,
@@ -22,21 +23,6 @@ ChartJS.register(
   Filler,
   annotationPlugin
 );
-
-interface PersonalYearData {
-  year: number;
-  pyn: number;
-  power: number;
-  meaning: string;
-}
-
-interface PersonalYearChartProps {
-  birthDay: number;
-  birthMonth: number;
-  birthYear: number;
-  onYearSelect: (data: PersonalYearData | null) => void;
-  selectedPersonalYear: PersonalYearData | null;
-}
 
 export const PERSONAL_YEAR_MEANINGS: { [key: number]: string } = {
   1: `PERSONAL YEAR 1 – AN ACTIVE YEAR OF ADJUSTMENT This is an extremely powerful doing year for personal growth and expression as we adjust to the changes wrought during the now-concluded PY9. The power of this year encourages us to dare to be different as we improve in self-confidence and extricate ourselves from the limitations religion-dominated society feels justified in inflicting upon its faithful. This is an excellent year for the breaking of old habits. Indeed, adaptation to a new lifestyle invariably demands such severance. It is especially powerful year for improving ourselves financially and for buying and selling on a wide scale, such as with real estate, business interests and investments. However, the most significant and permanent success will only be achieved when people’s motives are genuinely for the common good, free of personal greed and recklessness. Ruling 1 people will find adaptation so effortless this year that they can be easily lulled into an attitude of frivolity. They must be careful to avoid recklessness, especially in financial matters, and take heed not to succumb to egocentricity. With appropriate self-discipline, they will find it a year of significant material growth and personal popularity.`,
@@ -51,12 +37,20 @@ export const PERSONAL_YEAR_MEANINGS: { [key: number]: string } = {
 };
 
 
+interface PersonalYearChartProps {
+  birthDay: number;
+  birthMonth: number;
+  birthYear: number;
+  onYearSelect: (data: PersonalYearData | null) => void;
+  selectedPersonalYear: PersonalYearData | null;
+}
+
 export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   birthDay,
   birthMonth,
   birthYear,
   onYearSelect,
-  selectedPersonalYear,
+  selectedPersonalYear
 }) => {
   const currentYear = 2026;
   const currentDate = new Date(currentYear, 0, 1);
@@ -85,36 +79,23 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
 
   const currentIndex = dataArray.findIndex(d => d.year === effectiveCurrentYear);
 
-  const chartData = (canvas: HTMLCanvasElement) => {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        return {
-            labels: [],
-            datasets: []
-        };
-    }
-    const gradient = ctx.createLinearGradient(0, 0, 0, 450);
-    gradient.addColorStop(0, 'rgba(128, 0, 255, 0.6)');
-    gradient.addColorStop(1, 'rgba(128, 0, 255, 0)');
-
-    return {
-      labels: dataArray.map(d => String(d.year)),
-      datasets: [{
-        label: 'Power Level',
-        data: dataArray.map(d => d.power),
-        borderColor: '#ff00ff',
-        backgroundColor: gradient,
-        fill: true,
-        tension: 0.45,
-        borderWidth: 7,
-        pointRadius: dataArray.map((_, i) => i === currentIndex ? 18 : 12),
-        pointBackgroundColor: dataArray.map((_, i) => i === currentIndex ? '#ffffff' : '#ff00ff'),
-        pointBorderColor: dataArray.map((_, i) => i === currentIndex ? '#fceabb' : '#ff00ff'),
-        pointBorderWidth: dataArray.map((_, i) => i === currentIndex ? 6 : 4),
-        pointHitRadius: 40,
-        pointHoverRadius: dataArray.map((_, i) => i === currentIndex ? 24 : 16),
-      }],
-    };
+  const data = {
+    labels: dataArray.map(d => String(d.year)),
+    datasets: [{
+      label: 'Power Level',
+      data: dataArray.map(d => d.power),
+      borderColor: '#ff00ff',
+      backgroundColor: 'rgba(128, 0, 255, 0.6)',
+      fill: true,
+      tension: 0.45,
+      borderWidth: 7,
+      pointRadius: dataArray.map((_, i) => i === currentIndex ? 18 : 12),
+      pointBackgroundColor: dataArray.map((_, i) => i === currentIndex ? '#ffffff' : '#ff00ff'),
+      pointBorderColor: dataArray.map((_, i) => i === currentIndex ? '#fceabb' : '#ff00ff'),
+      pointBorderWidth: dataArray.map((_, i) => i === currentIndex ? 6 : 4),
+      pointHitRadius: 40,
+      pointHoverRadius: dataArray.map((_, i) => i === currentIndex ? 24 : 16),
+    }],
   };
 
   const options: any = {
@@ -122,16 +103,17 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
     maintainAspectRatio: false,
     interaction: { mode: 'nearest', intersect: false },
     onClick: (_: any, elements: any[]) => {
-        if (!elements.length) {
-            onYearSelect(null);
-            return;
-        }
-        const clicked = dataArray[elements[0].index];
-        if (selectedPersonalYear && selectedPersonalYear.year === clicked.year) {
-            onYearSelect(null); // Toggle off
+      if (elements.length > 0) {
+        const clickedIndex = elements[0].index;
+        const clickedData = dataArray[clickedIndex];
+        if (selectedPersonalYear && selectedPersonalYear.year === clickedData.year) {
+          onYearSelect(null);
         } else {
-            onYearSelect(clicked); // Select new
+          onYearSelect(clickedData);
         }
+      } else {
+        onYearSelect(null);
+      }
     },
     scales: {
       y: { display: false, min: 0 },
@@ -183,7 +165,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   return (
     <div className="glass-card p-6 rounded-2xl bg-[#0f0f1e]">
       <div style={{ height: '520px' }}>
-        <Line data={chartData} options={options} />
+        <Line data={data} options={options} />
       </div>
       <p className="text-sm text-purple-200/80 text-center mt-4 italic font-medium">
         Click on a point to see more information about a specific year.
