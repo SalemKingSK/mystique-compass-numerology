@@ -8,7 +8,6 @@ import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PERSONAL_YEAR_MEANINGS } from '@/lib/numerology/data/personalYearMeanings';
 import { PersonalYearChart } from './personal-year-chart';
 
 
@@ -248,34 +247,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const [openSections, setOpenSections] = React.useState<string[]>([]);
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
 
-    React.useEffect(() => {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const birthdayThisYear = new Date(currentYear, birthMonth - 1, birthDay);
-        const effectiveCurrentYear = now >= birthdayThisYear ? currentYear : currentYear - 1;
-
-        const reduce = (num: number): number => {
-            let n = num;
-            while (n > 9) {
-                n = String(n).split('').reduce((a, b) => a + Number(b), 0);
-            }
-            return n || 9;
-        };
-
-        const pyn = reduce(birthMonth + birthDay + effectiveCurrentYear);
-        const cycleIndex = Math.floor((effectiveCurrentYear - birthYear) / 9);
-        const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
-        const offsetPerCycle = 3;
-        const power = powerMap[pyn] + cycleIndex * offsetPerCycle;
-        
-        setSelectedPersonalYear({
-          year: effectiveCurrentYear,
-          pyn: pyn,
-          power: power,
-          meaning: PERSONAL_YEAR_MEANINGS[pyn as keyof typeof PERSONAL_YEAR_MEANINGS]
-        });
-    }, [birthDay, birthMonth, birthYear]);
-
     const handleYearSelect = (data: PersonalYearData | null) => {
         setSelectedPersonalYear(data);
     };
@@ -385,7 +356,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
           birthMonth={birthMonth}
           birthYear={birthYear}
           onYearSelect={handleYearSelect}
-          selectedPersonalYear={selectedPersonalYear}
         />
       </motion.div>
 

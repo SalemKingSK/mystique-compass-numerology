@@ -9,8 +9,8 @@ import {
   Tooltip,
   Filler,
   Title,
+  Chart,
 } from 'chart.js';
-import type { Chart } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { PERSONAL_YEAR_MEANINGS } from '@/lib/numerology/data/personalYearMeanings';
 
@@ -37,7 +37,6 @@ interface PersonalYearChartProps {
   birthMonth: number;
   birthYear: number;
   onYearSelect: (data: PersonalYearData | null) => void;
-  selectedPersonalYear: PersonalYearData | null;
 }
 
 /** Core numerology peaks preserved */
@@ -69,10 +68,10 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   birthMonth,
   birthYear,
   onYearSelect,
-  selectedPersonalYear,
 }) => {
-  const chartRef = useRef<ChartJS<"line">>(null);
-  const [chartData, setChartData] = useState<any>({ datasets: [] });
+  const chartRef = useRef<Chart<"line">>(null);
+  const [chartData, setChartData] = useState<any>({ labels: [], datasets: [] });
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -89,7 +88,7 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
       const cycleIndex = Math.floor((year - birthYear) / 9);
 
       const power =
-        BASE_POWER[pyn] + cycleIndex * CYCLE_LIFT;
+        BASE_POWER[pyn as keyof typeof BASE_POWER] + cycleIndex * CYCLE_LIFT;
 
       return {
         year,
@@ -106,9 +105,9 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
 
     const ctx = chart.ctx;
     const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
-    gradient.addColorStop(0, 'rgba(128, 0, 255, 0.6)');
-    gradient.addColorStop(1, 'rgba(255, 0, 255, 0.05)');
-
+    gradient.addColorStop(0, 'rgba(255,0,255,0.6)');
+    gradient.addColorStop(1, 'rgba(255,0,255,0.05)');
+    
     const currentIndex = dataArray.findIndex(d => d.year === effectiveYear);
 
     setChartData({
@@ -147,13 +146,16 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
     interaction: { mode: 'nearest', intersect: false },
     onClick: (_: any, elements: any[]) => {
       if (!elements.length) {
+        setSelectedYear(null);
         onYearSelect(null);
         return;
       }
       const clicked = dataArray[elements[0].index];
       const next =
-        selectedPersonalYear?.year === clicked.year ? null : clicked;
-      onYearSelect(next);
+        selectedYear === clicked.year ? null : clicked.year;
+
+      setSelectedYear(next);
+      onYearSelect(next ? clicked : null);
     },
     scales: {
       y: {
