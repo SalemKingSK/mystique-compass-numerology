@@ -1,13 +1,17 @@
 // src/components/lo-shu-grid.tsx
-
+'use client';
 import React from 'react';
 import type { ArrowData } from '@/lib/numerology';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Layers } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Props for the LoShuGrid component
 interface LoShuGridProps {
   gridData: (string | null)[][];
   arrows: (ArrowData & { type: 'strength' | 'weakness' })[];
-  onNumberClick?: (number: string) => void;
+  numberCounts: { [key: string]: number };
+  repeatedNumberMeanings: { [key: string]: string };
   onArrowClick?: (arrowName: string) => void;
   title: string;
 }
@@ -42,7 +46,7 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
 };
 
 
-const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberClick, onArrowClick, title }) => {
+export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, numberCounts, repeatedNumberMeanings }: LoShuGridProps) {
   if (!gridData || gridData.length !== 3) {
     return <p>Grid data is not available.</p>;
   }
@@ -65,6 +69,52 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
 
   const gridOrder = [4, 9, 2, 3, 5, 7, 8, 1, 6];
 
+  const renderCell = (gridNum: number, index: number) => {
+    const cell = gridData.flat().find(c => c?.startsWith(String(gridNum)));
+    const count = numberCounts[String(gridNum)];
+    const meaningKey = count ? `${gridNum}_${Math.min(count, 5)}` : null;
+    const meaning = meaningKey ? repeatedNumberMeanings[meaningKey] : null;
+    const isClickable = !!cell && !!meaning;
+
+    const cellContent = (
+      <div
+        className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
+      >
+        <div className="flex-grow flex items-center justify-center">
+            {cell ? (
+            <span className="truncate">{cell}</span>
+            ) : (
+            <span className="opacity-20">{gridNum}</span>
+            )}
+        </div>
+        <div className="text-[10px] h-4 font-normal text-purple-300/50 mt-1">
+            {PLANETARY_LABELS[gridNum]}
+        </div>
+      </div>
+    );
+
+    if (isClickable) {
+      return (
+        <Popover key={index}>
+          <PopoverTrigger asChild>{cellContent}</PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+                <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count > 1 ? 's' : ''})
+              </h4>
+              <ScrollArea className="h-40">
+                <p className="text-sm text-muted-foreground">{meaning}</p>
+              </ScrollArea>
+            </div>
+          </PopoverContent>
+        </Popover>
+      );
+    }
+
+    return <div key={index}>{cellContent}</div>;
+  }
+
+
   return (
     // The main container that establishes the coordinate system for the overlay
     <div className="relative aspect-square w-full max-w-[400px] mx-auto glass-card p-4">
@@ -75,29 +125,7 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
       
       {/* 1. The Grid of Numbers (the base layer) */}
       <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2">
-        {gridOrder.map((gridNum, index) => {
-           const cell = gridData.flat().find(c => c?.startsWith(String(gridNum)));
-           const number = cell ? cell.charAt(0) : null;
-           const isClickable = !!number && onNumberClick;
-           return (
-              <div
-                key={index}
-                className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
-                onClick={isClickable ? () => onNumberClick(number!) : undefined}
-              >
-                <div className="flex-grow flex items-center justify-center">
-                    {cell ? (
-                    <span className="truncate">{cell}</span>
-                    ) : (
-                    <span className="opacity-20">{gridNum}</span>
-                    )}
-                </div>
-                <div className="text-[10px] h-4 font-normal text-purple-300/50 mt-1">
-                    {PLANETARY_LABELS[gridNum]}
-                </div>
-              </div>
-           )
-        })}
+        {gridOrder.map((gridNum, index) => renderCell(gridNum, index))}
       </div>
 
       {/* 2. The SVG Overlay for drawing arrows (sits on top of the grid) */}
@@ -178,6 +206,4 @@ const LoShuGrid: React.FC<LoShuGridProps> = ({ gridData, arrows = [], onNumberCl
       </svg>
     </div>
   );
-};
-
-export default LoShuGrid;
+}

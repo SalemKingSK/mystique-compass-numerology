@@ -147,48 +147,6 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
 });
 ArrowsDisplay.displayName = 'ArrowsDisplay';
 
-const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCounts: { [key: string]: number }, meanings: {[key:string]: string}, openItems: string[], onToggle: (value: string[]) => void }>(
-    ({ numberCounts, meanings, openItems, onToggle }, ref) => {
-  const repetitions = Object.entries(numberCounts)
-    .map(([number, count]) => {
-      const key = `${number}_${Math.min(count, 5)}`; // Cap count at 5 as per data structure
-      const meaning = meanings[key];
-      return { number, count, meaning };
-    })
-    .filter(item => item.meaning)
-    .sort((a,b) => parseInt(a.number) - parseInt(b.number));
-
-  if (repetitions.length === 0) return null;
-  
-  const RepetitionItem = ({ number, count, meaning }: { number: string, count: number, meaning: string }) => {
-      const itemValue = `number-${number}`;
-      return (
-           <AccordionItem value={itemValue} key={number} className="glass-card px-4">
-              <AccordionTrigger>
-                 <span>Number {number} (appears {count} time{count > 1 ? 's' : ''})</span>
-              </AccordionTrigger>
-              <AccordionContent>
-                   <AccordionContentWithPlayer text={meaning || ''} />
-              </AccordionContent>
-          </AccordionItem>
-      );
-  }
-
-  return (
-    <div className="glass-card p-4 space-y-3" ref={ref}>
-      <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-        <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
-      </h3>
-       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onToggle={onToggle}>
-            {repetitions.map(({ number, count, meaning }) => (
-                 <RepetitionItem key={number} number={number} count={count} meaning={meaning || ''} />
-            ))}
-        </Accordion>
-    </div>
-  );
-});
-RepetitionMeaningsDisplay.displayName = 'RepetitionMeaningsDisplay';
-
 const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: boolean, onToggle: () => void }>(
     ({ kuaAttributes, open, onToggle }, ref) => {
         if (!kuaAttributes || !kuaAttributes.directions) return null;
@@ -258,7 +216,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const inherentRef = React.useRef<HTMLDivElement>(null);
     const karmicRef = React.useRef<HTMLDivElement>(null);
     const kuaRef = React.useRef<HTMLDivElement>(null);
-    const repetitionRef = React.useRef<HTMLDivElement>(null);
     const arrowsRef = React.useRef<HTMLDivElement>(null);
 
     const handleToggle = (section: string) => {
@@ -286,18 +243,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         } else if (psychicRef.current) {
             handleScrollAndOpen(psychicRef, `psychic-${psycheNum}`);
         }
-    };
-
-    const handleGridNumberClick = (number: string) => {
-        const sectionId = `number-${number}`;
-        setOpenSections(prev => {
-            const isOpen = prev.includes(sectionId);
-            const newOpenSections = isOpen ? prev.filter(s => s !== sectionId) : [...prev, sectionId];
-            setTimeout(() => {
-                repetitionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-            return newOpenSections;
-        });
     };
 
     const handleArrowClick = (arrowName: string) => {
@@ -335,13 +280,16 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             title="Lo Shu Grid - Numbers"
             gridData={loShuGrid}
             arrows={[]}
-            onNumberClick={handleGridNumberClick}
+            numberCounts={numberCounts}
+            repeatedNumberMeanings={repeatedNumberMeanings}
         />
         <LoShuGrid
             title="Lo Shu Grid - Arrows"
             gridData={loShuGrid}
             arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]}
             onArrowClick={handleArrowClick}
+            numberCounts={numberCounts}
+            repeatedNumberMeanings={repeatedNumberMeanings}
         />
       </div>
 
@@ -397,8 +345,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       {specialTraitMeaning && <SpecialTraitDisplay ref={specialTraitRef} number={birthDay} meaning={specialTraitMeaning} open={openSections.includes(specialTraitId)} onToggle={() => handleToggle(specialTraitId)} />}
 
       {destinyMeaning && <DestinyMeaningDisplay ref={destinyRef} number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} open={openSections.includes(destinyId)} onToggle={() => handleToggle(destinyId)} />}
-
-      <RepetitionMeaningsDisplay ref={repetitionRef} numberCounts={numberCounts} meanings={repeatedNumberMeanings} openItems={openSections} onToggle={handleToggleMultiple}/>
 
       <ArrowsDisplay ref={arrowsRef} arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} openItems={openSections} onToggle={handleToggleMultiple} />
 
