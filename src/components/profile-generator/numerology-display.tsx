@@ -180,7 +180,7 @@ const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCount
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
-       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onToggle={onToggle}>
+       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onValueChange={onToggle}>
             {repetitions.map(({ number, count, meaning }) => (
                  <RepetitionItem key={number} number={number} count={count} meaning={meaning || ''} />
             ))}
@@ -274,11 +274,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     }, [birthDay, birthMonth, birthYear]);
 
     const handleYearSelect = (data: PersonalYearData | null) => {
-        if (selectedPersonalYear && data && selectedPersonalYear.year === data.year) {
-            setSelectedPersonalYear(null);
-        } else {
-            setSelectedPersonalYear(data);
-        }
+        setSelectedPersonalYear(prev => prev && data && prev.year === data.year ? null : data);
     };
 
     const psychicRef = React.useRef<HTMLDivElement>(null);
