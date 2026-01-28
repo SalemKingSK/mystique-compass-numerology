@@ -55,13 +55,13 @@ function AccordionContentWithPlayer({ text }: { text: string }) {
     const sentences = React.useMemo(() => text.match(/[^.!?\n]+[.!?\n]+/g) || [text], [text]);
     return (
         <div className="space-y-4">
-            <SpeechPlayer 
-                text={text} 
+            <SpeechPlayer
+                text={text}
                 sentences={sentences}
                 onBoundary={setActiveSentenceIndex}
                 onEnd={() => setActiveSentenceIndex(-1)}
             />
-            <ScrollableTextDisplay 
+            <ScrollableTextDisplay
                 text={text}
                 sentences={sentences}
                 activeSentenceIndex={activeSentenceIndex}
@@ -133,18 +133,18 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
     );
 }
 
-function ResultsHeader({ 
-  name, 
-  newAstroSign, 
+function ResultsHeader({
+  name,
+  newAstroSign,
   birthDate,
-  onTabClick, 
-  activeTab 
-}: { 
-  name: string, 
-  newAstroSign: string, 
+  onTabClick,
+  activeTab
+}: {
+  name: string,
+  newAstroSign: string,
   birthDate: string,
-  onTabClick: (tab: string) => void, 
-  activeTab: string 
+  onTabClick: (tab: string) => void,
+  activeTab: string
 }) {
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
@@ -229,8 +229,8 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
       className="results-background w-full min-h-screen flex flex-col p-4"
     >
       <div className="w-full max-w-4xl mx-auto flex-grow">
-        <ResultsHeader 
-            name={insight.name} 
+        <ResultsHeader
+            name={insight.name}
             newAstroSign={insight.new_astrology_sign}
             birthDate={formatDate()}
             onTabClick={setActiveTab}
@@ -246,7 +246,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
               transition={{ duration: 0.3 }}
             >
               {activeTab === 'astro' && <AstroDisplay insight={insight} />}
-              {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
+              {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} birthMonth={insight.month} birthYear={insight.year} />}
               {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
             </motion.div>
         </AnimatePresence>

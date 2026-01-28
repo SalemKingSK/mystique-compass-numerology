@@ -32,15 +32,23 @@ export interface AstroInsightOutput {
     compatibilities?: string;
     homeAndFamily?: string;
     profession?: string;
-  }; 
+  };
 }
 
 // This is the data returned from the numerology calculation
 export interface ArrowData {
-    name: string;
-    description: string;
-    numbers: number[];
+  name: string;
+  description: string;
+  numbers: number[];
 }
+
+export interface PersonalYearData {
+  year: number;
+  pyn: number;
+  power: number;
+  meaning: string;
+}
+
 export interface NumerologyData {
   birthDay: number;
   psycheNum: number;
@@ -51,21 +59,22 @@ export interface NumerologyData {
   reducedCompoundMeaning: string | null;
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
-  psychicMeaning: { title: string; description: string; };
+  psychicMeaning: { title: string; description: string };
   specialTraitMeaning: string | null;
-  destinyMeaning: { title: string; description: string; };
+  destinyMeaning: { title: string; description: string };
   kuaNum: number;
   kuaAttributes: {
     element: string;
     colors: string;
     season: string;
+    directions: { [key: string]: string };
   };
-  auspiciousDirections: { [key: string]: string };
   loShuGrid: (string | null)[][];
   numberCounts: { [key: string]: number };
   repeatedNumberMeanings: { [key: string]: string };
   arrowsOfStrength: ArrowData[];
   arrowsOfWeakness: ArrowData[];
+  personalYears?: PersonalYearData[];
 }
 
 export interface FamousPerson {

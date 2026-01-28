@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SpeechPlayer } from './speech-player';
 import { ScrollableTextDisplay } from './scrollable-text-display';
+import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 
 // --- SUB-COMPONENTS ---
@@ -26,26 +27,6 @@ const TABS: { name: string; icon: React.ElementType }[] = [
   { name: "Future", icon: Forward },
 ];
 
-
-function AccordionContentWithPlayer({ text }: { text: string }) {
-    const [activeSentenceIndex, setActiveSentenceIndex] = React.useState(-1);
-    const sentences = React.useMemo(() => text.match(/[^.!?\n]+[.!?\n]+/g) || [text], [text]);
-    return (
-        <div className="space-y-4">
-            <SpeechPlayer 
-                text={text} 
-                sentences={sentences}
-                onBoundary={setActiveSentenceIndex}
-                onEnd={() => setActiveSentenceIndex(-1)}
-            />
-            <ScrollableTextDisplay 
-                text={text}
-                sentences={sentences}
-                activeSentenceIndex={activeSentenceIndex}
-            />
-        </div>
-    )
-}
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {

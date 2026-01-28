@@ -3,15 +3,18 @@
 
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
-import type { NumerologyData, ArrowData } from './types';
+import type { NumerologyData, ArrowData, PersonalYearData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { SpeechPlayer } from './speech-player';
 import { ScrollableTextDisplay } from './scrollable-text-display';
+import { PersonalYearChart, PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
-    <div 
+    <div
         className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square ${onClick ? 'transition-all duration-300 hover:bg-purple-500/20 cursor-pointer' : ''}`}
         onClick={onClick}
     >
@@ -22,26 +25,6 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
         <p className="text-5xl font-bold text-yellow-300 mt-2">{value || ''}</p>
     </div>
 );
-
-const AccordionContentWithPlayer = ({ text }: { text: string }) => {
-    const [activeSentenceIndex, setActiveSentenceIndex] = React.useState(-1);
-    const sentences = React.useMemo(() => text.match(/[^.!?\n]+[.!?\n]+/g) || [text], [text]);
-    return (
-        <div className="space-y-4">
-            <SpeechPlayer 
-                text={text} 
-                sentences={sentences}
-                onBoundary={setActiveSentenceIndex}
-                onEnd={() => setActiveSentenceIndex(-1)}
-            />
-            <ScrollableTextDisplay 
-                text={text}
-                sentences={sentences}
-                activeSentenceIndex={activeSentenceIndex}
-            />
-        </div>
-    )
-}
 
 const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string, meaning: string | null, open: boolean, onToggle: () => void }>(
   ({ id, title, meaning, open, onToggle }, ref) => {
@@ -198,7 +181,7 @@ const RepetitionMeaningsDisplay = React.forwardRef<HTMLDivElement, { numberCount
       <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
         <Layers className="h-5 w-5" /> Repetitive Numbers Meanings
       </h3>
-       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onValueChange={onToggle}>
+       <Accordion type="multiple" className="w-full space-y-1" value={openItems} onToggle={onToggle}>
             {repetitions.map(({ number, count, meaning }) => (
                  <RepetitionItem key={number} number={number} count={count} meaning={meaning || ''} />
             ))}
@@ -238,9 +221,38 @@ const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: 
 KuaDisplay.displayName = 'KuaDisplay';
 
 
-export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
+export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numerology: NumerologyData, birthMonth: number, birthYear: number }) {
     const [openSections, setOpenSections] = React.useState<string[]>([]);
-    
+    const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
+
+    React.useEffect(() => {
+        const currentYear = 2026;
+        const reduce = (num: number): number => {
+            let n = num;
+            while (n > 9) {
+                n = String(n).split('').reduce((a, b) => a + Number(b), 0);
+            }
+            return n;
+        };
+        
+        const wyn = reduce(currentYear);
+        const monthDaySum = reduce(birthMonth) + reduce(birthDay);
+        const pyn = reduce(wyn + monthDaySum) || 9;
+        
+        const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
+        const offsetPerCycle = 3;
+        const cycleIndex = Math.floor((currentYear - birthYear) / 9);
+        const basePower = powerMap[pyn];
+        const power = basePower + cycleIndex * offsetPerCycle;
+
+        setSelectedPersonalYear({
+          year: currentYear,
+          pyn: pyn,
+          power: power,
+          meaning: PERSONAL_YEAR_MEANINGS[pyn]
+        });
+    }, [birthDay, birthMonth, birthYear]);
+
     const psychicRef = React.useRef<HTMLDivElement>(null);
     const specialTraitRef = React.useRef<HTMLDivElement>(null);
     const destinyRef = React.useRef<HTMLDivElement>(null);
@@ -252,11 +264,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const arrowsRef = React.useRef<HTMLDivElement>(null);
 
     const handleToggle = (section: string) => {
-        setOpenSections(prev => 
+        setOpenSections(prev =>
             prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
         );
     };
-    
+
     const handleToggleMultiple = (newSections: string[]) => {
         setOpenSections(newSections);
     };
@@ -269,7 +281,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 150);
     };
-    
+
     const handlePsycheClick = () => {
         if (specialTraitRef.current) {
             handleScrollAndOpen(specialTraitRef, `special-trait-${birthDay}`);
@@ -277,7 +289,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             handleScrollAndOpen(psychicRef, `psychic-${psycheNum}`);
         }
     };
-    
+
     const handleGridNumberClick = (number: string) => {
         const sectionId = `number-${number}`;
         setOpenSections(prev => {
@@ -343,36 +355,76 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LoShuGrid 
+        <LoShuGrid
             title="Lo Shu Grid - Numbers"
-            gridData={loShuGrid} 
+            gridData={loShuGrid}
             arrows={[]}
-            onNumberClick={handleGridNumberClick} 
+            onNumberClick={handleGridNumberClick}
         />
-        <LoShuGrid 
+        <LoShuGrid
             title="Lo Shu Grid - Arrows"
-            gridData={loShuGrid} 
-            arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]} 
+            gridData={loShuGrid}
+            arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]}
             onArrowClick={handleArrowClick}
         />
       </div>
-      
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8"
+      >
+        <PersonalYearChart
+          birthDay={birthDay}
+          birthMonth={birthMonth}
+          birthYear={birthYear}
+          onYearSelect={setSelectedPersonalYear}
+        />
+      </motion.div>
+
+      <AnimatePresence>
+        {selectedPersonalYear && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mt-6"
+          >
+            <div className="glass-card px-4">
+              <Accordion type="single" collapsible defaultValue="personal-year-detail" value={selectedPersonalYear ? "personal-year-detail" : ""}>
+                <AccordionItem value="personal-year-detail">
+                  <AccordionTrigger>
+                    <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                      <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="space-y-4">
          <FateDisplay ref={compoundRef} id={compoundId} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>
          {reducedCompoundNum && <FateDisplay ref={inherentRef} id={inherentId} title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={openSections.includes(inherentId)} onToggle={() => handleToggle(inherentId)} />}
          {karmicFateNum && <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} />}
       </div>
-      
+
       {psychicMeaning && <PsychicMeaningDisplay ref={psychicRef} number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} open={openSections.includes(psychicId)} onToggle={() => handleToggle(psychicId)} />}
 
       {specialTraitMeaning && <SpecialTraitDisplay ref={specialTraitRef} number={birthDay} meaning={specialTraitMeaning} open={openSections.includes(specialTraitId)} onToggle={() => handleToggle(specialTraitId)} />}
 
       {destinyMeaning && <DestinyMeaningDisplay ref={destinyRef} number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} open={openSections.includes(destinyId)} onToggle={() => handleToggle(destinyId)} />}
-      
+
       <RepetitionMeaningsDisplay ref={repetitionRef} numberCounts={numberCounts} meanings={repeatedNumberMeanings} openItems={openSections} onToggle={handleToggleMultiple}/>
 
       <ArrowsDisplay ref={arrowsRef} arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} openItems={openSections} onToggle={handleToggleMultiple} />
-      
+
       <div ref={kuaRef}>
           <KuaDisplay kuaAttributes={kuaAttributes} open={openSections.includes(kuaId)} onToggle={() => handleToggle(kuaId)} />
       </div>
