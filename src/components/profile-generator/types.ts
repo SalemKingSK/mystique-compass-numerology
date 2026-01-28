@@ -51,6 +51,8 @@ export interface PersonalYearData {
 
 export interface NumerologyData {
   birthDay: number;
+  birthMonth: number;
+  birthYear: number;
   psycheNum: number;
   destinyNum: number;
   compoundNum: number;

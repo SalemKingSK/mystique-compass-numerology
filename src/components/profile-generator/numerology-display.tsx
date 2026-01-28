@@ -6,9 +6,7 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { SpeechPlayer } from './speech-player';
-import { ScrollableTextDisplay } from './scrollable-text-display';
-import { PersonalYearChart, PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
+import { PersonalYearChart } from './personal-year-chart';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -254,13 +252,10 @@ export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numer
             while (n > 9) {
                 n = String(n).split('').reduce((a, b) => a + Number(b), 0);
             }
-            return n;
+            return n || 9;
         };
         
-        const wyn = reduce(currentYear);
-        const monthDaySum = reduce(birthMonth) + reduce(birthDay);
-        const pyn = reduce(wyn + monthDaySum) || 9;
-        
+        const pyn = reduce(birthMonth + birthDay + currentYear);
         const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
         const offsetPerCycle = 3;
         const cycleIndex = Math.floor((currentYear - birthYear) / 9);
@@ -274,6 +269,14 @@ export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numer
           meaning: PERSONAL_YEAR_MEANINGS[pyn]
         });
     }, [birthDay, birthMonth, birthYear]);
+
+    const handleYearSelect = (data: PersonalYearData | null) => {
+        if (selectedPersonalYear && data && selectedPersonalYear.year === data.year) {
+            setSelectedPersonalYear(null);
+        } else {
+            setSelectedPersonalYear(data);
+        }
+    };
 
     const psychicRef = React.useRef<HTMLDivElement>(null);
     const specialTraitRef = React.useRef<HTMLDivElement>(null);
@@ -372,13 +375,14 @@ export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numer
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
         className="mt-8"
       >
         <PersonalYearChart
           birthDay={birthDay}
           birthMonth={birthMonth}
           birthYear={birthYear}
-          onYearSelect={setSelectedPersonalYear}
+          onYearSelect={handleYearSelect}
         />
       </motion.div>
 

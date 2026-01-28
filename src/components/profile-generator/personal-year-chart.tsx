@@ -1,11 +1,7 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler } from 'chart.js';
-import { motion } from 'framer-motion';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { PersonalYearData } from './types';
-
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
@@ -29,89 +25,135 @@ interface PersonalYearChartProps {
 }
 
 export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({ birthDay, birthMonth, birthYear, onYearSelect }) => {
-  const currentYear = new Date().getFullYear();
+  const chartRef = React.useRef(null);
+  const currentYear = 2026;
   const startYear = currentYear - 9;
   const endYear = currentYear + 9;
 
-  const data: PersonalYearData[] = [];
-  const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
-  const offsetPerCycle = 3;
+  const data: PersonalYearData[] = React.useMemo(() => {
+    const chartData: PersonalYearData[] = [];
+    const powerMap: { [key: number]: number } = { 1: 10, 2: 5, 3: 4, 4: 2, 5: 5, 6: 8, 7: 2, 8: 7, 9: 10 };
+    const offsetPerCycle = 3;
 
-  const reduce = (num: number): number => {
-    let n = num;
-    while (n > 9) {
-      n = String(n).split('').reduce((a, b) => a + Number(b), 0);
+    const reduce = (num: number): number => {
+      let n = num;
+      while (n > 9) {
+        n = String(n).split('').reduce((a, b) => a + Number(b), 0);
+      }
+      return n || 9;
+    };
+
+    for (let year = startYear; year <= endYear; year++) {
+      const pyn = reduce(birthMonth + birthDay + year);
+      const cycleIndex = Math.floor((year - birthYear) / 9);
+      const basePower = powerMap[pyn];
+      const power = basePower + cycleIndex * offsetPerCycle;
+      chartData.push({ year, pyn, power, meaning: PERSONAL_YEAR_MEANINGS[pyn] });
     }
-    return n;
-  };
+    return chartData;
+  }, [birthDay, birthMonth, birthYear, startYear, endYear]);
 
-  for (let year = startYear; year <= endYear; year++) {
-    const wyn = reduce(year);
-    const monthDaySum = reduce(birthMonth) + reduce(birthDay);
-    const pyn = reduce(wyn + monthDaySum) || 9;
-    const cycleIndex = Math.floor((year - birthYear) / 9);
-    const basePower = powerMap[pyn];
-    const power = basePower + cycleIndex * offsetPerCycle;
-    data.push({ year, pyn, power, meaning: PERSONAL_YEAR_MEANINGS[pyn] });
-  }
+  const maxPower = Math.max(...data.map(d => d.power)) + 5;
+  const currentIndex = data.findIndex(d => d.year === currentYear);
 
   const chartData = {
     labels: data.map(d => d.year),
-    datasets: [{
-      label: 'Power Level',
-      data: data.map(d => d.power),
-      borderColor: '#ff00ff',
-      backgroundColor: 'rgba(255, 0, 255, 0.2)',
-      fill: true,
-      tension: 0.4,
-      pointRadius: 4,
-      pointBackgroundColor: data.map(d => d.year === 2026 ? '#fceabb' : '#ff00ff'),
-    }]
+    datasets: [
+      {
+        label: 'Power Level',
+        data: data.map(d => d.power),
+        borderColor: '#ff00ff',
+        backgroundColor: 'rgba(255, 0, 255, 0.3)',
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointRadius: data.map((d, i) => i === currentIndex ? 8 : 5),
+        pointBackgroundColor: data.map((d, i) => i === currentIndex ? '#fceabb' : '#ff00ff'),
+        pointBorderColor: data.map((d, i) => i === currentIndex ? '#fff' : '#ff00ff'),
+        pointBorderWidth: 2,
+        pointHitRadius: 20,
+        pointHoverRadius: 10,
+        pointHoverBorderWidth: 3,
+      }
+    ]
   };
 
   const options: any = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
+      intersect: false,
+    },
     onClick: (event: any, elements: any) => {
       if (elements.length > 0) {
         const index = elements[0].index;
         onYearSelect(data[index]);
       } else {
-        onYearSelect(null);
+        const chart = chartRef.current;
+        if (chart) {
+            const canvasPosition = ChartJS.helpers.getRelativePosition(event, chart);
+            const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
+            // Check if click is outside of plotted area on x-axis
+            if(dataX < 0 || dataX >= data.length) {
+                onYearSelect(null);
+            }
+        }
       }
     },
     scales: {
-      y: { 
-        display: false,
-        min: 0,
-      },
-      x: { 
-        ticks: { color: 'hsl(var(--foreground))' }, 
-        grid: { color: 'hsl(var(--border))' } 
+      y: { display: false, min: 0, max: maxPower },
+      x: {
+        ticks: { color: 'hsl(var(--foreground))', font: { size: 12 } },
+        grid: { color: 'hsl(var(--border) / 0.5)' }
       }
     },
     plugins: {
-      legend: {
-        display: false,
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => `Personal Year ${data[context.dataIndex].pyn} - Power ${context.parsed.y}`
+        }
       },
-      tooltip: { 
-        callbacks: { 
-          label: (context: any) => `Personal Year ${data[context.dataIndex].pyn} - Power ${context.parsed.y}` 
-        } 
+      title: {
+        display: true,
+        text: 'Personal Year Cycle',
+        color: 'hsl(var(--primary))',
+        font: { size: 18, weight: 'bold' }
       },
-      title: { 
-        display: true, 
-        text: 'Personal Year Cycle', 
-        color: 'hsl(var(--primary))', 
-        font: { size: 18 } 
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 0,
+            yMax: maxPower,
+            xMin: currentYear,
+            xMax: currentYear,
+            borderColor: '#fceabb',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            label: {
+              content: `Current Year: ${currentYear}`,
+              enabled: true,
+              position: 'start',
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              color: '#fceabb',
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
+            }
+          }
+        }
       }
     }
   };
 
   return (
-    <div className="glass-card p-4 md:p-6 rounded-2xl h-80 relative">
-      <Line data={chartData} options={options} />
-      <p className="text-xs text-purple-200/70 text-center mt-2 italic">Click any year on the chart for detailed insights</p>
+    <div className="glass-card p-4 md:p-6 rounded-2xl bg-[#1a1a2e] h-[450px] relative">
+      <Line ref={chartRef} data={chartData} options={options} />
+      <p className="text-xs text-purple-200/70 text-center mt-2 italic">Click any point on the chart for detailed insights</p>
     </div>
   );
 };

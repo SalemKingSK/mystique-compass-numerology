@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SpeechPlayer } from './speech-player';
-import { ScrollableTextDisplay } from './scrollable-text-display';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 

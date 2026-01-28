@@ -23,11 +23,11 @@ const reduceOnce = (n: number): number => {
 
 // --- CORE NUMBER CALCULATIONS ---
 export const calculatePsyche = (day: number): number => {
-    let sum = day;
     if (day > 9) {
-         sum = String(day).split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+         const sum = String(day).split('').reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+         return reduceToSingleDigit(sum);
     }
-    return reduceToSingleDigit(sum);
+    return day;
 };
 
 export const calculateDestiny = (day: number, month: number, year: number): number => {
@@ -40,7 +40,21 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
 
 export const calculateKua = (year: number, gender: string): number => {
   
-  // 1. Reduce the Birth Year first (Page 5 Instructions)
+  // 1. Helper function to reduce any number to a single digit
+  // Recursive approach: if n > 9, sum digits and run again.
+  const reduceToSingleDigit = (n: number): number => {
+    // If number is already single digit, return it
+    if (n <= 9) return n;
+    
+    // Convert to string, split, reduce sum, convert back to number
+    const sum = n.toString()
+      .split('')
+      .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+      
+    return reduceToSingleDigit(sum);
+  };
+
+  // 2. Reduce the Birth Year first (Page 5 Instructions)
   const reducedYear = reduceToSingleDigit(year);
 
   let initialKua: number;
@@ -81,6 +95,8 @@ export interface ArrowData {
 }
 export interface NumerologyData {
   birthDay: number;
+  birthMonth: number;
+  birthYear: number;
   psycheNum: number;
   destinyNum: number;
   compoundNum: number;
@@ -201,8 +217,10 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const arrows = calculateArrows(loShuGrid);
   
   let kuaLookupKey = String(kuaNum);
-  if (kuaNum === 5) {
-      kuaLookupKey = gender.toLowerCase() === 'male' ? '5_male' : '5_female';
+  if (kuaNum === 2 && gender.toLowerCase() === 'male' && reduceToSingleDigit(year) === 5) {
+      kuaLookupKey = '5_male';
+  } else if (kuaNum === 8 && gender.toLowerCase() === 'female' && reduceToSingleDigit(year) === 5) {
+      kuaLookupKey = '5_female';
   }
   
   const kuaAttributes = KUA_DATA[kuaLookupKey] || {};
@@ -218,6 +236,8 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
 
   return {
     birthDay: day,
+    birthMonth: month,
+    birthYear: year,
     psycheNum,
     destinyNum,
     kuaNum,
