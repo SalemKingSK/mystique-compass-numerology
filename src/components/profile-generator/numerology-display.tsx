@@ -6,7 +6,7 @@ import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
 import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { PersonalYearChart } from './personal-year-chart';
+import { PersonalYearChart, PERSONAL_YEAR_MEANINGS } from './personal-year-chart';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -219,9 +219,11 @@ const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: 
 KuaDisplay.displayName = 'KuaDisplay';
 
 
-export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numerology: NumerologyData, birthMonth: number, birthYear: number }) {
+export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const {
         birthDay,
+        birthMonth,
+        birthYear,
         psycheNum,
         destinyNum,
         kuaNum,
@@ -383,6 +385,7 @@ export function NumerologyDisplay({ numerology, birthMonth, birthYear }: { numer
           birthMonth={birthMonth}
           birthYear={birthYear}
           onYearSelect={handleYearSelect}
+          selectedPersonalYear={selectedPersonalYear}
         />
       </motion.div>
 
