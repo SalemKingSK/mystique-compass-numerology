@@ -71,6 +71,9 @@ export function ProfileForm({
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <header className="text-center pt-8">
+        <div className="flex justify-center mb-4">
+          <InstallButton />
+        </div>
         <div className="flex justify-center items-center my-4 md:my-0">
             <svg viewBox="0 0 400 150" className="w-full max-w-sm h-auto">
               <defs>
@@ -281,7 +284,6 @@ export function ProfileForm({
             >
               {isPending ? 'Generating...' : 'Generate Profile'}
             </Button>
-            <InstallButton />
           </div>
         </form>
       </div>

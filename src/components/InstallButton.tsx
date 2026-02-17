@@ -4,45 +4,58 @@ import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Download } from 'lucide-react';
 
+// Store the prompt event at the module level to handle cases
+// where the event fires before the component mounts.
+let deferredPrompt: Event | null = null;
+
 const InstallButton = () => {
-  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallPrompt(event);
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // When the event is caught, show the button.
+      setIsVisible(true);
     };
 
-    // Register service worker if not already done
-    if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => console.log('Service Worker registered with scope:', registration.scope))
-        .catch((error) => console.error('Service Worker registration failed:', error));
-    }
-    
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // Also check if the prompt was already captured when the component mounts.
+    if (deferredPrompt) {
+      setIsVisible(true);
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
 
-  const handleInstallClick = () => {
-    if (installPrompt && 'prompt' in installPrompt) {
-      (installPrompt as any).prompt();
-      (installPrompt as any).userChoice.then((choiceResult: { outcome: string }) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        } else {
-          console.log('User dismissed the install prompt');
-        }
-        setInstallPrompt(null);
-      });
+  const handleInstallClick = async () => {
+    if (!deferredPrompt || !('prompt' in deferredPrompt)) {
+      return;
     }
+    
+    // Show the browser's installation prompt.
+    const prompt = deferredPrompt as any;
+    prompt.prompt();
+    
+    // Wait for the user to respond to the prompt.
+    const { outcome } = await prompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    
+    // The prompt can only be used once.
+    deferredPrompt = null;
+    setIsVisible(false);
   };
 
-  if (!installPrompt) {
+  // Only render the button if the app is installable.
+  if (!isVisible) {
     return null;
   }
 
