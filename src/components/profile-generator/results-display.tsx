@@ -16,6 +16,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
+import InstallButton from '../InstallButton';
 
 
 // --- SUB-COMPONENTS ---
@@ -151,10 +152,11 @@ function ResultsHeader({
 function ResultsFooter({ onReset, onHistoryOpen }: { onReset: () => void; onHistoryOpen: () => void; }) {
     return (
         <div className="flex flex-col items-center justify-center mt-8 w-full max-w-4xl mx-auto px-4">
-             <div className="flex items-center justify-between w-full">
+             <div className="flex items-center justify-around w-full max-w-md">
                 <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
+                <InstallButton />
                 <Button variant="ghost" onClick={onHistoryOpen} className="text-white/80 hover:text-white">
                     <History className="mr-2 h-5 w-5" /> History
                 </Button>
@@ -225,7 +227,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
               transition={{ duration: 0.3 }}
             >
               {activeTab === 'astro' && <AstroDisplay insight={insight} />}
-              {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} birthMonth={insight.month} birthYear={insight.year} />}
+              {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
               {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
             </motion.div>
         </AnimatePresence>

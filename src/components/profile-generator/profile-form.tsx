@@ -17,6 +17,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { FamousPerson } from '@/lib/famous-birthdays';
 import { famousBirthdays } from '@/lib/famous-birthdays';
+import InstallButton from '../InstallButton';
 
 interface ProfileFormProps {
   formData: {
@@ -210,13 +211,16 @@ export function ProfileForm({
             </Select>
           </div>
 
-          <Button
-            type="submit"
-            className="w-full font-bold text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-            disabled={isPending}
-          >
-            {isPending ? 'Generating...' : 'Generate Profile'}
-          </Button>
+          <div className="flex flex-col items-center gap-4">
+            <Button
+              type="submit"
+              className="w-full font-bold text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+              disabled={isPending}
+            >
+              {isPending ? 'Generating...' : 'Generate Profile'}
+            </Button>
+            <InstallButton />
+          </div>
         </form>
       </div>
       <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">

@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import CosmicNebula from '@/components/cosmic-nebula';
-import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 
 export const metadata: Metadata = {
   title: 'Mystique Co. – Numerology & Astrology',
@@ -56,7 +55,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <CosmicNebula />
-        <ServiceWorkerRegister />
         {children}
         <Toaster />
       </body>
