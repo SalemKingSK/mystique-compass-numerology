@@ -1,12 +1,7 @@
 {
-  "name": "Mystique Co. – Numerology & Astrology",
+  "name": "Mystique Compass",
   "short_name": "Mystique",
-  "description": "Personalized Numerology, Astrology & Chinese Zodiac Insights",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0f0f1e",
-  "theme_color": "#ff00ff",
-  "orientation": "portrait-primary",
+  "description": "Personalized insights from Numerology, Astrology & Chinese Zodiac",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -20,5 +15,10 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
 }
