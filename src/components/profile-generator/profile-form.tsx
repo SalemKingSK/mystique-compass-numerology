@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { History, Search } from 'lucide-react';
+import { History, Search, Loader2, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import type { FamousPerson } from '@/lib/famous-birthdays';
 import { famousBirthdays } from '@/lib/famous-birthdays';
 import InstallButton from '../InstallButton';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfileFormProps {
   formData: {
@@ -45,6 +46,8 @@ export function ProfileForm({
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<FamousPerson[]>([]);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [isWikiLoading, setIsWikiLoading] = React.useState(false);
+  const { toast } = useToast();
 
   React.useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -53,7 +56,7 @@ export function ProfileForm({
         person.name.toLowerCase().includes(lowerCaseQuery) ||
         (person.tags && person.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
       );
-      setSearchResults(results.slice(0, 50));
+      setSearchResults(results.slice(0, 20)); // Keep local results small
       setIsSearchOpen(true); 
     } else {
       setSearchResults([]);
@@ -65,6 +68,49 @@ export function ProfileForm({
     onFamousPersonSelect(person);
     setSearchQuery('');
     setIsSearchOpen(false);
+  };
+
+  const handleWikiSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsWikiLoading(true);
+    try {
+      const response = await fetch(`/api/biography?name=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+
+      if (data.found && data.birthDate) {
+        // Wikipedia date format from our API is "Month DD, YYYY"
+        const bDate = new Date(data.birthDate);
+        if (!isNaN(bDate.getTime())) {
+          const wikiPerson: FamousPerson = {
+            name: data.title,
+            day: bDate.getDate(),
+            month: bDate.getMonth() + 1,
+            year: bDate.getFullYear(),
+            gender: data.gender || 'male', // Default to male if unknown
+            tags: ['Wikipedia', data.description].filter(Boolean) as string[],
+          };
+          handleSelectPerson(wikiPerson);
+        } else {
+          throw new Error('Invalid date format found');
+        }
+      } else {
+        toast({
+          title: "Not Found",
+          description: "Could not find precise birth data on Wikipedia for this name.",
+        });
+      }
+    } catch (error) {
+      console.error('Wiki search error:', error);
+      toast({
+        variant: 'destructive',
+        title: "Search Error",
+        description: "Failed to fetch data from Wikipedia. Please try manual entry.",
+      });
+    } finally {
+      setIsWikiLoading(false);
+      setIsSearchOpen(false);
+    }
   };
 
   return (
@@ -160,7 +206,7 @@ export function ProfileForm({
             <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
               <PopoverTrigger asChild>
                 <div className="space-y-2">
-                  <Label htmlFor="search">Search Famous Person, Country, Sport...</Label>
+                  <Label htmlFor="search">Search Database or Wikipedia...</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                     <Input
@@ -170,11 +216,11 @@ export function ProfileForm({
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onBlur={() => {
-                        // We use a timeout to allow click events on the popover to register
-                        setTimeout(() => setIsSearchOpen(false), 150);
+                        // Small delay to let click register
+                        setTimeout(() => setIsSearchOpen(false), 200);
                       }}
                       onFocus={() => {
-                         if (searchResults.length > 0) {
+                         if (searchQuery.length > 1) {
                              setIsSearchOpen(true);
                          }
                       }}
@@ -185,22 +231,40 @@ export function ProfileForm({
                 </div>
               </PopoverTrigger>
               <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
-                  {searchResults.length > 0 && (
-                      <div className="max-h-60 overflow-y-auto">
-                          {searchResults.map((person, index) => (
-                          <div
-                              key={`${person.name}-${index}`}
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                handleSelectPerson(person)
-                              }}
-                              className="p-3 hover:bg-white/10 cursor-pointer text-sm"
-                          >
-                              {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+                  <div className="max-h-80 overflow-y-auto">
+                      {searchResults.length > 0 && (
+                          <div className="border-b border-white/10 pb-1">
+                              <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-white/40 font-bold bg-white/5">Local Database</div>
+                              {searchResults.map((person, index) => (
+                              <div
+                                  key={`${person.name}-${index}`}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    handleSelectPerson(person)
+                                  }}
+                                  className="p-3 hover:bg-white/10 cursor-pointer text-sm"
+                              >
+                                  {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+                              </div>
+                              ))}
                           </div>
-                          ))}
+                      )}
+                      
+                      <div 
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleWikiSearch();
+                        }}
+                        className="p-3 hover:bg-purple-500/20 cursor-pointer text-sm flex items-center gap-2 text-purple-200 font-medium"
+                      >
+                        {isWikiLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Globe className="h-4 w-4" />
+                        )}
+                        {isWikiLoading ? 'Searching Wikipedia...' : `Search Wikipedia for "${searchQuery || '...'}"`}
                       </div>
-                  )}
+                  </div>
               </PopoverContent>
             </Popover>
           </div>
@@ -256,7 +320,7 @@ export function ProfileForm({
                 value={formData.year || ''}
                 onChange={onFieldChange}
                 required
-                min="1920"
+                min="1"
                 max={new Date().getFullYear()}
               />
             </div>
