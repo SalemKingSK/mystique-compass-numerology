@@ -78,22 +78,16 @@ export function ProfileForm({
       const response = await fetch(`/api/biography?name=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
 
-      if (data.found && data.birthDate) {
-        // Wikipedia date format from our API is "Month DD, YYYY"
-        const bDate = new Date(data.birthDate);
-        if (!isNaN(bDate.getTime())) {
-          const wikiPerson: FamousPerson = {
-            name: data.title,
-            day: bDate.getDate(),
-            month: bDate.getMonth() + 1,
-            year: bDate.getFullYear(),
-            gender: data.gender || 'male', // Default to male if unknown
-            tags: ['Wikipedia', data.description].filter(Boolean) as string[],
-          };
-          handleSelectPerson(wikiPerson);
-        } else {
-          throw new Error('Invalid date format found');
-        }
+      if (data.found && data.birthYear && data.birthMonth && data.birthDay) {
+        const wikiPerson: FamousPerson = {
+          name: data.title,
+          day: data.birthDay,
+          month: data.birthMonth,
+          year: data.birthYear,
+          gender: data.gender || 'male', // Default to male if unknown
+          tags: ['Wikipedia', data.description].filter(Boolean) as string[],
+        };
+        handleSelectPerson(wikiPerson);
       } else {
         toast({
           title: "Not Found",

@@ -35,9 +35,13 @@ export interface BiographyData {
   description: string;  // Short Wikipedia description (e.g. "German-born physicist")
   imageUrl: string | null;
   wikiUrl: string;
-  birthDate: string | null;
+  birthYear: number | null;
+  birthMonth: number | null;
+  birthDay: number | null;
+  deathYear: number | null;
+  deathMonth: number | null;
+  deathDay: number | null;
   birthPlace: string | null;
-  deathDate: string | null;
   gender: 'male' | 'female' | 'other' | null;
   found: boolean;
 }
@@ -71,9 +75,9 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
   const summary = await summaryRes.json();
 
   // Step 3: Fetch birth/death dates and gender from Wikidata
-  let birthDate: string | null = null;
+  let birthParts: { year: number, month: number, day: number } | null = null;
   let birthPlace: string | null = null;
-  let deathDate: string | null = null;
+  let deathParts: { year: number, month: number, day: number } | null = null;
   let gender: 'male' | 'female' | 'other' | null = null;
 
   try {
@@ -91,8 +95,8 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
       const entity = entityData?.entities?.[wikidataId]?.claims;
 
       // P569 = date of birth, P570 = date of death, P19 = place of birth, P21 = gender
-      birthDate = extractWikidataDate(entity?.P569);
-      deathDate = extractWikidataDate(entity?.P570);
+      birthParts = extractWikidataDateParts(entity?.P569);
+      deathParts = extractWikidataDateParts(entity?.P570);
       birthPlace = await extractWikidataPlace(entity?.P19);
       
       const genderId = entity?.P21?.[0]?.mainsnak?.datavalue?.value?.id;
@@ -111,9 +115,13 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
     description: summary.description || '',
     imageUrl: summary.thumbnail?.source || summary.originalimage?.source || null,
     wikiUrl: summary.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodedTitle}`,
-    birthDate,
+    birthYear: birthParts?.year || null,
+    birthMonth: birthParts?.month || null,
+    birthDay: birthParts?.day || null,
+    deathYear: deathParts?.year || null,
+    deathMonth: deathParts?.month || null,
+    deathDay: deathParts?.day || null,
     birthPlace,
-    deathDate,
     gender,
     found: true,
   };
@@ -127,25 +135,31 @@ function emptyBio(name: string): BiographyData {
     description: '',
     imageUrl: null,
     wikiUrl: `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(name)}`,
-    birthDate: null,
+    birthYear: null,
+    birthMonth: null,
+    birthDay: null,
+    deathYear: null,
+    deathMonth: null,
+    deathDay: null,
     birthPlace: null,
-    deathDate: null,
     gender: null,
     found: false,
   };
 }
 
-function extractWikidataDate(claims: any[] | undefined): string | null {
+function extractWikidataDateParts(claims: any[] | undefined): { year: number, month: number, day: number } | null {
   if (!claims || claims.length === 0) return null;
   const value = claims[0]?.mainsnak?.datavalue?.value?.time;
   if (!value) return null;
-  // Format: +1879-03-14T00:00:00Z → "March 14, 1879"
+  // Format: +1879-03-14T00:00:00Z
   try {
-    const match = value.match(/[+-](\d{4})-(\d{2})-(\d{2})/);
+    const match = value.match(/[+-](\d+)-(\d{2})-(\d{2})/);
     if (!match) return null;
-    const [, year, month, day] = match;
-    const date = new Date(`${year}-${month}-${day}`);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    return {
+      year: parseInt(match[1], 10),
+      month: parseInt(match[2], 10),
+      day: parseInt(match[3], 10)
+    };
   } catch {
     return null;
   }
