@@ -1,4 +1,3 @@
-// src/components/profile-generator/profile-form.tsx
 'use client';
 
 import * as React from 'react';
@@ -71,7 +70,7 @@ export function ProfileForm({
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <header className="text-center pt-8">
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-6">
           <InstallButton />
         </div>
         <div className="flex justify-center items-center my-4 md:my-0">

@@ -1,69 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from './ui/button';
 import { Download } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
-// Store the prompt event at the module level to handle cases
-// where the event fires before the component mounts.
-let deferredPrompt: Event | null = null;
-
+/**
+ * A button component that triggers the PWA installation prompt.
+ * Only renders if the app is installable and not already installed.
+ */
 const InstallButton = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const { isInstallable, isInstalled, promptInstall } = usePWAInstall();
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      // When the event is caught, show the button.
-      setIsVisible(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Also check if the prompt was already captured when the component mounts.
-    if (deferredPrompt) {
-      setIsVisible(true);
-    }
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt || !('prompt' in deferredPrompt)) {
-      return;
-    }
-    
-    // Show the browser's installation prompt.
-    const prompt = deferredPrompt as any;
-    prompt.prompt();
-    
-    // Wait for the user to respond to the prompt.
-    const { outcome } = await prompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    } else {
-      console.log('User dismissed the install prompt');
-    }
-    
-    // The prompt can only be used once.
-    deferredPrompt = null;
-    setIsVisible(false);
-  };
-
-  // Only render the button if the app is installable.
-  if (!isVisible) {
+  // Only render the button if the app is installable and not already installed
+  if (!isInstallable || isInstalled) {
     return null;
   }
+
+  const handleInstallClick = async () => {
+    const result = await promptInstall();
+    if (result === 'accepted') {
+      console.log('User accepted the PWA install prompt');
+    } else {
+      console.log('User dismissed the PWA install prompt');
+    }
+  };
 
   return (
     <Button
       variant="outline"
       onClick={handleInstallClick}
-      className="text-white/80 hover:text-white bg-black/20"
+      className="text-white/80 hover:text-white bg-black/20 border-purple-500/30 hover:bg-purple-500/10"
     >
       <Download className="mr-2 h-4 w-4" />
       Install App
