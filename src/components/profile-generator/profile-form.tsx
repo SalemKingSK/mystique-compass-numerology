@@ -72,8 +72,70 @@ export function ProfileForm({
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <header className="text-center pt-8">
-        <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-500">Mystique Compass</h1>
-        <p className="text-white/70 mt-2">Giving your life a meaning.</p>
+        <div className="flex justify-center items-center my-4 md:my-0">
+            <svg viewBox="0 0 400 150" className="w-full max-w-sm h-auto">
+              <defs>
+                <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#FDF1B8', stopOpacity: 1 }} />
+                  <stop offset="50%" style={{ stopColor: '#E8C56D', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: '#B8860B', stopOpacity: 1 }} />
+                </linearGradient>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+              </defs>
+
+              {/* Compass Rose */}
+              <g transform="translate(200, 45) scale(0.8)">
+                <g filter="url(#glow)">
+                    {/* Main points */}
+                    <path d="M 0 -40 L 10 0 L -10 0 Z" fill="#FDF1B8"/>
+                    <path d="M 0 40 L 10 0 L -10 0 Z" fill="#E8C56D"/>
+                    <path d="M 40 0 L 0 10 L 0 -10 Z" fill="#FDF1B8"/>
+                    <path d="M -40 0 L 0 10 L 0 -10 Z" fill="#E8C56D"/>
+                    {/* Diagonal points */}
+                    <path d="M 28 -28 L 5 -5 L -5 5 Z" fill="#E8C56D" />
+                    <path d="M 28 28 L 5 5 L -5 -5 Z" fill="#FDF1B8" />
+                    <path d="M -28 28 L -5 5 L 5 -5 Z" fill="#E8C56D" />
+                    <path d="M -28 -28 L -5 -5 L 5 5 Z" fill="#FDF1B8" />
+                </g>
+              </g>
+
+              {/* Text */}
+              <text
+                x="50%"
+                y="100"
+                dominantBaseline="middle"
+                textAnchor="middle"
+                fontFamily="Poppins, sans-serif"
+                fontSize="48"
+                fontWeight="600"
+                fill="url(#gold-gradient)"
+                letterSpacing="1"
+                filter="url(#glow)"
+              >
+                Mystique
+              </text>
+              <text
+                x="50%"
+                y="130"
+                dominantBaseline="middle"
+                textAnchor="middle"
+                fontFamily="Poppins, sans-serif"
+                fontSize="24"
+                fontWeight="400"
+                fill="url(#gold-gradient)"
+                letterSpacing="2"
+                filter="url(#glow)"
+              >
+                compass
+              </text>
+            </svg>
+        </div>
       </header>
       <div className="flex-grow flex items-center justify-center">
         <form onSubmit={onSubmit} className="space-y-6 w-full glass-card p-6 md:p-8">
