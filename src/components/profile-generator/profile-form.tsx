@@ -1,4 +1,3 @@
-
 // src/components/profile-generator/profile-form.tsx
 'use client';
 
@@ -136,6 +135,7 @@ export function ProfileForm({
               </text>
             </svg>
         </div>
+        <p className="text-white/70 italic text-sm -mt-2">Giving your life a Meaning.</p>
       </header>
       <div className="flex-grow flex items-center justify-center">
         <form onSubmit={onSubmit} className="space-y-6 w-full glass-card p-6 md:p-8">
