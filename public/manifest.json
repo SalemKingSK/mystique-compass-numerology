@@ -2,6 +2,10 @@
   "name": "Mystique Compass",
   "short_name": "Mystique",
   "description": "Personalized insights from Numerology, Astrology & Chinese Zodiac",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#a855f7",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -13,12 +17,7 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
-  ],
-  "theme_color": "#0a0a0a",
-  "background_color": "#0a0a0a",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }

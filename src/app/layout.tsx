@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Mystique Co. – Numerology & Astrology',
   description: 'Personalized insights from Numerology, Astrology & Chinese Zodiac',
   manifest: '/manifest.json',
-  themeColor: '#ff00ff',
+  themeColor: '#a855f7',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -46,7 +46,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
         
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ff00ff" />
+        <meta name="theme-color" content="#a855f7" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
