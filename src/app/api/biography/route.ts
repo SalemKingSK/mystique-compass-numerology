@@ -26,13 +26,13 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// ─── Wikipedia Fetching Logic ─────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface BiographyData {
   name: string;
   title: string;
-  extract: string;       // Plain text summary (2–5 sentences)
-  description: string;  // Short Wikipedia description (e.g. "German-born physicist")
+  extract: string;
+  description: string;
   imageUrl: string | null;
   wikiUrl: string;
   birthYear: number | null;
@@ -44,8 +44,19 @@ export interface BiographyData {
   birthPlace: string | null;
   gender: 'male' | 'female' | 'other' | null;
   found: boolean;
-  isEntity?: boolean;    // Indicates if it's a geographic/non-person entity
+  isEntity?: boolean;
+  foundingEvent?: string | null; // e.g. "Iranian Revolution"
 }
+
+interface DateParts {
+  year: number;
+  month: number;
+  day: number;
+  isPrecise: boolean; // true if both month AND day are real (non-zero) values
+  label?: string;     // optional event label from Wikidata qualifiers
+}
+
+// ─── Main Fetcher ─────────────────────────────────────────────────────────────
 
 async function fetchWikipediaBio(name: string): Promise<BiographyData> {
   const encodedName = encodeURIComponent(name.trim());
@@ -75,12 +86,13 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
   if (!summaryRes.ok) return emptyBio(name);
   const summary = await summaryRes.json();
 
-  // Step 3: Fetch birth/death dates or founding/inception dates from Wikidata
-  let birthParts: { year: number, month: number, day: number } | null = null;
+  // Step 3: Fetch dates from Wikidata
+  let birthParts: DateParts | null = null;
+  let deathParts: DateParts | null = null;
   let birthPlace: string | null = null;
-  let deathParts: { year: number, month: number, day: number } | null = null;
   let gender: 'male' | 'female' | 'other' | null = null;
   let isEntity = false;
+  let foundingEvent: string | null = null;
 
   try {
     const wikidataUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodedTitle}&prop=pageprops&format=json&origin=*`;
@@ -96,34 +108,33 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
       const entityData = await entityRes.json();
       const claims = entityData?.entities?.[wikidataId]?.claims;
 
-      // P569 = date of birth (usually for people)
-      birthParts = getBestDateParts(claims?.P569);
-      
-      // If no birth date, check for inception/founding/independence (usually for entities)
-      if (!birthParts) {
-        // P571 = inception, P580 = start time, P1246 = independence date
-        const inception = getBestDateParts(claims?.P571, true); // true = prioritize latest
-        const startTime = getBestDateParts(claims?.P580, true);
-        const independence = getBestDateParts(claims?.P1246, true);
+      // ── Person: P569 = date of birth ──────────────────────────────────────
+      birthParts = getPersonBirthDate(claims?.P569);
 
-        // Prioritize independence date, then latest inception, then start time
-        birthParts = independence || inception || startTime;
+      if (birthParts) {
+        // It's a person — get gender and birthplace normally
+        deathParts = getPersonBirthDate(claims?.P570);
+        birthPlace = await extractWikidataPlace(claims?.P19);
 
-        if (birthParts) {
-          isEntity = true;
-          gender = 'male'; // Assume male for geographic entities
-        }
-      }
-
-      deathParts = getBestDateParts(claims?.P570);
-      birthPlace = await extractWikidataPlace(claims?.P19);
-      
-      // If it's a person, get their actual gender
-      if (!isEntity) {
         const genderId = claims?.P21?.[0]?.mainsnak?.datavalue?.value?.id;
         if (genderId === 'Q6581097') gender = 'male';
         else if (genderId === 'Q6581072') gender = 'female';
         else if (genderId) gender = 'other';
+
+      } else {
+        // ── Entity (country / city / state): pick the best founding date ───
+        const allEntityDates: DateParts[] = [
+          ...parseDateClaims(claims?.P571),  // inception
+          ...parseDateClaims(claims?.P580),  // start time
+          ...parseDateClaims(claims?.P1246), // independence
+        ];
+
+        if (allEntityDates.length > 0) {
+          birthParts = pickBestEntityDate(allEntityDates);
+          isEntity = true;
+          gender = 'male'; // All geographic entities are treated as male per app logic
+          foundingEvent = birthParts?.label || null;
+        }
       }
     }
   } catch (err) {
@@ -137,17 +148,118 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
     description: summary.description || '',
     imageUrl: summary.thumbnail?.source || summary.originalimage?.source || null,
     wikiUrl: summary.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodedTitle}`,
-    birthYear: birthParts?.year || null,
-    birthMonth: birthParts?.month || null,
-    birthDay: birthParts?.day || null,
-    deathYear: deathParts?.year || null,
-    deathMonth: deathParts?.month || null,
-    deathDay: deathParts?.day || null,
+    birthYear: birthParts?.year ?? null,
+    birthMonth: birthParts?.month ?? null,
+    birthDay: birthParts?.day ?? null,
+    deathYear: deathParts?.year ?? null,
+    deathMonth: deathParts?.month ?? null,
+    deathDay: deathParts?.day ?? null,
     birthPlace,
     gender,
     found: !!birthParts,
-    isEntity
+    isEntity,
+    foundingEvent,
   };
+}
+
+// ─── Date Parsing Helpers ─────────────────────────────────────────────────────
+
+function parseWikidataTime(timeStr: string): { year: number; rawMonth: number; rawDay: number } | null {
+  const match = timeStr.match(/[+-](\d+)-(\d{2})-(\d{2})/);
+  if (!match) return null;
+
+  const year = parseInt(match[1], 10);
+  const rawMonth = parseInt(match[2], 10);
+  const rawDay = parseInt(match[3], 10);
+
+  if (year === 0) return null;
+
+  return { year, rawMonth, rawDay };
+}
+
+function parseDateClaims(claims: any[] | undefined): DateParts[] {
+  if (!claims || claims.length === 0) return [];
+
+  const results: DateParts[] = [];
+
+  for (const claim of claims) {
+    const timeStr = claim?.mainsnak?.datavalue?.value?.time;
+    if (!timeStr) continue;
+
+    const parsed = parseWikidataTime(timeStr);
+    if (!parsed) continue;
+
+    const { year, rawMonth, rawDay } = parsed;
+    const isPrecise = rawMonth > 0 && rawDay > 0;
+    const month = rawMonth > 0 ? rawMonth : 0;
+    const day = rawDay > 0 ? rawDay : 0;
+
+    results.push({ year, month, day, isPrecise });
+  }
+
+  return results;
+}
+
+function getPersonBirthDate(claims: any[] | undefined): DateParts | null {
+  const dates = parseDateClaims(claims);
+  if (dates.length === 0) return null;
+
+  const precise = dates.find(d => d.isPrecise);
+  if (precise) return precise;
+
+  const first = dates[0];
+  return {
+    ...first,
+    month: first.month || 1,
+    day: first.day || 1,
+  };
+}
+
+function pickBestEntityDate(dates: DateParts[]): DateParts | null {
+  if (dates.length === 0) return null;
+
+  const preciseDates = dates.filter(d => d.isPrecise);
+  const impreciseDates = dates.filter(d => !d.isPrecise);
+
+  const sortDesc = (a: DateParts, b: DateParts) => {
+    if (a.year !== b.year) return b.year - a.year;
+    if (a.month !== b.month) return b.month - a.month;
+    return b.day - a.day;
+  };
+
+  if (preciseDates.length > 0) {
+    preciseDates.sort(sortDesc);
+    return preciseDates[0];
+  }
+
+  if (impreciseDates.length > 0) {
+    impreciseDates.sort(sortDesc);
+    const best = impreciseDates[0];
+    return {
+      ...best,
+      month: best.month || 1,
+      day: best.day || 1,
+      isPrecise: false,
+    };
+  }
+
+  return null;
+}
+
+async function extractWikidataPlace(claims: any[] | undefined): Promise<string | null> {
+  if (!claims || claims.length === 0) return null;
+  const entityId = claims[0]?.mainsnak?.datavalue?.value?.id;
+  if (!entityId) return null;
+  try {
+    const res = await fetch(
+      `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=labels&languages=en&format=json&origin=*`,
+      { headers: { 'User-Agent': 'FamousBirthdaysApp/1.0' } }
+    );
+    const data = await res.json();
+    return data?.entities?.[entityId]?.labels?.en?.value || null;
+  } catch {
+    return null;
+  }
 }
 
 function emptyBio(name: string): BiographyData {
@@ -167,76 +279,6 @@ function emptyBio(name: string): BiographyData {
     birthPlace: null,
     gender: null,
     found: false,
+    foundingEvent: null,
   };
-}
-
-/**
- * Parses multiple Wikidata claims for a date and returns the best match.
- * For entities, we often want the *latest* formation date (e.g. Revolution or modern Independence).
- * For people, we usually want the *first* (primary) birth date.
- */
-function getBestDateParts(claims: any[] | undefined, latest: boolean = false): { year: number, month: number, day: number } | null {
-  if (!claims || claims.length === 0) return null;
-  
-  const validDates: { year: number, month: number, day: number }[] = [];
-
-  for (const claim of claims) {
-    const value = claim?.mainsnak?.datavalue?.value?.time;
-    if (!value) continue;
-    
-    try {
-      const match = value.match(/[+-](\d+)-(\d{2})-(\d{2})/);
-      if (!match) continue;
-      
-      const year = parseInt(match[1], 10);
-      let month = parseInt(match[2], 10);
-      let day = parseInt(match[3], 10);
-      
-      // Wikidata uses 00 for imprecise months/days
-      const isImprecise = month === 0 || day === 0;
-      
-      // Default to Jan 1st if totally imprecise
-      if (month === 0) month = 1;
-      if (day === 0) day = 1;
-      
-      validDates.push({ year, month, day });
-      
-      // If we're looking for a person's birth date and we found a precise one, return it immediately
-      if (!latest && !isImprecise) {
-        return { year, month, day };
-      }
-    } catch {
-      continue;
-    }
-  }
-
-  if (validDates.length === 0) return null;
-
-  if (latest) {
-    // Return the latest date found (good for modern state formations)
-    return validDates.sort((a, b) => {
-      if (a.year !== b.year) return b.year - a.year;
-      if (a.month !== b.month) return b.month - a.month;
-      return b.day - a.day;
-    })[0];
-  }
-
-  // Default fallback to the first one found
-  return validDates[0];
-}
-
-async function extractWikidataPlace(claims: any[] | undefined): Promise<string | null> {
-  if (!claims || claims.length === 0) return null;
-  const entityId = claims[0]?.mainsnak?.datavalue?.value?.id;
-  if (!entityId) return null;
-  try {
-    const res = await fetch(
-      `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=labels&languages=en&format=json&origin=*`,
-      { headers: { 'User-Agent': 'FamousBirthdaysApp/1.0' } }
-    );
-    const data = await res.json();
-    return data?.entities?.[entityId]?.labels?.en?.value || null;
-  } catch {
-    return null;
-  }
 }
