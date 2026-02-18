@@ -44,6 +44,7 @@ export interface BiographyData {
   birthPlace: string | null;
   gender: 'male' | 'female' | 'other' | null;
   found: boolean;
+  isEntity?: boolean;    // Indicates if it's a geographic/non-person entity
 }
 
 async function fetchWikipediaBio(name: string): Promise<BiographyData> {
@@ -62,7 +63,7 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
   const pageTitle = results[0].title;
   const encodedTitle = encodeURIComponent(pageTitle);
 
-  // Step 2: Fetch full summary + image from the REST Summary API (much cleaner than action=query)
+  // Step 2: Fetch full summary + image from the REST Summary API
   const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodedTitle}`;
   const summaryRes = await fetch(summaryUrl, {
     headers: {
@@ -74,11 +75,12 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
   if (!summaryRes.ok) return emptyBio(name);
   const summary = await summaryRes.json();
 
-  // Step 3: Fetch birth/death dates and gender from Wikidata
+  // Step 3: Fetch birth/death dates or founding/inception dates from Wikidata
   let birthParts: { year: number, month: number, day: number } | null = null;
   let birthPlace: string | null = null;
   let deathParts: { year: number, month: number, day: number } | null = null;
   let gender: 'male' | 'female' | 'other' | null = null;
+  let isEntity = false;
 
   try {
     const wikidataUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodedTitle}&prop=pageprops&format=json&origin=*`;
@@ -92,20 +94,33 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
       const entityUrl = `https://www.wikidata.org/wiki/Special:EntityData/${wikidataId}.json`;
       const entityRes = await fetch(entityUrl, { headers: { 'User-Agent': 'FamousBirthdaysApp/1.0' } });
       const entityData = await entityRes.json();
-      const entity = entityData?.entities?.[wikidataId]?.claims;
+      const claims = entityData?.entities?.[wikidataId]?.claims;
 
-      // P569 = date of birth, P570 = date of death, P19 = place of birth, P21 = gender
-      birthParts = extractWikidataDateParts(entity?.P569);
-      deathParts = extractWikidataDateParts(entity?.P570);
-      birthPlace = await extractWikidataPlace(entity?.P19);
+      // P569 = date of birth
+      birthParts = extractWikidataDateParts(claims?.P569);
       
-      const genderId = entity?.P21?.[0]?.mainsnak?.datavalue?.value?.id;
-      if (genderId === 'Q6581097') gender = 'male';
-      else if (genderId === 'Q6581072') gender = 'female';
-      else if (genderId) gender = 'other';
+      // If no birth date, check for P571 (inception/founding) or P580 (start time)
+      if (!birthParts) {
+        birthParts = extractWikidataDateParts(claims?.P571) || extractWikidataDateParts(claims?.P580);
+        if (birthParts) {
+          isEntity = true;
+          gender = 'male'; // Assume male for geographic entities as requested
+        }
+      }
+
+      deathParts = extractWikidataDateParts(claims?.P570);
+      birthPlace = await extractWikidataPlace(claims?.P19);
+      
+      // If it's a person, get their actual gender
+      if (!isEntity) {
+        const genderId = claims?.P21?.[0]?.mainsnak?.datavalue?.value?.id;
+        if (genderId === 'Q6581097') gender = 'male';
+        else if (genderId === 'Q6581072') gender = 'female';
+        else if (genderId) gender = 'other';
+      }
     }
   } catch {
-    // Silently skip — Wikidata is a bonus, not critical
+    // Silently skip — Wikidata is a bonus
   }
 
   return {
@@ -123,7 +138,8 @@ async function fetchWikipediaBio(name: string): Promise<BiographyData> {
     deathDay: deathParts?.day || null,
     birthPlace,
     gender,
-    found: true,
+    found: !!birthParts,
+    isEntity
   };
 }
 
@@ -149,20 +165,30 @@ function emptyBio(name: string): BiographyData {
 
 function extractWikidataDateParts(claims: any[] | undefined): { year: number, month: number, day: number } | null {
   if (!claims || claims.length === 0) return null;
-  const value = claims[0]?.mainsnak?.datavalue?.value?.time;
-  if (!value) return null;
-  // Format: +1879-03-14T00:00:00Z
-  try {
-    const match = value.match(/[+-](\d+)-(\d{2})-(\d{2})/);
-    if (!match) return null;
-    return {
-      year: parseInt(match[1], 10),
-      month: parseInt(match[2], 10),
-      day: parseInt(match[3], 10)
-    };
-  } catch {
-    return null;
+  
+  for (const claim of claims) {
+    const value = claim?.mainsnak?.datavalue?.value?.time;
+    if (!value) continue;
+    
+    // Format can be +YYYY-MM-DD or +YYYY-00-00 for imprecise dates
+    try {
+      const match = value.match(/[+-](\d+)-(\d{2})-(\d{2})/);
+      if (!match) continue;
+      
+      const year = parseInt(match[1], 10);
+      let month = parseInt(match[2], 10);
+      let day = parseInt(match[3], 10);
+      
+      // Fallback for imprecise dates (e.g. 1900-00-00)
+      if (month === 0) month = 1;
+      if (day === 0) day = 1;
+      
+      return { year, month, day };
+    } catch {
+      continue;
+    }
   }
+  return null;
 }
 
 async function extractWikidataPlace(claims: any[] | undefined): Promise<string | null> {
