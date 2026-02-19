@@ -29,7 +29,10 @@ export const metadata: Metadata = {
     description: "Personalized insights from Numerology, Astrology & Chinese Zodiac",
   },
   icons: {
-    icon: '/icon-192.png',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', type: 'image/png' }
+    ],
     apple: '/icon-192.png',
   },
 };
