@@ -4,7 +4,7 @@
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
-import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star } from "lucide-react";
+import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star, Activity } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,8 +24,8 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
     </div>
 );
 
-const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string, meaning: string | null, open: boolean, onToggle: () => void }>(
-  ({ id, title, meaning, open, onToggle }, ref) => {
+const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string, meaning: string | null, open: boolean, onToggle: () => void, icon?: React.ReactNode }>(
+  ({ id, title, meaning, open, onToggle, icon }, ref) => {
     if (!meaning) return null;
     return (
         <div ref={ref}>
@@ -33,7 +33,7 @@ const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string
                 <AccordionItem value={id} className="glass-card px-4">
                     <AccordionTrigger>
                         <span className="font-semibold text-lg text-primary flex items-center gap-2">
-                            <Wand2 className="h-5 w-5" /> {title}
+                            {icon || <Wand2 className="h-5 w-5" />} {title}
                         </span>
                     </AccordionTrigger>
                     <AccordionContent>
@@ -337,7 +337,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       <div className="space-y-4">
          <FateDisplay ref={compoundRef} id={compoundId} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>
          {reducedCompoundNum && <FateDisplay ref={inherentRef} id={inherentId} title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={openSections.includes(inherentId)} onToggle={() => handleToggle(inherentId)} />}
-         {karmicFateNum && <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} />}
+         {karmicFateNum && <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} icon={<Activity className="h-5 w-5" />} />}
       </div>
 
       {psychicMeaning && <PsychicMeaningDisplay ref={psychicRef} number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} open={openSections.includes(psychicId)} onToggle={() => handleToggle(psychicId)} />}

@@ -1,8 +1,15 @@
 // src/lib/numerology.ts
 import type { AstroInsightInput, PersonalYearData } from '@/components/profile-generator/types';
-import { COMPOUND_NUMBER_MEANINGS, DESTINY_NUMBER_MEANINGS, KARMIC_FATE_MEANINGS, KUA_DATA, PSYCHIC_NUMBER_MEANINGS, REPEATED_NUMBER_MEANINGS } from './numerology/data';
+import { 
+  COMPOUND_NUMBER_MEANINGS, 
+  DESTINY_NUMBER_MEANINGS, 
+  KARMIC_FATE_MEANINGS, 
+  KUA_DATA, 
+  PSYCHIC_NUMBER_MEANINGS, 
+  REPEATED_NUMBER_MEANINGS,
+  lindaGoodmanMeanings
+} from './numerology/data';
 import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
-import { PERSONAL_YEAR_MEANINGS } from '@/components/profile-generator/personal-year-chart';
 
 // --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
@@ -42,39 +49,25 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
 export const calculateKua = (year: number, gender: string): number => {
   
   // 1. Helper function to reduce any number to a single digit
-  // Recursive approach: if n > 9, sum digits and run again.
   const reduceToSingleDigit = (n: number): number => {
-    // If number is already single digit, return it
     if (n <= 9) return n;
-    
-    // Convert to string, split, reduce sum, convert back to number
     const sum = n.toString()
       .split('')
       .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
-      
     return reduceToSingleDigit(sum);
   };
 
-  // 2. Reduce the Birth Year first (Page 5 Instructions)
   const reducedYear = reduceToSingleDigit(year);
-
   let initialKua: number;
 
-  // 3. Apply Formulas (Page 5 Instructions)
   if (gender.toLowerCase() === 'male') {
-    // PDF Rule: Subtract from 11
     initialKua = 11 - reducedYear;
   } else {
-    // PDF Rule: Add 4
     initialKua = reducedYear + 4;
   }
 
-  // 4. Final Reduction
-  // Example: If Male result is 11-1=10, we must reduce 10 -> 1
-  // Example: If Female result is 8+4=12, we must reduce 12 -> 3
   let finalKua = reduceToSingleDigit(initialKua);
 
-  // Handle the special case for Kua number 5
   if (finalKua === 5) {
     finalKua = gender.toLowerCase() === 'male' ? 2 : 8;
   }
@@ -82,11 +75,6 @@ export const calculateKua = (year: number, gender: string): number => {
   return finalKua;
 };
 
-
-export const calculateKarmicFate = (day: number, month: number, year: number): number => {
-    const sum = day + month + year;
-    return reduceOnce(sum);
-}
 
 // --- DATA INTERFACES ---
 export interface ArrowData {
@@ -178,16 +166,10 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
       reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inherent Fate number ${reducedCompoundNum}.`;
   }
   
-  let karmicFateNum: number | null = null;
-  let karmicFateMeaning: string | null = null;
-
-  if (reducedCompoundNum) {
-      const secondReduction = reduceOnce(reducedCompoundNum);
-      if (secondReduction >= 10 && secondReduction !== reducedCompoundNum) {
-          karmicFateNum = secondReduction;
-          karmicFateMeaning = KARMIC_FATE_MEANINGS[karmicFateNum as keyof typeof KARMIC_FATE_MEANINGS] || `No specific meaning for Karmic Fate number ${karmicFateNum}.`;
-      }
-  }
+  // NEW KARMIC FATE LOGIC
+  const rawKarmicSum = day + month + year;
+  const karmicFateNum = String(rawKarmicSum).split('').reduce((a, b) => a + Number(b), 0);
+  const karmicFateMeaning = lindaGoodmanMeanings[karmicFateNum] || `No specific meaning for Karmic Fate number ${karmicFateNum}.`;
 
 
   const calculateArrows = (grid: (string | null)[][]) => {
@@ -218,9 +200,9 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const arrows = calculateArrows(loShuGrid);
   
   let kuaLookupKey = String(kuaNum);
-  if (kuaNum === 2 && gender.toLowerCase() === 'male' && reduceToSingleDigit(year) === 5) {
+  if (kuaNum === 2 && gender.toLowerCase() === 'male' && String(year).split('').reduce((a, b) => a + Number(b), 0) % 9 === 5) {
       kuaLookupKey = '5_male';
-  } else if (kuaNum === 8 && gender.toLowerCase() === 'female' && reduceToSingleDigit(year) === 5) {
+  } else if (kuaNum === 8 && gender.toLowerCase() === 'female' && String(year).split('').reduce((a, b) => a + Number(b), 0) % 9 === 5) {
       kuaLookupKey = '5_female';
   }
   
