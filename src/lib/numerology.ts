@@ -3,7 +3,6 @@ import type { AstroInsightInput, PersonalYearData } from '@/components/profile-g
 import { 
   COMPOUND_NUMBER_MEANINGS, 
   DESTINY_NUMBER_MEANINGS, 
-  KARMIC_FATE_MEANINGS, 
   KUA_DATA, 
   PSYCHIC_NUMBER_MEANINGS, 
   REPEATED_NUMBER_MEANINGS,
@@ -88,8 +87,8 @@ export interface NumerologyData {
   birthYear: number;
   psycheNum: number;
   destinyNum: number;
-  compoundNum: number;
-  compoundMeaning: string;
+  compoundNum: number | null;
+  compoundMeaning: string | null;
   reducedCompoundNum: number | null;
   reducedCompoundMeaning: string | null;
   karmicFateNum: number | null;
@@ -154,22 +153,26 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const birthDateSum = String(day).split('').reduce((a, b) => a + Number(b), 0) +
                        String(month).split('').reduce((a, b) => a + Number(b), 0) +
                        String(year).split('').reduce((a, b) => a + Number(b), 0);
-  const compoundNum = birthDateSum;
-  const compoundMeaning = COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for this compound number (${compoundNum}).`;
   
-  const firstReduction = reduceOnce(compoundNum);
+  // Compound Fate Logic: Hide if single digit (< 10) or meaning is missing
+  const compoundNum = (birthDateSum >= 10 && COMPOUND_NUMBER_MEANINGS[birthDateSum as keyof typeof COMPOUND_NUMBER_MEANINGS]) ? birthDateSum : null;
+  const compoundMeaning = compoundNum ? COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] : null;
+  
+  // Inherent Fate Logic: Hide if single digit or meaning is missing
+  const firstReduction = reduceOnce(birthDateSum);
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
 
-  if (firstReduction >= 10 && firstReduction !== compoundNum) {
+  if (firstReduction >= 10 && firstReduction !== birthDateSum && COMPOUND_NUMBER_MEANINGS[firstReduction as keyof typeof COMPOUND_NUMBER_MEANINGS]) {
       reducedCompoundNum = firstReduction;
-      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[reducedCompoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] || `No specific meaning for Inherent Fate number ${reducedCompoundNum}.`;
+      reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[firstReduction as keyof typeof COMPOUND_NUMBER_MEANINGS];
   }
   
-  // NEW KARMIC FATE LOGIC
+  // Karmic Fate Logic: Hide if single digit or meaning is missing
   const rawKarmicSum = day + month + year;
-  const karmicFateNum = String(rawKarmicSum).split('').reduce((a, b) => a + Number(b), 0);
-  const karmicFateMeaning = lindaGoodmanMeanings[karmicFateNum] || `No specific meaning for Karmic Fate number ${karmicFateNum}.`;
+  const karmicCandidate = String(rawKarmicSum).split('').reduce((a, b) => a + Number(b), 0);
+  const karmicFateNum = (karmicCandidate >= 10 && lindaGoodmanMeanings[karmicCandidate]) ? karmicCandidate : null;
+  const karmicFateMeaning = karmicFateNum ? lindaGoodmanMeanings[karmicFateNum] : null;
 
 
   const calculateArrows = (grid: (string | null)[][]) => {
