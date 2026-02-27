@@ -53,11 +53,9 @@ function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onCli
 function NewAstroSignDetails({ sign, signData }: { sign: string, signData: AstroInsightOutput['signData'] }) {
     const [api, setApi] = React.useState<any>(null);
     const [current, setCurrent] = React.useState(0);
-    const [count, setCount] = React.useState(0);
 
     React.useEffect(() => {
         if (!api) return;
-        setCount(api.scrollSnapList().length);
         setCurrent(api.selectedScrollSnap());
         api.on("select", () => {
             setCurrent(api.selectedScrollSnap());
@@ -149,23 +147,32 @@ function ResultsHeader({
   );
 }
 
-function ResultsFooter({ onReset, onHistoryOpen }: { onReset: () => void; onHistoryOpen: () => void; }) {
+function ResultsFooter() {
     return (
-        <div className="flex flex-col items-center justify-center mt-8 w-full max-w-4xl mx-auto px-4">
-             <div className="flex items-center justify-around w-full max-w-md">
-                <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                </Button>
-                <InstallButton />
-                <Button variant="ghost" onClick={onHistoryOpen} className="text-white/80 hover:text-white">
-                    <History className="mr-2 h-5 w-5" /> History
-                </Button>
-            </div>
+        <div className="flex flex-col items-center justify-center mt-8 pb-24 w-full max-w-4xl mx-auto px-4">
              <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">
                 {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
             </footer>
         </div>
     );
+}
+
+function FloatingNavigation({ onReset, onHistoryOpen }: { onReset: () => void; onHistoryOpen: () => void; }) {
+  return (
+    <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+      <div className="glass-card flex items-center justify-around w-full max-w-md p-2 pointer-events-auto shadow-2xl border-white/10 bg-black/40 backdrop-blur-md rounded-full">
+        <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white flex-1 rounded-full h-12">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back
+        </Button>
+        <div className="flex-1 flex justify-center">
+          <InstallButton />
+        </div>
+        <Button variant="ghost" onClick={onHistoryOpen} className="text-white/80 hover:text-white flex-1 rounded-full h-12">
+            <History className="mr-2 h-5 w-5" /> History
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 
@@ -202,38 +209,41 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-      className="results-background w-full min-h-screen flex flex-col p-4"
-    >
-      <div className="w-full max-w-4xl mx-auto flex-grow">
-        <ResultsHeader
-            name={insight.name}
-            newAstroSign={insight.new_astrology_sign}
-            birthDate={formatDate()}
-            onTabClick={setActiveTab}
-            activeTab={activeTab}
-        />
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5 }}
+        className="results-background w-full min-h-screen flex flex-col p-4"
+      >
+        <div className="w-full max-w-4xl mx-auto flex-grow">
+          <ResultsHeader
+              name={insight.name}
+              newAstroSign={insight.new_astrology_sign}
+              birthDate={formatDate()}
+              onTabClick={setActiveTab}
+              activeTab={activeTab}
+          />
 
-        <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-            >
-              {activeTab === 'astro' && <AstroDisplay insight={insight} />}
-              {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
-              {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
-            </motion.div>
-        </AnimatePresence>
+          <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                {activeTab === 'astro' && <AstroDisplay insight={insight} />}
+                {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
+                {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
+              </motion.div>
+          </AnimatePresence>
 
-      </div>
-       <ResultsFooter onReset={onReset} onHistoryOpen={onHistoryOpen} />
-    </motion.div>
+        </div>
+         <ResultsFooter />
+      </motion.div>
+      <FloatingNavigation onReset={onReset} onHistoryOpen={onHistoryOpen} />
+    </>
   );
 }
