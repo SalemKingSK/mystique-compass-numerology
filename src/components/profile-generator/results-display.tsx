@@ -160,15 +160,23 @@ function ResultsFooter() {
 function FloatingNavigation({ onReset, onHistoryOpen }: { onReset: () => void; onHistoryOpen: () => void; }) {
   return (
     <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-      <div className="glass-card flex items-center justify-around w-full max-w-md p-2 pointer-events-auto shadow-2xl border-white/10 bg-black/40 backdrop-blur-md rounded-full">
-        <Button variant="ghost" onClick={onReset} className="text-white/80 hover:text-white flex-1 rounded-full h-12">
+      <div className="flex items-center justify-around w-full max-w-md p-1.5 pointer-events-auto shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-white/10 bg-white/5 backdrop-blur-2xl rounded-full overflow-hidden">
+        <Button 
+          variant="ghost" 
+          onClick={onReset} 
+          className="text-white/70 hover:text-white hover:bg-white/10 flex-1 rounded-full h-11 transition-all duration-300"
+        >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
-        <div className="flex-1 flex justify-center">
+        <div className="flex-1 flex justify-center scale-90 md:scale-100">
           <InstallButton />
         </div>
-        <Button variant="ghost" onClick={onHistoryOpen} className="text-white/80 hover:text-white flex-1 rounded-full h-12">
-            <History className="mr-2 h-5 w-5" /> History
+        <Button 
+          variant="ghost" 
+          onClick={onHistoryOpen} 
+          className="text-white/70 hover:text-white hover:bg-white/10 flex-1 rounded-full h-11 transition-all duration-300"
+        >
+            <History className="mr-2 h-4 w-4" /> History
         </Button>
       </div>
     </div>
