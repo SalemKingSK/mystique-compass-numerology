@@ -23,6 +23,7 @@ const TABS = [
   { id: 'mp', name: 'Map', icon: MapIcon },
   { id: 'dr', name: 'Deep Read', icon: BookOpen },
   { id: 'co', name: 'Codex', icon: Info },
+  { id: 'rf', name: 'Ref', icon: BookOpen },
 ];
 
 export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsightOutput, numerology: NumerologyData }) {
@@ -30,18 +31,10 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const [selectedCodex, setSelectedCodex] = useState('Rat');
   const [selectedPersonalYear, setSelectedPersonalYear] = useState<PersonalYearData | null>(null);
 
-  // Correct destructuring from NumerologyData structure
   const { birthDay: day, birthMonth: month, birthYear: year } = numerology;
   const birthSign = insight.sign;
   const curYear = new Date().getFullYear();
 
-  const red = (n: number): number => {
-    let s = n;
-    while (s > 9) s = String(s).split('').reduce((a, b) => a + parseInt(b), 0);
-    return s || 9;
-  };
-
-  const getPY = (y: number) => red(red(day) + red(month) + red(y));
   const getSign = (y: number) => {
     const index = ((y - 1900) % 12 + 12) % 12;
     return ANIMALS[index] || ANIMALS[0];
@@ -57,6 +50,17 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     if (r.sanhe.includes(ysName)) return 'sanhe';
     if (ysName === r.liuhe) return 'liuhe';
     return 'neutral';
+  };
+
+  const getPY = (y: number) => {
+    const reduce = (n: number): number => {
+      let s = n;
+      while (s > 9) s = String(s).split('').reduce((a, b) => a + parseInt(b), 0);
+      return s || 9;
+    };
+    const worldYear = reduce(y);
+    const birthSum = reduce(day) + reduce(month);
+    return reduce(worldYear + birthSum);
   };
 
   const convergences = useMemo(() => {
@@ -79,6 +83,26 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     });
     return events.sort((a, b) => a.age - b.age);
   }, [year, birthSign]);
+
+  const renderSignBook = (aname: string) => {
+    const bookData = (BOOK.animals as any)[aname];
+    if (!bookData) return <p className="italic text-muted-foreground text-center py-10">No detailed chapter available for this sign in the current source text.</p>;
+
+    return (
+      <Accordion type="multiple" className="space-y-4">
+        {Object.entries(bookData).map(([key, text]) => (
+          <Card key={key} className="bg-black/40 border-white/10 overflow-hidden">
+            <div className="p-4 border-b border-white/5 bg-white/5 font-bold uppercase tracking-widest text-[10px] text-primary">
+              {key.replace('_', ' ')}
+            </div>
+            <div className="p-4 text-sm leading-relaxed text-white/80">
+              <AccordionContentWithPlayer text={text as string} />
+            </div>
+          </Card>
+        ))}
+      </Accordion>
+    );
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -118,12 +142,11 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             <section className="space-y-4">
               <h3 className="flex items-center gap-2 text-primary font-bold text-lg"><Zap className="h-5 w-5" /> Critical Convergences</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Years where Personal Year 4 or 7 (the cycle&apos;s troughs) coincide with hostile celestial bonds.
+                Years where Personal Year 4 or 7 (the cycle's troughs) coincide with hostile celestial bonds — the most concentrated periods of compound pressure.
               </p>
               {convergences.length > 0 ? (
                 convergences.map(h => {
                   const meta = CAT_META[h.rt];
-                  const pyInfo = PERSONAL_YEARS.find(p => p.n === h.p);
                   return (
                     <Card key={h.y} className={`p-4 bg-black/40 border-l-4 ${h.rt === 'clash' ? 'border-red-500' : 'border-amber-500'}`}>
                       <div className="flex justify-between items-start mb-2">
@@ -131,19 +154,15 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                         <Badge className={meta.badge}>{meta.label}</Badge>
                       </div>
                       <div className="space-y-3 text-sm">
-                        <p><span className="text-primary font-bold">◎ Numerological:</span> {pyInfo?.name}</p>
-                        <p><span className="text-primary font-bold">⚔ Celestial Bond:</span> Your {birthSign} meets the {h.ys.n} year.</p>
-                        <div className="bg-black/20 p-3 rounded-lg border border-white/5 text-[13px] leading-relaxed italic text-white/70">
-                          {h.p === 4 
-                            ? "Personal Year 4 demands disciplined foundation-laying while hostile energy disrupts your environment. Reduce commitments radically."
-                            : "Personal Year 7 calls for inward retreat while external energy invades your space. Prioritize mental clarity."}
-                        </div>
+                        <p><span className="text-primary font-bold">◎ Convergence Insight:</span> {h.p === 4 
+                          ? "Personal Year 4 demands disciplined foundation-laying while hostile energy disrupts your environment. Reduce commitments radically."
+                          : "Personal Year 7 calls for inward retreat while external energy invades your space. Prioritize mental clarity."}</p>
                       </div>
                     </Card>
                   );
                 })
               ) : (
-                <p className="text-center italic text-muted-foreground py-10">No immediate convergences found.</p>
+                <p className="text-center italic text-muted-foreground py-10">No immediate convergences found in the next 20 years.</p>
               )}
             </section>
           </div>
@@ -153,26 +172,18 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
           <div className="space-y-6">
             <ZodiacWheel birthSign={birthSign} />
             <section className="space-y-2">
-              <h3 className="text-primary font-bold text-lg px-2">Relationship Dynamics</h3>
+              <h3 className="text-primary font-bold text-lg px-2">Bond Definitions</h3>
               <Accordion type="multiple" className="space-y-2">
-                {Object.entries(RELATIONS[birthSign]).map(([type, name]) => {
-                  if (type === 'sanhe' || type === 'self') return null;
-                  const meta = CAT_META[type];
-                  return (
-                    <AccordionItem value={type} key={type} className="bg-black/40 border-white/10 rounded-xl px-4">
-                      <AccordionTrigger className="hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl">{ANIMALS.find(a => a.n === name as string)?.e}</span>
-                          <span className="font-bold">{name as string}</span>
-                          <Badge className={meta.badge}>{meta.label}</Badge>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground leading-relaxed">
-                        <AccordionContentWithPlayer text={BOOK.foundation[type as keyof typeof BOOK.foundation] || ''} />
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                })}
+                {Object.entries(BOOK.foundation).map(([key, text]) => (
+                  <AccordionItem value={key} key={key} className="bg-black/40 border-white/10 rounded-xl px-4">
+                    <AccordionTrigger className="hover:no-underline capitalize">
+                      {key.replace('_', ' ')}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground leading-relaxed">
+                      <AccordionContentWithPlayer text={text} />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
               </Accordion>
             </section>
           </div>
@@ -196,20 +207,12 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                   transition={{ duration: 0.4 }}
                   className="mt-6"
                 >
-                  <div className="glass-card px-4">
-                    <Accordion type="single" collapsible defaultValue="personal-year-detail" value={selectedPersonalYear ? "personal-year-detail" : ""}>
-                      <AccordionItem value="personal-year-detail">
-                        <AccordionTrigger>
-                          <span className="font-semibold text-lg text-primary flex items-center gap-2">
-                            <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </div>
+                  <Card className="p-4 bg-black/40 border-white/10">
+                    <h4 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+                      <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
+                    </h4>
+                    <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
+                  </Card>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -226,7 +229,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                         <span className="text-sm font-bold text-primary">{ev.yr}</span>
                         <Badge className={CAT_META[ev.k].badge}>{CAT_META[ev.k].label}</Badge>
                       </div>
-                      <p className="text-[13px] text-white/70">{LIFESTAGES[ev.age] || 'Celestial Shift'}</p>
+                      <p className="text-[13px] text-white/70">{LIFESTAGES[ev.age as keyof typeof LIFESTAGES] || 'Celestial Shift'}</p>
                     </div>
                   </div>
                 ))}
@@ -237,7 +240,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
         {activeTab === 'mp' && (
           <div className="space-y-4">
-            <h3 className="text-primary font-bold text-lg px-2">Yearly Fate Projection</h3>
+            <h3 className="text-primary font-bold text-lg px-2">Fate Map Projection</h3>
             <div className="rounded-xl border border-white/10 overflow-hidden">
               <Table>
                 <TableHeader className="bg-black/60">
@@ -245,7 +248,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                     <TableHead>Year</TableHead>
                     <TableHead>Animal</TableHead>
                     <TableHead>Bond</TableHead>
-                    <TableHead>PY</TableHead>
+                    <TableHead>Theme (2026 Focus)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-black/40 text-xs">
@@ -254,12 +257,17 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                     const p = getPY(y);
                     const ys = getSign(y);
                     const rt = getRel(ys.n);
+                    const signBook = (BOOK.animals as any)[birthSign];
+                    const themeText = y === 2026 ? signBook?.overview_2026 : '';
+                    
                     return (
                       <TableRow key={y} className="border-white/5">
                         <TableCell className="font-bold text-white">{y}</TableCell>
                         <TableCell>{ys.e} {ys.n}</TableCell>
                         <TableCell><Badge className={CAT_META[rt].badge}>{CAT_META[rt].label}</Badge></TableCell>
-                        <TableCell><span className={`inline-block w-6 h-6 rounded-full text-center leading-6 ${p === 4 || p === 7 ? 'bg-fuchsia-500/20 text-fuchsia-400' : 'bg-white/5'}`}>{p}</span></TableCell>
+                        <TableCell className="max-w-[200px] truncate opacity-70">
+                          {themeText || `PY ${p}`}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -271,23 +279,8 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
         {activeTab === 'dr' && (
           <div className="space-y-6 p-2">
-            <h3 className="text-primary font-bold text-lg">Verbatim Analysis — {birthSign}</h3>
-            {BOOK.animals[birthSign as keyof typeof BOOK.animals] ? (
-              <Accordion type="multiple" className="space-y-4">
-                {Object.entries(BOOK.animals[birthSign as keyof typeof BOOK.animals]).map(([key, text]) => (
-                  <Card key={key} className="bg-black/40 border-white/10 overflow-hidden">
-                    <div className="p-4 border-b border-white/5 bg-white/5 font-bold uppercase tracking-widest text-[10px] text-primary">
-                      {key.replace('_', ' ')}
-                    </div>
-                    <div className="p-4 text-sm leading-relaxed text-white/80">
-                      <AccordionContentWithPlayer text={text as string} />
-                    </div>
-                  </Card>
-                ))}
-              </Accordion>
-            ) : (
-              <p className="italic text-muted-foreground text-center py-20">Full text chapters available for Rat, Ox, Tiger, Rabbit, Dragon, and Snake.</p>
-            )}
+            <h3 className="text-primary font-bold text-lg">Detailed Reading — {birthSign}</h3>
+            {renderSignBook(birthSign)}
           </div>
         )}
 
@@ -307,21 +300,28 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                 </button>
               ))}
             </div>
-            <Card className="p-6 bg-black/40 border-white/10">
-              <h4 className="text-2xl font-black text-primary mb-4">{selectedCodex} Chapter</h4>
-              <div className="text-sm leading-relaxed text-white/80 space-y-4">
-                {BOOK.animals[selectedCodex as keyof typeof BOOK.animals] ? (
-                  Object.entries(BOOK.animals[selectedCodex as keyof typeof BOOK.animals]).map(([key, text]) => (
-                    <div key={key} className="space-y-2 pb-4 border-b border-white/5 last:border-0">
-                      <h5 className="font-black text-yellow-500 uppercase text-[10px] tracking-widest">{key}</h5>
-                      <p>{(text as string).substring(0, 300)}...</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="italic">Analysis available in the Deep Read tab for your birth sign.</p>
-                )}
-              </div>
-            </Card>
+            <div className="mt-4">
+              <h4 className="text-2xl font-black text-primary mb-4">{selectedCodex} Encyclopedia</h4>
+              {renderSignBook(selectedCodex)}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'rf' && (
+          <div className="space-y-6">
+            <h3 className="text-primary font-bold text-lg px-2">Cycle Reference</h3>
+            <Accordion type="multiple" className="space-y-2">
+              {PERSONAL_YEARS.map(p => (
+                <AccordionItem value={`ref-${p.n}`} key={p.n} className="bg-black/40 border-white/10 rounded-xl px-4">
+                  <AccordionTrigger className="hover:no-underline">
+                    PY {p.n} - {p.name}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <AccordionContentWithPlayer text={p.desc} />
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         )}
       </ScrollArea>
