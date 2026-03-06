@@ -1,4 +1,3 @@
-
 import { AnimalData, RelationshipData, CategoryMeta, PersonalYearInfo, TaiSuiData } from './types';
 
 export const ANIMALS: AnimalData[] = [
@@ -45,124 +44,127 @@ export const PERSONAL_YEARS: PersonalYearInfo[] = [
   {
     n: 1,
     name: 'New Beginnings',
-    season: 'Spring Equinox',
+    season: 'Spring — Seed Planting',
     vedic: 'Sun (Surya)',
     loshu: 'North · Water · Career',
     t: false,
-    opportunity: 'Launch projects with multi-year potential. Make decisive career moves. Establish clear personal boundaries. Implement physical vitality practices. This is the most powerful year for adjustment and breaking old habits.',
-    challenge: 'Self-focus can tip into isolation. Enthusiasm may produce overcommitment before adequate information is available. Efforts may feel scattered — focus is essential. Year 1 follows Year 9s completion; the transition may involve unrecognised loss.',
-    spirit: 'The fundamental challenge of individuation: claiming authentic existence separate from collective definitions. Courage here means acting with awareness of uncertainty rather than waiting for its resolution.',
-    desc: "Personal Year 1 stands at the cycle's threshold — the undifferentiated source from which all subsequent manifestation proceeds. This is the spring equinox moment: seed planted, potential activated, direction established. The seed you plant now contains the genetic information for the entire nine-year cycle. All subsequent years' themes are latent in Year 1's initiating gesture, making this year's choices particularly consequential even when their full significance won't become apparent until later. The year's energy supports claiming authority over your own life direction, making independent decisions, and accepting consequences as personal rather than inherited or imposed. Questions of \"who am I?\" and \"what do I want?\" demand attention and resolution. You may experience heightened awareness of your distinctness from others — sometimes exhilarating, sometimes isolating. Pythagorean tradition identifies Years 8, 9, and 1 as the cycle's three \"power years\" for significant life changes, with Year 1 specifically designated the most powerful for adjustment. Vedic numerology places this year under the Sun (Surya), activating the solar plexus — the centre of personal power. In the Chinese Lo Shu system, Year 1 occupies the North position, associated with Water, career, and life path. The Water element adds depth: effective initiation requires reading and responding to conditions, not merely imposing will."
+    opportunity: 'Launch projects with multi-year potential. Make decisive career moves. Establish clear personal boundaries. Implement physical vitality practices.',
+    challenge: 'Self-focus can tip into isolation. Enthusiasm may produce overcommitment.',
+    spirit: 'Courage means acting with awareness of uncertainty rather than waiting for its resolution.',
+    desc: "Year 1 — The seed year. The nine-year cycle resets. Whatever you initiate now carries influence across the following eight years. Independence, bold initiative, and self-determination are essential — passivity wastes the single most potent planting window of the cycle. Claim your authority over your own direction."
   },
   {
     n: 2,
     name: 'Partnership & Patience',
-    season: 'Late Spring',
+    season: 'Late Spring — Germination',
     vedic: 'Moon (Chandra)',
     loshu: 'Southwest · Earth · Relationships',
     t: false,
-    opportunity: 'Deepen or newly form romantic and professional partnerships. Develop diplomatic skill. Expand intuitive and emotional intelligence. Build community connections through increased social sensitivity.',
-    challenge: 'Indecision when multiple perspectives seem equally valid. Over-sensitivity — interpreting neutral events as threatening. Codependency: the most serious Year 2 challenge, where self-worth becomes contingent on others approval and boundaries dissolve.',
-    spirit: 'Surrender to timing not self-determined. Active receptivity — maintaining prepared openness while allowing development to proceed at its own pace. Emotional authenticity: the recognition that feelings carry information.',
-    desc: "Personal Year 2 represents late spring's germination phase — the critical period when the seed coat breaks, roots descend, and vulnerability is maximal. Above ground, little may be visible; below, transformative processes proceed invisibly. This explains Year 2's frequent experience of apparent stagnation: progress continues but is internal and preparatory, not yet manifest. This year's energy shifts dramatically from Year 1's initiating yang to cultivating yin: patience replaces urgency, cooperation supersedes competition, and emotional intelligence becomes more valuable than decisive action. The year's energy is distinctly receptive — where Year 1 acted, Year 2 responds; where Year 1 initiated, Year 2 nurtures. Partnerships of all kinds come to prominence. Vedic numerology assigns this year to Chandra, the Moon — governor of mind, emotion, and fluctuation. Chandra activates the sacral centre, seat of creativity and emotional flow. In the Chinese Lo Shu system, Year 2 occupies the Southwest — the most yin of all positions, associated with pure receptivity and devotion. The Earth element here emphasises grounding and practical manifestation of receptive qualities. Year 2's challenge is entering genuine relationship without losing the self-definition established in Year 1. The year's difficulties around codependency and indecision reflect failures of this discrimination. The spiritual goal is neither emotional flooding nor emotional control — but emotional integration."
+    opportunity: 'Deepen or newly form romantic and professional partnerships. Develop diplomatic skill.',
+    challenge: 'Indecision when multiple perspectives seem equally valid. Over-sensitivity.',
+    spirit: 'Surrender to timing not self-determined. Active receptivity.',
+    desc: "Year 2 — The cooperation year. Push and the year fragments; wait, cooperate, and gather — and it compounds. Emotional sensitivity is heightened, making you both more empathic and more vulnerable to perceived slights. Diplomacy is not weakness here — it is the specific intelligence the year rewards."
   },
   {
     n: 3,
     name: 'Expression & Joy',
-    season: 'Early Summer',
+    season: 'Early Summer — Blossoming',
     vedic: 'Jupiter (Guru)',
     loshu: 'East · Wood · Family & Health',
     t: false,
-    opportunity: 'Launch creative projects — work begun now often becomes defining output of the cycle. Expand social networks. Develop communication skills. Share gifts publicly. Express what accumulated in Years 1 and 2.',
-    challenge: 'Scattered energy and superficiality are the primary traps. The abundance of creative directions can dissipate momentum. Guard against too many projects started and none completed.',
-    spirit: 'Creative expression as genuine self-disclosure — the year asks what has been germinating since Year 1 and offers it a voice. The blossoming is not decoration; it is purpose made visible.',
-    desc: "Personal Year 3 completes spring with blossoming — the visible expression of prior cultivation. This year's energy is expansive, joyful, and creatively fertile. Social connections multiply, artistic output flourishes, and communication becomes your primary instrument. The individual experiences increased optimism and charisma, attracting opportunities through expressive presence. Where Year 1 planted and Year 2 nurtured in relative obscurity, Year 3 brings what was tended into visible bloom. Ideas flow, social opportunities multiply, and the work of sharing your gifts publicly is not optional — it is what this year structurally rewards. Vedic numerology places Year 3 under Jupiter (Guru), activating the throat chakra — the centre of communication, education, and wisdom. In the Chinese Lo Shu system, Year 3 occupies the East position, associated with Wood, family, and health. The blossoming Wood energy supports growth, expansion, and upward momentum. The year's primary risk is scattered energy — the creative abundance can dissipate into superficiality if not deliberately focused. The counsel across all traditions: select the creative projects that truly matter and bring your full expression to those. Creative work begun in Year 3 often becomes the defining output of the entire nine-year cycle."
+    opportunity: 'Launch creative projects. Expand social networks. Develop communication skills.',
+    challenge: 'Scattered energy and superficiality are the primary traps.',
+    spirit: 'Creative expression as genuine self-disclosure — purpose made visible.',
+    desc: "Year 3 — The creative year. Ideas flow, social connections multiply, and communication becomes your primary instrument. Share your gifts publicly. Creative projects begun now often become defining works of the cycle. Guard against scattered energy and superficiality — focus the creative abundance on meaningful work."
   },
   {
     n: 4,
     name: 'Foundation & Work',
-    season: 'Midsummer',
+    season: 'Midsummer — Fruit-Setting',
     vedic: 'Rahu (North Node)',
     loshu: 'Southeast · Wood · Wealth & Prosperity',
     t: true,
-    opportunity: 'Build permanent foundations that will carry Years 5– 9. Master financial management, organisational development, and core skills. The grind is the gift — structures built here compound across the entire remaining cycle.',
-    challenge: 'May feel invisible, restricted, and unrewarded. The year constructs foundation rather than visible achievement. Abandoning structures in Year 4 creates losses requiring multiple subsequent years to recover.',
-    spirit: 'Acceptance of necessary limitation as a creative force. The tetrad in Pythagorean philosophy represents structural integrity — the four directions, four seasons, four elements. This year tests whether vision can become substance.',
-    desc: "Personal Year 4 is the cycle's first trough — and the most structurally important year most people barely notice it is. This corresponds to midsummer's demanding conditions: fruit-setting requires consistent effort, systems must support growth, and foundations are tested by heat and pressure. The year's energy is structural, disciplined, methodical. You may feel invisible, restricted, or unrewarded. This is by design — the year constructs permanent foundation for what follows. The practical requirements of manifesting visions come due: financial management, organisational development, skill mastery. Abandoning structures in Year 4 creates losses that can require multiple subsequent years to recover. Vedic numerology places Year 4 under Rahu (the North Node) — associated with real estate, long-term security, and disruption. Rahu's influence can produce unexpected developments that ultimately serve the foundation-building purpose. In the Chinese Lo Shu system, Year 4 occupies the Southeast position, associated with Wood and wealth — but wealth here requires cultivation, not windfall. All traditions converge on the same counsel: the grind is the gift. The compound interest of Year 4 discipline pays across Years 5 through 9 in ways that cannot be manufactured any other way. Walk away from the grind this year, and you spend the cycle's second half paying for it."
+    opportunity: 'Build permanent foundations that will carry Years 5–9. Master financial management.',
+    challenge: 'May feel invisible, restricted, and unrewarded.',
+    spirit: 'Acceptance of necessary limitation as a creative force.',
+    desc: "Year 4 — First Trough. The cycle's most internally pressured period. You may feel invisible, restricted, unrewarded. This is by design — the year constructs permanent foundation for what follows. Abandoning structures in PY 4 creates losses requiring multiple subsequent years to recover. The grind is the gift."
   },
   {
     n: 5,
     name: 'Freedom & Change',
-    season: 'Late Summer',
+    season: 'Late Summer — Harvest Preparation',
     vedic: 'Mercury (Budha)',
     loshu: 'Centre · Earth · Stability & Balance',
     t: false,
-    opportunity: 'Welcome unexpected opportunities. Travel, career shifts, experimental learning, new relationships. Adaptability is a requirement this year, not merely an advantage. The more flexible you remain, the more the year delivers.',
-    challenge: 'Clinging to Year 4 structures creates dangerous friction. The pace of change can feel destabilising. Impulsive decisions made under this year\'s energy can be difficult to reverse.',
-    spirit: 'Freedom as purposeful movement rather than mere escape. The pentad represents the dynamic centre — the pivot point of the entire cycle — where accumulated structure meets the necessity of transformation.',
-    desc: "Personal Year 5 is the cycle's pivot point — the dynamic centre where late summer's variability arrives and harvest approaches but weather remains unpredictable. This year's energy is dynamic, change-oriented, and freedom-seeking. The individual experiences restlessness with established patterns, seeking new experiences, locations, or relationships. Travel, career shifts, and experimental learning characterise this period. Where Year 4 demanded stillness and structure, Year 5 demands movement and adaptability. Opportunities appear and expire fast — adaptability is a requirement, not an advantage. Clinging to Year 4's structures creates dangerous friction. The year rewards those who move with its chaotic energy. Vedic numerology places Year 5 under Mercury (Budha), activating the heart chakra — associated with commerce, communication, and adaptability. Mercury's quicksilver nature amplifies Year 5's already changeable quality. In the Chinese Lo Shu system, Year 5 occupies the Centre position — the most dynamic, most unpredictable position on the Lo Shu square. The freedom this year provides is purposeful. The restlessness is not random — it is the cycle dismantling what Year 4 built that has served its purpose, making room for what Years 6, 7, and 8 will require. Say yes more than you say no. Stay curious. The year's chaos is a gift in disguise."
+    opportunity: 'Welcome unexpected opportunities. Travel, career shifts, experimental learning.',
+    challenge: 'Clinging to Year 4 structures creates dangerous friction.',
+    spirit: 'Freedom as purposeful movement rather than mere escape.',
+    desc: "Year 5 — Liberation and flux. Dynamic shifts, travel, and freedom arrive suddenly. Opportunities appear and expire fast — adaptability is a requirement. Clinging to PY 4's structures creates dangerous friction. The year rewards those who move with its chaotic energy."
   },
   {
     n: 6,
-    name: 'Responsibility & Love',
-    season: 'Early Autumn',
+    name: 'Responsibility',
+    season: 'Early Autumn — Abundance Sharing',
     vedic: 'Venus (Shukra)',
     loshu: 'Northwest · Metal · Helpful People',
     t: false,
-    opportunity: 'Deepen or make significant commitments in relationships. Beautify and harmonise home and environment. Serve family and community. Creative partnerships flourish. Troubled relationships can be repaired.',
-    challenge: 'Guard against martyrdom — giving so much that the capacity for sustained service collapses. The year\'s nurturing call can become self-neglect if not balanced with deliberate self-care.',
-    spirit: 'Love in its practical form — showing up, making repairs, investing in what lasts. The hexagon is nature\'s most efficient structure; Year 6 asks how you can be structurally useful to those around you.',
-    desc: "Personal Year 6 is early autumn's moment of sharing abundance — harvest distributed, responsibilities embraced, harmony restored. This year's energy is nurturing, service-oriented, and relationally focused. Family matters, domestic concerns, and community involvement move to the centre. The individual experiences increased capacity for care and creative collaboration, often making significant commitments in relationships or creative partnerships. After Year 5's liberating chaos, Year 6 returns the individual to the people and places that matter most. The universe calls for commitment — to family, to community, to those who depend on you. Beauty and harmony can be restored in troubled relationships during this year in ways that may not be possible in others. Vedic numerology places Year 6 under Venus (Shukra), also activating the heart chakra — now associated with marriage, aesthetics, and financial partnerships. Venus's domain extends the relational focus to include beauty, art, and the harmonious organisation of space and resources. In the Chinese Lo Shu system, Year 6 occupies the Northwest position, associated with Metal, helpful people, and heaven. Be generous — but maintain the capacity for sustained service. The year's trap is martyrdom: giving everything until there is nothing left to give. The most successful Year 6 is one where love is both extended and received, where service is sustainable rather than sacrificial."
+    opportunity: 'Deepen commitments in relationships. Beautify home. Serve family and community.',
+    challenge: 'Guard against martyrdom — giving so much that the capacity for sustained service collapses.',
+    spirit: 'Love in its practical form — showing up, making repairs, investing in what lasts.',
+    desc: "Year 6 — Home and service. The universe calls for nurturing and commitment to family, community, and those who depend on you. Beauty and harmony can be restored in troubled relationships. Guard against martyrdom — give generously but maintain the capacity for sustained service."
   },
   {
     n: 7,
     name: 'Inner Retreat',
-    season: 'Mid-Autumn',
+    season: 'Mid-Autumn — Inward Turning',
     vedic: 'Ketu (South Node)',
     loshu: 'West · Metal · Children & Creativity',
     t: true,
-    opportunity: 'Deep research, study, spiritual practice, and genuine inner work. Analysis of the cycle so far. Development of wisdom that external action could never produce. The understanding you gain in Year 7 becomes the foundation for Year 8\'s material power.',
-    challenge: 'Forcing external results creates compounding frustration. Reducing social engagement is appropriate; complete isolation is not. The inward turn can become avoidance if it serves escape rather than genuine reflection.',
-    spirit: 'Mid-autumn\'s sacred mystery — the heptad in Pythagorean philosophy is the number of cycles within cycles, the rhythm within rhythm. Year 7 asks: what do you actually know about yourself, as distinct from what you perform?',
-    desc: "Personal Year 7 is the cycle's second trough — the year the world goes quiet, or at least the year you need it to. Mid-autumn's introspective mood arrives: days shorten, attention withdraws from external achievement to internal processing. This year's energy is analytical, mystical, and solitude-seeking. The individual experiences a need for study, reflection, and spiritual practice, often reducing social engagement to prioritise inner development. External ambitions yield little this year. Introspection, spiritual seeking, research, and deep analysis are what Year 7 structurally supports. Forcing external action creates compounding frustration — not because you cannot act, but because the year is configured for a different kind of work. Vedic numerology places Year 7 under Ketu (the South Node) — associated with mysticism, foreign connections, and past-life patterns. Ketu activates the third eye chakra, the centre of insight and inner vision. In the Chinese Lo Shu system, Year 7 occupies the West position, associated with Metal, children, and creativity — but the creativity here is inner creativity, the kind produced by stillness rather than activity. Use the withdrawal for genuine inner work. Read, research, meditate, study, sit with questions you have been avoiding. The person who emerges from a well-lived Year 7 enters Year 8 with a clarity and depth — an understanding of their own patterns, values, and direction — that no shortcut can produce."
+    opportunity: 'Deep research, study, spiritual practice, and genuine inner work.',
+    challenge: 'Forcing external results creates compounding frustration.',
+    spirit: 'What do you actually know about yourself, as distinct from what you perform?',
+    desc: "Year 7 — Second Trough. The cycle's inward-turning. External ambitions yield little. Introspection, spiritual seeking, research, and deep analysis are what the year supports. Forcing external action creates compounding frustration. Use withdrawal for genuine inner work — you emerge in Year 8 with capabilities external action could never have produced."
   },
   {
     n: 8,
     name: 'Material Power',
-    season: 'Late Autumn',
+    season: 'Late Autumn — Final Harvest',
     vedic: 'Saturn (Shani)',
     loshu: 'Northeast · Earth · Knowledge & Self-Cultivation',
     t: false,
-    opportunity: 'Convert seven years of sustained effort into tangible results — financial achievement, professional authority, recognition. Leadership roles and significant career moves are powerfully activated. The cycle\'s material peak.',
-    challenge: 'The confidence Year 8 generates can tip into arrogance and overreach. The very boldness that makes the year productive can produce decisions so outsized they damage what they were meant to build. Ethical integrity is not optional.',
-    spirit: 'Authority earned rather than claimed. Saturn\'s counsel in Vedic numerology: karmic justice — what was genuinely built gets genuinely recognised; what was performed without substance gets exposed. Year 8 is both reward and reckoning.',
-    desc: "Personal Year 8 is late autumn's final productive surge — last harvest, accounting, preparation for winter. This year's energy is powerful, materially focused, and karmically active. The individual experiences opportunities for significant achievement in career and finance, but also faces consequences of prior actions. Authority and responsibility increase, demanding ethical integrity. The sustained effort of seven years can now convert into tangible results. Year 8 is when the compound interest of the cycle pays out — financial achievement, professional authority, recognition, leadership. The cycle identifies Years 8, 9, and 1 as the three \"power years,\" and Year 8 is the one where external, material results are most available. Vedic numerology places Year 8 under Saturn (Shani), activating the solar plexus — associated with career peak, authority, and karmic justice. Saturn is the great accountant: it rewards genuine effort and reveals hollow performance. In the Chinese Lo Shu system, Year 8 occupies the Northeast position, associated with Earth, knowledge, and self-cultivation — the harvest is not just material but the harvest of what was learned. Guard against arrogance and overreach. Year 8's danger is that the confidence required to seize its opportunities can, in excess, generate decisions so large they damage what they were meant to build. Build for real, not just for show. The boldness this year requires and the integrity it demands are not in conflict — they are the same thing."
+    opportunity: 'Convert sustained effort into tangible results — financial achievement, recognition.',
+    challenge: 'Confidence can tip into arrogance and overreach.',
+    spirit: 'Authority earned rather than claimed.',
+    desc: "Year 8 — The material peak. Sustained effort of seven years can now convert into tangible results — financial achievement, professional authority, recognition. Guard against arrogance and overreach: the very confidence that makes Year 8 productive can generate decisions so outsized they damage what they were meant to build."
   },
   {
     n: 9,
     name: 'Completion & Release',
-    season: 'Winter Solstice',
+    season: 'Winter Solstice — Seed Return',
     vedic: 'Mars (Mangal)',
     loshu: 'South · Fire · Fame & Recognition',
     t: false,
-    opportunity: 'Integrate and harvest the entire nine-year cycle. Give generously, forgive where possible, release what has run its course. This year is simultaneously ending and beginning. Those who release deliberately experience liberation.',
-    challenge: 'Clinging to what must go — people, habits, identities, projects. The universe accomplishes the release one way or another; conscious release is far less painful than forced loss. Grief is appropriate and should not be bypassed.',
-    spirit: 'The ennead in Pythagorean philosophy contains all other numbers within itself. Year 9 is completion as wholeness — not the end of something, but the return of the seed to soil, carrying everything that was learned back into potential for the next cycle.',
-    desc: "Personal Year 9 is the great clearing — winter solstice, when the cycle completes and the seed returns to soil. The year's energy is compassionate, transcendent, and releasing. The individual experiences necessary endings: projects conclude, relationships complete their purpose, outgrown patterns dissolve. Grief and gratitude intermingle as the cycle's harvest is integrated. In Pythagorean philosophy, 9 contains all other numbers within itself (1+2+3+4+5+6+7+8 = 36, and 3+6 = 9), making it a symbol of completion and containment. This mathematical wholeness translates into Year 9's function: integration of everything that has been built, learned, gained, and released across the preceding eight years before renewal enables the next cycle. Vedic numerology places Year 9 under Mars (Mangal), activating the root chakra — associated with completion, courage, and transformation. Mars provides the courage required for genuine endings. In the Chinese Lo Shu system, Year 9 occupies the South position, associated with Fire and recognition — the cycle ends in its highest expression of visibility before dissolution. Release what no longer serves: relationships, habits, beliefs, identities. This releasing is not optional — the universe accomplishes it one way or another. Those who cling experience loss; those who release deliberately experience liberation and arrive at Year 1 perfectly prepared for what comes next. Grieve what needs grieving. Give generously. Forgive where you can. Trust what is coming."
+    opportunity: 'Integrate and harvest the entire nine-year cycle. Release what has run its course.',
+    challenge: 'Clinging to what must go — people, habits, identities, projects.',
+    spirit: 'The return of the seed to soil, carrying everything that was learned back into potential.',
+    desc: "Year 9 — The great releasing. Simultaneously ending and beginning. Release what no longer serves: relationships, habits, beliefs, identities. This releasing is not optional — the universe accomplishes it one way or another. Those who cling experience loss; those who release deliberately experience liberation and perfect preparation for Year 1."
   },
 ];
 
+export const STEMS = ['Metal', 'Metal', 'Water', 'Water', 'Wood', 'Wood', 'Fire', 'Fire', 'Earth', 'Earth'];
+export const SNAMES = ['Geng', 'Xin', 'Ren', 'Gui', 'Jia', 'Yi', 'Bing', 'Ding', 'Wu', 'Ji'];
+
 export const TAISUI: Record<number, TaiSuiData> = {
-  2025: { cy: 'Yisi', gn: 'Xu Shan', note: 'Wood Snake · strategic patience, hidden cultivation' },
-  2026: { cy: 'Bingwu', gn: 'Wen Zhe', note: 'Fire Horse · maximum Yang Fire, peak clash for Rats' },
-  2027: { cy: 'Dingwei', gn: 'Miao Bing', note: 'Fire Goat · Ding Fire intensifies Wei Earth absorption' },
-  2028: { cy: 'Wushen', gn: 'Peng Tai', note: 'Earth Monkey · stable foundation for technical innovation' },
-  2029: { cy: 'Jiyou', gn: 'Cheng Bao', note: 'Earth Rooster · Ben Ming Nian for Roosters, San He for Snakes & Oxen' },
-  2030: { cy: 'Gengxu', gn: 'Ni Mi', note: 'Metal Dog · structural consolidation, San He for Tigers' },
-  2031: { cy: 'Xinhai', gn: 'Ye Jian', note: 'Metal Pig · San He for Rabbits & Goats' },
-  2032: { cy: 'Renzi', gn: 'Qiu De', note: 'Water Rat · doubled Water, Ben Ming Nian for Rats' },
-  2033: { cy: 'Guichou', gn: 'Lin Jian', note: 'Water Ox · Ben Ming Nian for Oxen, Liu He for Rats' },
-  2034: { cy: 'Jiayin', gn: 'Zhang Ci', note: 'Wood Tiger · Ben Ming Nian for Tigers' },
+  2025: { cy: 'Yisi 乙巳', gn: 'Xu Shan 许山将军', note: 'Wood Snake · strategic patience, hidden cultivation' },
+  2026: { cy: 'Bingwu 丙午', gn: 'Wen Zhe 文哲将军', note: 'Fire Horse · maximum Yang Fire, peak clash for Rats' },
+  2027: { cy: 'Dingwei 丁未', gn: 'Miao Bing 缪丙将军', note: 'Fire Goat · Ding Fire intensifies Wei Earth absorption' },
+  2028: { cy: 'Wushen 戊申', gn: 'Peng Tai 彭泰将军', note: 'Earth Monkey · stable foundation for technical innovation' },
+  2029: { cy: 'Jiyou 己酉', gn: 'Cheng Bao 程宝将军', note: 'Earth Rooster · Ben Ming Nian for Roosters, San He for Snakes & Oxen' },
+  2030: { cy: 'Gengxu 庚戌', gn: 'Ni Mi 倪秘将军', note: 'Metal Dog · structural consolidation, San He for Tigers' },
+  2031: { cy: 'Xinhai 辛亥', gn: 'Ye Jian 叶坚将军', note: 'Metal Pig · San He for Rabbits & Goats' },
+  2032: { cy: 'Renzi 壬子', gn: 'Qiu De 丘德将军', note: 'Water Rat · doubled Water, Ben Ming Nian for Rats' },
+  2033: { cy: 'Guichou 癸丑', gn: 'Lin Jian 林坚将军', note: 'Water Ox · Ben Ming Nian for Oxen, Liu He for Rats' },
+  2034: { cy: 'Jiayin 甲寅', gn: 'Zhang Ci 章词将军', note: 'Wood Tiger · Ben Ming Nian for Tigers' },
 };
 
 export const LIFESTAGES: Record<number, string> = {

@@ -1,9 +1,8 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
 import { AstroInsightOutput, NumerologyData, PersonalYearData } from './types';
-import { ANIMALS, RELATIONS, CAT_META, PERSONAL_YEARS, LIFESTAGES, TAISUI } from '@/lib/cosmic-fate/constants';
+import { ANIMALS, RELATIONS, CAT_META, PERSONAL_YEARS, LIFESTAGES, TAISUI, STEMS, SNAMES } from '@/lib/cosmic-fate/constants';
 import { BOOK } from '@/lib/cosmic-fate/book';
 import { ZodiacWheel } from './cosmic-fate/zodiac-wheel';
 import { PersonalYearChart } from './personal-year-chart';
@@ -13,18 +12,26 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
-import { Info, Sparkles, Zap, Calendar, BookOpen, MapIcon, Star } from 'lucide-react';
+import { Info, Sparkles, Zap, Calendar, BookOpen, MapIcon, Star, History, Users, Search, BrainCircuit, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const TABS = [
   { id: 'ov', name: 'Overview', icon: Sparkles },
-  { id: 'wh', name: 'Wheel', icon: Zap },
-  { id: 'cy', name: 'Cycles', icon: Calendar },
+  { id: 'wh', name: 'Wheel', icon: Users },
+  { id: 'cy', name: 'Cycles', icon: Activity },
   { id: 'mp', name: 'Map', icon: MapIcon },
   { id: 'dr', name: 'Deep Read', icon: BookOpen },
-  { id: 'co', name: 'Codex', icon: Info },
-  { id: 'rf', name: 'Ref', icon: BookOpen },
+  { id: 'co', name: 'Codex', icon: Search },
+  { id: 'rf', name: 'Ref', icon: Info },
 ];
+
+const EL_CLASS: Record<string, string> = {
+  Wood: 'bg-green-500/20 text-green-400 border-green-500/30',
+  Fire: 'bg-red-500/20 text-red-400 border-red-500/30',
+  Earth: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  Metal: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  Water: 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+};
 
 export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsightOutput, numerology: NumerologyData }) {
   const [activeTab, setActiveTab] = useState('ov');
@@ -35,11 +42,20 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const birthSign = insight.sign;
   const curYear = new Date().getFullYear();
 
+  // --- HELPERS ---
+  const red = (n: number): number => {
+    let s = n;
+    while (s > 9) s = String(s).split('').reduce((a, b) => a + parseInt(b), 0);
+    return s || 9;
+  };
+
+  const getPY = (y: number) => red(red(day) + red(month) + red(y));
+  
   const getSign = (y: number) => {
     const index = ((y - 1900) % 12 + 12) % 12;
     return ANIMALS[index] || ANIMALS[0];
   };
-  
+
   const getRel = (ysName: string) => {
     const r = RELATIONS[birthSign];
     if (!r) return 'neutral';
@@ -52,20 +68,16 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     return 'neutral';
   };
 
-  const getPY = (y: number) => {
-    const reduce = (n: number): number => {
-      let s = n;
-      while (s > 9) s = String(s).split('').reduce((a, b) => a + parseInt(b), 0);
-      return s || 9;
-    };
-    const worldYear = reduce(y);
-    const birthSum = reduce(day) + reduce(month);
-    return reduce(worldYear + birthSum);
-  };
+  const getStem = (y: number) => STEMS[y % 10];
+  const getStemName = (y: number) => SNAMES[y % 10];
+
+  // --- DERIVED DATA ---
+  const LP = useMemo(() => red(red(day) + red(month) + red(year)), [day, month, year]);
+  const BN = useMemo(() => red(day), [day]);
 
   const convergences = useMemo(() => {
-    const hits = [];
     const ENEMY = ['clash', 'harm', 'destroy', 'self'];
+    const hits = [];
     for (let y = curYear; y < curYear + 20; y++) {
       const p = getPY(y);
       const ys = getSign(y);
@@ -73,39 +85,35 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
       if ((p === 4 || p === 7) && ENEMY.includes(rt)) hits.push({ y, p, ys, rt });
     }
     return hits;
-  }, [day, month, year, birthSign]);
+  }, [day, month, curYear, birthSign]);
 
-  const timeline = useMemo(() => {
-    const events: any[] = [];
-    ['self', 'clash', 'harm', 'destroy', 'sanhe', 'liuhe'].forEach(k => {
-      const ages = CAT_META[k]?.ages || [];
-      ages.forEach(age => events.push({ age, k, yr: year + age }));
-    });
-    return events.sort((a, b) => a.age - b.age);
-  }, [year, birthSign]);
+  const documentedSigns = ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake'];
 
-  const renderSignBook = (aname: string) => {
-    const bookData = (BOOK.animals as any)[aname];
-    if (!bookData) return <p className="italic text-muted-foreground text-center py-10">No detailed chapter available for this sign in the current source text.</p>;
-
+  // --- RENDERERS ---
+  const renderBookSection = (title: string, content: string, category: string) => {
+    const cm = CAT_META[category] || { badge: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
     return (
-      <Accordion type="multiple" className="space-y-4">
-        {Object.entries(bookData).map(([key, text]) => (
-          <Card key={key} className="bg-black/40 border-white/10 overflow-hidden">
-            <div className="p-4 border-b border-white/5 bg-white/5 font-bold uppercase tracking-widest text-[10px] text-primary">
-              {key.replace('_', ' ')}
-            </div>
-            <div className="p-4 text-sm leading-relaxed text-white/80">
-              <AccordionContentWithPlayer text={text as string} />
-            </div>
-          </Card>
-        ))}
-      </Accordion>
+      <AccordionItem value={title} key={title} className="bg-black/40 border-white/10 rounded-xl px-4 mb-4">
+        <AccordionTrigger className="hover:no-underline">
+          <span className="flex items-center gap-2">
+            {title} <Badge className={cm.badge}>{cm.label}</Badge>
+          </span>
+        </AccordionTrigger>
+        <AccordionContent className="text-white/80 leading-relaxed text-sm">
+          <div className="whitespace-pre-line space-y-4">
+            <AccordionContentWithPlayer text={content} />
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/5 text-[10px] text-muted-foreground italic">
+            Source: The Chinese Zodiac: Six Categories of Years — Verbatim Text
+          </div>
+        </AccordionContent>
+      </AccordionItem>
     );
   };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Tab Navigation */}
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
         {TABS.map(tab => (
           <button
@@ -118,45 +126,79 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             }`}
           >
             <tab.icon className="h-4 w-4 mb-1" />
-            <span className="text-[10px] font-bold uppercase tracking-tight">{tab.name}</span>
+            <span className="text-[9px] font-bold uppercase tracking-tight">{tab.name}</span>
           </button>
         ))}
       </div>
 
       <ScrollArea className="h-[600px] pr-4">
+        {/* OVERVIEW TAB */}
         {activeTab === 'ov' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="p-4 bg-black/40 border-white/10 text-center">
-                <span className="text-3xl mb-1 block">{getSign(year)?.e || '✨'}</span>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Birth Sign</p>
-                <p className="text-xl font-bold text-yellow-400">{birthSign}</p>
-              </Card>
-              <Card className="p-4 bg-black/40 border-white/10 text-center">
-                <span className="text-3xl mb-1 block">{numerology.psycheNum}</span>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Personal Year</p>
-                <p className="text-xl font-bold text-primary">{getPY(curYear)}</p>
-              </Card>
-            </div>
+          <div className="space-y-8 pb-10">
+            <section>
+              <h3 className="flex items-center gap-2 text-primary font-bold text-lg mb-4"><Star className="h-5 w-5" /> Core Numbers</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <Card className="p-3 bg-black/40 border-white/10 text-center flex flex-col justify-center">
+                  <span className="text-2xl mb-1">{getSign(year).e}</span>
+                  <p className="text-[9px] text-muted-foreground uppercase font-black">Birth Sign</p>
+                  <p className="text-xs font-bold text-yellow-400">{birthSign}</p>
+                </Card>
+                <Card className="p-3 bg-black/40 border-white/10 text-center flex flex-col justify-center">
+                  <span className="text-2xl mb-1 text-primary font-black">{BN}</span>
+                  <p className="text-[9px] text-muted-foreground uppercase font-black">Psyche No.</p>
+                  <p className="text-xs font-bold text-white/70">Planet {BN}</p>
+                </Card>
+                <Card className="p-3 bg-black/40 border-white/10 text-center flex flex-col justify-center">
+                  <span className="text-2xl mb-1 text-primary font-black">{LP}</span>
+                  <p className="text-[9px] text-muted-foreground uppercase font-black">Life Path</p>
+                  <p className="text-xs font-bold text-white/70">{PERSONAL_YEARS.find(p => p.n === LP)?.name}</p>
+                </Card>
+                <Card className="p-3 bg-black/40 border-white/10 text-center flex flex-col justify-center">
+                  <span className="text-2xl mb-1 text-magenta font-black">{getPY(curYear)}</span>
+                  <p className="text-[9px] text-muted-foreground uppercase font-black">PY {curYear}</p>
+                  <p className="text-xs font-bold text-white/70">{PERSONAL_YEARS.find(p => p.n === getPY(curYear))?.name}</p>
+                </Card>
+              </div>
+            </section>
 
             <section className="space-y-4">
               <h3 className="flex items-center gap-2 text-primary font-bold text-lg"><Zap className="h-5 w-5" /> Critical Convergences</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Years where Personal Year 4 or 7 (the cycle's troughs) coincide with hostile celestial bonds — the most concentrated periods of compound pressure.
               </p>
               {convergences.length > 0 ? (
                 convergences.map(h => {
-                  const meta = CAT_META[h.rt];
+                  const cm = CAT_META[h.rt];
+                  const pi = PERSONAL_YEARS.find(x => x.n === h.p);
+                  const ts = TAISUI[h.y];
+                  const signBook = (BOOK.animals as any)[birthSign];
+                  const bookSect = signBook ? signBook[h.rt] : '';
+                  const bookPreview = bookSect ? bookSect.substring(0, 400) + '...' : '';
+
                   return (
-                    <Card key={h.y} className={`p-4 bg-black/40 border-l-4 ${h.rt === 'clash' ? 'border-red-500' : 'border-amber-500'}`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-2xl font-black">{h.y}</span>
-                        <Badge className={meta.badge}>{meta.label}</Badge>
+                    <Card key={h.y} className={`p-5 bg-black/40 border-l-4 ${['clash', 'self'].includes(h.rt) ? 'border-red-500' : 'border-amber-500'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <span className="text-3xl font-black text-white">{h.y}</span>
+                        <Badge className={cm.badge}>{cm.label}</Badge>
                       </div>
-                      <div className="space-y-3 text-sm">
-                        <p><span className="text-primary font-bold">◎ Convergence Insight:</span> {h.p === 4 
-                          ? "Personal Year 4 demands disciplined foundation-laying while hostile energy disrupts your environment. Reduce commitments radically."
-                          : "Personal Year 7 calls for inward retreat while external energy invades your space. Prioritize mental clarity."}</p>
+                      <div className="space-y-4 text-sm leading-relaxed">
+                        <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">
+                          PY {h.p} · {h.ys.e} {h.ys.n} Year · <span className={EL_CLASS[getStem(h.y)]}>{getStemName(h.y)} {getStem(h.y)}</span>
+                        </p>
+                        <div className="space-y-3">
+                          <p><span className="text-amber-400 font-black">☯ Numerological —</span> {pi?.desc}</p>
+                          <p><span className="text-primary font-black">⚔ Celestial Bond —</span> Your <strong>${birthSign}</strong> meets the <strong>${h.ys.n}</strong> year in ${cm.label} configuration. {ts && `This ${ts.cy} year: ${ts.note}.`}</p>
+                          {bookPreview && (
+                            <div className="p-3 bg-white/5 rounded-lg border border-white/5 italic text-white/60 text-xs">
+                              <span className="font-bold text-white block mb-1">📖 From the Source Text:</span>
+                              {bookPreview}
+                            </div>
+                          )}
+                          <p><span className="text-green-400 font-black">⚡ Compound Counsel —</span> {h.p === 4 
+                            ? `Personal Year 4 demands disciplined foundation-laying while ${cm.label} energy simultaneously disrupts your environment. Reduce commitments radically. Honour every existing obligation.` 
+                            : `Personal Year 7 calls for inward retreat and genuine reflection while ${cm.label} energy invades the inner space required for that retreat. Prioritize mental and spiritual clarity.`
+                          }</p>
+                        </div>
                       </div>
                     </Card>
                   );
@@ -168,106 +210,106 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
           </div>
         )}
 
+        {/* WHEEL TAB */}
         {activeTab === 'wh' && (
-          <div className="space-y-6">
-            <ZodiacWheel birthSign={birthSign} />
-            <section className="space-y-2">
-              <h3 className="text-primary font-bold text-lg px-2">Bond Definitions</h3>
-              <Accordion type="multiple" className="space-y-2">
-                {Object.entries(BOOK.foundation).map(([key, text]) => (
-                  <AccordionItem value={key} key={key} className="bg-black/40 border-white/10 rounded-xl px-4">
-                    <AccordionTrigger className="hover:no-underline capitalize">
-                      {key.replace('_', ' ')}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground leading-relaxed">
-                      <AccordionContentWithPlayer text={text} />
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+          <div className="space-y-6 pb-10">
+            <section className="text-center">
+              <h3 className="text-primary font-bold text-lg mb-4">Celestial Relationship Wheel</h3>
+              <ZodiacWheel birthSign={birthSign} />
+            </section>
+            <section>
+              <h3 className="flex items-center gap-2 text-primary font-bold text-lg mb-4"><Users className="h-5 w-5" /> Relationship Details</h3>
+              <div className="space-y-2">
+                {Object.entries(RELS[birthSign]).map(([type, name]) => {
+                  const names = Array.isArray(name) ? name : [name];
+                  return names.map(targetName => {
+                    const typeKey = type === 'sanhe' || type === 'liuhe' ? type : type;
+                    const bookData = (BOOK.animals as any)[birthSign];
+                    const content = bookData ? bookData[typeKey] : BOOK.foundation[typeKey as keyof typeof BOOK.foundation];
+                    return renderBookSection(`${getSign(year).e} ${birthSign} × ${AN.find(a => a.n === targetName)?.e} ${targetName}`, content as string, typeKey);
+                  });
+                })}
+              </div>
             </section>
           </div>
         )}
 
+        {/* CYCLES TAB */}
         {activeTab === 'cy' && (
-          <div className="space-y-6">
+          <div className="space-y-6 pb-10">
             <PersonalYearChart
               birthDay={day}
               birthMonth={month}
               birthYear={year}
               onYearSelect={setSelectedPersonalYear}
             />
-
             <AnimatePresence>
               {selectedPersonalYear && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="mt-6"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="mt-4"
                 >
-                  <Card className="p-4 bg-black/40 border-white/10">
-                    <h4 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-                      <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
+                  <Card className="p-5 bg-black/40 border-white/10 border-l-4 border-primary">
+                    <h4 className="font-black text-xl text-primary mb-3 flex items-center gap-2">
+                      <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} — {selectedPersonalYear.year}
                     </h4>
-                    <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
+                    <div className="text-sm leading-relaxed text-white/80 space-y-4">
+                      <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
+                    </div>
                   </Card>
                 </motion.div>
               )}
             </AnimatePresence>
-
-            <section className="space-y-4">
-              <h3 className="text-primary font-bold text-lg px-2">Lifecycle Timeline</h3>
-              <div className="pl-6 border-l-2 border-white/5 space-y-6">
-                {timeline.map((ev, i) => (
-                  <div key={i} className="relative">
-                    <div className="absolute -left-[31px] top-1 w-2 h-2 rounded-full bg-primary ring-4 ring-black" />
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-white/40 uppercase">Age {ev.age}</span>
-                        <span className="text-sm font-bold text-primary">{ev.yr}</span>
-                        <Badge className={CAT_META[ev.k].badge}>{CAT_META[ev.k].label}</Badge>
-                      </div>
-                      <p className="text-[13px] text-white/70">{LIFESTAGES[ev.age as keyof typeof LIFESTAGES] || 'Celestial Shift'}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
           </div>
         )}
 
+        {/* YEAR MAP TAB */}
         {activeTab === 'mp' && (
-          <div className="space-y-4">
-            <h3 className="text-primary font-bold text-lg px-2">Fate Map Projection</h3>
+          <div className="space-y-4 pb-10">
+            <h3 className="text-primary font-bold text-lg">Year-by-Year Fate Projection</h3>
             <div className="rounded-xl border border-white/10 overflow-hidden">
               <Table>
                 <TableHeader className="bg-black/60">
                   <TableRow>
-                    <TableHead>Year</TableHead>
-                    <TableHead>Animal</TableHead>
-                    <TableHead>Bond</TableHead>
-                    <TableHead>Theme (2026 Focus)</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">Year</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">Animal</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">Stem·Elem</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">Bond</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">PY</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">Confluence</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody className="bg-black/40 text-xs">
+                <TableBody className="bg-black/40">
                   {Array.from({ length: 20 }, (_, i) => {
                     const y = curYear + i;
                     const p = getPY(y);
                     const ys = getSign(y);
                     const rt = getRel(ys.n);
-                    const signBook = (BOOK.animals as any)[birthSign];
-                    const themeText = y === 2026 ? signBook?.overview_2026 : '';
+                    const isT = p === 4 || p === 7;
+                    const isE = ['clash', 'harm', 'destroy', 'self'].includes(rt);
+                    const isA = ['sanhe', 'liuhe'].includes(rt);
+                    
+                    let confluence = null;
+                    if (isT && isE) confluence = <span className="text-red-400 font-bold">⚡ Trough+Enemy</span>;
+                    else if (isT && isA) confluence = <span className="text-magenta font-bold">✦ Trough+Ally</span>;
+                    else if (isT) confluence = <span className="text-amber-400 font-bold">◎ Trough</span>;
                     
                     return (
-                      <TableRow key={y} className="border-white/5">
-                        <TableCell className="font-bold text-white">{y}</TableCell>
-                        <TableCell>{ys.e} {ys.n}</TableCell>
-                        <TableCell><Badge className={CAT_META[rt].badge}>{CAT_META[rt].label}</Badge></TableCell>
-                        <TableCell className="max-w-[200px] truncate opacity-70">
-                          {themeText || `PY ${p}`}
+                      <TableRow key={y} className="border-white/5 hover:bg-white/5">
+                        <TableCell className={`font-black text-sm ${y === curYear ? 'text-magenta' : 'text-white'}`}>{y}</TableCell>
+                        <TableCell className="text-xs">{ys.e} {ys.n}</TableCell>
+                        <TableCell>
+                          <Badge className={`text-[9px] ${EL_CLASS[getStem(y)]}`}>{getStemName(y)}·{getStem(y)[0]}</Badge>
                         </TableCell>
+                        <TableCell>
+                          <Badge className={`text-[9px] ${CAT_META[rt].badge}`}>{rt === 'sanhe' ? 'San He' : rt === 'liuhe' ? 'Liu He' : CAT_META[rt].label}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black border ${isT ? 'border-magenta bg-magenta/10 text-magenta' : 'border-white/10 text-white/60'}`}>{p}</span>
+                        </TableCell>
+                        <TableCell className="text-[10px]">{confluence || <span className="text-muted-foreground opacity-30">—</span>}</TableCell>
                       </TableRow>
                     );
                   })}
@@ -277,51 +319,123 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
           </div>
         )}
 
+        {/* DEEP READ TAB */}
         {activeTab === 'dr' && (
-          <div className="space-y-6 p-2">
-            <h3 className="text-primary font-bold text-lg">Detailed Reading — {birthSign}</h3>
-            {renderSignBook(birthSign)}
+          <div className="space-y-6 pb-10">
+            <h3 className="text-primary font-bold text-lg">Deep Reading — {birthSign}</h3>
+            {documentedSigns.includes(birthSign) ? (
+              <Accordion type="multiple" className="space-y-4">
+                {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
+                  renderBookSection(key === 'self' ? `Ben Ming Nian — ${birthSign} Years` : key.replace('_', ' '), (BOOK.animals as any)[birthSign][key], key)
+                ))}
+              </Accordion>
+            ) : (
+              <div className="space-y-6">
+                <Card className="p-4 bg-black/40 border-white/10">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    The source text documents six signs in full encyclopaedic detail: <strong>Rat, Ox, Tiger, Rabbit, Dragon,</strong> and <strong>Snake</strong>. 
+                    As your sign (<strong>{birthSign}</strong>) is not one of the six, we provide a <strong>Derived Analysis</strong> using the verbatim chapters of your primary celestial partners.
+                  </p>
+                </Card>
+                <h4 className="text-primary font-bold flex items-center gap-2"><Activity className="h-4 w-4" /> Derived Analysis from Partners</h4>
+                <Accordion type="multiple" className="space-y-4">
+                  {/* Derived sections from partners */}
+                  {RELS[birthSign].clash && documentedSigns.includes(RELS[birthSign].clash) && (
+                    renderBookSection(`Through your Clash Partner: ${RELS[birthSign].clash}`, (BOOK.animals as any)[RELS[birthSign].clash].self, 'clash')
+                  )}
+                  {RELS[birthSign].harm && documentedSigns.includes(RELS[birthSign].harm) && (
+                    renderBookSection(`Through your Harm Partner: ${RELS[birthSign].harm}`, (BOOK.animals as any)[RELS[birthSign].harm].self, 'harm')
+                  )}
+                  {RELS[birthSign].sanhe.map(partner => documentedSigns.includes(partner) && (
+                    renderBookSection(`Through your San He Ally: ${partner}`, (BOOK.animals as any)[partner].self, 'sanhe')
+                  ))}
+                </Accordion>
+              </div>
+            )}
           </div>
         )}
 
+        {/* CODEX TAB */}
         {activeTab === 'co' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-3 gap-2">
-              {ANIMALS.map(a => (
-                <button
-                  key={a.n}
-                  onClick={() => setSelectedCodex(a.n)}
-                  className={`p-3 rounded-xl text-center border transition-all ${
-                    selectedCodex === a.n ? 'bg-primary border-primary' : 'bg-black/40 border-white/5 opacity-60'
-                  }`}
-                >
-                  <span className="text-xl block mb-1">{a.e}</span>
-                  <span className="text-[10px] font-bold uppercase">{a.n}</span>
-                </button>
-              ))}
-            </div>
-            <div className="mt-4">
-              <h4 className="text-2xl font-black text-primary mb-4">{selectedCodex} Encyclopedia</h4>
-              {renderSignBook(selectedCodex)}
-            </div>
+          <div className="space-y-6 pb-10">
+            <section>
+              <h3 className="text-primary font-bold text-lg mb-2">Sign Codex</h3>
+              <div className="info-tag text-[10px] mb-4">📚 Source: The Chinese Zodiac: Six Categories of Years — Verbatim</div>
+              <div className="grid grid-cols-3 gap-2">
+                {ANIMALS.map(a => {
+                  const isLocked = !documentedSigns.includes(a.n);
+                  return (
+                    <button
+                      key={a.n}
+                      onClick={() => !isLocked && setSelectedCodex(a.n)}
+                      className={`p-3 rounded-xl text-center border transition-all ${
+                        selectedCodex === a.n ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/40 border-white/5 text-muted-foreground'
+                      } ${isLocked ? 'opacity-30 cursor-not-allowed' : 'hover:border-white/20'}`}
+                    >
+                      <span className="text-xl block mb-1">{a.e}</span>
+                      <span className="text-[9px] font-bold uppercase block">{a.n}</span>
+                      {isLocked && <span className="text-[8px] block mt-1">🔒</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <AnimatePresence mode="wait">
+              <motion.div key={selectedCodex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                <Card className="p-4 bg-primary/10 border-primary/20">
+                  <h4 className="text-2xl font-black text-primary flex items-center gap-2">
+                    {AN.find(a => a.n === selectedCodex)?.e} {selectedCodex} Encyclopedia
+                  </h4>
+                </Card>
+                <Accordion type="multiple" className="space-y-4">
+                  {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
+                    renderBookSection(key === 'self' ? 'Ben Ming Nian' : key.replace('_', ' '), (BOOK.animals as any)[selectedCodex][key], key)
+                  ))}
+                </Accordion>
+              </motion.div>
+            </AnimatePresence>
           </div>
         )}
 
+        {/* REF TAB */}
         {activeTab === 'rf' && (
-          <div className="space-y-6">
-            <h3 className="text-primary font-bold text-lg px-2">Cycle Reference</h3>
-            <Accordion type="multiple" className="space-y-2">
-              {PERSONAL_YEARS.map(p => (
-                <AccordionItem value={`ref-${p.n}`} key={p.n} className="bg-black/40 border-white/10 rounded-xl px-4">
-                  <AccordionTrigger className="hover:no-underline">
-                    PY {p.n} - {p.name}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <AccordionContentWithPlayer text={p.desc} />
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+          <div className="space-y-8 pb-10">
+            <section>
+              <h3 className="text-primary font-bold text-lg mb-4">Personal Year Meanings</h3>
+              <div className="grid grid-cols-1 gap-4">
+                {PERSONAL_YEARS.map(p => (
+                  <Card key={p.n} className={`p-4 bg-black/40 border-white/10 ${p.t ? 'border-l-4 border-magenta' : ''}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl font-black text-amber-400">{p.n}</span>
+                      <div>
+                        <h4 className="font-bold text-white leading-tight">{p.name}</h4>
+                        <p className="text-[9px] text-muted-foreground uppercase">{p.season}</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-white/60 leading-relaxed italic mb-3">{p.desc}</p>
+                    <div className="grid grid-cols-2 gap-2 text-[10px]">
+                      <div className="p-2 bg-white/5 rounded"><strong>☽ Vedic:</strong> {p.vedic}</div>
+                      <div className="p-2 bg-white/5 rounded"><strong>☰ Lo Shu:</strong> {p.loshu}</div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-primary font-bold text-lg mb-4">Six Categories — Foundation</h3>
+              <div className="space-y-4">
+                {Object.entries(BOOK.foundation).map(([key, text]) => (
+                  <Card key={key} className="p-4 bg-black/40 border-white/10">
+                    <h4 className="font-bold text-magenta mb-2 capitalize">{key.replace('_', ' ')}</h4>
+                    <div className="text-xs text-white/70 leading-relaxed whitespace-pre-line">
+                      <AccordionContentWithPlayer text={text} />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
           </div>
         )}
       </ScrollArea>
