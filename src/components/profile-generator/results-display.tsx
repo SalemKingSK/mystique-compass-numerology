@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import type { AstroInsightOutput, NumerologyData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
+import { CosmicFateDisplay } from './cosmic-fate-display';
 import { ArrowLeft, History, BookUser, Heart, Home, Users, Briefcase } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -130,17 +132,14 @@ function ResultsHeader({
             {name}
         </h1>
         <p className="text-sm text-white/50 mt-1">{birthDate}</p>
-        <div className='relative flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-6 space-y-4'>
+        <div className='relative flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-6 space-y-4 px-4'>
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
                 {newAstroSign}
              </AnimatedTab>
-            <div className="flex justify-between w-full">
-                <div className="w-2/5">
-                    <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro Insights</AnimatedTab>
-                </div>
-                <div className="w-2/5">
-                    <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numerology Report</AnimatedTab>
-                </div>
+            <div className="grid grid-cols-3 gap-2 w-full">
+                <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro</AnimatedTab>
+                <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numbers</AnimatedTab>
+                <AnimatedTab isActive={activeTab === 'cosmic'} onClick={() => onTabClick('cosmic')}>Cosmic</AnimatedTab>
             </div>
         </div>
     </div>
@@ -165,7 +164,7 @@ function FloatingNavigation({ onReset, onHistoryOpen }: { onReset: () => void; o
           variant="ghost" 
           size="icon"
           onClick={onReset} 
-          className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
+          className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
         >
             <ArrowLeft className="h-5 w-5" />
             <span className="sr-only">Back</span>
@@ -181,7 +180,7 @@ function FloatingNavigation({ onReset, onHistoryOpen }: { onReset: () => void; o
           variant="ghost" 
           size="icon"
           onClick={onHistoryOpen} 
-          className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
+          className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
         >
             <History className="h-5 w-5" />
             <span className="sr-only">History</span>
@@ -253,6 +252,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
                 {activeTab === 'astro' && <AstroDisplay insight={insight} />}
                 {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
                 {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
+                {activeTab === 'cosmic' && <CosmicFateDisplay insight={insight} numerology={numerology} />}
               </motion.div>
           </AnimatePresence>
 
