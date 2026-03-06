@@ -93,6 +93,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   // --- RENDERERS ---
   const renderBookSection = (title: string, content: string, category: string) => {
+    if (!content) return null;
     const cm = CAT_META[category] || { badge: 'bg-gray-500/20 text-gray-400 border-gray-500/30', label: category };
     return (
       <AccordionItem value={title} key={title} className="bg-black/40 border-white/10 rounded-xl px-4 mb-4">
@@ -227,10 +228,10 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                 {Object.entries(RELATIONS[birthSign] || {}).map(([type, name]) => {
                   const names = Array.isArray(name) ? name : [name];
                   return names.map(targetName => {
-                    const typeKey = type === 'sanhe' || type === 'liuhe' ? type : type;
+                    const mappedKey = type === 'sanhe' || type === 'liuhe' ? 'alliance' : type === 'self' ? 'self' : type;
                     const bookData = (BOOK.animals as any)[birthSign];
-                    const content = bookData ? bookData[typeKey] : BOOK.foundation[typeKey as keyof typeof BOOK.foundation];
-                    return renderBookSection(`${ANIMALS.find(a => a.n === targetName)?.e || ''} ${targetName}`, content as string, typeKey);
+                    const content = bookData ? bookData[mappedKey] : (BOOK.foundation as any)[type === 'self' ? 'ben_ming' : type === 'sanhe' || type === 'liuhe' ? 'alliance' : type];
+                    return renderBookSection(`${ANIMALS.find(a => a.n === targetName)?.e || ''} ${targetName}`, content as string, mappedKey);
                   });
                 })}
               </Accordion>
@@ -315,7 +316,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                         <TableCell>
                           <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black border ${isT ? 'border-magenta bg-magenta/10 text-magenta' : 'border-white/10 text-white/60'}`}>{p}</span>
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground">{pi?.name || ''}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{pi?.name || pi?.name || ''}</TableCell>
                         <TableCell className="text-[10px]">{confluence || <span className="text-muted-foreground opacity-30">—</span>}</TableCell>
                       </TableRow>
                     );
