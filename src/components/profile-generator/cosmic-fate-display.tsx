@@ -2,18 +2,19 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { AstroInsightOutput, NumerologyData } from './types';
+import { AstroInsightOutput, NumerologyData, PersonalYearData } from './types';
 import { ANIMALS, RELATIONS, CAT_META, PERSONAL_YEARS, LIFESTAGES, TAISUI } from '@/lib/cosmic-fate/constants';
 import { BOOK } from '@/lib/cosmic-fate/book';
 import { ZodiacWheel } from './cosmic-fate/zodiac-wheel';
-import { PersonalYearWave } from './cosmic-fate/personal-year-wave';
+import { PersonalYearChart } from './personal-year-chart';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
-import { Info, Sparkles, Zap, Calendar, BookOpen, ShieldCheck, MapIcon } from 'lucide-react';
+import { Info, Sparkles, Zap, Calendar, BookOpen, MapIcon, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TABS = [
   { id: 'ov', name: 'Overview', icon: Sparkles },
@@ -27,6 +28,7 @@ const TABS = [
 export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsightOutput, numerology: NumerologyData }) {
   const [activeTab, setActiveTab] = useState('ov');
   const [selectedCodex, setSelectedCodex] = useState('Rat');
+  const [selectedPersonalYear, setSelectedPersonalYear] = useState<PersonalYearData | null>(null);
 
   // Correct destructuring from NumerologyData structure
   const { birthDay: day, birthMonth: month, birthYear: year } = numerology;
@@ -178,7 +180,40 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
         {activeTab === 'cy' && (
           <div className="space-y-6">
-            <PersonalYearWave day={day} month={month} year={year} birthSign={birthSign} />
+            <PersonalYearChart
+              birthDay={day}
+              birthMonth={month}
+              birthYear={year}
+              onYearSelect={setSelectedPersonalYear}
+            />
+
+            <AnimatePresence>
+              {selectedPersonalYear && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="mt-6"
+                >
+                  <div className="glass-card px-4">
+                    <Accordion type="single" collapsible defaultValue="personal-year-detail" value={selectedPersonalYear ? "personal-year-detail" : ""}>
+                      <AccordionItem value="personal-year-detail">
+                        <AccordionTrigger>
+                          <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                            <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <section className="space-y-4">
               <h3 className="text-primary font-bold text-lg px-2">Lifecycle Timeline</h3>
               <div className="pl-6 border-l-2 border-white/5 space-y-6">
