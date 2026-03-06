@@ -28,7 +28,8 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const [activeTab, setActiveTab] = useState('ov');
   const [selectedCodex, setSelectedCodex] = useState('Rat');
 
-  const { day, month, year } = numerology;
+  // Correct destructuring from NumerologyData structure
+  const { birthDay: day, birthMonth: month, birthYear: year } = numerology;
   const birthSign = insight.sign;
   const curYear = new Date().getFullYear();
 
@@ -39,7 +40,10 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   };
 
   const getPY = (y: number) => red(red(day) + red(month) + red(y));
-  const getSign = (y: number) => ANIMALS[((y - 1900) % 12 + 12) % 12];
+  const getSign = (y: number) => {
+    const index = ((y - 1900) % 12 + 12) % 12;
+    return ANIMALS[index] || ANIMALS[0];
+  };
   
   const getRel = (ysName: string) => {
     const r = RELATIONS[birthSign];
@@ -68,7 +72,8 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const timeline = useMemo(() => {
     const events: any[] = [];
     ['self', 'clash', 'harm', 'destroy', 'sanhe', 'liuhe'].forEach(k => {
-      CAT_META[k].ages.forEach(age => events.push({ age, k, yr: year + age }));
+      const ages = CAT_META[k]?.ages || [];
+      ages.forEach(age => events.push({ age, k, yr: year + age }));
     });
     return events.sort((a, b) => a.age - b.age);
   }, [year, birthSign]);
@@ -97,7 +102,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <Card className="p-4 bg-black/40 border-white/10 text-center">
-                <span className="text-3xl mb-1 block">{getSign(year).e}</span>
+                <span className="text-3xl mb-1 block">{getSign(year)?.e || '✨'}</span>
                 <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Birth Sign</p>
                 <p className="text-xl font-bold text-yellow-400">{birthSign}</p>
               </Card>
