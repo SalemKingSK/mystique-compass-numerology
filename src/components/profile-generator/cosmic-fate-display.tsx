@@ -91,7 +91,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   // --- RENDERERS ---
   const renderBookSection = (title: string, content: string, category: string) => {
-    const cm = CAT_META[category] || { badge: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
+    const cm = CAT_META[category] || { badge: 'bg-gray-500/20 text-gray-400 border-gray-500/30', label: category };
     return (
       <AccordionItem value={title} key={title} className="bg-black/40 border-white/10 rounded-xl px-4 mb-4">
         <AccordionTrigger className="hover:no-underline">
@@ -187,7 +187,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                         </p>
                         <div className="space-y-3">
                           <p><span className="text-amber-400 font-black">☯ Numerological —</span> {pi?.desc}</p>
-                          <p><span className="text-primary font-black">⚔ Celestial Bond —</span> Your <strong>${birthSign}</strong> meets the <strong>${h.ys.n}</strong> year in ${cm.label} configuration. {ts && `This ${ts.cy} year: ${ts.note}.`}</p>
+                          <p><span className="text-primary font-black">⚔ Celestial Bond —</span> Your <strong>{birthSign}</strong> meets the <strong>{h.ys.n}</strong> year in {cm.label} configuration. {ts && `This ${ts.cy} year: ${ts.note}.`}</p>
                           {bookPreview && (
                             <div className="p-3 bg-white/5 rounded-lg border border-white/5 italic text-white/60 text-xs">
                               <span className="font-bold text-white block mb-1">📖 From the Source Text:</span>
@@ -220,13 +220,13 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             <section>
               <h3 className="flex items-center gap-2 text-primary font-bold text-lg mb-4"><Users className="h-5 w-5" /> Relationship Details</h3>
               <div className="space-y-2">
-                {Object.entries(RELS[birthSign]).map(([type, name]) => {
+                {Object.entries(RELATIONS[birthSign] || {}).map(([type, name]) => {
                   const names = Array.isArray(name) ? name : [name];
                   return names.map(targetName => {
                     const typeKey = type === 'sanhe' || type === 'liuhe' ? type : type;
                     const bookData = (BOOK.animals as any)[birthSign];
                     const content = bookData ? bookData[typeKey] : BOOK.foundation[typeKey as keyof typeof BOOK.foundation];
-                    return renderBookSection(`${getSign(year).e} ${birthSign} × ${AN.find(a => a.n === targetName)?.e} ${targetName}`, content as string, typeKey);
+                    return renderBookSection(`${getSign(year).e} ${birthSign} × ${ANIMALS.find(a => a.n === targetName)?.e || ''} ${targetName}`, content as string, typeKey);
                   });
                 })}
               </div>
@@ -304,7 +304,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                           <Badge className={`text-[9px] ${EL_CLASS[getStem(y)]}`}>{getStemName(y)}·{getStem(y)[0]}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge className={`text-[9px] ${CAT_META[rt].badge}`}>{rt === 'sanhe' ? 'San He' : rt === 'liuhe' ? 'Liu He' : CAT_META[rt].label}</Badge>
+                          <Badge className={`text-[9px] ${CAT_META[rt]?.badge || ''}`}>{rt === 'sanhe' ? 'San He' : rt === 'liuhe' ? 'Liu He' : CAT_META[rt]?.label || 'Neutral'}</Badge>
                         </TableCell>
                         <TableCell>
                           <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black border ${isT ? 'border-magenta bg-magenta/10 text-magenta' : 'border-white/10 text-white/60'}`}>{p}</span>
@@ -325,9 +325,11 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             <h3 className="text-primary font-bold text-lg">Deep Reading — {birthSign}</h3>
             {documentedSigns.includes(birthSign) ? (
               <Accordion type="multiple" className="space-y-4">
-                {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
-                  renderBookSection(key === 'self' ? `Ben Ming Nian — ${birthSign} Years` : key.replace('_', ' '), (BOOK.animals as any)[birthSign][key], key)
-                ))}
+                {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => {
+                  const content = (BOOK.animals as any)[birthSign]?.[key];
+                  if (!content) return null;
+                  return renderBookSection(key === 'self' ? `Ben Ming Nian — ${birthSign} Years` : key.replace('_', ' '), content, key);
+                })}
               </Accordion>
             ) : (
               <div className="space-y-6">
@@ -340,13 +342,13 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                 <h4 className="text-primary font-bold flex items-center gap-2"><Activity className="h-4 w-4" /> Derived Analysis from Partners</h4>
                 <Accordion type="multiple" className="space-y-4">
                   {/* Derived sections from partners */}
-                  {RELS[birthSign].clash && documentedSigns.includes(RELS[birthSign].clash) && (
-                    renderBookSection(`Through your Clash Partner: ${RELS[birthSign].clash}`, (BOOK.animals as any)[RELS[birthSign].clash].self, 'clash')
+                  {RELATIONS[birthSign]?.clash && documentedSigns.includes(RELATIONS[birthSign].clash) && (
+                    renderBookSection(`Through your Clash Partner: ${RELATIONS[birthSign].clash}`, (BOOK.animals as any)[RELATIONS[birthSign].clash].self, 'clash')
                   )}
-                  {RELS[birthSign].harm && documentedSigns.includes(RELS[birthSign].harm) && (
-                    renderBookSection(`Through your Harm Partner: ${RELS[birthSign].harm}`, (BOOK.animals as any)[RELS[birthSign].harm].self, 'harm')
+                  {RELATIONS[birthSign]?.harm && documentedSigns.includes(RELATIONS[birthSign].harm) && (
+                    renderBookSection(`Through your Harm Partner: ${RELATIONS[birthSign].harm}`, (BOOK.animals as any)[RELATIONS[birthSign].harm].self, 'harm')
                   )}
-                  {RELS[birthSign].sanhe.map(partner => documentedSigns.includes(partner) && (
+                  {(RELATIONS[birthSign]?.sanhe || []).map(partner => documentedSigns.includes(partner) && (
                     renderBookSection(`Through your San He Ally: ${partner}`, (BOOK.animals as any)[partner].self, 'sanhe')
                   ))}
                 </Accordion>
@@ -385,13 +387,15 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
               <motion.div key={selectedCodex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <Card className="p-4 bg-primary/10 border-primary/20">
                   <h4 className="text-2xl font-black text-primary flex items-center gap-2">
-                    {AN.find(a => a.n === selectedCodex)?.e} {selectedCodex} Encyclopedia
+                    {ANIMALS.find(a => a.n === selectedCodex)?.e} {selectedCodex} Encyclopedia
                   </h4>
                 </Card>
                 <Accordion type="multiple" className="space-y-4">
-                  {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
-                    renderBookSection(key === 'self' ? 'Ben Ming Nian' : key.replace('_', ' '), (BOOK.animals as any)[selectedCodex][key], key)
-                  ))}
+                  {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => {
+                    const content = (BOOK.animals as any)[selectedCodex]?.[key];
+                    if (!content) return null;
+                    return renderBookSection(key === 'self' ? 'Ben Ming Nian' : key.replace('_', ' '), content, key);
+                  })}
                 </Accordion>
               </motion.div>
             </AnimatePresence>
