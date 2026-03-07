@@ -1,5 +1,6 @@
 /**
  * @fileOverview Refactored Cosmic Fate Display mirroring provided code structure & verbatim logic.
+ * Integrated with SpeechPlayer and ScrollableTextDisplay for interactive reading.
  */
 
 'use client';
@@ -16,12 +17,11 @@ import { Card } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   Sparkles, Star, MapIcon, Info, CalendarDays, 
-  ChevronDown, Layers, BookUser, Activity
+  ChevronDown, Layers, BookUser, Activity, Volume2
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PersonalYearChart } from './personal-year-chart';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -29,14 +29,23 @@ const TABS = [
   { id: 'ov', name: 'Oracle', icon: Sparkles },
   { id: 'dv', name: 'Year Dive', icon: Info },
   { id: 'wh', name: 'Wheel', icon: Star },
-  { id: 'cy', name: 'Cycles', icon: Activity },
   { id: 'mp', name: 'Fate Map', icon: MapIcon },
   { id: 'co', name: 'Codex', icon: BookUser },
   { id: 'rf', name: 'Ref', icon: Layers },
 ];
 
+const DIVE_SUBTABS = [
+  { id: 'overview', name: 'Overview' },
+  { id: 'pyth', name: 'Pythagorean' },
+  { id: 'vedic', name: 'Vedic' },
+  { id: 'chinese', name: 'Chinese' },
+  { id: 'chald', name: 'Chaldean' },
+  { id: 'pr', name: 'Practices' },
+];
+
 export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsightOutput, numerology: NumerologyData }) {
   const [activeTab, setActiveTab] = useState('ov');
+  const [diveSubTab, setDiveSubTab] = useState('overview');
   const [selectedCodex, setSelectedCodex] = useState('Rat');
   const [readYear, setReadYear] = useState(new Date().getFullYear());
   const [yearInput, setYearInput] = useState(new Date().getFullYear().toString());
@@ -84,19 +93,6 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     return labels[c] || 'Neutral Year ◦';
   };
 
-  const catColor = (c: string) => {
-    const colors: Record<string, string> = {
-      'self': '#60a5fa',
-      'clash': '#f87171',
-      'harm': '#fbbf24',
-      'destroy': '#a78bfa',
-      'sanhe': '#34d399',
-      'liuhe': '#e040fb',
-      'neutral': '#9ca3af'
-    };
-    return colors[c] || 'var(--foreground)';
-  };
-
   const LP = useMemo(() => reduce(reduce(m) + reduce(d) + reduce(by)), [d, m, by]);
   const currentPY = useMemo(() => getPY(d, m, readYear), [d, m, readYear]);
   const currentUY = useMemo(() => reduce(readYear), [readYear]);
@@ -107,12 +103,12 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const lpName = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
 
   const getIntersectionNarrative = (pyNum: number, cat: string, yearAnimalName: string) => {
-    const ba = BOOK.animals[birthSign] as any;
+    const ba = (BOOK.animals as any)[birthSign];
     if (pyNum === 4) {
       if (cat === 'clash') return `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearAnimalName} year's forced disruption, creating a year when every structure you attempt to build meets maximum environmental resistance. The karmic invitation: use Rahu's building energy not to resist the Clash year's forced movement but to build the internal foundations — psychological resilience, spiritual groundedness, practical contingency systems — that make you genuinely mobile rather than frantically rootless. Do not attempt to build permanent structures this year; build portable ones. Financial reserves over fixed investments. Transferable skills over institutional positioning. Psychological stability over social status. The Clash year will move things regardless; your Year 4 work is to ensure that what moves carries your genuine foundation with it rather than leaving it behind.\n\nSpecific to ${birthSign}/${yearAnimalName}: ${ba?.clash || ''}`;
-      if (cat === 'harm') return `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion: while Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build before it can be completed. This is the configuration where workaholism is most dangerous — the compulsive Year 4 building impulse creating elaborate structures that the Harm year's concealed forces are simultaneously destabilizing. The specific risk: trusted colleagues or business partners with hidden agendas at precisely the moment when you are most invested in collaborative structural projects. Year 4 foundation work should be primarily solo or with your most thoroughly verified relationships during this year. Avoid large structural financial commitments that depend on others' reliability.\n\nSpecific dynamics: ${ba?.harm || ''}`;
-      if (cat === 'destroy') return `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation: the very foundations you are working to build are subject to unexpected structural failures from within. This is the year when old structures that have been maintained through inertia rather than genuine viability finally collapse — often at the moment of most inconvenient timing, precisely when Year 4's energy has you most invested in building. The Chaldean 13/4 resonance is strongest in this configuration: regeneration through upheaval, transformation forced by structural collapse. Work with this rather than against it: deliberately review all existing structures (financial, relational, professional, physical) for those that are maintained through inertia rather than genuine value, and release them proactively before the Destruction year's energy collapses them reactively.\n\nSpecific dynamics: ${ba?.destroy || ''}`;
-      if (cat === 'self') return `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian — the intensification of your natal sign's energy. This creates a year when your characteristic patterns are simultaneously amplified to maximum expression and subjected to maximum structural pressure. Your ${birthSign} nature's most compulsive tendencies will emerge most strongly precisely in the domains where Year 4 is calling you to build most deliberately. The invitation: use Ben Ming Nian's heightened self-awareness as a diagnostic tool. The patterns that emerge most compulsively this year are exactly the patterns whose sublimation into conscious discipline would produce the strongest foundation.\n\nSpecific dynamics: ${ba?.self || ''}`;
+      if (cat === 'harm') return `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion: while Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build before it can be completed. This is the configuration where workaholism is most dangerous — the compulsive Year 4 building impulse creating elaborate structures that the Harm year's concealed forces are simultaneously destabilizing. The specific risk: trusted colleagues or business partners with hidden agendas at precisely the moment when you are most invested in collaborative structural projects. Year 4 foundation work should be primarily solo or with your most thoroughly verified relationships during this year.\n\nSpecific dynamics: ${ba?.harm || ''}`;
+      if (cat === 'destroy') return `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation: the very foundations you are working to build are subject to unexpected structural failures from within. This is the year when old structures that have been maintained through inertia rather than genuine viability finally collapse — often at the moment of most inconvenient timing, precisely when Year 4's energy has you most invested in building. The Chaldean 13/4 resonance is strongest in this configuration: regeneration through upheaval, transformation forced by structural collapse.\n\nSpecific dynamics: ${ba?.destroy || ''}`;
+      if (cat === 'self') return `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian — the intensification of your natal sign's energy. This creates a year when your characteristic patterns are simultaneously amplified to maximum expression and subjected to maximum structural pressure. Your ${birthSign} nature's most compulsive tendencies will emerge most strongly precisely in the domains where Year 4 is calling you to build most deliberately.\n\nSpecific dynamics: ${ba?.self || ''}`;
       if (cat === 'alliance') return `Personal Year 4's foundation-building receives the unusual gift of alliance support — the most favorable configuration for Year 4 in your Chinese zodiac cycle. ${yearAnimalName} year's harmonious energy reduces the friction that Year 4's structural work typically encounters, making it easier to find reliable collaborators, establish stable institutional relationships, and build foundations that are supported rather than undermined by the environmental energy.\n\nAlliance dynamics: ${ba?.alliance || ''}`;
       return `Personal Year 4's foundation-building discipline proceeds in a ${yearAnimalName} Neutral year — neither amplified by alliance support nor undermined by conflict energy. This allows Year 4's structural work to proceed primarily through your own effort and discernment rather than through environmental support or resistance. The advantage: your Year 4 foundations this year reflect your genuine capacity rather than exceptional circumstances in either direction.`;
     }
@@ -203,9 +199,11 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     const synthText = `In ${readYear}, you are in a Personal Year ${currentPY} — ${yr?.title}, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${currentUY} (${YEAR_DESCRIPTIONS[currentUY]?.title}) sets the collective backdrop. Your current Personal Month is ${PM} (${pmNames[PM]}). ${animalLine} ${convergeLine}`;
 
     return (
-      <Card className="p-6 bg-slate-900/60 border border-primary/20 relative">
+      <Card className="p-6 bg-slate-900/60 border border-primary/20 relative overflow-hidden">
         <div className="flex flex-col gap-2">
-          <h4 className="font-serif text-[0.65rem] tracking-[0.3em] uppercase text-primary/80 mb-2">✦ Oracle Synthesis</h4>
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-serif text-[0.65rem] tracking-[0.3em] uppercase text-primary/80">✦ Oracle Synthesis</h4>
+          </div>
           <AccordionContentWithPlayer text={synthText} />
         </div>
       </Card>
@@ -230,18 +228,20 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {hits.map((h, i) => {
-          const cm = CAT_META[h.rt];
+          const cm = CAT_META[h.rt as keyof typeof CAT_META] || CAT_META.neutral;
           const pi = YEAR_DESCRIPTIONS[h.p];
           const narrative = getIntersectionNarrative(h.p, h.rt, h.ys.n);
 
           return (
-            <Card key={i} className={`p-6 border-l-4 ${h.rt === 'clash' || h.rt === 'self' ? 'border-rose-500 bg-rose-950/10' : 'border-amber-500 bg-amber-950/10'} w-full overflow-hidden`}>
-              <div className="flex justify-between items-start mb-2">
-                <div className="text-2xl font-bold font-serif text-primary">{h.y}</div>
-                <Badge style={{ backgroundColor: catColor(h.rt) }}>{catLabel(h.rt)}</Badge>
+            <Card key={i} className={`border-l-4 ${h.rt === 'clash' || h.rt === 'self' ? 'border-rose-500 bg-rose-950/10' : 'border-amber-500 bg-amber-950/10'} w-full overflow-hidden`}>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="text-2xl font-bold font-serif text-primary">{h.y}</div>
+                  <Badge style={{ backgroundColor: cm.col }}>{catLabel(h.rt)}</Badge>
+                </div>
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Personal Year {h.p} • {h.ys.e} {h.ys.n} Year</div>
+                <AccordionContentWithPlayer text={narrative} />
               </div>
-              <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Personal Year {h.p} · {h.ys.e} {h.ys.n} Year</div>
-              <AccordionContentWithPlayer text={narrative} />
             </Card>
           );
         })}
@@ -251,33 +251,40 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   const renderZodiacMap = () => {
     const years = [];
-    const startYear = readYear;
+    const startYear = today.getFullYear();
     for (let y = startYear; y < startYear + 12; y++) {
       const ya = getSign(y);
       const cat = getRel(ya.n);
       const pyNum = getPY(d, m, y);
-      const isCrit = pyNum === 4 || pyNum === 7;
+      
+      const isTrough = pyNum === 4 || pyNum === 7;
       const isPeak = pyNum === 1 || pyNum === 9;
       const isClash = cat === 'clash';
       const isAlliance = ['sanhe', 'liuhe'].includes(cat);
 
       let rowClass = 'bg-black/40 border-white/5';
       let confluence = 'Neutral';
-      if (isClash && isCrit) {
+      let statusColor = 'var(--text-dim)';
+
+      if (isClash && isTrough) {
         rowClass = 'bg-rose-950/30 border-rose-500 text-rose-200';
         confluence = '⚡ Critical Tension';
+        statusColor = '#f87171';
       } else if (isAlliance && isPeak) {
         rowClass = 'bg-emerald-950/30 border-emerald-500 text-emerald-200';
         confluence = '✦ Fortunate Peak';
-      } else if (isCrit) {
+        statusColor = '#34d399';
+      } else if (isTrough) {
         rowClass = 'bg-amber-950/20 border-amber-500/30';
-        confluence = '◈ Trough Window';
+        confluence = '◎ Trough Window';
+        statusColor = '#fbbf24';
       } else if (isAlliance) {
         rowClass = 'bg-indigo-950/20 border-indigo-500/30';
         confluence = '✓ Supported';
+        statusColor = '#818cf8';
       }
 
-      years.push({ year: y, animal: ya, cat, py: pyNum, rowClass, confluence });
+      years.push({ year: y, animal: ya, cat, py: pyNum, rowClass, confluence, statusColor });
     }
 
     return (
@@ -295,15 +302,17 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${y.py === 4 || y.py === 7 ? 'bg-rose-500/20 text-rose-400' : 'bg-primary/20 text-primary'}`}>
                     {y.py}
                   </span>
-                  <span className="text-[9px] uppercase tracking-tighter text-muted-foreground">{y.confluence}</span>
+                  <span className="text-[9px] uppercase tracking-tighter" style={{ color: y.statusColor }}>{y.confluence}</span>
                 </div>
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-80 glass-card border-primary/20">
               <div className="space-y-3">
-                <h4 className="font-bold text-primary flex items-center gap-2">
-                  {y.animal.e} Year {y.year} Analysis
-                </h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-primary">
+                    {y.animal.e} Year {y.year} Analysis
+                  </h4>
+                </div>
                 <div className="text-xs uppercase text-muted-foreground tracking-widest mb-2">
                   Personal Year {y.py} • {catLabel(y.cat)}
                 </div>
@@ -314,6 +323,73 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             </PopoverContent>
           </Popover>
         ))}
+      </div>
+    );
+  };
+
+  const renderYearDive = () => {
+    const yr = YEAR_DESCRIPTIONS[currentPY];
+    if (!yr) return null;
+
+    const sections = [
+      { id: 'overview', title: 'Cycle Overview', content: yr.overview },
+      { id: 'pyth', title: 'Pythagorean Challenge', content: yr.pyth },
+      { id: 'vedic', title: 'Vedic Analysis', content: yr.vedic },
+      { id: 'chinese', title: 'Chinese Numerology', content: yr.chinese },
+      { id: 'chald', title: 'Chaldean Vibration', content: yr.chald },
+    ];
+
+    const activeSection = sections.find(s => s.id === diveSubTab) || sections[0];
+
+    return (
+      <div className="space-y-6">
+        <div className="p-6 bg-gradient-to-br from-primary/20 to-black rounded-2xl border border-primary/20">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <div className="year-num-big text-6xl font-bold text-primary leading-none">{currentPY}</div>
+              <div className="text-2xl font-bold text-white mt-2">{yr.title}</div>
+              <div className="text-sm italic text-muted-foreground">{yr.sub}</div>
+            </div>
+            <Badge variant="outline" className="bg-primary/10 border-primary/40 text-primary">
+              {yr.phase}
+            </Badge>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-6">
+            <Badge variant="outline">{yr.planet}</Badge>
+            <Badge variant="outline">{yr.chakra}</Badge>
+            {yr.kw.map((k: string) => <Badge key={k} variant="secondary" className="bg-white/5">{k}</Badge>)}
+          </div>
+          
+          <div className="flex gap-1 overflow-x-auto no-scrollbar border-b border-white/10 pb-2 mb-6">
+            {DIVE_SUBTABS.map(st => (
+              <button
+                key={st.id}
+                onClick={() => setDiveSubTab(st.id)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  diveSubTab === st.id ? 'bg-primary text-primary-foreground' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {st.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="min-h-[200px]">
+            {diveSubTab === 'pr' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {yr.pr.map((p: any, idx: number) => (
+                  <div key={idx} className="p-4 bg-black/40 rounded-xl border border-white/5">
+                    <div className="text-2xl mb-2">{p.i}</div>
+                    <div className="text-xs font-bold text-primary uppercase mb-1">{p.n}</div>
+                    <div className="text-[11px] text-muted-foreground">{p.d}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <AccordionContentWithPlayer text={activeSection.content} />
+            )}
+          </div>
+        </div>
       </div>
     );
   };
@@ -338,128 +414,119 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
       </div>
 
       <ScrollArea className="h-[700px] pr-4">
-        {activeTab === 'ov' && (
-          <div className="space-y-6 pb-20">
-            {renderYearSelector()}
-            {renderSynthesis()}
-            <div className="div h-[1px] bg-white/10 my-4" />
-            <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest">Critical Convergences</h3>
-            {renderConvergences()}
-          </div>
-        )}
-
-        {activeTab === 'dv' && (
-          <div className="space-y-6 pb-20">
-            {YEAR_DESCRIPTIONS[currentPY] && (
-              <div className="year-deep-dive">
-                <div className="p-6 bg-gradient-to-br from-primary/20 to-black rounded-2xl border border-primary/20 mb-6">
-                  <div className="year-num-big text-6xl font-bold text-primary mb-2">{currentPY}</div>
-                  <div className="text-2xl font-bold text-white mb-1">{YEAR_DESCRIPTIONS[currentPY].title}</div>
-                  <div className="text-sm italic text-muted-foreground mb-4">{YEAR_DESCRIPTIONS[currentPY].sub}</div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">{YEAR_DESCRIPTIONS[currentPY].planet}</Badge>
-                    <Badge 
-                      variant="outline" 
-                      className="cursor-pointer hover:bg-primary/10 border-primary/40 text-primary"
-                      onClick={() => setActiveTab('rf')}
-                    >
-                      {YEAR_DESCRIPTIONS[currentPY].phase}
-                    </Badge>
-                    <Badge variant="outline">{YEAR_DESCRIPTIONS[currentPY].chakra}</Badge>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <AccordionContentWithPlayer text={YEAR_DESCRIPTIONS[currentPY].overview} />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'wh' && (
-          <div className="space-y-6 pb-10">
-            <section className="text-center">
-              <h3 className="text-primary font-bold text-lg mb-4 font-serif uppercase tracking-widest">Celestial Bond Wheel</h3>
-              <ZodiacWheel birthSign={birthSign} />
-            </section>
-          </div>
-        )}
-
-        {activeTab === 'cy' && (
-          <div className="space-y-6 pb-10">
-            <PersonalYearChart
-              birthDay={d}
-              birthMonth={m}
-              birthYear={by}
-              onYearSelect={() => {}}
-            />
-          </div>
-        )}
-
-        {activeTab === 'mp' && (
-          <div className="space-y-6 pb-10 px-1">
-            <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest">12-Year Fate Map</h3>
-            {renderZodiacMap()}
-          </div>
-        )}
-
-        {activeTab === 'co' && (
-          <div className="space-y-6 pb-10">
-            <div className="codex-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-              {ANIMALS.map(a => {
-                const isDoc = ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake'].includes(a.n);
-                return (
-                  <button
-                    key={a.n}
-                    onClick={() => isDoc && setSelectedCodex(a.n)}
-                    className={`p-3 rounded-xl border transition-all ${selectedCodex === a.n ? 'border-primary bg-primary/10' : 'border-white/5 bg-black/40'} ${!isDoc && 'opacity-40'}`}
-                  >
-                    <div className="text-2xl mb-1">{a.e}</div>
-                    <div className="text-[8px] font-bold uppercase tracking-tight">{a.n}</div>
-                  </button>
-                );
-              })}
+        <div className="pb-24">
+          {activeTab === 'ov' && (
+            <div className="space-y-6">
+              {renderYearSelector()}
+              {renderSynthesis()}
+              <div className="div h-[1px] bg-white/10 my-4" />
+              <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest px-1">Critical Convergences</h3>
+              {renderConvergences()}
             </div>
-            {selectedCodex && (
-              <Card className="p-6 bg-black/60 border-primary/20 mt-4">
-                <h4 className="text-xl font-bold text-primary mb-4">{selectedCodex} Codex</h4>
-                <div className="space-y-4">
-                  <Accordion type="single" collapsible className="space-y-2">
-                    {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => {
-                      const txt = (BOOK.animals as any)[selectedCodex]?.[key];
-                      if (!txt) return null;
+          )}
+
+          {activeTab === 'dv' && renderYearDive()}
+
+          {activeTab === 'wh' && (
+            <div className="space-y-6">
+              <section className="text-center">
+                <h3 className="text-primary font-bold text-lg mb-4 font-serif uppercase tracking-widest">Celestial Bond Wheel</h3>
+                <ZodiacWheel birthSign={birthSign} />
+              </section>
+              <div className="div h-[1px] bg-white/10 my-8" />
+              <section>
+                <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Relationship Details</h3>
+                <Accordion type="single" collapsible className="space-y-2">
+                  {Object.entries(RELATIONS[birthSign as keyof typeof RELATIONS]).map(([type, name]) => {
+                    const names = Array.isArray(name) ? name : [name];
+                    return names.map(targetName => {
+                      const bookEntry = (BOOK.animals as any)[birthSign]?.[type];
+                      if (!bookEntry) return null;
+                      const targetAnimal = ANIMALS.find(a => a.n === targetName);
                       return (
-                        <AccordionItem key={key} value={key} className="glass-card px-4 border-0">
-                          <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">{key}</AccordionTrigger>
+                        <AccordionItem key={`${type}-${targetName}`} value={`${type}-${targetName}`} className="glass-card px-4 border-0">
+                          <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">
+                            {targetAnimal?.e} {targetName} • {type.toUpperCase()}
+                          </AccordionTrigger>
                           <AccordionContent>
-                            <AccordionContentWithPlayer text={txt} />
+                            <AccordionContentWithPlayer text={bookEntry} />
                           </AccordionContent>
                         </AccordionItem>
-                      )
-                    })}
-                  </Accordion>
-                </div>
-              </Card>
-            )}
-          </div>
-        )}
+                      );
+                    });
+                  })}
+                </Accordion>
+              </section>
+            </div>
+          )}
 
-        {activeTab === 'rf' && (
-          <div className="space-y-6 pb-10">
-            <div className="space-y-8">
-              <div className="pymg grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[1,2,3,4,5,6,7,8,9].map(n => {
-                  const p = YEAR_DESCRIPTIONS[n];
+          {activeTab === 'mp' && (
+            <div className="space-y-6 px-1">
+              <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest">12-Year Fate Map</h3>
+              <p className="text-xs text-muted-foreground italic mb-4">Click any box for specific personal intersection analysis.</p>
+              {renderZodiacMap()}
+            </div>
+          )}
+
+          {activeTab === 'co' && (
+            <div className="space-y-6">
+              <div className="codex-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {ANIMALS.map(a => {
+                  const isDoc = !!(BOOK.animals as any)[a.n];
                   return (
-                    <Card key={n} className={`p-4 bg-black/40 border-primary/10 ${n === 4 || n === 7 ? 'border-rose-500/30 bg-rose-950/5' : ''}`}>
-                      <div className="text-3xl font-bold text-primary mb-1">{n}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{p.title}</div>
-                      <div className="text-[9px] uppercase font-bold text-primary mb-2">{p.phase}</div>
-                      <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{p.desc}</p>
-                    </Card>
+                    <button
+                      key={a.n}
+                      onClick={() => isDoc && setSelectedCodex(a.n)}
+                      className={`p-3 rounded-xl border transition-all ${selectedCodex === a.n ? 'border-primary bg-primary/10' : 'border-white/5 bg-black/40'} ${!isDoc && 'opacity-40 cursor-not-allowed'}`}
+                    >
+                      <div className="text-2xl mb-1">{a.e}</div>
+                      <div className="text-[8px] font-bold uppercase tracking-tight">{a.n}</div>
+                    </button>
                   );
                 })}
               </div>
+              {selectedCodex && (
+                <Card className="p-6 bg-black/60 border-primary/20 mt-4">
+                  <h4 className="text-xl font-bold text-primary mb-4">{selectedCodex} Codex</h4>
+                  <div className="space-y-4">
+                    <Accordion type="single" collapsible className="space-y-2">
+                      {['self', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => {
+                        const txt = (BOOK.animals as any)[selectedCodex]?.[key];
+                        if (!txt) return null;
+                        return (
+                          <AccordionItem key={key} value={key} className="glass-card px-4 border-0">
+                            <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">{key}</AccordionTrigger>
+                            <AccordionContent>
+                              <AccordionContentWithPlayer text={txt} />
+                            </AccordionContent>
+                          </AccordionItem>
+                        )
+                      })}
+                    </Accordion>
+                  </div>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'rf' && (
+            <div className="space-y-6">
+              <section>
+                <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">The Nine-Year Cycle</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[1,2,3,4,5,6,7,8,9].map(n => {
+                    const p = YEAR_DESCRIPTIONS[n];
+                    return (
+                      <Card key={n} className={`p-4 bg-black/40 border-primary/10 ${n === 4 || n === 7 ? 'border-rose-500/30 bg-rose-950/5' : ''}`}>
+                        <div className="text-3xl font-bold text-primary mb-1">{n}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{p.title}</div>
+                        <div className="text-[9px] uppercase font-bold text-primary mb-2">{p.phase}</div>
+                        <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{p.overview}</p>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </section>
               <div className="div h-[1px] bg-white/10 my-8" />
               <section>
                 <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Six Categories - Foundation</h3>
@@ -467,7 +534,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                   {['ben_ming', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
                     <AccordionItem key={key} value={key} className="glass-card px-4 border-0">
                       <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">
-                        {key === 'ben_ming' ? 'Ben Ming Nian' : key === 'clash' ? 'Direct Clash' : key === 'harm' ? 'Harm' : key === 'destroy' ? 'Destruction' : key === 'alliance' ? 'Alliance' : 'Neutral'}
+                        {key.replace('_', ' ').toUpperCase()}
                       </AccordionTrigger>
                       <AccordionContent>
                         <AccordionContentWithPlayer text={(BOOK.foundation as any)[key]} />
@@ -477,8 +544,8 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                 </Accordion>
               </section>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </ScrollArea>
     </div>
   );
