@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AstroInsightOutput, NumerologyData } from './types';
 import { ANIMALS, RELATIONS, CAT_META, LIFESTAGES } from '@/lib/cosmic-fate/constants';
 import { YEAR_DESCRIPTIONS } from '@/lib/cosmic-fate/oracle-data';
@@ -14,18 +14,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { 
-  Sparkles, Star, MapIcon, BookOpen, Info, CalendarDays, 
-  ChevronDown, Layers, BookUser, History, AlertTriangle, 
-  Users, Activity, Wand2, Globe
+  Sparkles, Star, MapIcon, Info, CalendarDays, 
+  ChevronDown, Layers, BookUser, Activity
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PersonalYearChart } from './personal-year-chart';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 const TABS = [
   { id: 'ov', name: 'Oracle', icon: Sparkles },
@@ -108,6 +106,27 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const PM = useMemo(() => reduce(currentPY + currentMonth), [currentPY, currentMonth]);
   const lpName = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
 
+  const getIntersectionNarrative = (pyNum: number, cat: string, yearAnimalName: string) => {
+    const ba = BOOK.animals[birthSign] as any;
+    if (pyNum === 4) {
+      if (cat === 'clash') return `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearAnimalName} year's forced disruption, creating a year when every structure you attempt to build meets maximum environmental resistance. The karmic invitation: use Rahu's building energy not to resist the Clash year's forced movement but to build the internal foundations — psychological resilience, spiritual groundedness, practical contingency systems — that make you genuinely mobile rather than frantically rootless. Do not attempt to build permanent structures this year; build portable ones. Financial reserves over fixed investments. Transferable skills over institutional positioning. Psychological stability over social status. The Clash year will move things regardless; your Year 4 work is to ensure that what moves carries your genuine foundation with it rather than leaving it behind.\n\nSpecific to ${birthSign}/${yearAnimalName}: ${ba?.clash || ''}`;
+      if (cat === 'harm') return `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion: while Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build before it can be completed. This is the configuration where workaholism is most dangerous — the compulsive Year 4 building impulse creating elaborate structures that the Harm year's concealed forces are simultaneously destabilizing. The specific risk: trusted colleagues or business partners with hidden agendas at precisely the moment when you are most invested in collaborative structural projects. Year 4 foundation work should be primarily solo or with your most thoroughly verified relationships during this year. Avoid large structural financial commitments that depend on others' reliability.\n\nSpecific dynamics: ${ba?.harm || ''}`;
+      if (cat === 'destroy') return `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation: the very foundations you are working to build are subject to unexpected structural failures from within. This is the year when old structures that have been maintained through inertia rather than genuine viability finally collapse — often at the moment of most inconvenient timing, precisely when Year 4's energy has you most invested in building. The Chaldean 13/4 resonance is strongest in this configuration: regeneration through upheaval, transformation forced by structural collapse. Work with this rather than against it: deliberately review all existing structures (financial, relational, professional, physical) for those that are maintained through inertia rather than genuine value, and release them proactively before the Destruction year's energy collapses them reactively.\n\nSpecific dynamics: ${ba?.destroy || ''}`;
+      if (cat === 'self') return `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian — the intensification of your natal sign's energy. This creates a year when your characteristic patterns are simultaneously amplified to maximum expression and subjected to maximum structural pressure. Your ${birthSign} nature's most compulsive tendencies will emerge most strongly precisely in the domains where Year 4 is calling you to build most deliberately. The invitation: use Ben Ming Nian's heightened self-awareness as a diagnostic tool. The patterns that emerge most compulsively this year are exactly the patterns whose sublimation into conscious discipline would produce the strongest foundation.\n\nSpecific dynamics: ${ba?.self || ''}`;
+      if (cat === 'alliance') return `Personal Year 4's foundation-building receives the unusual gift of alliance support — the most favorable configuration for Year 4 in your Chinese zodiac cycle. ${yearAnimalName} year's harmonious energy reduces the friction that Year 4's structural work typically encounters, making it easier to find reliable collaborators, establish stable institutional relationships, and build foundations that are supported rather than undermined by the environmental energy.\n\nAlliance dynamics: ${ba?.alliance || ''}`;
+      return `Personal Year 4's foundation-building discipline proceeds in a ${yearAnimalName} Neutral year — neither amplified by alliance support nor undermined by conflict energy. This allows Year 4's structural work to proceed primarily through your own effort and discernment rather than through environmental support or resistance. The advantage: your Year 4 foundations this year reflect your genuine capacity rather than exceptional circumstances in either direction.`;
+    }
+    if (pyNum === 7) {
+      if (cat === 'clash') return `The most spiritually dissonant configuration in your cycle: Personal Year 7's requirement for interior solitude and contemplative withdrawal coincides with your Direct Clash year's maximum external pressure and forced movement. Ketu's pull toward inner silence confronts ${yearAnimalName} year's unavoidable disruption and change. The world is demanding movement and response precisely when your soul requires stillness and inward turning.\n\nSpecific dynamics: ${ba?.clash || ''}`;
+      if (cat === 'harm') return `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion — creating a configuration where the solitude Year 7 genuinely requires is simultaneously being enforced by relationship betrayals and authority miscommunications that make social engagement feel increasingly unsafe. The practice of this intersection year is choosing the interior work that the circumstances are enforcing, transforming reactive isolation into genuine contemplative retreat.\n\nSpecific dynamics: ${ba?.harm || ''}`;
+      if (cat === 'destroy') return `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation — creating the most internally turbulent Year 7 possible. The structures that provide the container for contemplative practice (stable living situation, reliable relationships, financial security) may be destabilized by the Destruction year's energy precisely when Year 7's inner work requires external stability as its foundation.\n\nSpecific dynamics: ${ba?.destroy || ''}`;
+      if (cat === 'self') return `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian — creating a year of maximum identity amplification during precisely the year when Ketu is asking you to release identification with the very identity being amplified.\n\nSpecific dynamics: ${ba?.self || ''}`;
+      if (cat === 'alliance') return `Personal Year 7's contemplative interior work receives the unusual gift of Chinese zodiac alliance support — meaning the environmental energy facilitates rather than disrupts the Year 7 retreat. This is your most supported Year 7, where the external circumstances actually create space and support for the interior work Ketu calls for.\n\nAlliance dynamics: ${ba?.alliance || ''}`;
+      return `Personal Year 7's contemplative withdrawal proceeds in a ${yearAnimalName} Neutral year — neither supported nor undermined by exceptional Chinese zodiac energy. The interior work this Year 7 calls for is primarily between you and the depth that Ketu is activating.`;
+    }
+    return `In ${readYear}, your ${birthSign} nature interacts with the ${yearAnimalName} year in a ${catLabel(cat)} configuration. This occurs during your Personal Year ${pyNum} (${YEAR_DESCRIPTIONS[pyNum]?.title}). This window favors steady progress through ${cat === 'alliance' ? 'supported collaboration' : 'individual initiative'}.`;
+  };
+
   const renderYearSelector = () => (
     <Collapsible
       open={isYearSelectorOpen}
@@ -185,8 +204,10 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
     return (
       <Card className="p-6 bg-slate-900/60 border border-primary/20 relative">
-        <h4 className="font-serif text-[0.65rem] tracking-[0.3em] uppercase text-primary/80 mb-4">✦ Oracle Synthesis</h4>
-        <AccordionContentWithPlayer text={synthText} />
+        <div className="flex flex-col gap-2">
+          <h4 className="font-serif text-[0.65rem] tracking-[0.3em] uppercase text-primary/80 mb-2">✦ Oracle Synthesis</h4>
+          <AccordionContentWithPlayer text={synthText} />
+        </div>
       </Card>
     );
   };
@@ -211,19 +232,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
         {hits.map((h, i) => {
           const cm = CAT_META[h.rt];
           const pi = YEAR_DESCRIPTIONS[h.p];
-          
-          let narrative = '';
-          if (h.p === 4) {
-            if (h.rt === 'clash') narrative = `Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year. Rahu's compulsive building drive collides with ${h.ys.n} year's forced disruption. The compound pressure forges character when accepted; destroys foundations when resisted.`;
-            else if (h.rt === 'harm') narrative = `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion. While Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build.`;
-            else if (h.rt === 'destroy') narrative = `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation. This is the year when old structures maintained through inertia finally collapse.`;
-            else if (h.rt === 'self') narrative = `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian intensification. Your nature's most compulsive tendencies emerge most strongly in the domains where Year 4 calls for discipline.`;
-          } else {
-            if (h.rt === 'clash') narrative = `Personal Year 7's requirement for interior solitude coincides with your Direct Clash year's maximum external pressure. The world demands movement precisely when your soul requires stillness.`;
-            else if (h.rt === 'harm') narrative = `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion. The solitude Year 7 requires is being enforced by relationship betrayals.`;
-            else if (h.rt === 'destroy') narrative = `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation. Discovery whether your practice can proceed without external scaffolding.`;
-            else if (h.rt === 'self') narrative = `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian. Releasing identification with the very identity being amplified.`;
-          }
+          const narrative = getIntersectionNarrative(h.p, h.rt, h.ys.n);
 
           return (
             <Card key={i} className={`p-6 border-l-4 ${h.rt === 'clash' || h.rt === 'self' ? 'border-rose-500 bg-rose-950/10' : 'border-amber-500 bg-amber-950/10'} w-full overflow-hidden`}>
@@ -242,7 +251,8 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   const renderZodiacMap = () => {
     const years = [];
-    for (let y = curYear; y < curYear + 12; y++) {
+    const startYear = readYear;
+    for (let y = startYear; y < startYear + 12; y++) {
       const ya = getSign(y);
       const cat = getRel(ya.n);
       const pyNum = getPY(d, m, y);
@@ -271,16 +281,16 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     }
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-full">
         {years.map((y, i) => (
           <Popover key={i}>
             <PopoverTrigger asChild>
               <div 
-                className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${y.rowClass} flex flex-col items-center text-center`}
+                className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${y.rowClass} flex flex-col items-center text-center overflow-hidden h-40`}
               >
                 <div className="text-3xl mb-1">{y.animal.e}</div>
                 <div className="font-bold text-xl text-white">{y.year}</div>
-                <div className="text-[10px] uppercase font-bold text-primary mb-1">{catLabel(y.cat)}</div>
+                <div className="text-[10px] uppercase font-bold text-primary mb-1 truncate w-full">{catLabel(y.cat)}</div>
                 <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${y.py === 4 || y.py === 7 ? 'bg-rose-500/20 text-rose-400' : 'bg-primary/20 text-primary'}`}>
                     {y.py}
@@ -298,7 +308,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                   Personal Year {y.py} • {catLabel(y.cat)}
                 </div>
                 <AccordionContentWithPlayer 
-                  text={`In ${y.year}, your ${birthSign} nature interacts with the ${y.animal.n} year in a ${catLabel(y.cat)} configuration. This occurs during your Personal Year ${y.py} (${YEAR_DESCRIPTIONS[y.py]?.title}). ${y.confluence.includes('Tension') ? 'This is a period of high pressure requiring disciplined restraint.' : 'This window favors steady progress.'}`} 
+                  text={getIntersectionNarrative(y.py, y.cat, y.animal.n)} 
                 />
               </div>
             </PopoverContent>
@@ -307,93 +317,6 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
       </div>
     );
   };
-
-  const renderDeepRead = () => {
-    return (
-      <div className="space-y-6">
-        <section>
-          <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Foundational Principles</h3>
-          <Accordion type="single" collapsible className="space-y-2">
-            <AccordionItem value="p1" className="glass-card px-4 border-0">
-              <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">1.1.1 Earthly Branches</AccordionTrigger>
-              <AccordionContent><AccordionContentWithPlayer text={BOOK.foundation.principles} /></AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="p2" className="glass-card px-4 border-0">
-              <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">1.1.2 Tai Sui Nature</AccordionTrigger>
-              <AccordionContent><AccordionContentWithPlayer text={BOOK.foundation.taisui} /></AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="p3" className="glass-card px-4 border-0">
-              <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">1.1.3 Modern Analysis</AccordionTrigger>
-              <AccordionContent><AccordionContentWithPlayer text={BOOK.foundation.interp} /></AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </section>
-
-        <section>
-          <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Life-Age Recurrence Map</h3>
-          <div className="tl-wrap border-l-2 border-primary/20 ml-4 pl-6 space-y-6">
-            {Object.entries(LIFESTAGES).map(([age, label]) => {
-              const evYr = by + parseInt(age);
-              return (
-                <div key={age} className="relative">
-                  <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-primary/40 border-2 border-primary" />
-                  <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Age {age} · {evYr}</div>
-                  <div className="text-sm font-serif text-white">{label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </div>
-    );
-  };
-
-  const renderRef = () => (
-    <div className="space-y-8">
-      <div className="pymg grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {[1,2,3,4,5,6,7,8,9].map(n => {
-          const p = YEAR_DESCRIPTIONS[n];
-          return (
-            <Card key={n} className={`p-4 bg-black/40 border-primary/10 ${n === 4 || n === 7 ? 'border-rose-500/30 bg-rose-950/5' : ''}`}>
-              <div className="text-3xl font-bold text-primary mb-1">{n}</div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{p.title}</div>
-              <div 
-                className="text-[9px] uppercase font-bold text-primary cursor-pointer hover:underline mb-2"
-                onClick={() => {
-                  const el = document.getElementById(`tp-ov`);
-                  if (el) {
-                    setActiveTab('dv');
-                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
-                  }
-                }}
-              >
-                {p.phase} →
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{p.desc}</p>
-            </Card>
-          );
-        })}
-      </div>
-      
-      <div className="div h-[1px] bg-white/10 my-8" />
-      
-      <section>
-        <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Six Categories - Foundation</h3>
-        <Accordion type="single" collapsible className="space-y-2">
-          {['ben_ming', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
-            <AccordionItem key={key} value={key} className="glass-card px-4 border-0">
-              <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">
-                {key === 'ben_ming' ? 'Ben Ming Nian' : key === 'clash' ? 'Direct Clash' : key === 'harm' ? 'Harm' : key === 'destroy' ? 'Destruction' : key === 'alliance' ? 'Alliance' : 'Neutral'}
-              </AccordionTrigger>
-              <AccordionContent>
-                <AccordionContentWithPlayer text={(BOOK.foundation as any)[key]} />
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </section>
-    </div>
-  );
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 font-serif max-w-full overflow-x-hidden">
@@ -445,7 +368,9 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                     <Badge variant="outline">{YEAR_DESCRIPTIONS[currentPY].chakra}</Badge>
                   </div>
                 </div>
-                <AccordionContentWithPlayer text={YEAR_DESCRIPTIONS[currentPY].overview} />
+                <div className="flex flex-col gap-2">
+                  <AccordionContentWithPlayer text={YEAR_DESCRIPTIONS[currentPY].overview} />
+                </div>
               </div>
             )}
           </div>
@@ -475,12 +400,6 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
           <div className="space-y-6 pb-10 px-1">
             <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest">12-Year Fate Map</h3>
             {renderZodiacMap()}
-          </div>
-        )}
-
-        {activeTab === 'dr' && (
-          <div className="space-y-6 pb-10">
-            {renderDeepRead()}
           </div>
         )}
 
@@ -527,11 +446,40 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
         {activeTab === 'rf' && (
           <div className="space-y-6 pb-10">
-            {renderRef()}
+            <div className="space-y-8">
+              <div className="pymg grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[1,2,3,4,5,6,7,8,9].map(n => {
+                  const p = YEAR_DESCRIPTIONS[n];
+                  return (
+                    <Card key={n} className={`p-4 bg-black/40 border-primary/10 ${n === 4 || n === 7 ? 'border-rose-500/30 bg-rose-950/5' : ''}`}>
+                      <div className="text-3xl font-bold text-primary mb-1">{n}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{p.title}</div>
+                      <div className="text-[9px] uppercase font-bold text-primary mb-2">{p.phase}</div>
+                      <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{p.desc}</p>
+                    </Card>
+                  );
+                })}
+              </div>
+              <div className="div h-[1px] bg-white/10 my-8" />
+              <section>
+                <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Six Categories - Foundation</h3>
+                <Accordion type="single" collapsible className="space-y-2">
+                  {['ben_ming', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
+                    <AccordionItem key={key} value={key} className="glass-card px-4 border-0">
+                      <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">
+                        {key === 'ben_ming' ? 'Ben Ming Nian' : key === 'clash' ? 'Direct Clash' : key === 'harm' ? 'Harm' : key === 'destroy' ? 'Destruction' : key === 'alliance' ? 'Alliance' : 'Neutral'}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <AccordionContentWithPlayer text={(BOOK.foundation as any)[key]} />
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </section>
+            </div>
           </div>
         )}
       </ScrollArea>
     </div>
   );
 }
-
