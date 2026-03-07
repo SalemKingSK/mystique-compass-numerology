@@ -180,7 +180,7 @@
 .btn-reveal { display:block; width:100%; max-width:280px; margin:0 auto; background:linear-gradient(135deg,#6a5220,#c8a84b,#6a5220); background-size:200% 100%; border:none; border-radius:10px; padding:13px 24px; color:var(--cf-void); font-family:'Cinzel', serif; font-size:.82rem; font-weight:600; letter-spacing:.22em; text-transform:uppercase; cursor:pointer; transition:all .3s; box-shadow:0 4px 24px rgba(200,168,75,.28); }
 .btn-reveal:hover { background-position:100% 0; box-shadow:0 6px 36px rgba(200,168,75,.52); transform:translateY(-2px); }
 
-.tts-btn { display:inline-flex; align-items:center; gap:6px; background:rgba(200,168,75,0.1); border:1px solid rgba(200,168,75,0.22); border-radius:20px; padding:4px 12px; cursor:pointer; font-family:'Cinzel', serif; font-size:.55rem; letter-spacing:.15em; text-transform:uppercase; color:var(--cf-gold-dim); transition:all 0.2s; margin-top:12px; }
+.tts-btn { display:inline-flex; align-items:center; gap:6px; background:rgba(200,168,75,0.1); border:1px solid rgba(200,168,75,0.22); border-radius:20px; padding:4px 12px; cursor:pointer; font-family:'Cinzel', serif; font-size:.55rem; letter-spacing:.1em; text-transform:uppercase; color:var(--cf-gold-dim); transition:all 0.2s; margin-top:12px; }
 .tts-btn:hover { background:rgba(200,168,75,0.2); color:var(--cf-gold); border-color:rgba(200,168,75,0.4); }
 .tts-btn.playing { background:rgba(200,168,75,0.2); color:var(--cf-gold); border-color:rgba(200,168,75,0.5); animation:pulse-tts-cf .8s ease-in-out infinite alternate; }
 .tts-icon { font-size:.8rem; }
