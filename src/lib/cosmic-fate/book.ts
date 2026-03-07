@@ -1,197 +1,106 @@
+/**
+ * @fileOverview Verbatim knowledge base from "The Chinese Zodiac: Six Categories of Years Across the Perpetual 12-Year Cycle"
+ */
 
 export const BOOK = {
   foundation: {
-    ben_ming: `1.1.1 Fundamental Meaning
-Ben Ming Nian represents the most personally significant cyclical event in Chinese zodiac astrology, occurring when an individual's birth animal sign aligns precisely with the current year's governing sign. This alignment creates what traditional sources describe as "值太岁" (Zhi Tai Sui)—literally "sitting with the Tai Sui" or "occupying the same position as the annual deity" . The phenomenon manifests every twelve years, marking complete zodiac cycle returns that carry extraordinary weight in personal destiny calculation.
+    principles: `1.1 The Earthly Branch System and Zodiac Interactions
+1.1.1 The Twelve Earthly Branches and Their Animal Correspondences
+The Chinese zodiac operates through a sophisticated framework of twelve Earthly Branches (地支, dizhi), each permanently associated with one of twelve animal signs: Zi (子)-Rat, Chou (丑)-Ox, Yin (寅)-Tiger, Mao (卯)-Rabbit, Chen (辰)-Dragon, Si (巳)-Snake, Wu (午)-Horse, Wei (未)-Goat, Shen (申)-Monkey, You (酉)-Rooster, Xu (戌)-Dog, and Hai (亥)-Pig. This correspondence forms the mathematical foundation for all zodiac calculations, with each branch carrying specific elemental associations (Wood, Fire, Earth, Metal, Water) and yin-yang polarities that determine how signs interact with annual energies.
 
-The fundamental nature of this category transcends simplistic "bad luck" characterizations prevalent in popular culture. Contemporary analysis, particularly from Imperial strategic perspectives, reframes Ben Ming Nian as a period of exceptional opportunity contingent upon disciplined execution . The mechanism involves what practitioners term "heightened exposure"—a state where personal energy fields become exceptionally permeable to cosmic temporal forces, creating compressed feedback loops between intention and manifestation . This exposure operates bidirectionally: positive alignments yield disproportionately favorable results, while impulsive decisions or poorly timed initiatives encounter equally magnified negative consequences.
+The spatial arrangement of these branches in a circular formation creates predictable geometric relationships. Opposite positions (six branches apart, 180 degrees) generate Direct Clash; specific angular separations create Harm and Destruction relationships; triangular groupings form San He (三合) alliances; and particular pairings establish Liu He (六合) connections. This geometric-energetic architecture ensures that the six year categories apply universally across all twelve signs with mathematical precision, repeating every twelve years throughout an individual's lifetime.`,
+    taisui: `1.1.2 The Cyclical Nature of Tai Sui (太岁) and Annual Influences
+Tai Sui (太岁), the Grand Duke Jupiter, represents the annual governing deity that rotates through the twelve Earthly Branches in perfect synchronization with the zodiac cycle. Originally derived from astronomical observation of Jupiter's approximately twelve-year orbital period, Tai Sui has evolved into a comprehensive system of annual fortune analysis. Each year's specific Tai Sui carries distinct characteristics: the 2026 Bingwu (丙午) Year of the Horse is governed by Tai Sui General Wen Zhe (文哲将军), while the 2027 Dingwei (丁未) Year of the Goat will see Tai Sui General Miao Bing (繆丙将军) assume responsibility.
 
-The traditional formulation "太岁当头坐，无喜必有祸" (When Tai Sui sits above, without joy there must be calamity) captures this dual-edged dynamic . The "value" aspect implies that one's actions, presence, and decisions acquire enhanced resonance within the cosmic field—what modern systems theory might describe as "sensitive dependence conditions" where small inputs generate nonlinear outputs . The twelve-year cycle thus creates natural rhythm points for life review and recalibration, with Ben Ming Nian serving as the peak of this introspective and potentially transformative period.
+The relationship between personal birth branch and annual Tai Sui determines year category classification. When branches align perfectly, Ben Ming Nian (值太岁) occurs; when directly opposed (180 degrees), Direct Clash (冲太岁) manifests; when in specific harmful configurations, Harm (害太岁) emerges; when in destructive relationships, Destruction (破太岁) applies; when in harmonious triangular or paired arrangements, Alliance years (三合/六合) bring support; and when no special relationship exists, Neutral years (平年) provide steady conditions.`,
+    interp: `1.1.3 Traditional versus Modern Interpretations of Zodiac Year Classifications
+Traditional interpretation treats the six categories as deterministic cosmic influences requiring specific ritual responses. Classical texts prescribe: An Tai Sui (安太岁) temple ceremonies for challenging years; red color wearing (especially undergarments) during Ben Ming Nian; directional avoidance (e.g., Rats avoiding south in Horse years); behavioral taboos (postponing marriage, relocation, major investments); and charitable deeds to accumulate merit.
 
-1.1.2 Manifestation Characteristics
-The manifestation profile of Ben Ming Nian operates through three interconnected mechanisms:
-- Recognition Acceleration: Achievements gain rapid visibility; errors attract swift consequences (Underlying Mechanism: Amplified energetic resonance with annual governing force).
-- Scrutiny Intensification: Heightened attention from authority figures, institutions, and social networks (Underlying Mechanism: Direct energetic conduit between personal and annual Tai Sui).
-- Outcome Magnification: Both positive and negative results achieve greater magnitude than comparable actions in neutral years (Underlying Mechanism: Compressed karma—reduced lag between cause and effect).
+Modern interpretation increasingly emphasizes psychological and strategic dimensions. Challenging years are reframed as risk-amplification periods requiring enhanced vigilance and contingency planning rather than inevitable misfortune. Ben Ming Nian becomes a scheduled life-review opportunity; Direct Clash years force necessary transformations that might otherwise stagnate; Harm years highlight trust vulnerabilities demanding systematic verification; Destruction years expose structural weaknesses requiring preventive maintenance; Alliance years reduce friction costs for well-prepared initiatives; and Neutral years provide essential consolidation space for sustainable performance.`,
+    ben_ming: `1.2.1 Ben Ming Nian (本命年 / 值太岁): The Year of One's Birth Sign
+Ben Ming Nian (本命年), also Zhi Tai Sui (值太岁), occurs when annual zodiac matches birth sign—every twelve years at ages 12, 24, 36, 48, 60, 72, 84. The classical formulation "太岁当头坐，无喜必有祸" (When Tai Sui sits above, without joy there must be misfortune) captures its dual potential: intensified energy amplifies both achievement and vulnerability.
 
-Professional manifestations feature accelerated career trajectories where promotions, demotions, or dramatic role changes occur with unusual speed and finality. Financial patterns demonstrate amplified volatility—not in market conditions per se, but in personal financial decision-making. Relationship dynamics intensify proportionally, with existing partnerships either solidifying through shared experience or fracturing under accumulated pressure.
+Traditional characteristics include: emotional volatility from resonant native energy; health vulnerability in element-associated organ systems; relationship turbulence as heightened sensitivity produces both deeper intimacy and more frequent conflict; career obstacles with recognition delays; and financial instability with unexpected expenses. Protective measures emphasize: red color wearing (undergarments, belts, accessories) to activate balancing Fire element; An Tai Sui rituals establishing formal relationship with annual deity; avoidance of major decisions (marriage, property, career change); enhanced health screening; and charitable activities to redistribute accumulated energy.
 
-1.1.3 Strategic Response
-- Discipline: Meticulous preparation, conservative commitment, quality-over-quantity emphasis ("Rather than pursuing speed, look at the bigger picture").
-- Precision: Thorough documentation, explicit communication, systematic execution ("Accuracy in all endeavors substantially outweighs speed").
-- Restraint: Deferment of major life changes where possible, enhanced due diligence when unavoidable ("Avoid impulsive decisions, advance steadily").`,
-    clash: `1.2.1 Fundamental Meaning
-Direct Clash, or "冲太岁" (Chong Tai Sui), represents the most confrontational relationship in the six-category system. This condition occurs when an individual's birth zodiac animal stands in direct opposition to the current year's animal—precisely six positions apart in the twelve-animal cycle . The structural basis creates maximum energetic incompatibility: the "相冲" (mutual clash) relationships—Rat-Horse, Ox-Goat, Tiger-Monkey, Rabbit-Rooster, Dragon-Dog, Snake-Pig—represent elemental and directional oppositions that cannot coexist harmoniously .
+Modern reframing treats Ben Ming Nian as natural developmental transition points. The 12-year intervals coincide with established life-stage tasks: adolescence (12), emerging adulthood (24), career consolidation (36), midlife reassessment (48), retirement transition (60), and elder wisdom integration (72). Strategic engagement emphasizes: structured self-assessment with explicit goal review; identity consolidation clarifying values and priorities; support system strengthening before crises emerge; and intentional rather than reactive decision-making.`,
+    clash: `1.2.2 Direct Clash Years (冲太岁): Opposition and Confrontation
+Direct Clash years (冲太岁, Chong Tai Sui) occur when annual branch stands six positions opposite (180 degrees) from birth branch, creating maximum energetic confrontation. The six clash pairs are: Rat-Horse (子午冲, Water-Fire), Ox-Goat (丑未冲, Earth-Earth polarization), Tiger-Monkey (寅申冲, Wood-Metal), Rabbit-Rooster (卯酉冲, Wood-Metal), Dragon-Dog (辰戌冲, Earth-Earth), and Snake-Pig (巳亥冲, Fire-Water).
 
-The fundamental meaning encompasses forced transformation through disruption. Unlike Ben Ming Nian's amplification of existing conditions, Direct Clash fundamentally restructures them. The traditional characterization emphasizes "变动" (change), "转折" (turning points), and "突发调整" (sudden adjustments) . Contemporary interpretation recognizes that the forced changes characteristic of this category, while potentially disruptive, also eliminate stagnation and compel growth that comfortable conditions might not inspire .
+Traditional interpretation emphasizes sudden, dramatic disruption: forced relocation, unexpected career termination, relationship dissolution, health crises, and financial volatility. The "冲" (clash) character suggests violent, unavoidable encounter with opposing forces. Classical advice focuses on "using movement to respond to movement"—proactive travel or strategic change rather than resistance—and extensive protective rituals.
 
-1.2.2 Manifestation Characteristics
-- Career: Involuntary transitions, organizational restructuring, rapid skill adaptation ("各类人生大事的转变，尤其是事业、感情变化").
-- Geography: Physical mobility, relocation, environmental change ("冲" energy translates literally into movement).
-- Relationships: Accelerated decision points, polarization, commitment or separation urgency (Partnerships face "make or break" junctures).
-- Financial: Income stream volatility, investment timing sensitivity, liquidity demands ("稳字当头" (stability as paramount) emphasized).
-- Health: Stress-related conditions, accident susceptibility, sleep disruption (Particular risk in travel and movement contexts).
+Modern strategic interpretation reframes clash years as periods of necessary transformation where external pressure clears accumulated stagnation. Management strategies include: comprehensive contingency planning with multiple scenarios; skill diversification enabling rapid pivoting; network maintenance providing transition support; financial reserves absorbing income interruption; and psychological reframing of disruption as accelerated learning.`,
+    harm: `1.2.3 Harm Years (害太岁): Covert Damage and Betrayal
+Harm years (害太岁, Hai Tai Sui) operate through concealed mechanisms rather than overt confrontation, making them particularly insidious. The six harm pairs are: Rat-Goat (子未害, Water-Earth absorption), Ox-Horse (丑午害, Earth-Fire smothering), Tiger-Snake (寅巳害, Wood-Fire tension), Rabbit-Dragon (卯辰害, Wood-Earth subjugation), Monkey-Pig (申亥害, Metal-Water corrosion), and Rooster-Dog (酉戌害, Metal-Earth burial).
 
-The kinetic dimension of Direct Clash deserves special attention: the opposition pattern manifests as literal movement, with travel, commuting, and environmental change all intensifying during these periods.
+Traditional characteristics include: betrayal by trusted associates with hidden grievances; miscommunication with authority figures damaging career trajectory; gradual financial drain through unexamined expenses or exploitative relationships; chronic health deterioration with asymptomatic development; and project failure through overlooked details emerging at critical moments. The "害" (harm) character suggests injury from apparent safety, damage through intimacy.
 
-1.2.3 Strategic Response
-- Adaptability: Multiple contingency options, transferable skills, portable assets ("主动应对变化" (proactively responding to change)).
-- Documentation: Comprehensive record-keeping, formal process adherence, written evidence (Protection against disputes in unstable conditions).
-- Network Cultivation: Diversified social capital, benefactor relationships, assistance access ("贵人" (helpful people) for unexpected support).
-- Temporal Management: Strategic pacing, favorable date selection, scenario planning ("择吉" (date selection) for systematic optimization).`,
-    harm: `1.3.1 Fundamental Meaning
-Harm, or "害太岁" (Hai Tai Sui), also known as "穿太岁" (Chuan Tai Sui / Piercing Tai Sui), occupies a distinctive position in the six-category framework as the category of hidden resistance and subtle obstruction . Unlike Direct Clash's visible confrontation or Ben Ming Nian's amplified visibility, Harm operates through concealment—obstacles emerging from unexpected sources, progress impeded by forces that resist identification.
+Modern approaches translate traditional warnings into systematic risk management: enhanced due diligence with independent verification; documentation protocols creating objective records; relationship auditing identifying unaddressed tensions; diversified information sources preventing echo chambers; and early warning systems detecting gradual deterioration.`,
+    destroy: `1.2.4 Destruction Years (破太岁): Rupture and Financial Loss
+Destruction years (破太岁, Po Tai Sui) are characterized by fragmentation, dissolution, and structural failure. The six destruction pairs are: Rat-Rooster (子酉破, Water-Metal dissolution), Ox-Dragon (丑辰破, Wet-Dry Earth conflict), Tiger-Pig (寅亥破, Wood-Water overnourishment), Rabbit-Horse (卯午破, Wood-Fire consumption), Snake-Monkey (巳申破, Fire-Metal corrosion), and Goat-Dog (未戌破, Dry-Wet Earth conflict).
 
-The structural basis involves complex antagonistic relationships between zodiac animals that lack the clean opposition of Direct Clash. The "相害" (mutual harm) relationships—Rat-Goat, Ox-Horse, Tiger-Snake, Rabbit-Dragon, Monkey-Pig, Rooster-Dog—create "六害" (six harm) or "六穿" (six piercings) patterns . These pairings represent elemental and directional tensions that generate friction without resolution—what might be described as entanglement rather than collision.
+Traditional interpretation emphasizes: partnership dissolution through accumulated incompatibility; unexpected major expenses depleting reserves; project failure near completion from structural weaknesses; investment losses from overconfidence; and reputation damage through association with failing enterprises. The "破" (destruction) character suggests breaking, rupture, rendering useless—established patterns disrupted beyond repair.
 
-The fundamental meaning centers on "陷害、危害" (entrapment, harm)—deliberate or systemic interference that undermines objectives without direct confrontation . The mechanism resembles "hidden punishment" or "concealed injury": interactions between Earthly Branches that generate negative outcomes without clear causality .
+Modern mitigation emphasizes proactive structural reinforcement: comprehensive contract review with legal consultation; emergency reserve accumulation beyond standard recommendations; system simplification reducing complexity and interdependence; preventive maintenance addressing wear before failure; and graceful exit preparation preserving long-term connection potential even when specific collaborations terminate.`,
+    alliance: `1.2.5 Alliance Years (三合 / 六合): Harmonious Support and Prosperity
+Alliance years comprise two distinct harmonious relationships: San He (三合, Triple Harmony) and Liu He (六合, Six Harmonies).
 
-1.3.2 Manifestation Characteristics
-- Project Delays: Near-completion reversal, inexplicable timeline extension, resource access difficulties (Frustration, self-doubt, premature abandonment risk).
-- Recognition Dilution: Delayed acknowledgment, attribution to others, contribution invisibility (Cumulative discouragement, motivation erosion).
-- Interpersonal Misunderstanding: Communication distortion, collaborative friction, trust erosion (Relationship drift, network contraction).
-- Financial Irregularity: Cash flow timing problems, investment timing difficulties, expense acceleration (Anxiety, planning difficulty, liquidity pressure).
+San He alliances form elemental triads: Monkey-Rat-Dragon (Water), Snake-Rooster-Ox (Metal), Tiger-Horse-Dog (Fire), and Pig-Rabbit-Goat (Wood). These create broad-based, multi-directional support for complex undertakings requiring diverse resources. For any sign, two San He years occur in each 12-year cycle.
 
-The insidious quality of Harm makes it particularly challenging: the absence of clear confrontation may delay recognition that negative patterns are systematically present.
+Liu He alliances create optimal yin-yang pairings: Rat-Ox, Tiger-Pig, Rabbit-Dog, Dragon-Rooster, Snake-Monkey, Horse-Goat. These represent singular, deeply significant connections that can transform life circumstances. For any sign, one Liu He year occurs in each 12-year cycle.
 
-1.3.3 Strategic Response
-- Patience: Extended timelines, persistence despite delayed feedback, milestone-based review ("步步为营" (advance step by step)).
-- Documentation: Pattern identification records, factual establishment, external perspective cultivation ("少卷入口舌是非" (avoiding involvement in discord)).
-- Verification: Multi-source information, explicit confirmation protocols, assumption testing ("反复确认" (repeated confirmation) of agreements).
-- Network Intelligence: Diverse information sources, synthesis capacity, actual condition assessment ("小人" (petty people) awareness).`,
-    destroy: `1.4.1 Fundamental Meaning
-Destruction, or "破太岁" (Po Tai Sui), represents the category of fragmentation, disruption, and dissolution of established patterns . The fundamental meaning encompasses "破坏、破损" (destruction, damage)—the breakdown of structures, relationships, and plans that have achieved apparent stability . Where Direct Clash generates opposition and Harm creates concealed resistance, Destruction operates through decomposition, with integrated systems separating into uncoordinated components.
+Traditional interpretation promises "贵人" (noble persons)—beneficial allies appearing unexpectedly; effortless progress with obstacles dissolving; successful collaboration with reduced friction; and disproportionate returns on initiative. Classical advice emphasizes bold initiative: launching ventures, seeking promotion, forming partnerships, making major investments.`,
+    neutral: `1.2.6 Neutral Years (平年): Unremarkable Transitional Periods
+Neutral years (平年, Ping Nian) comprise 4-5 years per 12-year cycle with no special Tai Sui relationship—neither conflict nor alliance. These periods are characterized by absence of dramatic cosmic influence, where individual effort and circumstance determine outcomes.
 
-The structural basis involves "相破" (mutual destruction) relationships: Rat-Rooster, Ox-Dragon, Tiger-Pig, Rabbit-Horse, Snake-Monkey, Goat-Dog . These pairings represent elemental combinations that generate internal tension—fire meeting water not in opposition but in gradual mutual consumption, wood encountering metal in erosive contact. The resulting dynamic resembles slow unraveling rather than sudden rupture: structures persist in apparent integrity while internal coherence progressively weakens.
+Traditional interpretation emphasizes "cultivating virtue and awaiting opportunity"—steady progress without dramatic breakthrough, maintenance of established patterns, completion of deferred tasks, and preparation for more significant periods. The danger: complacency without external pressure or opportunity.
 
-1.4.2 Manifestation Characteristics
-- Collaborative Arrangements: Partnership dissolution, misalignment, progressive cooperation degradation ("合作关系易破" (cooperative relationships easily broken)).
-- Plan Execution: Near-completion complications, final phase obstacles, momentum dissipation ("突然而来的诸事破坏" (sudden destruction of various matters)).
-- Foundational Systems: Organizational restructuring, role redefinition, coordination mechanism failure (Structural integrity compromise).
-- Personal Routines: Habit disruption, discipline fragmentation, maintenance difficulty ("破坏身体" (destruction of the body) through chronic patterns).
-
-1.4.3 Strategic Response
-- Consolidation: Core priority concentration, peripheral commitment abandonment, resource focus (Reduction of complexity to match coordination capacity).
-- Simplification: Direct relationship structures, reduced interdependencies, robustness over optimization ("稳中求进" (steady progress)).
-- Foundation Reinforcement: Systematic review, explicit performance metrics, external advisory perspective ("反复确认" (repeated confirmation) of agreement integrity).
-- Redundancy: Multiple paths to objectives, backup arrangements, failure mode preparation (Protection against single-point fragmentation).`,
-    alliance: `1.5.1 Fundamental Meaning
-Alliance represents the most favorable category within the six-category framework, encompassing harmonious relationships that generate mutual benefit and amplified positive outcomes. The Triple Harmony (San He) groups organize the twelve zodiac animals into four elemental alliances separated by four-year intervals. Members of each alliance share natural understanding and cooperation with minimal friction, functioning as "power teams" for external achievement.
-
-The Six Harmony (Liu He) pairs represent optimal complementarity between adjacent animals in the zodiac sequence, characterized as "贵人" (benefactors or helpful people) relationships where each partner provides what the other lacks . The traditional characterization that "六合好比夫妻之亲" (six harmony resembles marital intimacy) suggests depth of mutual understanding and support.
-
-1.5.2 Manifestation Characteristics
-- Career Opportunity: Enhanced access, collaborative success, network-mediated advancement ("贵人相助" (noble person assistance)).
-- Financial Benefit: Opportunity identification, risk-sharing, favorable terms ("合伙生财" (partnership generating wealth)).
-- Relationship Quality: Deepening connection, mutual support, organic development ("情投意合" (congenial spirits)).
-- Health & Well-being: Enhanced resilience, stress reduction, recovery capacity (Supportive environmental conditions).
-
-1.5.3 Strategic Response
-- Activation: Explicit alliance partner identification, deliberate collaboration approach, symbolic relationship engagement ("佩戴羊／虎／狗饰物趋吉避凶" (wear Sheep/Tiger/Dog ornaments for good fortune)).
-- Collaborative Venture Pursuit: Partnership selection matching capabilities to complementary needs, formal joint venture structures (Synergistic returns exceeding individual capacity).
-- Network Cultivation: Quality deepening over quantity expansion, "忘年之交" (friends despite age difference) development (Sustainable relationship capital).
-- Reciprocity Maintenance: Explicit acknowledgment, appropriate return, proactive partner support (Relationship integrity for long-term value).`,
-    neutral: `1.6.1 Fundamental Meaning
-Neutral represents the absence of significant positive or negative relationship between individual zodiac sign and current year, creating conditions of balanced interaction without characteristic amplification or obstruction . The structural basis lies in the mathematical distribution of relationships across the twelve-animal cycle.
-
-The fundamental meaning encompasses "平稳" (stability) and "自主" (self-determination) . Without the amplification of Ben Ming Nian, the confrontation of Direct Clash, the obscurity of Harm, the fragmentation of Destruction, or the support of Alliance, Neutral years create conditions where outcomes depend primarily on individual effort and choice rather than systematic external influence .
-
-1.6.2 Manifestation Characteristics
-- Career: Self-directed achievement, stable environmental conditions, meritocratic progression (Outcomes reflect individual competence rather than category-mediated factors).
-- Financial: Predictable returns, manageable risk, steady accumulation (Results correspond to analytical expectation without systematic skew).
-- Relationships: Organic development, gradual deepening, mutual choice determination (Absence of forced acceleration or unexpected disruption).
-- Health: Baseline stability, behavioral factor determination, preventive care adherence (No category-specific susceptibility or enhancement).
-
-1.6.3 Strategic Response
-- Capacity Building: Skill development, knowledge acquisition, relationship foundation laying (Investment in long-term development).
-- Foundation Strengthening: Organizational, financial, relational, health infrastructure improvement (Preparation for future category variation).
-- Initiative Development: Extended attention projects, uncertainty ventures, new domain exploration (Self-directed opportunity pursuit).
-- Cycle Preparation: Personal category sequence understanding, future challenge/opportunity identification, responsive capability development (Leveraging Neutral stability for foresight).`,
+Modern strategic value recognizes neutral years as essential for sustainable performance: foundation-building—capabilities developed without performance pressure; consolidation—gains from alliance years institutionalized; recovery—from challenging year intensity; and preparation—for upcoming dynamic periods.`,
+    recurrence: `The perpetual nature of this system means that every person experiences each category multiple times at predictable ages. For any birth sign, Ben Ming Nian recurs at ages 12, 24, 36, 48, 60, 72, 84; Direct Clash years at ages 6, 18, 30, 42, 54, 66, 78; Harm years at ages 7, 19, 31, 43, 55, 67, 79; Destruction years at ages 9, 21, 33, 45, 57, 69, 81; San He Alliance years at ages 4, 8, 16, 20, 28, 32, 40, 44, 52, 56, 64, 68, 76, 80, 88; and Liu He Alliance years at ages 1, 13, 25, 37, 49, 61, 73, 85—with Neutral years filling the remaining positions.`
   },
   animals: {
     Rat: {
-      overview_2026: `Category: Direct Clash. Element Interaction: Water controlled by Fire. Key Opportunity: Alternative solutions, adaptive capacity. Primary Caution: High-risk attempts, hasty decisions.`,
-      career_2026: `Pattern: Forced transition, workplace disputes, involuntary change. Strategic Emphasis: Adaptability, clear boundaries, alternative solutions. "Consciously control your path" with "clear boundaries and decisive decision-making"; when uncertain, "maintain calm, simplify thinking, find alternative solutions"; and recognition that "seemingly unstable situations are actually paving the way for greater opportunities".`,
-      wealth_2026: `Condition: Forced reallocation, transition costs. Income Stability: Disrupted, timing mismatches. Investment Risk: High sudden loss risk. Key Guidance: Liquidity preference, emergency reserves, avoid high-risk attempts.`,
-      relationships_2026: `Pattern: Testing through external pressure. Romantic: "Workplace disputes" spillover, clear boundaries needed. Social Network: Network restructuring, some connection loss.`,
-      health_2026: `Priority: Acute injury, accident susceptibility. Physical: Cardiovascular strain, immune variation. Mental: Transition stress, adaptation demand. Preventive: Safety protocols, emergency preparedness, mindfulness.`,
+      self: `2.1.1 Identifying Rat Years in the 12-Year Cycle
+Rat years (鼠年) correspond to the Earthly Branch Zi (子) and recur every twelve years: 2020, 2032, 2044, 2056, 2068, 2080 (forward) and 2008, 1996, 1984, 1972, 1960, 1948 (backward). Each combines with rotating Heavenly Stems creating five elemental variations: Wood Rat (Jiazi, 1984, 2044), Fire Rat (Bingzi, 1996, 2056), Earth Rat (Wuzi, 2008, 2068), Metal Rat (Gengzi, 2020, 2080), and Water Rat (Renzi, 2032, 2092).
+
+The 2020 Gengzi (Metal Rat) year exemplified Metal-Water Ben Ming Nian, with Metal generating Water to create productive but demanding conditions—structural change pressure with resource availability. The forthcoming 2032 Renzi (Water Rat) will manifest doubled Water influence, intensifying emotional and relational dimensions.
+
+For Rat-born individuals, Ben Ming Nian occurs at ages 12, 24, 36, 48, 60, 72, 84, 96, with developmental significance varying by life stage: age 12 (childhood-to-adolescence transition); age 24 (career establishment and partnership formation); age 36 (mid-life consolidation and reassessment); age 48 (mature achievement evaluation); age 60 (retirement and elder status transition); and advanced ages (wisdom integration and legacy consideration).`,
+      clash: `2.2.1 The Zi-Wu Opposition: Fundamental Conflict Dynamics
+For Rat-born individuals, Direct Clash years occur in all Horse years (Wu, 午): 2026, 2014, 2002, 1990, 1978, 1966, 1954, 1942, 1930 and continuing in perpetual twelve-year cycles. The Zi-Wu opposition (子午相冲) represents one of the most dramatic elemental conflicts in Chinese astrology: concentrated yin Water (Rat/Zi) versus intense yang Fire (Horse/Wu)—mutual extinction where each element possesses capacity to extinguish or evaporate the other.
+
+This opposition operates on multiple dimensions: elemental (Water-Fire incompatibility); directional (north-south polarization, Zi as northernmost, Wu as southernmost); temporal (midnight-noon, winter solstice-summer solstice); and energetic (maximum yin versus maximum yang). The result is fundamental instability where personal and annual energies work at cross-purposes, creating conditions of maximum environmental volatility.`,
+      harm: `2.3.1 The Zi-Wei Harm Relationship: Hidden Adversaries
+For Rat-born individuals, Harm years occur in all Goat years (Wei, 未): 2027, 2015, 2003, 1991, 1979, 1967, 1955, 1943, 1931 and continuing in perpetual twelve-year cycles. The Zi-Wei harm relationship (子未相害) operates through subtle Earth-Water interaction where Goat's Earth element appears to stabilize Rat's Water while gradually absorbing and depleting its vitality.
+
+Unlike overt confrontation of clash years, harm manifests through concealment: problems develop invisibly until cumulative effect becomes unavoidable. The geometric relationship—150 degrees apart, five positions in twelve-branch circle—creates "oblique" or "sidelong" influence. The elemental dynamic involves Earth's natural capacity to absorb Water becoming excessive and destructive, with Wei's late summer dampness (maximum Earth fertility) drowning Zi's clear winter flow.`,
+      destroy: `2.4.1 The Zi-You Destruction Pattern: Financial and Relational Fractures
+For Rat-born individuals, Destruction years occur in all Rooster years (You, 酉): 2029, 2017, 2005, 1993, 1981, 1969, 1957, 1945, 1933 and continuing in perpetual twelve-year cycles. The Zi-You destruction relationship (子酉相破) involves Metal-Water interaction where Rooster's Metal element initially appears productive—Metal generates Water in normal elemental cycle—but becomes excessive and corrosive, with Metal's precision and structure progressively fragmenting Water's fluid adaptability.
+
+The "po" (破) character encompasses breaking, damaging, spoiling, rendering useless—applied to years, suggesting systematic resistance to building or maintenance, with existing structures becoming unexpectedly vulnerable to collapse. The geometric relationship—300 degrees apart, ten positions in twelve-branch circle—creates "returning" or "closing" angle associated with completion, consolidation, and structural failure when consolidation is excessive.`,
+      alliance: `2.5.1 San He Alliance: The Dragon (辰 / Chen) and Monkey (申 / Shen)
+For Rat-born individuals, San He Alliance years occur in all Dragon years (Chen, 辰) and all Monkey years (Shen, 申), forming the complete Shen-Zi-Chen (申子辰) Water triangle. Dragon years: 2024, 2012, 2000, 1988, 1976, 1964, 1952, 1940, 1928 and continuing; Monkey years: 2028, 2016, 2004, 1992, 1980, 1968, 1956, 1944, 1932 and continuing.
+
+This Water-element triad represents deep structural compatibility based on shared elemental nature: Monkey (Shen) as yang Metal containing Water—source, initiation, resource extraction; Rat (Zi) as yang Water—accumulation, concentration, strategic patience; Dragon (Chen) as yang Earth containing Water—transformation, distribution, expression. Together creating complete Water system: storage → transformation → application.`,
+      neutral: `2.6.1 Identifying Neutral Years: Tiger, Rabbit, Snake, Dog, Pig
+For Rat-born individuals, Neutral years comprise: Tiger years (Yin, 寅): 2022, 2034, 2046, 2058, 2070, 2082; Rabbit years (Mao, 卯): 2023, 2035, 2047, 2059, 2071, 2083; Snake years (Si, 巳): 2025, 2037, 2049, 2061, 2073, 2085; Dog years (Xu, 戌): 2030, 2042, 2054, 2066, 2078, 2090; and Pig years (Hai, 亥): 2031, 2043, 2055, 2067, 2079, 2091. These five years per 12-year cycle maintain no defined conflict or alliance relationship with Zi.`
     },
     Ox: {
-      overview_2026: `Category: Harm. Element Interaction: Earth generated by Fire. Key Opportunity: Steady persistence, planning payoff. Primary Caution: Impatience, recognition frustration.`,
-      career_2026: `Pattern: Delayed recognition, effort-reward gaps, steady persistence required. Strategic Emphasis: Thorough planning, continuous action, timeline extension. "Do thorough planning, maintain continuous and steady action"; recognition that "past efforts begin to show results" but "lack of opportunities and luck" requires extended timeline acceptance.`,
-      wealth_2026: `Condition: Eroded returns, gradual drainage. Income Stability: Constricted, delayed receipts. Investment Risk: Entrapment in poor investments. Key Guidance: Patience, systematic discipline, thorough planning.`,
-      relationships_2026: `Pattern: Gradual erosion, patience required. Romantic: Frustration from delayed recognition, steady investment. Social Network: Quality maintenance over expansion.`,
-      health_2026: `Priority: Chronic conditions, gradual degradation. Physical: Digestive sensitivity, fatigue accumulation. Mental: Frustration, persistent low-grade pressure. Preventive: Preventive screening, dietary vigilance, patience maintenance.`,
-    },
-    Tiger: {
-      overview_2026: `Category: Alliance (San He). Element Interaction: Wood generates Fire. Key Opportunity: Promotion, expansion, collaboration. Primary Caution: Overextension, burnout risk.`,
-      career_2026: `Pattern: Promotion opportunities, business expansion, noble person assistance. Strategic Emphasis: Active leverage, collaborative pursuit, network cultivation. "Three Harmony fire formation, representing extremely strong noble person luck, easy to receive help and recognition from others"; "career opportunities abundant, with promotion or business expansion opportunities".`,
-      wealth_2026: `Condition: Enhanced opportunity, favorable terms. Income Stability: Amplified synergistic inflows. Investment Risk: Favorable risk-adjusted returns. Key Guidance: Proactive engagement, calculated leverage, collaborative ventures.`,
-      relationships_2026: `Pattern: Exceptional opportunity, magnetic charisma. Romantic: "Love luck strong and vibrant," "charisma magnetic". Social Network: Rapid network growth, valuable introductions.`,
-      health_2026: `Priority: Enhanced resilience, overextension risk. Physical: Exceptional vitality with balanced activity. Mental: Confidence, positive affect. Preventive: Balanced activity, rest integration, avoid burnout.`,
-    },
-    Rabbit: {
-      overview_2026: `Category: Destruction. Element Interaction: Wood generates Fire. Key Opportunity: Romance, financial growth despite challenges. Primary Caution: Momentum loss, fragmentation.`,
-      career_2026: `Pattern: Interrupted momentum, near-completion obstacles, consolidation need. Strategic Emphasis: Simplification, core focus, foundation reinforcement. Guidance emphasizing "focusing on consolidation, simplifying complex arrangements, reinforcing core foundations" to restore stability.`,
-      wealth_2026: `Condition: Structural impairment, fragmented sources. Income Stability: Collapsed expected inflows. Investment Risk: Fundamental loss risk. Key Guidance: Consolidation, simplification, tangible assets.`,
-      relationships_2026: `Pattern: Fragmentation risk, deliberate investment. Romantic: "Romance...favored" despite challenges. Social Network: Selective deepening, reduced breadth.`,
-      health_2026: `Priority: Structural integrity, connective tissue. Physical: Skeletal, dental, vascular systems. Mental: Dissolution stress, gradual depletion. Preventive: Physical conditioning, early intervention, routine protection.`,
-    },
-    Dragon: {
-      overview_2026: `Category: Neutral. Element Interaction: Earth generated by Fire. Key Opportunity: Self-directed opportunity pursuit. Primary Caution: Passive waiting, missed initiative.`,
-      career_2026: `Pattern: Self-directed development, stable conditions, proactive opportunity seeking. Strategic Emphasis: Capacity building, skill investment, initiative launch. "No clash no harmony, relatively stable fortune, need to actively seek opportunities oneself".`,
-      wealth_2026: `Condition: Stable conditions. Key Guidance: Proactive development, independent resource management.`,
-      relationships_2026: `Pattern: Stable resonance without systematic enhancement. Social Network: Self-directed development, autonomous opportunity pursuit.`,
-      health_2026: `Priority: Baseline stability. Preventive: Standard protocols, individual effort determination.`,
-    },
-    Snake: {
-      overview_2026: `Category: Neutral/Challenging. Element Interaction: Fire intensified. Key Opportunity: Competitive excellence, visibility. Primary Caution: Pressure fatigue, comparison stress.`,
-      career_2026: `Pattern: Competition intensifies, pressure increases. Strategic Emphasis: Capacity building, skill investment, initiative launch. "Competition intensifies, pressure increases"; "opportunities exist though process relatively hard, easy to feel tired".`,
-      wealth_2026: `Condition: Resource management under pressure. Key Guidance: Efficient allocation, avoid competition-driven spending.`,
-      relationships_2026: `Pattern: Competitive pressure. Social Network: Network maintenance despite fatigue.`,
-      health_2026: `Priority: Stress management. Physical: Burnout risk management.`,
-    },
-    Horse: {
-      overview_2026: `Category: Ben Ming Nian. Element Interaction: Fire maximally intensified. Key Opportunity: Leadership maturation, rapid recognition. Primary Caution: Impulsivity, amplified consequence.`,
-      career_2026: `Pattern: Accelerated recognition, amplified consequences, leadership maturation. Strategic Emphasis: Disciplined precision, strategic patience, calm maintenance. "Leadership matures, psychological resilience continuously improves" with "maintaining calm and stability" becoming the paramount advantage.`,
-      wealth_2026: `Condition: Volatile—amplified gains and losses. Income Stability: Unpredictable large inflows/outflows. Investment Risk: Elevated misjudgment risk. Key Guidance: Conservative positioning, liquidity maintenance, avoid speculation.`,
-      relationships_2026: `Pattern: Intensified dynamics, accelerated decisions. Romantic: Rapid deepening or dissolution, "emotional turbulence". Social Network: Visibility expansion, reputation impact.`,
-      health_2026: `Priority: Stress-related conditions, cardiovascular. Physical: Sleep disruption, inflammatory tendency. Mental: Anxiety, performance pressure. Preventive: Regular monitoring, stress management, risk avoidance.`,
-    },
-    Goat: {
-      overview_2026: `Category: Alliance (Liu He). Element Interaction: Earth generated by Fire. Key Opportunity: Peak cooperation, interpersonal harmony. Primary Caution: Overcommitment, boundary erosion.`,
-      career_2026: `Pattern: Cooperation luck, interpersonal luck reaching peak. Strategic Emphasis: Active leverage, collaborative pursuit, network cultivation. "Cooperation luck, interpersonal luck reaching peak"; "午未六合, Goat and Horse are 'heaven and earth mandarin duck harmony'".`,
-      wealth_2026: `Condition: Abundance theme, unexpected streams. Income Stability: Multiple source development. Investment Risk: Network-derived opportunities. Key Guidance: Active cultivation, appropriate commitment, relationship investment.`,
-      relationships_2026: `Pattern: Peak cooperation, interpersonal harmony. Romantic: "Very favorable" for emotional marriage. Social Network: Maximum expansion, peak influence.`,
-      health_2026: `Priority: Emotional well-being, sensitivity management. Mental: "Emotional ups and downs," mood variation. Preventive: Mindfulness, scheduled self-care, commitment patience.`,
-    },
-    Monkey: {
-      overview_2026: `Category: Neutral/Favorable. Element Interaction: Metal controlled by Fire. Key Opportunity: Innovation, technology opportunities. Primary Caution: Tempering pressure, precision demands.`,
-      career_2026: `Pattern: "Medium偏上" (medium-to-above); "flexible变通" to "seize opportunities that Fire Horse year's flourishing fire brings".`,
-      wealth_2026: `Condition: Innovation-linked gains. Key Guidance: Flexible adaptation, technology-focused investment.`,
-      relationships_2026: `Pattern: Tempered resonance. Social Network: Transformation shaped by analysis.`,
-      health_2026: `Priority: Tempering resilience. Preventive: Adaptation strategies.`,
-    },
-    Rooster: {
-      overview_2026: `Category: Neutral/Challenging. Element Interaction: Metal controlled by Fire. Key Opportunity: Breakthrough through pressure. Primary Caution: Competitive environment intensity.`,
-      career_2026: `Pattern: "Fire overcomes metal" creates "tempering" pressure; "fast changes of environment and fierce competitions".`,
-      wealth_2026: `Condition: Precision testing. Key Guidance: High-standard financial management, avoid competitive waste.`,
-      relationships_2026: `Pattern: Vision refined by precision. Social Network: Consistent conditions.`,
-      health_2026: `Priority: Performance pressure management. Preventive: Precision health monitoring.`,
-    },
-    Dog: {
-      overview_2026: `Category: Alliance (San He). Element Interaction: Earth generated by Fire. Key Opportunity: Salary advancement, family planning. Primary Caution: Loyalty-driven overextension.`,
-      career_2026: `Pattern: "Both personal and professional life" thriving; "salary hikes or promotion" opportunities.`,
-      wealth_2026: `Condition: Steady growth, promotion-linked gains. Income Stability: Reliable with upside potential. Investment Risk: Balanced risk acceptable. Key Guidance: Confidence in pursuit, expansion initiatives, partnership leverage.`,
-      relationships_2026: `Pattern: Deepening commitment, loyalty reinforcement. Romantic: "Favorable year for couples to plan a baby". Social Network: Quality consolidation, trusted circle.`,
-      health_2026: `Priority: Loyalty-driven overwork, anxiety. Physical: Reliable function with stress monitoring. Mental: "Anxiety may increase," service pressure. Preventive: Emotional intelligence focus, boundary setting, rest prioritization.`,
-    },
-    Pig: {
-      overview_2026: `Category: Neutral. Element Interaction: Water controlled by Fire. Key Opportunity: Adaptation skill development. Primary Caution: Systematic pressure, supplementation need.`,
-      career_2026: `Pattern: Self-directed development. Strategic Emphasis: Capacity building, skill investment, initiative launch.`,
-      wealth_2026: `Condition: Systematic pressure. Key Guidance: Adaptation strategies, Water supplementation.`,
-      relationships_2026: `Pattern: Favorable resonance. Social Network: Ambition nourished by adaptability.`,
-      health_2026: `Priority: Adaptation demand. Preventive: Water element supplementation.`,
-    },
+      self: `3.1.1 Ox Year Identification and Cyclical Position
+Ox years (牛年) correspond to the Earthly Branch Chou (丑) and recur every twelve years: 2021, 2033, 2045, 2057, 2069, 2081 (forward) and 2009, 1997, 1985, 1973, 1961, 1949, 1937 (backward). Each combines with rotating Heavenly Stems creating five elemental variations: Wood Ox (Yichou, 1985, 2045), Fire Ox (Dingchou, 1997, 2057), Earth Ox (Jichou, 2009, 2069), Metal Ox (Xinchou, 2021, 2081), and Water Ox (Guichou, 2033, 2093).
+
+The Chou branch is yin Earth, associated with late winter, stored nutrients, and preparatory phase before spring emergence. This second position in zodiac sequence creates distinctive Ben Ming Nian dynamics: following initiatory Rat energy and preceding assertive Tiger emergence, Ox years emphasize consolidation, manifestation, and stabilization rather than exploration or expansion.`,
+      clash: `3.2.1 The Chou-Wei Opposition: Fundamental Earth Element Conflict
+For Ox-born individuals, Direct Clash years occur in all Goat years (Wei, 未): 2027, 2015, 2003, 1991, 1979, 1967, 1955, 1943, 1931 and continuing. The Chou-Wei opposition (丑未相冲) represents unique clash dynamics: both branches share Earth element but manifest incompatible polarities—Chou as yin Earth (wet, dense, cultivated, containing) versus Wei as yang Earth (dry, dispersed, wild, nurturing).`,
+      harm: `3.3.1 The Chou-Wu Harm Dynamic: Authority Conflicts
+For Ox-born individuals, Harm years occur in all Horse years (Wu, 午): 2026, 2014, 2002, 1990, 1978, 1966, 1954, 1942, 1930 and continuing. The Chou-Wu harm relationship (丑午相害) operates through Fire-Earth interaction where Horse's Fire element generates Ox's Earth element but simultaneously demands recognition and appreciation that Ox's reticent nature may fail to provide.`,
+      destroy: `3.4.1 The Chou-Chen Destruction Pattern: Earth Element Erosion
+For Ox-born individuals, Destruction years occur in all Dragon years (Chen, 辰): 2024, 2012, 2000, 1988, 1976, 1964, 1952, 1940, 1928 and continuing. The Chou-Chen destruction relationship (丑辰相破) involves complex Earth-Earth interaction where Dragon's yang Earth (dynamic, transformative, mountain/earthquake-associated) erodes Ox's yin Earth stability (wet, cultivated, field/garden-associated) without replacing it with viable alternatives.`,
+      alliance: `3.5.1 San He Alliance: The Snake (巳 / Si) and Rooster (酉 / You)
+For Ox-born individuals, San He Alliance years occur in all Snake years (Si, 巳) and all Rooster years (You, 酉), forming the complete Si-You-Chou (巳酉丑) Metal triangle. Snake years: 2025, 2013, 2001, 1989, 1977, 1965, 1953, 1941, 1929; Rooster years: 2029, 2017, 2005, 1993, 1981, 1969, 1957, 1945, 1933.
+
+This Metal-element triad represents deep structural compatibility: Snake (Si) as yin Fire containing Metal—strategic intelligence, hidden resources, patient cultivation; Rooster (You) as yin Metal—precision, presentation, quality standards, systematic execution; Ox (Chou) as yin Earth containing Metal—practical implementation, sustained effort, material manifestation.`,
+      neutral: `3.6.1 Identifying Neutral Years: Tiger, Rabbit, Monkey, Dog, Pig
+For Ox-born individuals, Neutral years comprise: Tiger years (Yin, 寅): 2022, 2034, 2046, 2058, 2070, 2082; Rabbit years (Mao, 卯): 2023, 2035, 2047, 2059, 2071, 2083; Monkey years (Shen, 申): 2028, 2016, 2004, 1992, 1980, 1968; Dog years (Xu, 戌): 2030, 2018, 2006, 1994, 1982, 1970; and Pig years (Hai, 亥): 2031, 2019, 2007, 1995, 1983, 1971. Elemental dynamics create variation: Tiger and Rabbit (Wood)—Earth contains Wood; Monkey (Metal)—Earth generates Metal; Dog (Earth)—Earth-Earth resonance; Pig (Water)—Earth controls Water.`
+    }
   }
 };
