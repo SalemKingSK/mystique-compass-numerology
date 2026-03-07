@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AstroInsightOutput, NumerologyData } from './types';
 import { ANIMALS, RELATIONS, CAT_META, LIFESTAGES } from '@/lib/cosmic-fate/constants';
 import { YEAR_DESCRIPTIONS } from '@/lib/cosmic-fate/oracle-data';
@@ -17,13 +17,14 @@ import { Card } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   Sparkles, Star, MapIcon, Info, CalendarDays, 
-  ChevronDown, Layers, BookUser, Activity, Volume2
+  ChevronDown, Layers, BookUser, Activity
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
+import { ANIMAL_ENEMY_DESCRIPTIONS } from '@/lib/cosmic-fate/animal-descriptions';
 
 const TABS = [
   { id: 'ov', name: 'Oracle', icon: Sparkles },
@@ -47,13 +48,15 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const [activeTab, setActiveTab] = useState('ov');
   const [diveSubTab, setDiveSubTab] = useState('overview');
   const [selectedCodex, setSelectedCodex] = useState('Rat');
-  const [readYear, setReadYear] = useState(new Date().getFullYear());
-  const [yearInput, setYearInput] = useState(new Date().getFullYear().toString());
+  
+  // Year Selector Logic
+  const today = new Date();
+  const [readYear, setReadYear] = useState(today.getFullYear());
+  const [yearInput, setYearInput] = useState(today.getFullYear().toString());
   const [isYearSelectorOpen, setIsYearSelectorOpen] = useState(false);
 
   const { birthDay: d, birthMonth: m, birthYear: by } = numerology;
   const birthSign = insight.sign;
-  const curYear = new Date().getFullYear();
 
   const reduce = (n: number): number => {
     let s = n;
@@ -80,7 +83,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     return 'neutral';
   };
 
-  const catLabel = (c: string) => {
+  const catLabelStr = (c: string) => {
     const labels: Record<string, string> = {
       'self': 'Ben Ming Nian ✦',
       'clash': 'Direct Clash ⚡',
@@ -93,34 +96,46 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     return labels[c] || 'Neutral Year ◦';
   };
 
+  const catColor = (c: string) => {
+    const colors: Record<string, string> = {
+      'self': 'var(--gold)',
+      'clash': 'var(--rose)',
+      'harm': '#d08028',
+      'destroy': '#9858b8',
+      'sanhe': 'var(--jade-bright)',
+      'liuhe': 'var(--magenta)',
+      'neutral': 'var(--silver-dim)'
+    };
+    return colors[c] || 'var(--text)';
+  };
+
   const LP = useMemo(() => reduce(reduce(m) + reduce(d) + reduce(by)), [d, m, by]);
   const currentPY = useMemo(() => getPY(d, m, readYear), [d, m, readYear]);
   const currentUY = useMemo(() => reduce(readYear), [readYear]);
   const pmNames = ['', 'New Beginnings', 'Cooperation', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Reflection', 'Power', 'Completion'];
-  const today = new Date();
   const currentMonth = readYear === today.getFullYear() ? today.getMonth() + 1 : 1;
   const PM = useMemo(() => reduce(currentPY + currentMonth), [currentPY, currentMonth]);
-  const lpName = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
+  const lpNameStr = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
 
   const getIntersectionNarrative = (pyNum: number, cat: string, yearAnimalName: string) => {
-    const ba = (BOOK.animals as any)[birthSign];
+    const ba = ANIMAL_ENEMY_DESCRIPTIONS[birthSign];
     if (pyNum === 4) {
-      if (cat === 'clash') return `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearAnimalName} year's forced disruption, creating a year when every structure you attempt to build meets maximum environmental resistance. The karmic invitation: use Rahu's building energy not to resist the Clash year's forced movement but to build the internal foundations — psychological resilience, spiritual groundedness, practical contingency systems — that make you genuinely mobile rather than frantically rootless. Do not attempt to build permanent structures this year; build portable ones. Financial reserves over fixed investments. Transferable skills over institutional positioning. Psychological stability over social status. The Clash year will move things regardless; your Year 4 work is to ensure that what moves carries your genuine foundation with it rather than leaving it behind.\n\nSpecific to ${birthSign}/${yearAnimalName}: ${ba?.clash || ''}`;
-      if (cat === 'harm') return `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion: while Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build before it can be completed. This is the configuration where workaholism is most dangerous — the compulsive Year 4 building impulse creating elaborate structures that the Harm year's concealed forces are simultaneously destabilizing. The specific risk: trusted colleagues or business partners with hidden agendas at precisely the moment when you are most invested in collaborative structural projects. Year 4 foundation work should be primarily solo or with your most thoroughly verified relationships during this year.\n\nSpecific dynamics: ${ba?.harm || ''}`;
-      if (cat === 'destroy') return `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation: the very foundations you are working to build are subject to unexpected structural failures from within. This is the year when old structures that have been maintained through inertia rather than genuine viability finally collapse — often at the moment of most inconvenient timing, precisely when Year 4's energy has you most invested in building. The Chaldean 13/4 resonance is strongest in this configuration: regeneration through upheaval, transformation forced by structural collapse.\n\nSpecific dynamics: ${ba?.destroy || ''}`;
-      if (cat === 'self') return `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian — the intensification of your natal sign's energy. This creates a year when your characteristic patterns are simultaneously amplified to maximum expression and subjected to maximum structural pressure. Your ${birthSign} nature's most compulsive tendencies will emerge most strongly precisely in the domains where Year 4 is calling you to build most deliberately.\n\nSpecific dynamics: ${ba?.self || ''}`;
-      if (cat === 'alliance') return `Personal Year 4's foundation-building receives the unusual gift of alliance support — the most favorable configuration for Year 4 in your Chinese zodiac cycle. ${yearAnimalName} year's harmonious energy reduces the friction that Year 4's structural work typically encounters, making it easier to find reliable collaborators, establish stable institutional relationships, and build foundations that are supported rather than undermined by the environmental energy.\n\nAlliance dynamics: ${ba?.alliance || ''}`;
-      return `Personal Year 4's foundation-building discipline proceeds in a ${yearAnimalName} Neutral year — neither amplified by alliance support nor undermined by conflict energy. This allows Year 4's structural work to proceed primarily through your own effort and discernment rather than through environmental support or resistance. The advantage: your Year 4 foundations this year reflect your genuine capacity rather than exceptional circumstances in either direction.`;
+      if (cat === 'clash') return `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearAnimalName} year's forced disruption, creating a year when every structure you attempt to build meets maximum environmental resistance. The karmic invitation: use Rahu's building energy not to resist the Clash year's forced movement but to build the internal foundations — psychological resilience, spiritual groundedness, practical contingency systems — that make you genuinely mobile rather than frantically rootless. Do not attempt to build permanent structures this year; build portable ones. Financial reserves over fixed investments. Transferable skills over institutional positioning. Psychological stability over social status. The Clash year will move things regardless; your Year 4 work is to ensure that what moves carries your genuine foundation with it rather than leaving it behind.\n\nSpecific to ${birthSign}/${yearAnimalName}: ${ba?.clashDesc || ''}`;
+      if (cat === 'harm') return `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion: while Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build before it can be completed. This is the configuration where workaholism is most dangerous — the compulsive Year 4 building impulse creating elaborate structures that the Harm year's concealed forces are simultaneously destabilizing. The specific risk: trusted colleagues or business partners with hidden agendas at precisely the moment when you are most invested in collaborative structural projects. Year 4 foundation work should be primarily solo or with your most thoroughly verified relationships during this year. Avoid large structural financial commitments that depend on others' reliability.\n\nSpecific dynamics: ${ba?.harmDesc || ''}`;
+      if (cat === 'destroy') return `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation: the very foundations you are working to build are subject to unexpected structural failures from within. This is the year when old structures that have been maintained through inertia rather than genuine viability finally collapse — often at the moment of most inconvenient timing, precisely when Year 4's energy has you most invested in building. The Chaldean 13/4 resonance is strongest in this configuration: regeneration through upheaval, transformation forced by structural collapse. Work with this rather than against it: deliberately review all existing structures (financial, relational, professional, physical) for those that are maintained through inertia rather than genuine value, and release them proactively before the Destruction year's energy collapses them reactively.\n\nSpecific dynamics: ${ba?.destDesc || ''}`;
+      if (cat === 'self') return `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian — the intensification of your natal sign's energy. This creates a year when your characteristic patterns are simultaneously amplified to maximum expression and subjected to maximum structural pressure. Your ${birthSign} nature's most compulsive tendencies will emerge most strongly precisely in the domains where Year 4 is calling you to build most deliberately. The invitation: use Ben Ming Nian's heightened self-awareness as a diagnostic tool. The patterns that emerge most compulsively this year are exactly the patterns whose sublimation into conscious discipline would produce the strongest foundation. Rahu's building demand and your Ben Ming Nian's amplification combine to produce either the most compulsive year in your cycle or the most consciously productive — the difference is awareness.\n\nSpecific dynamics: ${ba?.benDesc || ''}`;
+      if (cat === 'alliance') return `Personal Year 4's foundation-building receives the unusual gift of alliance support — the most favorable configuration for Year 4 in your Chinese zodiac cycle. ${yearAnimalName} year's harmonious energy reduces the friction that Year 4's structural work typically encounters, making it easier to find reliable collaborators, establish stable institutional relationships, and build foundations that are supported rather than undermined by the environmental energy. This is your optimal Year 4 — the year when foundation-building produces the most lasting results. Prioritize your most ambitious structural projects for this intersection year: the financial systems, professional credentials, health disciplines, and organizational frameworks you build in a supported Year 4 carry unusual stability and longevity.\n\nAlliance dynamics: ${ba?.allianceDesc || ''}`;
+      return `Personal Year 4's foundation-building discipline proceeds in a ${yearAnimalName} Neutral year — neither amplified by alliance support nor undermined by conflict energy. This allows Year 4's structural work to proceed primarily through your own effort and discernment rather than through environmental support or resistance. The advantage: your Year 4 foundations this year reflect your genuine capacity rather than exceptional circumstances in either direction. The discipline you build during a neutral Year 4 is the most authentic measure of your actual developmental state and the most reliable foundation for the years that follow.`;
     }
     if (pyNum === 7) {
-      if (cat === 'clash') return `The most spiritually dissonant configuration in your cycle: Personal Year 7's requirement for interior solitude and contemplative withdrawal coincides with your Direct Clash year's maximum external pressure and forced movement. Ketu's pull toward inner silence confronts ${yearAnimalName} year's unavoidable disruption and change. The world is demanding movement and response precisely when your soul requires stillness and inward turning.\n\nSpecific dynamics: ${ba?.clash || ''}`;
-      if (cat === 'harm') return `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion — creating a configuration where the solitude Year 7 genuinely requires is simultaneously being enforced by relationship betrayals and authority miscommunications that make social engagement feel increasingly unsafe. The practice of this intersection year is choosing the interior work that the circumstances are enforcing, transforming reactive isolation into genuine contemplative retreat.\n\nSpecific dynamics: ${ba?.harm || ''}`;
-      if (cat === 'destroy') return `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation — creating the most internally turbulent Year 7 possible. The structures that provide the container for contemplative practice (stable living situation, reliable relationships, financial security) may be destabilized by the Destruction year's energy precisely when Year 7's inner work requires external stability as its foundation.\n\nSpecific dynamics: ${ba?.destroy || ''}`;
-      if (cat === 'self') return `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian — creating a year of maximum identity amplification during precisely the year when Ketu is asking you to release identification with the very identity being amplified.\n\nSpecific dynamics: ${ba?.self || ''}`;
-      if (cat === 'alliance') return `Personal Year 7's contemplative interior work receives the unusual gift of Chinese zodiac alliance support — meaning the environmental energy facilitates rather than disrupts the Year 7 retreat. This is your most supported Year 7, where the external circumstances actually create space and support for the interior work Ketu calls for.\n\nAlliance dynamics: ${ba?.alliance || ''}`;
-      return `Personal Year 7's contemplative withdrawal proceeds in a ${yearAnimalName} Neutral year — neither supported nor undermined by exceptional Chinese zodiac energy. The interior work this Year 7 calls for is primarily between you and the depth that Ketu is activating.`;
+      if (cat === 'clash') return `The most spiritually dissonant configuration in your cycle: Personal Year 7's requirement for interior solitude and contemplative withdrawal coincides with your Direct Clash year's maximum external pressure and forced movement. Ketu's pull toward inner silence confronts ${yearAnimalName} year's unavoidable disruption and change. The world is demanding movement and response precisely when your soul requires stillness and inward turning. This combination produces the Year 7 challenge at maximum intensity: the forced recognition that genuine interior work must occur even amid significant external chaos. The invitation is to develop what contemplative traditions call "the eye of the storm" — the capacity for genuine interior stillness that does not require external calm as its precondition. Those who develop this capacity during this configuration emerge from Year 7 with an unusual combination of genuine mystical depth and practical resilience.\n\nSpecific dynamics: ${ba?.clashDesc || ''}`;
+      if (cat === 'harm') return `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion — creating a configuration where the solitude Year 7 genuinely requires is simultaneously being enforced by relationship betrayals and authority miscommunications that make social engagement feel increasingly unsafe. The risk of misinterpreting forced social withdrawal (caused by Harm year's trust violations) as the voluntary spiritual retreat that Year 7 genuinely calls for: both feel similar, but one is reactive and one is chosen. The practice of this intersection year is choosing the interior work that the circumstances are enforcing, transforming reactive isolation into genuine contemplative retreat, and using the Harm year's trust-testing experiences as direct material for the psychological and spiritual clarification that Year 7 is designed to produce.\n\nSpecific dynamics: ${ba?.harmDesc || ''}`;
+      if (cat === 'destroy') return `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation — creating the most internally turbulent Year 7 possible. The structures that provide the container for contemplative practice (stable living situation, reliable relationships, financial security) may be destabilized by the Destruction year's energy precisely when Year 7's inner work requires external stability as its foundation. The invitation — and it is a genuine spiritual invitation despite its discomfort — is to discover whether your contemplative practice can proceed without the external scaffolding you thought it required. Ketu's deepest teaching often arrives precisely through Destruction year losses: the revelation that the inner ground is genuinely stable independent of outer circumstance.\n\nSpecific dynamics: ${ba?.destDesc || ''}`;
+      if (cat === 'ben-ming') return `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian — creating a year of maximum identity amplification during precisely the year when Ketu is asking you to release identification with the very identity being amplified. Your ${birthSign} nature's most characteristic patterns are simultaneously at peak intensity and being subjected to Ketu's dissolution. This is either the most confusing year of your cycle or the most profoundly clarifying, depending entirely on your willingness to witness what your amplified nature reveals about what it has been protecting through its characteristic patterns. Year 7's Ketu energy and Ben Ming Nian's amplification together create conditions for genuine identity breakthrough — the recognition of what you are beneath what you characteristically do.\n\nSpecific dynamics: ${ba?.benDesc || ''}`;
+      if (cat === 'alliance') return `Personal Year 7's contemplative interior work receives the unusual gift of Chinese zodiac alliance support — meaning the environmental energy facilitates rather than disrupts the Year 7 retreat. This is your most supported Year 7, where the external circumstances actually create space and support for the interior work Ketu calls for. The year may bring specific teachers, texts, practices, or communities that provide precisely the framework your Year 7 inner exploration requires. Approach this configuration with deliberate intention: plan the retreat, study program, writing project, or contemplative practice that most represents what you genuinely need to explore during Year 7, and enter this intersection year with that intention clearly set.\n\nAlliance dynamics: ${ba?.allianceDesc || ''}`;
+      return `Personal Year 7's contemplative withdrawal proceeds in a ${yearAnimalName} Neutral year — neither supported nor undermined by exceptional Chinese zodiac energy. The interior work this Year 7 calls for is primarily between you and the depth that Ketu is activating, without the amplification of either favorable alliance energy or disruptive conflict energy. This may feel like the quietest of your Year 7s, which is often precisely what genuine contemplative work requires.`;
     }
-    return `In ${readYear}, your ${birthSign} nature interacts with the ${yearAnimalName} year in a ${catLabel(cat)} configuration. This occurs during your Personal Year ${pyNum} (${YEAR_DESCRIPTIONS[pyNum]?.title}). This window favors steady progress through ${cat === 'alliance' ? 'supported collaboration' : 'individual initiative'}.`;
+    return `In ${readYear}, your ${birthSign} nature interacts with the ${yearAnimalName} year in a ${catLabelStr(cat)} configuration. This occurs during your Personal Year ${pyNum} (${YEAR_DESCRIPTIONS[pyNum]?.title}). This window favors steady progress through ${cat === 'alliance' ? 'supported collaboration' : 'individual initiative'}.`;
   };
 
   const renderYearSelector = () => (
@@ -149,7 +164,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
               onChange={(e) => {
                 setYearInput(e.target.value);
                 const val = parseInt(e.target.value);
-                if (val >= 1900 && val <= 2100) {
+                if (!isNaN(val) && val >= 1900 && val <= 2100) {
                   setReadYear(val);
                 }
               }}
@@ -159,8 +174,9 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             />
             <button 
               onClick={() => {
-                setReadYear(curYear);
-                setYearInput(curYear.toString());
+                const cy = today.getFullYear();
+                setReadYear(cy);
+                setYearInput(cy.toString());
               }}
               className="px-4 py-2 bg-primary/20 border border-primary/30 rounded-md text-xs font-bold hover:bg-primary/30 transition-colors"
             >
@@ -176,12 +192,12 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     const yr = YEAR_DESCRIPTIONS[currentPY];
     const yearAnimal = getSign(readYear);
     const cat = getRel(yearAnimal.n);
-    const catLabelStr = catLabel(cat);
+    const catLabel = catLabelStr(cat);
     
     const tension = (currentPY===4 && (LP===5||LP===3)) || (currentPY===7 && (LP===1||LP===6));
     const harmony = (currentPY===LP) || (currentPY===currentUY);
 
-    const animalLine = `Your ${birthSign} nature meets a ${yearAnimal.n} year (${catLabelStr}) — ${ 
+    const animalLine = `Your ${birthSign} nature meets a ${yearAnimal.n} year (${catLabel}) — ${ 
       cat==='clash'?'an environment of maximum elemental friction calling for proactive adaptation rather than resistance': 
       cat==='harm'?'a year of concealed pressures requiring extra vigilance in trust and documentation': 
       cat==='destroy'?'a year when outdated structures may fracture, clearing ground for what genuinely serves you': 
@@ -191,7 +207,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     }.`;
 
     const convergeLine = tension
-      ? `Your Life Path ${LP} (${lpName(LP)}) creates notable friction with Personal Year ${currentPY}'s demands — a soul-level tension with specific lessons.`
+      ? `Your Life Path ${LP} (${lpNameStr(LP)}) creates notable friction with Personal Year ${currentPY}'s demands — a soul-level tension with specific lessons.`
       : harmony
       ? `A significant harmonic: your Personal Year ${currentPY} resonates with another core number in your chart — an amplification point for ${yr?.title.toLowerCase()} themes.`
       : `Your Life Path ${LP} and Personal Year ${currentPY} are in productive dialogue, allowing this year's work to proceed through genuine effort.`;
@@ -214,7 +230,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     const ENEMY = ['clash', 'harm', 'destroy', 'self'];
     const range = 20;
     const hits = [];
-    for (let y = curYear; y < curYear + range; y++) {
+    for (let y = readYear; y < readYear + range; y++) {
       const p = getPY(d, m, y);
       const ys = getSign(y);
       const rt = getRel(ys.n);
@@ -237,7 +253,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
               <div className="p-6">
                 <div className="flex justify-between items-start mb-2">
                   <div className="text-2xl font-bold font-serif text-primary">{h.y}</div>
-                  <Badge style={{ backgroundColor: cm.col }}>{catLabel(h.rt)}</Badge>
+                  <Badge style={{ backgroundColor: cm.col }}>{catLabelStr(h.rt)}</Badge>
                 </div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Personal Year {h.p} • {h.ys.e} {h.ys.n} Year</div>
                 <AccordionContentWithPlayer text={narrative} />
@@ -251,8 +267,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   const renderZodiacMap = () => {
     const years = [];
-    const startYear = today.getFullYear();
-    for (let y = startYear; y < startYear + 12; y++) {
+    for (let y = today.getFullYear(); y < today.getFullYear() + 12; y++) {
       const ya = getSign(y);
       const cat = getRel(ya.n);
       const pyNum = getPY(d, m, y);
@@ -295,14 +310,14 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
               <div 
                 className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] ${y.rowClass} flex flex-col items-center text-center overflow-hidden h-40`}
               >
-                <div className="text-3xl mb-1">{y.animal.e}</div>
-                <div className="font-bold text-xl text-white">{y.year}</div>
-                <div className="text-[10px] uppercase font-bold text-primary mb-1 truncate w-full">{catLabel(y.cat)}</div>
+                <div className="text-3xl mb-1">${y.animal.e}</div>
+                <div className="font-bold text-xl text-white">${y.year}</div>
+                <div className="text-[10px] uppercase font-bold text-primary mb-1 truncate w-full">${catLabelStr(y.cat)}</div>
                 <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${y.py === 4 || y.py === 7 ? 'bg-rose-500/20 text-rose-400' : 'bg-primary/20 text-primary'}`}>
-                    {y.py}
+                    ${y.py}
                   </span>
-                  <span className="text-[9px] uppercase tracking-tighter" style={{ color: y.statusColor }}>{y.confluence}</span>
+                  <span className="text-[9px] uppercase tracking-tighter" style={{ color: y.statusColor }}>${y.confluence}</span>
                 </div>
               </div>
             </PopoverTrigger>
@@ -314,7 +329,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                   </h4>
                 </div>
                 <div className="text-xs uppercase text-muted-foreground tracking-widest mb-2">
-                  Personal Year {y.py} • {catLabel(y.cat)}
+                  Personal Year {y.py} • {catLabelStr(y.cat)}
                 </div>
                 <AccordionContentWithPlayer 
                   text={getIntersectionNarrative(y.py, y.cat, y.animal.n)} 
@@ -348,10 +363,10 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             <div>
               <div className="year-num-big text-6xl font-bold text-primary leading-none">{currentPY}</div>
               <div className="text-2xl font-bold text-white mt-2">{yr.title}</div>
-              <div className="text-sm italic text-muted-foreground">{yr.sub}</div>
+              <div className="text-sm italic text-muted-foreground">{yr.phase}</div>
             </div>
             <Badge variant="outline" className="bg-primary/10 border-primary/40 text-primary">
-              {yr.phase}
+              {yr.phase.split(' — ')[0]}
             </Badge>
           </div>
           <div className="flex flex-wrap gap-2 mb-6">
