@@ -253,7 +253,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
                 {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
                 {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
                 {activeTab === 'cosmic' && <div className="text-center p-8 glass-card">Section discarded as per user request. Use Cosmic Fate Map instead.</div>}
-                {activeTab === 'cosmic-fate' && <CosmicFateMap />}
+                {activeTab === 'cosmic-fate' && <CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear} />}
               </motion.div>
           </AnimatePresence>
 
