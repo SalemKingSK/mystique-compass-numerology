@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import type { AstroInsightOutput, NumerologyData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
-import { CosmicFateDisplay } from './cosmic-fate-display';
+import { CosmicFateMap } from './cosmic-fate-map';
 import { ArrowLeft, History, BookUser, Heart, Home, Users, Briefcase } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -132,14 +131,15 @@ function ResultsHeader({
             {name}
         </h1>
         <p className="text-sm text-white/50 mt-1">{birthDate}</p>
-        <div className='relative flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-6 space-y-4 px-4'>
+        <div className='relative flex flex-col justify-center items-center w-full max-w-2xl mx-auto mt-6 space-y-4 px-4'>
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
                 {newAstroSign}
              </AnimatedTab>
-            <div className="grid grid-cols-3 gap-2 w-full">
+            <div className="grid grid-cols-4 gap-2 w-full">
                 <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro</AnimatedTab>
                 <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numbers</AnimatedTab>
                 <AnimatedTab isActive={activeTab === 'cosmic'} onClick={() => onTabClick('cosmic')}>Cosmic</AnimatedTab>
+                <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>Cosmic Fate</AnimatedTab>
             </div>
         </div>
     </div>
@@ -252,7 +252,8 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
                 {activeTab === 'astro' && <AstroDisplay insight={insight} />}
                 {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
                 {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
-                {activeTab === 'cosmic' && <CosmicFateDisplay insight={insight} numerology={numerology} />}
+                {activeTab === 'cosmic' && <div className="text-center p-8 glass-card">Section discarded as per user request. Use Cosmic Fate Map instead.</div>}
+                {activeTab === 'cosmic-fate' && <CosmicFateMap />}
               </motion.div>
           </AnimatePresence>
 
