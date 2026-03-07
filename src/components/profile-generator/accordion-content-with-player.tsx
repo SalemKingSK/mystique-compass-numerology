@@ -8,19 +8,23 @@ export function AccordionContentWithPlayer({ text = "" }: { text?: string }) {
     // Safety check: ensure text is a string before matching
     const sentences = React.useMemo(() => {
         if (!text) return [""];
-        return text.match(/[^.!?\n]+[.!?\n]+/g) || [text];
+        // Split by major punctuation while preserving it
+        const matches = text.match(/[^.!?\n]+[.!?\n]+/g);
+        return matches || [text];
     }, [text]);
 
     if (!text) return null;
 
     return (
-        <div className="space-y-4">
-            <SpeechPlayer
-                text={text}
-                sentences={sentences}
-                onBoundary={setActiveSentenceIndex}
-                onEnd={() => setActiveSentenceIndex(-1)}
-            />
+        <div className="flex flex-col space-y-4">
+            <div className="flex justify-start">
+                <SpeechPlayer
+                    text={text}
+                    sentences={sentences}
+                    onBoundary={setActiveSentenceIndex}
+                    onEnd={() => setActiveSentenceIndex(-1)}
+                />
+            </div>
             <ScrollableTextDisplay
                 text={text}
                 sentences={sentences}
