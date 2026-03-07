@@ -7,17 +7,17 @@ import { YEAR_DESCRIPTIONS, PINNACLE_MEANINGS, CHALLENGE_MEANINGS } from '@/lib/
 import { ANIMAL_ENEMY_DESCRIPTIONS } from '@/lib/cosmic-fate/animal-descriptions';
 import { BOOK } from '@/lib/cosmic-fate/book';
 import { ZodiacWheel } from './cosmic-fate/zodiac-wheel';
-import { PersonalYearChart } from './personal-year-chart';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
-import { Sparkles, Star, Activity, MapIcon, BookOpen, Clock, CalendarDays, ChevronDown, Info, ShieldAlert, Users, Layers, Compass, Wand2, BookUser, History, AlertTriangle } from 'lucide-react';
+import { Sparkles, Star, Activity, MapIcon, BookOpen, Info, CalendarDays, ChevronDown, Layers, BookUser, History, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PersonalYearChart } from './personal-year-chart';
 
 const TABS = [
   { id: 'ov', name: 'Oracle', icon: Sparkles },
@@ -41,7 +41,6 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const birthSign = insight.sign;
   const curYear = new Date().getFullYear();
 
-  // --- HELPERS ---
   const reduce = (n: number): number => {
     let s = n;
     while (s > 9) s = String(s).split('').reduce((a, b) => a + parseInt(b), 0);
@@ -82,18 +81,17 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   const catColor = (c: string) => {
     const colors: Record<string, string> = {
-      'self': 'var(--primary)',
-      'clash': 'var(--destructive)',
-      'harm': '#d08028',
-      'destroy': '#9858b8',
+      'self': '#60a5fa',
+      'clash': '#f87171',
+      'harm': '#fbbf24',
+      'destroy': '#a78bfa',
       'sanhe': '#34d399',
       'liuhe': '#e040fb',
-      'neutral': 'var(--muted-foreground)'
+      'neutral': '#9ca3af'
     };
     return colors[c] || 'var(--foreground)';
   };
 
-  // --- DERIVED NUMEROLOGY ---
   const LP = useMemo(() => reduce(reduce(m) + reduce(d) + reduce(by)), [d, m, by]);
   const currentPY = useMemo(() => getPY(d, m, readYear), [d, m, readYear]);
   const currentUY = useMemo(() => reduce(readYear), [readYear]);
@@ -103,7 +101,6 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const PM = useMemo(() => reduce(currentPY + currentMonth), [currentPY, currentMonth]);
   const lpName = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
 
-  // --- RENDERERS ---
   const renderYearSelector = () => (
     <Collapsible
       open={isYearSelectorOpen}
@@ -114,14 +111,14 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
         <button className="flex items-center justify-between w-full text-primary font-bold uppercase tracking-widest text-sm">
           <span className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" />
-            Reading Focus: {readYear}
+            Temporal Focus: {readYear}
           </span>
           <ChevronDown className={`h-4 w-4 transition-transform ${isYearSelectorOpen ? 'rotate-180' : ''}`} />
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent className="pt-4 space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="read-year" className="text-[10px] uppercase tracking-wider text-muted-foreground">Select Year to Cast</Label>
+          <Label htmlFor="read-year" className="text-[10px] uppercase tracking-wider text-muted-foreground">Select Year to Forecast</Label>
           <div className="flex gap-2">
             <Input
               id="read-year"
@@ -145,7 +142,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
               }}
               className="px-4 py-2 bg-primary/20 border border-primary/30 rounded-md text-xs font-bold hover:bg-primary/30 transition-colors"
             >
-              Current
+              Reset
             </button>
           </div>
         </div>
@@ -205,21 +202,21 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
     return (
       <div className="space-y-4">
         {hits.map((h, i) => {
-          const cm = CATM[h.rt];
+          const cm = CAT_META[h.rt];
           const pi = YEAR_DESCRIPTIONS[h.p];
           const ba = ANIMAL_ENEMY_DESCRIPTIONS[birthSign];
           
           let narrative = '';
           if (h.p === 4) {
-            if (h.rt === 'clash') narrative = `This is the most challenging configuration: PY 4's discipline collides with Direct Clash disruption. ${ba?.clashDesc || ''}`;
-            else if (h.rt === 'harm') narrative = `PY 4's building meets Harm's concealed erosion. ${ba?.harmDesc || ''}`;
-            else if (h.rt === 'destroy') narrative = `PY 4's foundations meet Destruction's fragmentation. ${ba?.destDesc || ''}`;
-            else if (h.rt === 'self') narrative = `PY 4's demand meets Ben Ming Nian's amplification. ${ba?.benDesc || ''}`;
+            if (h.rt === 'clash') narrative = `Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year. Rahu's compulsive building drive collides with ${h.ys.n} year's forced disruption. ${ba?.clashDesc || ''}`;
+            else if (h.rt === 'harm') narrative = `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion. ${ba?.harmDesc || ''}`;
+            else if (h.rt === 'destroy') narrative = `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation. ${ba?.destDesc || ''}`;
+            else if (h.rt === 'self') narrative = `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian intensification. ${ba?.benDesc || ''}`;
           } else {
-            if (h.rt === 'clash') narrative = `PY 7's retreat meets Clash's external pressure. ${ba?.clashDesc || ''}`;
-            else if (h.rt === 'harm') narrative = `PY 7's solitude meets Harm's trust violation. ${ba?.harmDesc || ''}`;
-            else if (h.rt === 'destroy') narrative = `PY 7's dissolution meets Destruction's fragmentation. ${ba?.destDesc || ''}`;
-            else if (h.rt === 'self') narrative = `PY 7's inward turn meets Ben Ming Nian's identity amplification. ${ba?.benDesc || ''}`;
+            if (h.rt === 'clash') narrative = `Personal Year 7's requirement for interior solitude coincides with your Direct Clash year's maximum external pressure. ${ba?.clashDesc || ''}`;
+            else if (h.rt === 'harm') narrative = `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion. ${ba?.harmDesc || ''}`;
+            else if (h.rt === 'destroy') narrative = `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation. ${ba?.destDesc || ''}`;
+            else if (h.rt === 'self') narrative = `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian identity amplification. ${ba?.benDesc || ''}`;
           }
 
           return (
@@ -289,7 +286,6 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
                   const pi = YEAR_DESCRIPTIONS[y.py];
                   const catTxt = y.cat === 'neutral' ? 'Neutral Year' : catLabel(y.cat);
                   const bodyText = `In ${y.year}, your ${birthSign} nature interacts with the ${y.animal.n} year in a ${catTxt} configuration. This occurs during your Personal Year ${y.py} (${pi?.title}). ${y.confluence.includes('Tension') ? 'This is a period of high pressure requiring disciplined restraint.' : ''}`;
-                  // We use a simple logic here to show the popover in the original code's style
                   alert(`${y.year} Analysis:\n\n${bodyText}`);
                 }}
               >
@@ -400,16 +396,16 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
       <section>
         <h3 className="text-primary font-bold text-lg font-serif uppercase tracking-widest mb-4">Six Categories - Foundation</h3>
         <div className="space-y-4">
-          {['ben_ming', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
-            <Accordion key={key} type="single" collapsible>
-              <AccordionItem value={key} className="glass-card px-4 border-0">
+          <Accordion type="single" collapsible>
+            {['ben_ming', 'clash', 'harm', 'destroy', 'alliance', 'neutral'].map(key => (
+              <AccordionItem key={key} value={key} className="glass-card px-4 border-0">
                 <AccordionTrigger className="uppercase text-[10px] tracking-widest font-bold">{(BOOK.foundation as any)[key].split('\n')[0]}</AccordionTrigger>
                 <AccordionContent>
                   <AccordionContentWithPlayer text={(BOOK.foundation as any)[key]} />
                 </AccordionContent>
               </AccordionItem>
-            </Accordion>
-          ))}
+            ))}
+          </Accordion>
         </div>
       </section>
     </div>
