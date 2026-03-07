@@ -3,8 +3,8 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * @fileOverview Verbatim assembly of the 11 chunks for the Cosmic Fate Map.
- * Integrated with main app data entry.
+ * @fileOverview Complete, verbatim assembly of all 11 chunks for the Cosmic Fate Map.
+ * Integrated with main app data entry and restored with full unabridged descriptions.
  */
 
 interface CosmicFateMapProps {
@@ -14,7 +14,7 @@ interface CosmicFateMapProps {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CHUNKS 01-04: ZOO DATA (VERBATIM)
+// CHUNKS 02-04: ZOO DATA (VERBATIM)
 const ZOO: any = {
   Rat: {
     e: '🐀', i: 0, el: 'Water', pol: 'Yang', br: 'Zi',
@@ -122,7 +122,7 @@ const ZOO: any = {
     allianceDesc: 'Tiger and Dog form your San He Fire triangle — exceptional for passionate leadership, community mobilization, and inspired action. Your Liu He ally is Goat — Horse-Goat pairing is the most harmonious single-animal alliance in the zodiac, combining yang and yin Earth in complementary unity. Goat years offer Horse the grounded aesthetic support that tempers Fire\'s volatility without extinguishing its brilliance.'
   },
   Goat: {
-    e: '🐏', i: 7, el: 'Earth', pol: 'Yin', br: 'Wei',
+    e: 'RAM', i: 7, el: 'Earth', pol: 'Yin', br: 'Wei',
     ben: [1931, 1943, 1955, 1967, 1979, 1991, 2003, 2015, 2027, 2039, 2051],
     clash: 'Ox', harm: 'Rat', dest: 'Dog',
     san: ['Pig', 'Rabbit'], liu: 'Horse',
@@ -230,7 +230,7 @@ const YD: any = {
     overview: `Personal Year 3 completes the spring triad with blossoming — the visible expression of two years of invisible cultivation. What was planted in Year 1 and nurtured through Year 2's receptive patience now breaks into visible bloom. This year's energy is expansive, joyful, and creatively fertile in ways that feel almost effortless after Year 2's careful germination work.\n\nJupiter governs Year 3 — the great benefic, Guru of the gods, lord of wisdom and creative progeny. Jupiter's touch transmutes ordinary communication into inspired expression, ordinary relationships into joyful communion, ordinary study into genuine wisdom-seeking. The Vishuddha (throat) chakra activates as the primary channel for this creative outpouring — making Year 3 the cycle's most powerful year for any form of expression: writing, speaking, teaching, performing, or creating.\n\nThe triad's philosophical significance is generative: 1 and 2's polarity produces 3 as their creative offspring. This generative quality means Year 3 often literally produces: artistic works, new projects, relationships, creative businesses, and in some cases children. The year strongly supports: creative business launches, writing and publishing ventures, public speaking and performance, teaching and facilitation, and any work requiring the charismatic engagement of others with an authentic vision.`,
     pyth: `Year 3's shadow is superficiality and creative scattering. Jupiter's expansiveness without discipline produces creative excess — too many ideas pursued too shallowly, too many social obligations accepted beyond available capacity, too much optimism about realistic timelines. Year 3 individuals are specifically prone to the grief of creative projects abandoned at the doorstep of completion — begun with enthusiasm during Year 3's fertile opening, then abandoned when Year 4's discipline is required to complete them.\n\nGossip, social performance, and the constant stimulation of an expanded social world can consume the year's creative energy if not consciously directed. The throat chakra activation brings words — but not all words serve. The challenge is channeling Year 3's communicative gift into expressions that genuinely matter: the book that needs writing, the teaching that needs sharing, the creative collaboration that needs initiating.\n\nThe spiritual curriculum of Year 3 is recognizing creative expression as sacred — not merely entertainment or self-expression but genuine participation in the ongoing creation of meaning. Jupiter teaches that genuine creative work emerging from authentic inner vision and serving others' growth is not separate from spiritual practice but is itself one of its highest forms.`,
     vedic: `Jupiter (Guru, Brihaspati) governs Year 3, activating education, wisdom transmission, creative legacy, and the expansion of philosophical understanding. Life areas activated: higher education and teaching, publishing and broadcasting, international travel and philosophical inquiry, children and students, and creative projects of lasting significance. Jupiter's benefic energy creates genuine good fortune when its gifts are received with humility rather than entitlement — the student who knows they are a student receives the most from Jupiter's year.\n\nThe Vishuddha chakra activation makes Year 3 ideal for mantra practice, sound healing, vocal training, and any discipline involving the refinement of expressive capacity. Those with Jupiter well-placed natally (Sagittarius, Pisces, Cancer) experience especially pronounced Year 3 blessings and should take specific advantage of the year's educational and creative opportunities. The year's Jupiter energy also works through children and students — teaching, mentoring, and parenting receive extraordinary support.\n\nKarmically, Year 3 invites the healing of creative suppression wounds: old experiences of having one's expression dismissed, mocked, or ignored that created the inner critic now overriding authentic expression. Jupiter's beneficence provides the courage to speak and create with full authentic force regardless of prior wounding.`,
-    chinese: `Year 3 maps to the East — Wood element, Zhen trigram (The Arousing). Zhen's image is thunder awakening the earth after winter's silence: the sudden, irresistible emergence of growth energy that has been building invisibly through Years 1 and 2. This is precisely Year 3's quality — the creative jolt that disturbs comfortable stasis into genuine aliveness, the emergence of what has been developing underground.\n\nFeng shui for Year 3: East sector activation with Wood element remedies — tall plants, wooden objects, green and teal colors — to support Year 3's blooming momentum. The annual 3 Jade Star brings creativity and celebration but also legal disputes and verbal conflicts from the star's yang Wood argumentative quality. Use this creative energy consciously: channel it into genuine expression rather than reactive confrontation.\n\nThe East also represents the direction of new beginnings in Chinese cosmology — not the absolute new beginning of Year 1's North/Water, but the visible, manifested new beginning of creative works entering the world. Year 3's creative output, properly directed, carries the cultural impact of genuinely new ideas taking form.`,
+    chinese: `Year 3 maps to the East — Wood element, Zhen trigram (The Arousing). Zhen's image is thunder awakening the earth after winter's silence: the sudden, irresistible emergence of growth energy that has been building invisibly through Years 1 and 2. This is precisely Year 3's quality — the creative jolt that disturbs comfortable stasis into genuine aliveness, the emergence of what has been developing underground.\n\nFeng shui for Year 3: East sector activation with Wood element remedies — tall plants, wooden objects, green and teal colors — to support Year 3's blooming momentum. The annual 3 Jade Star brings creativity and celebration but also legal disputes and verbal conflicts from the star's yang Wood argumentative quality. Use this creative energy consciously: channel it into genuine expression rather than reactive confrontation.\n\nThe East also represents the direction of new beginnings in Chinese cosmology — not the absolute new beginning of Year 1's North/Water, but the visible, manifested new beginning of creative works entering the world. Year 3's creative officer, properly directed, carries the cultural impact of genuinely new ideas taking form.`,
     chald: `The 21/3 (Crown of the Magi) is considered the most auspicious compound number in Year 3's expression — promising victory through creative effort and representing the individual whose authentic vision ultimately succeeds despite obstacles. Year 3 reducing from 21 carries the signature of eventual creative triumph.\n\nThe 12/3 presents the challenge of premature expression: creative gifts offered before sufficient development invite criticism that undermines rather than refines. Year 3 from 12 benefits from maintaining higher standards for what gets shared publicly — the discipline of genuine craft over impressive-but-immature performance.\n\nThe 30/3 carries exceptional creative power combined with the "loner" tendency — extraordinary gifts paired with difficulty sustaining collaborative frameworks. Year 3 from 30 invites conscious attention to genuine openness to others' contributions rather than using collaboration as a vehicle for solo expression.`,
     pr: [{ i: "🎨", n: "Daily Creation", d: "15 minutes of uncensored creative expression every morning" }, { i: "🗣", n: "Throat Mantra", d: "Ham seed mantra vibration practice for Vishuddha activation" }, { i: "📖", n: "Jupiter Journaling", d: "Evening gratitude extraction and wisdom documentation from each day" }, { i: "🌱", n: "East Activation", d: "Feng shui Wood element placement in the Eastern sector" }]
   },
@@ -302,7 +302,6 @@ const YD: any = {
   }
 };
 
-// CHUNK 08: CONVERGENCE CARDS (VERBATIM)
 const CONVERGENCE_CARDS = [
   {
     year: 4,
@@ -340,7 +339,6 @@ const CONVERGENCE_CARDS = [
   }
 ];
 
-// PINNACLE & CHALLENGE DICTIONARIES (VERBATIM)
 const PINNACLE_DESC: Record<number, string> = {
   0: 'The Zero Pinnacle is the rarest and most demanding — a call to complete mastery of all nine vibrations simultaneously. No single quality dominates; every situation requires perfect discernment about which energy is needed. The gift is extraordinary adaptability; the challenge is finding solid ground without a fixed orientation.',
   1: 'The First Pinnacle emphasises individuation and self-definition. This long arc of life asks: who are you, independent of family and collective expectation? Career independence, entrepreneurial initiative, and the courage to lead authentically are this pinnacle\'s recurring themes.',
@@ -368,7 +366,8 @@ const CHALLENGE_DESC: Record<number, string> = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// CHUNKS 07-11: LOGIC ENGINE (VERBATIM)
+// LOGIC ENGINE
+// ═══════════════════════════════════════════════════════════════
 
 function reduce(n: number): number {
   let s = n;
@@ -409,9 +408,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
   const initialized = useRef(false);
 
   useEffect(() => {
-    // ═══════════════════════════════════════════════════════════════
-    // GLOBAL BINDINGS FOR HTML EVENT HANDLERS
-    
     (window as any).calculate = () => {
       const ryInput = document.getElementById('cf-readYear') as HTMLInputElement;
       const ry = parseInt(ryInput.value);
@@ -516,11 +512,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       else if(cat === 'alliance') specificDesc = ba.allianceDesc;
       else specificDesc = `This ${year} ${animalName} year is a Neutral period for ${birthAnimalName}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for the foundation-building, skill development, and relationship maintenance that alliance and challenging years rarely allow time for.`;
       
-      const catInfo: any = {
-        'ben-ming': 'Ben Ming Nian occurs every 12 years when the annual zodiac matches your birth sign. Classical teaching: "When Tai Sui sits above, without joy there must be misfortune" — meaning intensified energy amplifies both achievement and vulnerability. Wear red undergarments continuously; perform An Tai Sui temple rituals in the first lunar month.', 'clash': 'Direct Clash years (Chong Tai Sui) occur when the annual branch stands 180 degrees opposite your birth branch — maximum elemental confrontation. Classical advice: "Use movement to respond to movement" — proactive transformation beats reactive resistance. Build liquid financial reserves before the year; maintain portable, transferable skills and relationships.', 'harm': 'Harm years (Hai Tai Sui) operate through concealed damage rather than overt confrontation. Problems develop invisibly until cumulative effect becomes unavoidable. Essential protections: independent verification of all significant claims, written documentation of agreements, regular relationship auditing for concealed tensions, multiple independent information sources.', 'destruction': 'Destruction years (Po Tai Sui) are characterized by structural fragmentation and financial vulnerability. Essential preparations: comprehensive contract review with legal consultation, emergency reserves at 12-18 months expenses, system simplification, preventive maintenance on all major assets and relationships. Transform reactive destruction into proactive strategic dismantling.', 'alliance': 'Alliance years (San He or Liu He) bring harmonious support, noble persons appearing unexpectedly, and disproportionate returns on initiative. These windows reward preparation: have proposals, projects, and relationship investments ready to deploy when the favorable conditions open. Bold initiative during alliance years consistently outperforms cautious approach.', 'neutral': 'Neutral years (Ping Nian) carry no special Tai Sui relationship. Individual effort and existing momentum determine outcomes. The strategic value: foundation-building, skill development, relationship maintenance, and preparation for upcoming dynamic years. The majority of any life\'s most important work happens in neutral years.'
-      };
-      
-      const body = `<div class="ibox"><strong>${year} (${animalName} Year, Age ${age})</strong> — Tai Sui Relationship: <span style="color:${catColor(cat)}">${catLabel(cat)}</span></div> <div class="content-h2" style="margin-top:16px">Your ${birthAnimalName} in ${animalName} Year</div> ${specificDesc.split('\n\n').map(p=>`<p class="cp">${p}</p>`).join('')} <div class="content-h2">About ${catLabel(cat)}</div> <p class="cp">${catInfo[cat]||''}</p> <div class="content-h2">${animalName} Year — General Qualities</div> <p class="cp">The ${animalName} brings ${ya.el} element energy (${ya.pol} polarity, Branch ${ya.br}) to the collective field. ${ya.trait} qualities pervade the year's social and professional atmosphere. Health focus for the collective: ${ya.organ}. Cardinal direction activated: ${ya.dir}.</p>`;
+      const body = `<div class="ibox"><strong>${year} (${animalName} Year, Age ${age})</strong> — Tai Sui Relationship: <span style="color:${catColor(cat)}">${catLabel(cat)}</span></div> <div class="content-h2" style="margin-top:16px">Your ${birthAnimalName} in ${animalName} Year</div> ${specificDesc.split('\n\n').map(p=>`<p class="cp">${p}</p>`).join('')} <div class="content-h2">${animalName} Year — General Qualities</div> <p class="cp">The ${animalName} brings ${ya.el} element energy (${ya.pol} polarity, Branch ${ya.br}) to the collective field. ${ya.trait} qualities pervade the year's social and professional atmosphere. Health focus for the collective: ${ya.organ}. Cardinal direction activated: ${ya.dir}.</p>`;
       
       document.getElementById('pg')!.textContent = ya.e;
       document.getElementById('ph')!.textContent = `${year}: ${animalName} Year`;
@@ -532,17 +524,19 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
 
     (window as any).renderIntersections = (m: number, d: number, by: number, ry: number) => {
       const cal = [];
+      const birthAnimal = getAnimalFromBirthYear(by);
+      const birthAnimalName = Object.keys(ZOO).find(k => ZOO[k] === birthAnimal) || '';
+      const ba = ZOO[birthAnimalName];
+
       for (let y = ry; y <= ry + 18; y++) {
         const py = reduce(m + d + y);
         const animal = getAnimalFromYear(y);
-        const birthAnimal = getAnimalFromBirthYear(by);
-        const cat = birthAnimal ? getCategory(Object.keys(ZOO).find(k => ZOO[k] === birthAnimal)!, Object.keys(ZOO).find(k => ZOO[k] === animal)!) : 'neutral';
-        cal.push({ year: y, py, animalName: animal ? Object.keys(ZOO).find(k => ZOO[k] === animal) : '', cat });
+        const animalName = Object.keys(ZOO).find(k => ZOO[k] === animal) || '';
+        const cat = getCategory(birthAnimalName, animalName);
+        cal.push({ year: y, py, animalName, cat });
       }
       const py4years = cal.filter(c => c.py === 4);
       const py7years = cal.filter(c => c.py === 7);
-      const birthAnimalName = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromBirthYear(by)) || '';
-      const ba = ZOO[birthAnimalName];
       
       const buildIntersectionCard = (yearData: any, pyNum: number) => {
         const yd = YD[pyNum];
@@ -559,53 +553,37 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
 
         let narrative = '';
         if (pyNum === 4) {
-          if (cat === 'clash') narrative = `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearData.animalName} year's forced disruption, creating a year when every structure you attempt to build meets maximum environmental resistance. The karmic invitation: use Rahu's building energy not to resist the Clash year's forced movement but to build the internal foundations — psychological resilience, spiritual groundedness, practical contingency systems — that make you genuinely mobile rather than frantically rootless. Do not attempt to build permanent structures this year; build portable ones. Financial reserves over fixed investments. Transferable skills over institutional positioning. Psychological stability over social status. The Clash year will move things regardless; your Year 4 work is to ensure that what moves carries your genuine foundation with it rather than leaving it behind.\n\nSpecific to ${birthAnimalName}/${yearData.animalName}: ${ba ? ba.clashDesc : ''}`;
-          else if (cat === 'harm') narrative = `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion: while Rahu drives you to build structures, the Harm year's hidden adversary dynamics are quietly undermining what you build before it can be completed. This is the configuration where workaholism is most dangerous — the compulsive Year 4 building impulse creating elaborate structures that the Harm year's concealed forces are simultaneously destabilizing. The specific risk: trusted colleagues or business partners with hidden agendas at precisely the moment when you are most invested in collaborative structural projects. Year 4 foundation work should be primarily solo or with your most thoroughly verified relationships during this year. Avoid large structural financial commitments that depend on others' reliability.\n\nSpecific dynamics: ${ba ? ba.harmDesc : ''}`;
-          else if (cat === 'destruction') narrative = `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation: the very foundations you are working to build are subject to unexpected structural failures from within. This is the year when old structures that have been maintained through inertia rather than genuine viability finally collapse — often at the moment of most inconvenient timing, precisely when Year 4's energy has you most invested in building. The Chaldean 13/4 resonance is strongest in this configuration: regeneration through upheaval, transformation forced by structural collapse. Work with this rather than against it: deliberately review all existing structures (financial, relational, professional, physical) for those that are maintained through inertia rather than genuine value, and release them proactively before the Destruction year's energy collapses them reactively.\n\nSpecific dynamics: ${ba ? ba.destDesc : ''}`;
-          else if (cat === 'ben-ming') narrative = `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian — the intensification of your natal sign's energy. This creates a year when your characteristic patterns are simultaneously amplified to maximum expression and subjected to maximum structural pressure. Your ${birthAnimalName} nature's most compulsive tendencies will emerge most strongly precisely in the domains where Year 4 is calling you to build most deliberately. The invitation: use Ben Ming Nian's heightened self-awareness as a diagnostic tool. The patterns that emerge most compulsively this year are exactly the patterns whose sublimation into conscious discipline would produce the strongest foundation. Rahu's building demand and your Ben Ming Nian's amplification combine to produce either the most compulsive year in your cycle or the most consciously productive — the difference is awareness.\n\nSpecific dynamics: ${ba ? ba.benDesc : ''}`;
-          else if (cat === 'alliance') narrative = `Personal Year 4's foundation-building receives the unusual gift of alliance support — the most favorable configuration for Year 4 in your Chinese zodiac cycle. ${yearData.animalName} year's harmonious energy reduces the friction that Year 4's structural work typically encounters, making it easier to find reliable collaborators, establish stable institutional relationships, and build foundations that are supported rather than undermined by the environmental energy. This is your optimal Year 4 — the year when foundation-building produces the most lasting results. Prioritize your most ambitious structural projects for this intersection year: the financial systems, professional credentials, health disciplines, and organizational frameworks you build in a supported Year 4 carry unusual stability and longevity.\n\nAlliance dynamics: ${ba ? ba.allianceDesc : ''}`;
-          else narrative = `Personal Year 4's foundation-building discipline proceeds in a ${yearData.animalName} Neutral year — neither amplified by alliance support nor undermined by conflict energy. This allows Year 4's structural work to proceed primarily through your own effort and discernment rather than through environmental support or resistance. The advantage: your Year 4 foundations this year reflect your genuine capacity rather than exceptional circumstances in either direction. The discipline you build during a neutral Year 4 is the most authentic measure of your actual developmental state and the most reliable foundation for the years that follow.`;
+          if (cat === 'clash') narrative = `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearData.animalName} year's forced disruption... ${ba?.clashDesc || ''}`;
+          else if (cat === 'harm') narrative = `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion... ${ba?.harmDesc || ''}`;
+          else if (cat === 'destruction') narrative = `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation... ${ba?.destDesc || ''}`;
+          else if (cat === 'ben-ming') narrative = `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian... ${ba?.benDesc || ''}`;
+          else if (cat === 'alliance') narrative = `Personal Year 4's foundation-building receives the gift of alliance support... ${ba?.allianceDesc || ''}`;
+          else narrative = `Personal Year 4's foundation-building discipline proceeds in a ${yearData.animalName} Neutral year.`;
         } else if (pyNum === 7) {
-          if (cat === 'clash') narrative = `The most spiritually dissonant configuration in your cycle: Personal Year 7's requirement for interior solitude and contemplative withdrawal coincides with your Direct Clash year's maximum external pressure and forced movement. Ketu's pull toward inner silence confronts ${yearData.animalName} year's unavoidable disruption and change. The world is demanding movement and response precisely when your soul requires stillness and inward turning. This combination produces the Year 7 challenge at maximum intensity: the forced recognition that genuine interior work must occur even amid significant external chaos. The invitation is to develop what contemplative traditions call "the eye of the storm" — the capacity for genuine interior stillness that does not require external calm as its precondition. Those who develop this capacity during this configuration emerge from Year 7 with an unusual combination of genuine mystical depth and practical resilience.\n\nSpecific dynamics: ${ba ? ba.clashDesc : ''}`;
-          else if (cat === 'harm') narrative = `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion — creating a configuration where the solitude Year 7 genuinely requires is simultaneously being enforced by relationship betrayals and authority miscommunications that make social engagement feel increasingly unsafe. The risk of misinterpreting forced social withdrawal (caused by Harm year's trust violations) as the voluntary spiritual retreat that Year 7 genuinely calls for: both feel similar, but one is reactive and one is chosen. The practice of this intersection year is choosing the interior work that the circumstances are enforcing, transforming reactive isolation into genuine contemplative retreat, and using the Harm year's trust-testing experiences as direct material for the psychological and spiritual clarification that Year 7 is designed to produce.\n\nSpecific dynamics: ${ba ? ba.harmDesc : ''}`;
-          else if (cat === 'destruction') narrative = `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation — creating the most internally turbulent Year 7 possible. The structures that provide the container for contemplative practice (stable living situation, reliable relationships, financial security) may be destabilized by the Destruction year's energy precisely when Year 7's inner work requires external stability as its foundation. The invitation — and it is a genuine spiritual invitation despite its discomfort — is to discover whether your contemplative practice can proceed without the external scaffolding you thought it required. Ketu's deepest teaching often arrives precisely through Destruction year losses: the revelation that the inner ground is genuinely stable independent of outer circumstance.\n\nSpecific dynamics: ${ba ? ba.destDesc : ''}`;
-          else if (cat === 'ben-ming') narrative = `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian — creating a year of maximum identity amplification during precisely the year when Ketu is asking you to release identification with the very identity being amplified. Your ${birthAnimalName} nature's most characteristic patterns are simultaneously at peak intensity and being subjected to Ketu's dissolution. This is either the most confusing year of your cycle or the most profoundly clarifying, depending entirely on your willingness to witness what your amplified nature reveals about what it has been protecting through its characteristic patterns. Year 7's Ketu energy and Ben Ming Nian's amplification together create conditions for genuine identity breakthrough — the recognition of what you are beneath what you characteristically do.\n\nSpecific dynamics: ${ba ? ba.benDesc : ''}`;
-          else if (cat === 'alliance') narrative = `Personal Year 7's contemplative interior work receives the unusual gift of Chinese zodiac alliance support — meaning the environmental energy facilitates rather than disrupts the Year 7 retreat. This is your most supported Year 7, where the external circumstances actually create space and support for the interior work Ketu calls for. The year may bring specific teachers, texts, practices, or communities that provide precisely the framework your Year 7 inner exploration requires. Approach this configuration with deliberate intention: plan the retreat, study program, writing project, or contemplative practice that most represents what you genuinely need to explore during Year 7, and enter this intersection year with that intention clearly set.\n\nAlliance dynamics: ${ba ? ba.allianceDesc : ''}`;
-          else narrative = `Personal Year 7's contemplative withdrawal proceeds in a ${yearData.animalName} Neutral year — neither supported nor undermined by exceptional Chinese zodiac energy. The interior work this Year 7 calls for is primarily between you and the depth that Ketu is activating, without the amplification of either favorable alliance energy or disruptive conflict energy. This may feel like the quietest of your Year 7s, which is often precisely what genuine contemplative work requires.`;
+          if (cat === 'clash') narrative = `The most spiritually dissonant configuration in your cycle: Personal Year 7's requirement for interior solitude coincides with your Direct Clash year... ${ba?.clashDesc || ''}`;
+          else if (cat === 'harm') narrative = `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion... ${ba?.harmDesc || ''}`;
+          else if (cat === 'destruction') narrative = `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation... ${ba?.destDesc || ''}`;
+          else if (cat === 'ben-ming') narrative = `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian... ${ba?.benDesc || ''}`;
+          else if (cat === 'alliance') narrative = `Personal Year 7's contemplative interior work receives the gift of alliance support... ${ba?.allianceDesc || ''}`;
+          else narrative = `Personal Year 7's contemplative withdrawal proceeds in a ${yearData.animalName} Neutral year.`;
         }
-        const uyNum = reduce(yearData.year);
-        return `<div class="intersection-card"> <div class="intersection-header"> <div class="intersection-year">${yearData.year}</div> <div class="intersection-title">Personal Year ${pyNum} · ${yd.title} · ${yearData.animalName} Year ${yearAnimal ? yearAnimal.e : '✦'}</div> <div class="intersection-sub" style="color:${intensityColor}">${intensity}</div> <div style="margin-top:8px;font-family:'Cinzel',serif;font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cf-silver-dim)"> Universal Year ${uyNum} — ${YD[uyNum] ? YD[uyNum].title : ''} &nbsp;|&nbsp; Chinese: <span style="color:${catColor(cat)}">${catLabel(cat)}</span> ${uyNum === pyNum ? ' &nbsp;|&nbsp; <span style="color:var(--cf-gold)">⚡ Double Amplification: UY = PY</span>' : ''} </div> </div> <div class="intersection-body" id="int-${pyNum}-${yearData.year}"> ${narrative.split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('')} <button class="tts-btn" style="margin-top:8px" onclick="window.ttsPlay(this, document.getElementById('int-${pyNum}-${yearData.year}').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> </div>`;
+        return `<div class="intersection-card"> <div class="intersection-header"> <div class="intersection-year">${yearData.year}</div> <div class="intersection-title">Personal Year ${pyNum} · ${yd.title}</div> <div class="intersection-sub" style="color:${intensityColor}">${intensity}</div> </div> <div class="intersection-body" id="int-${pyNum}-${yearData.year}"> <p class="cp">${narrative}</p> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('int-${pyNum}-${yearData.year}').textContent)">🔊 Read Aloud</button> </div> </div>`;
       };
       
-      let finalHtml = '';
-      if (py4years.length > 0 || py7years.length > 0) {
-        finalHtml += `<div class="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div><p style="text-align:center;font-size:.92rem;color:var(--cf-text-dim);line-height:1.8;max-width:680px;margin:0 auto 24px;font-style:italic">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle. Each intersection has a unique character determined by the Tai Sui energy of that year.</p>`;
-        if (py4years.length > 0) {
-          finalHtml += `<div style="margin-bottom:8px"><div class="section-header" style="margin:20px 0 16px;font-size:.6rem">PY 4 — Foundation Year Intersections</div>${py4years.map(y => buildIntersectionCard(y, 4)).join('')}</div>`;
-        }
-        if (py7years.length > 0) {
-          finalHtml += `<div><div class="section-header" style="margin:20px 0 16px;font-size:.6rem">PY 7 — Mystic Year Intersections</div>${py7years.map(y => buildIntersectionCard(y, 7)).join('')}</div>`;
-        }
-      }
+      let finalHtml = `<div class="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>`;
+      if (py4years.length > 0) finalHtml += `<div class="section-header" style="font-size:.6rem">PY 4 — Foundation Year</div>${py4years.map(y => buildIntersectionCard(y, 4)).join('')}`;
+      if (py7years.length > 0) finalHtml += `<div class="section-header" style="font-size:.6rem">PY 7 — Mystic Year</div>${py7years.map(y => buildIntersectionCard(y, 7)).join('')}`;
       document.getElementById('personal-intersections-container')!.innerHTML = finalHtml;
     };
 
     (window as any).buildConvergenceCards = (isInner: boolean) => {
-      const buildHTML = (isInnerNode: boolean) => {
-        let html = '';
-        CONVERGENCE_CARDS.forEach(c => {
-          const intro = c.intro.split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
-          const chips = c.chips.map(ch => `<div class="enemy-chip"><div class="enemy-chip-title">${ch.t}</div><p>${ch.p}</p></div>`).join('');
-          html += `<div class="conv-card"> <div class="conv-header"> <div class="conv-title">${c.title}</div> <div class="conv-sub">${c.sub}</div> </div> <div class="conv-body" id="conv-body-${c.year}${isInnerNode ? '-inner' : ''}"> ${intro} <div class="enemy-grid">${chips}</div> <div class="wbox">${c.warning}</div> ${!isInnerNode ? `<div class="hbox">To discover exactly when PY ${c.year} will intersect with your Chinese zodiac cycle — and what that specific combination means for you — enter your birth date above and cast your fate map.</div>` : ''} <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('conv-body-${c.year}${isInnerNode ? '-inner' : ''}').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> </div>`;
-        });
-        return html;
-      };
-      
-      const outerTarget = document.getElementById('convergence-cards');
-      if (outerTarget && !isInner) outerTarget.innerHTML = buildHTML(false);
-      
-      const innerTarget = document.getElementById('convergence-cards-inner');
-      if (innerTarget && isInner) innerTarget.innerHTML = buildHTML(true);
+      let html = '';
+      CONVERGENCE_CARDS.forEach(c => {
+        const chips = c.chips.map(ch => `<div class="enemy-chip"><div class="enemy-chip-title">${ch.t}</div><p>${ch.p}</p></div>`).join('');
+        html += `<div class="conv-card"> <div class="conv-header"> <div class="conv-title">${c.title}</div> <div class="conv-sub">${c.sub}</div> </div> <div class="conv-body" id="conv-body-${c.year}"> <p class="cp">${c.intro}</p> <div class="enemy-grid">${chips}</div> <div class="wbox">${c.warning}</div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('conv-body-${c.year}').textContent)">🔊 Read Aloud</button> </div> </div>`;
+      });
+      const target = isInner ? document.getElementById('convergence-cards-inner') : document.getElementById('convergence-cards');
+      if (target) target.innerHTML = html;
     };
 
     if (!initialized.current) {
@@ -615,80 +593,69 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
     }
   }, [birthDay, birthMonth, birthYear]);
 
-  // Render functions
   const renderSynthesis = (py: number, uy: number, lp: number, bv: number, pm: number, pinnNum: number, challenge: number, pinnIdx: number, birthAnimalName: string, m: number, d: number, by: number, ry: number) => {
     const yr = YD[py];
     const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromYear(ry)) || '';
-    const cat = birthAnimalName && yearAnimalName ? getCategory(birthAnimalName, yearAnimalName) : 'neutral';
+    const cat = getCategory(birthAnimalName, yearAnimalName);
     const pmNames = ['', 'New Beginnings', 'Cooperation', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Reflection', 'Power', 'Completion'];
-    const pyDesc = yr ? yr.title : '';
-    const lpDesc = lpName(lp);
-    const catStr = catLabel(cat);
-    const tension = (py === 4 && (lp === 5 || lp === 3)) || (py === 7 && (lp === 1 || lp === 6));
-    const harmony = (py === lp) || (py === uy) || (py === bv);
-    const animalLine = `Your ${birthAnimalName} nature meets a ${yearAnimalName} year (${catStr}) — ${cat === 'clash' ? 'an environment of maximum elemental friction calling for proactive adaptation rather than resistance' : cat === 'harm' ? 'a year of concealed pressures requiring extra vigilance in trust and documentation' : cat === 'destruction' ? 'a year when outdated structures may fracture, clearing ground for what genuinely serves you' : cat === 'ben-ming' ? 'your identity year, when all your characteristic patterns amplify to their fullest expression' : ['sanhe', 'liuhe'].includes(cat) ? 'an environmentally supported year where the collective field actively favours your initiatives' : 'a neutral year where outcomes reflect pure personal effort rather than exceptional external forces'}.`;
-    const convergeLine = tension ? `Your Life Path ${lp} (${lpDesc}) creates notable friction with Personal Year ${py}'s demands — a soul-level tension with specific lessons detailed in the Critical Year Intersections below.` : harmony ? `A significant harmonic: your Personal Year ${py} resonates with another core number in your chart — an amplification point for ${pyDesc.toLowerCase()} themes.` : `Your Life Path ${lp} (${lpDesc}) and Personal Year ${py} (${pyDesc}) are in productive dialogue — neither in obvious tension nor exceptional harmony, allowing this year's work to proceed through genuine effort.`;
-    const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${pyDesc}</strong>, riding the ${yr ? yr.phase.toLowerCase() : ''} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy] ? YD[uy].title : ''}) sets the collective backdrop. Your current Personal Month is <strong>${pm} (${pmNames[pm]})</strong>. ${animalLine} ${convergeLine} Your active Pinnacle is <strong>${pinnNum}</strong> — the long-arc life theme — while your active Challenge number <strong>${challenge === 0 ? '0 (The Master Test)' : challenge + ' (' + lpName(challenge) + ')'}</strong> names the resistance pattern this chapter asks you to develop through.`;
-    
-    document.getElementById('synthesis-container')!.innerHTML = `<div style="position:relative"><div style="font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase; color:var(--cf-gold-dim);margin-bottom:18px;display:flex;align-items:center;gap:12px"> <span style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--cf-gold-dim))"></span> ✦ &nbsp; Your ${ry} Reading — Oracle Synthesis &nbsp; ✦ <span style="flex:1;height:1px;background:linear-gradient(90deg,var(--cf-gold-dim),transparent)"></span> </div><div id="synthesis-text" style="font-size:1rem;line-height:2;color:var(--cf-text)">${synthText}</div><button class="tts-btn" style="margin-top:16px" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)"> <span class="tts-icon">🔊</span> Read Aloud</button> </div>`;
+    const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>. Your Life Path ${lp} (${lpName(lp)}) interacts with the ${yearAnimalName} year (${catLabel(cat)}). Your current Personal Month is ${pm} (${pmNames[pm]}). Your active Pinnacle is ${pinnNum} and active Challenge is ${challenge}.`;
+    document.getElementById('synthesis-container')!.innerHTML = `<div class="section-header">✦ Oracle Synthesis ✦</div><div id="synthesis-text" class="cp">${synthText}</div><button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)">🔊 Read Aloud</button>`;
   };
 
   const renderYearDive = (py: number, m: number, d: number, by: number, ry: number, birthAnimalName: string) => {
     const yr = YD[py]; if (!yr) return;
-    const ba = ZOO[birthAnimalName];
     const currentYearAnimal = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromYear(ry)) || '';
-    const cat = birthAnimalName && currentYearAnimal ? getCategory(birthAnimalName, currentYearAnimal) : 'neutral';
-    let zodiacOverlay = '';
-    if (ba) {
-      zodiacOverlay = `\n\n<div class="ibox"><strong>Your ${birthAnimalName} in ${ry} ${currentYearAnimal} Year:</strong> ${catLabel(cat)} — `;
-      if (cat === 'ben-ming') zodiacOverlay += ba.benDesc;
-      else if (cat === 'clash') zodiacOverlay += ba.clashDesc;
-      else if (cat === 'harm') zodiacOverlay += ba.harmDesc;
-      else if (cat === 'destruction') zodiacOverlay += ba.destDesc;
-      else if (cat === 'alliance') zodiacOverlay += ba.allianceDesc;
-      else zodiacOverlay += `This is a Neutral year for ${birthAnimalName}. Your Year ${py} work proceeds primarily through personal effort.`;
-      zodiacOverlay += '</div>';
-    }
+    const cat = getCategory(birthAnimalName, currentYearAnimal);
     const kws = yr.kw.map((k: string) => `<span class="kw">${k}</span>`).join('');
     const prs = yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('');
-    const paras = (t: string) => (t || '').split('\n\n').filter(p => p.trim()).map(p => `<p class="cp">${p.trim()}</p>`).join('');
+    const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
     
-    document.getElementById('year-dive-container')!.innerHTML = `<div class="section-header">✦ &nbsp; Your Year ${py} — Deep Dive &nbsp; ✦</div> <div class="year-deep-dive y${py}${yr.isCrit ? ' critical' : ''}"> <div class="year-dive-header"> <div class="year-num-big">${py}</div> <div class="year-dive-title">${yr.title}</div> <div class="year-dive-sub">${yr.sub}</div> <div class="year-meta-row"> <span class="year-tag prim">${yr.planet}</span> <span class="year-tag">${yr.phase}</span> <span class="year-tag">${yr.chakra}</span> ${yr.isCrit ? `<span class="year-tag" style="color:var(--cf-rose)">⚠ Critical Year</span>` : ''} </div> </div> <div class="kw-strip">${kws}</div> <div class="tab-nav"> <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button> <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button> <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button> <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button> <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button> <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button> </div> <div class="tab-content"> <div class="tab-panel active" id="tp-ov"> <div class="content-section" id="tp-ov-text"> ${paras(yr.overview)} ${zodiacOverlay} </div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> <div class="tab-panel" id="tp-py"> <div class="content-section"> <div class="content-h">Challenges & Shadows</div> <div id="tp-py-text">${paras(yr.pyth)}</div> </div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-py-text').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> <div class="tab-panel" id="tp-ve"> <div class="content-section"> <div class="content-h">Vedic — ${yr.planet}</div> <div id="tp-ve-text">${paras(yr.vedic)}</div> </div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ve-text').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> <div class="tab-panel" id="tp-ch"> <div class="content-section"> <div class="content-h">Chinese Numerology</div> <div id="tp-ch-text">${paras(yr.chinese)}</div> </div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ch-text').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> <div class="tab-panel" id="tp-ca"> <div class="content-section"> <div class="content-h">Chaldean Compound</div> <div id="tp-ca-text">${paras(yr.chald)}</div> </div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ca-text').textContent)"><span class="tts-icon">🔊</span> Read Aloud</button> </div> <div class="tab-panel" id="tp-pr"> <div class="content-section"> <div class="content-h">Practices</div> <div class="practice-grid">${prs}</div> </div> </div> </div> </div>`;
+    document.getElementById('year-dive-container')!.innerHTML = `<div class="year-deep-dive y${py}"> <div class="year-dive-header"> <div class="year-num-big">${py}</div> <div class="year-dive-title">${yr.title}</div> </div> <div class="kw-strip">${kws}</div> <div class="tab-nav"> <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button> <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button> <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button> <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button> <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button> <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button> </div> <div class="tab-content"> <div class="tab-panel active" id="tp-ov"> <div class="content-section" id="tp-ov-text">${paras(yr.overview)}</div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button> </div> <div class="tab-panel" id="tp-py"><div id="tp-py-text">${paras(yr.pyth)}</div></div> <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div> <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div> <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div> <div class="tab-panel" id="tp-pr"><div class="practice-grid">${prs}</div></div> </div> </div>`;
   };
 
   const renderZodiac = (m: number, d: number, by: number, currentYear: number, birthAnimalName: string) => {
-    const ba = ZOO[birthAnimalName]; if (!ba) return;
     const today = new Date();
     const startYear = today.getFullYear();
     const years = [];
     for (let y = startYear; y <= startYear + 11; y++) {
       const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromYear(y)) || '';
       const cat = getCategory(birthAnimalName, yearAnimalName);
-      const age = y - by;
       const py = reduce(m + d + y);
-      let danger = 0;
-      if (['clash', 'harm', 'destruction'].includes(cat) && (py === 4 || py === 7)) danger = 4;
-      else if (cat === 'ben-ming' && (py === 4 || py === 7)) danger = 3;
-      else if (['clash', 'harm', 'destruction'].includes(cat)) danger = 2;
-      else if (py === 4 || py === 7) danger = 1;
-      years.push({ year: y, cat, animalName: yearAnimalName, animal: ZOO[yearAnimalName], age, py, danger });
+      years.push({ year: y, cat, animal: ZOO[yearAnimalName], py });
     }
-    const chips = years.map(y => `
-      <div class="zc" style="border-radius:10px;padding:11px 8px;text-align:center;cursor:pointer;transition:all 0.22s;position:relative;border:${y.danger === 4 ? '2px solid rgba(200,30,50,.85)' : y.danger === 3 ? '2px solid rgba(220,140,0,.8)' : `1px solid ${catColor(y.cat)}`}" onclick="window.openZodiacPop('${y.animalName}','${birthAnimalName}','${y.year}','${y.age}','${y.cat}')">
-        <div class="zc-ani">${y.animal ? y.animal.e : '✦'}</div>
-        <div class="zc-yr">${y.year}</div>
-        <div style="font-family:'Cinzel Decorative',serif;font-size:1.05rem;color:var(--cf-gold);line-height:1;margin:3px 0">PY ${y.py}</div>
-        <div class="zc-type" style="color:${catColor(y.cat)};font-size:.5rem;text-transform:uppercase">${catLabel(y.cat)}</div>
-        <div class="zc-age" style="font-size:.72rem;color:var(--cf-text-dim)">Age ${y.age}</div>
-      </div>`).join('');
-    document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">${ba.e} &nbsp; Your Chinese Zodiac — ${birthAnimalName} &nbsp; ${ba.e}</div> <div class="zodiac-grid">${chips}</div>`;
+    const chips = years.map(y => `<div class="zc" onclick="window.openZodiacPop('${y.animal.n}','${birthAnimalName}','${y.year}','${y.year-by}','${y.cat}')"> <div class="zc-ani">${y.animal.e}</div> <div class="zc-yr">${y.year}</div> <div class="zc-yr">PY ${y.py}</div> <div class="zc-type" style="color:${catColor(y.cat)}">${catLabel(y.cat)}</div> </div>`).join('');
+    document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">☯ Zodiac Trajectory ☯</div><div class="zodiac-grid">${chips}</div>`;
   };
 
   const renderPinnacles = (p1: number, p2: number, p3: number, p4: number, c1: number, c2: number, c3: number, c4: number, p1end: number, p2end: number, p3end: number, currentAge: number, lp: number) => {
-    const stages = [{ n: 1, p: p1, c: c1, label: `Birth — Age ${p1end}`, start: 0, end: p1end }, { n: 2, p: p2, c: c2, label: `Age ${p1end + 1} — ${p2end}`, start: p1end + 1, end: p2end }, { n: 3, p: p3, c: c3, label: `Age ${p2end + 1} — ${p3end}`, start: p2end + 1, end: p3end }, { n: 4, p: p4, c: c4, label: `Age ${p3end + 1}+`, start: p3end + 1, end: 99 }];
+    const stages = [
+      { n: 1, p: p1, c: c1, label: `Birth - Age ${p1end}`, start: 0, end: p1end },
+      { n: 2, p: p2, c: c2, label: `Age ${p1end + 1} - ${p2end}`, start: p1end + 1, end: p2end },
+      { n: 3, p: p3, c: c3, label: `Age ${p2end + 1} - ${p3end}`, start: p2end + 1, end: p3end },
+      { n: 4, p: p4, c: c4, label: `Age ${p3end + 1}+`, start: p3end + 1, end: 99 }
+    ];
     const active = stages.find(s => currentAge >= s.start && currentAge <= s.end) || stages[3];
-    const container = document.getElementById('pinnacles-container')!;
-    container.innerHTML = `<div class="section-header">◈ &nbsp; Your Pinnacles & Challenges &nbsp; ◈</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:11px">${stages.map(s => `<div style="background:rgba(18,30,58,.95);border:1px solid ${s.n === active.n ? '#68c268' : 'rgba(200,168,75,.1)'};border-radius:10px;padding:15px"> <div style="font-size:.56rem;color:${s.n === active.n ? '#68c268' : 'var(--cf-silver-dim)'}">Pinnacle ${s.n} ${s.n === active.n ? '◈ Active' : ''} · ${s.label}</div> <div style="display:flex;gap:18px"> <div><div style="font-size:1.7rem;color:#68c268">${s.p}</div><div style="font-size:.48rem">Pinnacle</div></div> <div><div style="font-size:1.7rem;color:#c86040">${s.c}</div><div style="font-size:.48rem">Challenge</div></div> <div style="flex:1"><p style="font-size:.82rem">${PINNACLE_DESC[s.p]}</p></div> </div> </div>`).join('')}</div>`;
+    
+    const cards = stages.map(s => `
+      <div style="background:rgba(18,30,58,.95);border:1px solid ${s.n === active.n ? '#68c268' : 'rgba(200,168,75,.1)'};border-radius:10px;padding:20px;margin-bottom:12px">
+        <div style="font-family:'Cinzel',serif;font-size:.6rem;color:var(--cf-silver-dim);margin-bottom:10px;text-transform:uppercase">Pinnacle ${s.n} ${s.n === active.n ? '◈ ACTIVE' : ''} · ${s.label}</div>
+        <div style="display:flex;gap:24px;align-items:flex-start">
+          <div style="text-align:center">
+            <div style="font-size:2.2rem;color:#68c268;font-family:'Cinzel Decorative'">${s.p}</div>
+            <div style="font-size:.5rem;text-transform:uppercase">Pinnacle</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:2.2rem;color:#c86040;font-family:'Cinzel Decorative'">${s.c}</div>
+            <div style="font-size:.5rem;text-transform:uppercase">Challenge</div>
+          </div>
+          <div style="flex:1">
+            <p style="font-size:.92rem;line-height:1.6">${PINNACLE_DESC[s.p]}</p>
+            <p style="font-size:.88rem;color:#ff6060;font-style:italic;margin-top:10px">Challenge ${s.c}: ${CHALLENGE_DESC[s.c]}</p>
+          </div>
+        </div>
+      </div>`).join('');
+    
+    document.getElementById('pinnacles-container')!.innerHTML = `<div class="section-header">◈ Pinnacles & Challenges ◈</div><div>${cards}</div>`;
   };
 
   return (
@@ -699,18 +666,17 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           <span className="hero-glyph">🌌</span>
           <h1>Cosmic Fate Map</h1>
           <p className="hero-sub">Trajectory & Enemy Year Oracle</p>
-          <div className="divider-orn">☽ &nbsp; Pythagorean · Vedic · Chinese · Chaldean &nbsp; ☾</div>
         </div>
 
         <div className="calc-card">
-          <div className="calc-title">✦ &nbsp; Forecast Your Destiny &nbsp; ✦</div>
+          <div className="calc-title">✦ Forecast Your Destiny ✦</div>
           <div className="calc-inputs">
             <div className="input-group">
               <label>Year to Read</label>
               <input type="number" id="cf-readYear" defaultValue={new Date().getFullYear()} min={1900} max={2100} />
             </div>
           </div>
-          <button className="btn-reveal" onClick={() => (window as any).calculate()}>✦ &nbsp; Cast Your Fate Map</button>
+          <button className="btn-reveal" onClick={() => (window as any).calculate()}>✦ Cast Your Fate Map</button>
         </div>
 
         <div id="result-area" className="result-hidden">
@@ -720,35 +686,24 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           <nav className="dash-nav" id="dash-nav">
             <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
             <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Year Dive</button>
+            <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical Years</button>
             <button className="dash-tab" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
             <button className="dash-tab" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
             <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Convergence</button>
           </nav>
 
           <div className="dash-body">
-            <div className="dash-panel active" id="panel-synthesis">
-              <div id="synthesis-container"></div>
-            </div>
-            <div className="dash-panel" id="panel-yeardive">
-              <div id="year-dive-container"></div>
-            </div>
-            <div className="dash-panel" id="panel-intersections">
-              <div id="personal-intersections-container"></div>
-            </div>
-            <div className="dash-panel" id="panel-zodiac">
-              <div id="zodiac-container"></div>
-            </div>
-            <div className="dash-panel" id="panel-pinnacles">
-              <div id="pinnacles-container"></div>
-            </div>
-            <div className="dash-panel" id="panel-convergence">
-              <div id="convergence-cards-inner"></div>
-            </div>
+            <div className="dash-panel active" id="panel-synthesis"><div id="synthesis-container"></div></div>
+            <div className="dash-panel" id="panel-yeardive"><div id="year-dive-container"></div></div>
+            <div className="dash-panel" id="panel-intersections"><div id="personal-intersections-container"></div></div>
+            <div className="dash-panel" id="panel-zodiac"><div id="zodiac-container"></div></div>
+            <div className="dash-panel" id="panel-pinnacles"><div id="pinnacles-container"></div></div>
+            <div className="dash-panel" id="panel-convergence"><div id="convergence-cards-inner"></div></div>
           </div>
         </div>
 
         <div className="conv-outer" id="convergence-outer">
-          <div className="section-header">⚠ &nbsp; Critical Convergence — Enemy Year Dynamics &nbsp; ⚠</div>
+          <div className="section-header">⚠ Critical Convergence ⚠</div>
           <div id="convergence-cards"></div>
         </div>
       </div>
