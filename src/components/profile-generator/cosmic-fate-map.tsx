@@ -1,6 +1,6 @@
 /**
  * @fileOverview Complete restoration of Cosmic Fate Map with high-depth narratives and verbatim synthesis logic.
- * Synchronized Zodiac Trajectory with the selected search year.
+ * Synchronized Zodiac Trajectory with the selected search year and 2-column visual mirror layout.
  */
 'use client';
 
@@ -32,7 +32,7 @@ const getAnimalFromYear = (y: number) => {
 };
 
 const getCategory = (birthSign: string, yearSign: string) => {
-  if (birthSign === yearSign) return 'ben-ming';
+  if (birthSign === yearSign) return 'ben';
   
   const clashes: Record<string, string> = { Rat: 'Horse', Horse: 'Rat', Ox: 'Goat', Goat: 'Ox', Tiger: 'Monkey', Monkey: 'Tiger', Rabbit: 'Rooster', Rooster: 'Rabbit', Dragon: 'Dog', Dog: 'Dragon', Snake: 'Pig', Pig: 'Snake' };
   if (clashes[birthSign] === yearSign) return 'clash';
@@ -60,14 +60,14 @@ const getCategory = (birthSign: string, yearSign: string) => {
 };
 
 const catLabel = (c: string) => ({ 
-  'ben-ming': 'Ben Ming Nian ✦', 'clash': 'Direct Clash ⚡', 'harm': 'Harm Year ⚠', 
-  'destruction': 'Destruction Year 💀', 'alliance': 'Alliance Year ✅', 'neutral': 'Neutral Year ◦' 
-}[c] || 'Neutral Year ◦');
+  'ben': 'BEN MING NIAN', 'clash': 'DIRECT CLASH', 'harm': 'HARM YEAR', 
+  'destruction': 'DESTRUCTION YEAR', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
+}[c] || 'NEUTRAL');
 
-const catColor = (c: string) => ({ 
-  'ben-ming': 'var(--cf-gold)', 'clash': 'var(--cf-rose)', 'harm': 'var(--cf-amber)', 
-  'destruction': 'var(--cf-amethyst)', 'alliance': 'var(--cf-jade-bright)', 'neutral': 'var(--cf-silver-dim)' 
-}[c] || 'var(--cf-text)');
+const getStatusLabelShort = (c: string) => ({ 
+  'ben': 'BEN', 'clash': 'DIRECT', 'harm': 'HARM', 
+  'destruction': 'DESTRUCTION', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
+}[c] || 'NEUTRAL');
 
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const initialized = useRef(false);
@@ -190,7 +190,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           const ani = getAnimalFromYear(y);
           const iCat = getCategory(birthSign, ani.n);
           const uyn = reduce(y);
-          const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben-ming';
+          const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
           
           let statusLabel = `◦ Critical Personal Year ${pyn} in ${ani.n} Year`;
           let statusColor = 'var(--cf-silver-dim)';
@@ -223,20 +223,31 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
         <div class="px-2">${intersections.join('')}</div>`;
 
-      // Zodiac - Synchronized with ry (Read Year)
-      let zHtml = '<div class="zodiac-grid">';
+      // Zodiac Trajectory - 2 Column Mirror Grid
+      let zHtml = '<div class="zodiac-grid grid grid-cols-2 gap-3 px-2">';
       for (let y = ry; y <= ry + 11; y++) {
         const ani = getAnimalFromYear(y);
         const zCat = getCategory(birthSign, ani.n);
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
-        zHtml += `<div class="zc" onclick="window.openZodiacPop('${ani.n}','${birthSign}','${y}','${y-by}','${zCat}')">
+        
+        let labelColor = 'var(--cf-text-dim)';
+        if (pyn === 7 && zCat === 'clash') labelColor = '#b91c1c'; // Deep Red
+        else if ((pyn === 1 || pyn === 9) && zCat === 'alliance') labelColor = '#065f46'; // Deep Green
+        else if (zCat === 'alliance') labelColor = '#34d399'; // Emerald
+        else if (zCat === 'harm') labelColor = '#fbbf24'; // Amber
+        else if (zCat === 'ben') labelColor = '#c8a84b'; // Gold
+        else if (zCat === 'destruction') labelColor = '#a78bfa'; // Purple
+        else if (zCat === 'clash') labelColor = '#f87171'; // Red
+
+        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border border-white/5 rounded-2xl text-center" onclick="window.openZodiacPop('${ani.n}','${birthSign}','${y}','${y-by}','${zCat}')">
           <div class="text-4xl mb-3">${ani.e}</div>
-          <div class="text-[11px] font-bold text-white mb-1">${y}</div>
-          <div class="text-[10px] text-primary mb-1">PY ${pyn}</div>
-          <div class="text-[9px] uppercase font-black tracking-tighter" style="color:${catColor(zCat)}">${catLabel(zCat).split(' ')[0]}</div>
+          <div class="text-[13px] font-bold text-white mb-1">${y}</div>
+          <div class="text-[11px] text-primary mb-1">PY ${pyn}</div>
+          <div class="text-[10px] font-black uppercase tracking-tighter" style="color:${labelColor}">${getStatusLabelShort(zCat)}</div>
         </div>`;
       }
-      document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">☯ &nbsp; Zodiac Trajectory &nbsp; ☯</div>` + zHtml + '</div>';
+      document.getElementById('zodiac-container')!.innerHTML = `
+        <div class="section-header">☯ &nbsp; ZODIAC TRAJECTORY &nbsp; ☯</div>` + zHtml + '</div>';
 
       // Pinnacles
       const pStages = [
@@ -375,10 +386,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const ba = ZOO[birthSign]; const ya = ZOO[aniName]; if (!ba || !ya) return;
       const dyn = ba[`${cat}Desc`] || ba[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `This ${year} ${aniName} year is a Neutral period for ${birthSign}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for foundation-building, skill development, and relationship refinement that will serve as a stable platform for the years that follow.`;
       
+      const labelColor = (cat === 'clash') ? '#f87171' : (cat === 'alliance') ? '#34d399' : (cat === 'harm') ? '#fbbf24' : (cat === 'ben') ? '#c8a84b' : (cat === 'destruction') ? '#a78bfa' : 'var(--cf-silver-dim)';
+
       document.getElementById('pb')!.innerHTML = `
         <button class="tts-btn mb-6 w-full" onclick="window.ttsPlay(this, 'pb-content')">🔊 Read Aloud</button> 
         <div id="pb-content">
-          <div class="ibox mb-6"><strong>${year} (${aniName} Year, Age ${age})</strong> — Tai Sui: <span style="color:${catColor(cat)}">${catLabel(cat)}</span></div> 
+          <div class="ibox mb-6"><strong>${year} (${aniName} Year, Age ${age})</strong> — Tai Sui: <span style="color:${labelColor}">${catLabel(cat)}</span></div> 
           <div class="content-h mb-3 uppercase tracking-widest text-xs opacity-60">YOUR ${birthSign.toUpperCase()} IN ${aniName.toUpperCase()} YEAR</div> 
           ${dyn.split('\n\n').map(p=>`<p class="cp mb-4 text-sm leading-relaxed">${p}</p>`).join('')} 
           <div class="content-h mt-8 mb-3 uppercase tracking-widest text-xs opacity-60">${aniName.toUpperCase()} YEAR QUALITIES</div> 
@@ -424,12 +437,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <div className="alert-banner" id="alert-banner"></div>
 
           <nav className="dash-nav grid grid-cols-3 gap-1 mb-4" id="dash-nav">
-            <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
-            <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Dive</button>
-            <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical</button>
-            <button className="dash-tab active" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
-            <button className="dash-tab" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
-            <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
+            <button class="dash-tab active" data-panel="synthesis" onclick="window.switchDash(this)">✦ Oracle</button>
+            <button class="dash-tab" data-panel="yeardive" onclick="window.switchDash(this)">☽ Dive</button>
+            <button class="dash-tab" data-panel="intersections" onclick="window.switchDash(this)">🔥 Critical</button>
+            <button class="dash-tab" data-panel="zodiac" onclick="window.switchDash(this)">☯ Zodiac</button>
+            <button class="dash-tab" data-panel="pinnacles" onclick="window.switchDash(this)">◈ Pinnacles</button>
+            <button class="dash-tab" data-panel="convergence" onclick="window.switchDash(this)">⚠ Enemy</button>
           </nav>
 
           <div className="dash-body p-4">
