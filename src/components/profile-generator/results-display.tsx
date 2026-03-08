@@ -131,15 +131,19 @@ function ResultsHeader({
             {name}
         </h1>
         <p className="text-sm text-white/50 mt-1">{birthDate}</p>
-        <div className='relative flex flex-col justify-center items-center w-full max-w-2xl mx-auto mt-6 space-y-4 px-4'>
+        <div className='relative grid grid-cols-2 gap-3 w-full max-w-2xl mx-auto mt-6 px-4'>
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
                 {newAstroSign}
              </AnimatedTab>
-            <div className="grid grid-cols-3 gap-2 w-full">
-                <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro</AnimatedTab>
-                <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numbers</AnimatedTab>
-                <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>🌌 Cosmic Fate</AnimatedTab>
-            </div>
+             <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>
+                Astrology
+             </AnimatedTab>
+             <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>
+                Numerology
+             </AnimatedTab>
+             <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>
+                🌌 Cosmic Fate Map
+             </AnimatedTab>
         </div>
     </div>
   );
