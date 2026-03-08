@@ -230,10 +230,10 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         const zCat = getCategory(birthSign, ani.n);
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
         zHtml += `<div class="zc" onclick="window.openZodiacPop('${ani.n}','${birthSign}','${y}','${y-by}','${zCat}')">
-          <div class="text-2xl mb-1">${ani.e}</div>
-          <div class="text-[10px] font-bold text-white">${y}</div>
-          <div class="text-[9px] text-primary">PY ${pyn}</div>
-          <div class="text-[8px] uppercase font-black" style="color:${catColor(zCat)}">${catLabel(zCat).split(' ')[0]}</div>
+          <div class="text-4xl mb-3">${ani.e}</div>
+          <div class="text-[11px] font-bold text-white mb-1">${y}</div>
+          <div class="text-[10px] text-primary mb-1">PY ${pyn}</div>
+          <div class="text-[9px] uppercase font-black tracking-tighter" style="color:${catColor(zCat)}">${catLabel(zCat).split(' ')[0]}</div>
         </div>`;
       }
       document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">☯ &nbsp; Zodiac Trajectory &nbsp; ☯</div>` + zHtml + '</div>';
@@ -408,14 +408,14 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <p className="hero-sub">Destiny Synthesis & Critical Year Oracle</p>
         </div>
 
-        <div className="calc-card p-4">
+        <div className="calc-card p-6">
           <div className="calc-title">✦ Forecast Your Destiny ✦</div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <div className="input-group">
-              <label>Year to Read</label>
-              <input type="number" id="cf-readYear" className="bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-center font-bold" defaultValue={new Date().getFullYear()} min={1900} max={2100} onChange={() => (window as any).calculate()} />
+          <div className="flex flex-col items-center justify-center gap-6">
+            <div className="input-group text-center">
+              <label className="mb-2 block">Year to Read</label>
+              <input type="number" id="cf-readYear" className="bg-black/40 border border-white/10 rounded-lg px-6 py-3 text-center font-bold text-2xl w-full max-w-[200px]" defaultValue={new Date().getFullYear()} min={1900} max={2100} onChange={() => (window as any).calculate()} />
             </div>
-            <button className="btn-reveal" onClick={() => (window as any).calculate()}>✦ Cast Fate Map</button>
+            <button className="btn-reveal w-full py-4 text-lg font-bold" onClick={() => (window as any).calculate()}>✦ Cast Fate Map</button>
           </div>
         </div>
 
@@ -427,7 +427,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
             <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Dive</button>
             <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical</button>
-            <button className="dash-tab" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
+            <button className="dash-tab active" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
             <button className="dash-tab" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
             <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
           </nav>
