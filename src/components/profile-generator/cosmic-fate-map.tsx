@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from 'react';
 /**
  * @fileOverview Complete, verbatim assembly of all 11 chunks for the Cosmic Fate Map.
  * Integrated with main app data entry and restored with full unabridged descriptions.
+ * Refactored layout with reduced padding and simplified outlines to expand text areas.
  */
 
 interface CosmicFateMapProps {
@@ -57,7 +58,7 @@ const ZOO: any = {
     clashEl: 'Wood vs Metal combat', harmEl: 'Wood-Fire excessive generation', destEl: 'Wood-Water overnourishment',
     clashDesc: 'Yin-Shen Metal-Wood combat: your Yang Wood\'s expansive vision and bold initiative confronts Monkey\'s analytical precision and technological capability directly — Metal cuts Wood. Monkey years bring the systematic challenges that expose Tiger\'s big-picture orientation: legal disputes from insufficient contract detail, competitive losses to more methodical operators, technological disruptions to Tiger\'s intuitive approaches. 2028 (Earth Monkey) amplifies with Earth generating additional Metal. Legal preparation, technical skill development, and systematic contingency planning before Monkey years significantly reduce exposure.',
     harmDesc: 'Snake\'s yin Fire appears to be nourished by your yang Wood (Wood generates Fire) but becomes excessive and uncontrolled — burning through Tiger\'s resources rather than productively transforming them. Snake harm years bring concealed competitive threat: rivals patiently cultivating advantage while Tiger is distracted by Snake\'s demands for confrontation, strategic position erosion from premature commitment forced by Snake-energy individuals, inflammatory physical conditions from the excessive Fire dynamic. Tiger\'s characteristic boldness becomes its vulnerability when impulsive Snake-influenced forces disrupt the timing that success requires.',
-    destDesc: 'Tiger-Pig Wood-Water overnourishment: Pig\'s generous Water nourishes Tiger\'s Wood to excess, producing unrooted, unsustainable expansion. Pig years bring the over-commitment challenge: projects launched beyond sustainable capacity, financial obligations from optimistic over-assessment, energy depletion from simultaneously pursuing too many Wood-growth initiatives. The destruction comes not from opposition but from too much of a good thing — Pig\'s generosity enabling Tiger\'s inherent tendency to overextend.',
+    destDesc: 'Tiger-Pig Wood-Water overnourishment: Pig\'s generous Water nourishes Tiger\'s Wood to excess, producing unrooted, unsustainable expansion. Pig years bring the over-commitment challenge: projects launched beyond sustainable capacity, financial obligations from optimistic over-assessment, energy deadline from simultaneously pursuing too many Wood-growth initiatives. The destruction comes not from opposition but from too much of a good thing — Pig\'s generosity enabling Tiger\'s inherent tendency to overextend.',
     benDesc: 'Your Ben Ming Nian amplifies Tiger\'s boldness toward recklessness, competition toward destructive conflict, independence toward isolation. Liver and nervous system are health vulnerability areas — physical fire conditions, inflammatory complaints, stress-related nervous disorders. Career challenges from authority conflicts triggered by Tiger\'s amplified assertiveness. Financial risk from impulsive decisions made with Ben Ming Nian\'s intensified confidence. Yet Tiger\'s Ben Ming Nian is also the most magnetically charismatic personal year of any sign — leadership capacity, inspirational power, and the ability to mobilize others toward meaningful action reaches its peak. Direct this intensity toward genuinely important initiatives rather than reactive assertion.',
     allianceDesc: 'Horse and Dog form your San He Fire triangle, creating exceptional conditions for inspired action and community building. Horse years provide passionate momentum; Dog years provide loyal protective support. Your Liu He ally is Pig — Pig years offer deeply harmonious conditions for Tiger\'s initiatives, with Pig\'s generous Water nourishing Tiger\'s Wood growth (at sustainable levels). Tiger-Pig years are particularly favorable for relationship formation and collaborative venture launches.'
   },
@@ -101,7 +102,7 @@ const ZOO: any = {
     trait: 'perceptive, strategic, mysterious, patient, transformative',
     clashEl: 'Fire vs Water extinction', harmEl: 'Wood-Fire excessive generation', destEl: 'Fire-Metal corrosion',
     clashDesc: 'Si-Hai Fire-Water extinction: Snake\'s yin Fire strategic intensity confronts Pig\'s yin Water generous abundance — mutual extinction where neither element can fully dominate. Pig years bring the emotional flooding challenge: Pig\'s generous Water extinguishes Snake\'s strategic Fire clarity, financial resources depleted through emotional generosity, boundary dissolution from Pig\'s overwhelming abundance. The strategic control that defines Snake\'s nature is its most vulnerable quality in Pig years — careful preparations overwhelmed by Pig\'s expansive, unconditional giving that disrupts Snake\'s carefully managed information environment.',
-    harmDesc: 'Tiger\'s yang Wood appears to support Snake\'s yin Fire (Wood generates Fire), but generates excessive, uncontrolled burning that exhausts Snake\'s resources rather than sustaining them. Tiger harm years bring impulsive external forces that disrupt Snake\'s patient timing: premature exposure of strategic preparations, competitive pressure forcing action before Snake is ready, partner\'s bold initiative revealing Snake\'s private strategy to unintended audiences. Snake\'s characteristic patience — its most powerful strategic asset — is precisely what Tiger-energy forces undermine.',
+    harmDesc: 'Tiger\'s yang Wood appears to be nourished by your yang Wood (Wood generates Fire) but becomes excessive and uncontrolled — burning through Snake\'s resources rather than productively transforming them. Tiger harm years bring impulsive external forces that disrupt Snake\'s patient timing: premature exposure of strategic preparations, competitive pressure forcing action before Snake is ready, partner\'s bold initiative revealing Snake\'s private strategy to unintended audiences. Snake\'s characteristic patience — its most powerful strategic asset — is precisely what Tiger-energy forces undermine.',
     destDesc: 'Snake-Monkey Fire-Metal corrosion: both elements degrade through excessive interaction — Metal corrodes Fire, Fire exhausts Metal\'s precision. Monkey years bring implementation challenges: technical over-analysis paralysing Snake\'s intuitive strategy, systematic scrutiny revealing preparation gaps in Snake\'s carefully cultivated plans, public criticism of Snake\'s private methods from Monkey\'s transparent analytical approach. 2028 Earth Monkey is particularly challenging for Snake-born individuals.',
     benDesc: 'Snake\'s Ben Ming Nian amplifies strategic depth toward obsessive secrecy, perceptiveness toward paranoid vigilance, patience toward strategic paralysis. Cardiovascular system is the primary health vulnerability — sustained internal tension from heightened vigilance creates measurable cardiac stress. Reputation risk from perceived manipulation. Relationship isolation from excessive privacy in a year when all relationships are under magnified scrutiny. Yet Snake\'s Ben Ming Nian also intensifies its most extraordinary gifts: the strategic intelligence that can see seven moves ahead, the transformative capacity that produces genuine metamorphosis, and the perceptive depth that touches the hidden nature of reality. Transparency balance — sufficient disclosure to build trust, sufficient privacy to protect strategic advantage — is the year\'s central practice.',
     allianceDesc: 'Rooster and Ox form your San He Metal triangle — exceptional for precision achievement, quality recognition, and systematic implementation. Rooster years reward quality demonstration; Ox years reward practical implementation. Your Liu He ally is Monkey — Snake-Monkey pairing combines Snake\'s strategic yin Fire with Monkey\'s technical Metal in a Water-transforming relationship, creating exceptional problem-solving and innovation partnership. Monkey years (including the destructive 2028) offer paradoxical alliance potential for those who consciously navigate the Fire-Metal interaction.'
@@ -115,7 +116,7 @@ const ZOO: any = {
     organ: 'heart, small intestine, circulatory system', dir: 'South',
     trait: 'passionate, free-spirited, energetic, charismatic, restless',
     clashEl: 'Fire vs Water conflict', harmEl: 'Fire-Earth smothering', destEl: 'Fire-Wood consumption',
-    clashDesc: 'Wu-Zi Fire-Water conflict: your yang Fire\'s passionate intensity confronts Rat\'s yin Water strategic intelligence directly. Rat years bring the grounding challenge — Water\'s patient depth opposing Fire\'s expansive immediacy, strategic long-term thinking confronting Horse\'s impulse toward visible action. Career disruptions from those with greater strategic depth, relationship challenges from partners who plan while Horse acts, financial volatility from Water\'s tendency to contain and redirect Fire\'s spending momentum.',
+    clashDesc: 'Wu-Zi Fire-Water conflict: your yang Fire\'s passionate intensity confronts Rat\'s yin Water strategic intelligence directly. Rat years bring the grounding challenge — Water\'s patient depth opposing Fire\'s expansive immediacy, strategic long-term thinking confronting Horse\'s impulse toward visible action. Career disruptions from those with greater strategic depth, relationship challenges from partners who plan while Horse acts, financial volatility from Water\'s tendency to contain and redirect Horse\'s spending momentum.',
     harmDesc: 'Horse-Ox (Wu-Chou) harm: your Fire generates Ox\'s Earth productively — but Ox\'s reticent nature fails to provide the recognition that Horse\'s yang energy requires. Horse\'s visible contribution is absorbed without acknowledgment, generating the smothering dynamic. In 2026 — also Horse\'s own Ben Ming Nian — this harm with Ox-born individuals and Ox-type authority figures is particularly intense: the Fire generates Earth maximally while receiving minimal Fire-sustaining recognition.',
     destDesc: 'Horse-Rabbit destruction: Horse\'s yang Fire consumes Rabbit\'s yin Wood — the generous Wood that should fuel Fire instead burns away without productive transformation. Horse years bring relationships and projects where Rabbit-type individuals\' gentle energy is depleted rather than channeled productively, creative partnerships exhausting Rabbit-energy collaborators, romantic relationships where Horse\'s intensity overwhelms Rabbit\'s gentleness.',
     benDesc: '2026 is Horse\'s Ben Ming Nian — the year of maximum yang Fire amplification. Passion becomes volatility, restlessness becomes instability, charisma becomes manipulation of those who are mesmerized by Fire\'s light. Cardiovascular system is the critical health vulnerability — the most active fire year in the cycle creates maximum cardiac stress. Yet Horse\'s Ben Ming Nian is the most energetically powerful year of any sign\'s cycle — pure yang Fire at full expression. This is the year when Horse\'s authentic nature must be fully honored: wear red continuously, perform An Tai Sui rituals, and consciously direct the amplified Fire toward genuinely meaningful expression rather than reactive combustion.',
@@ -177,7 +178,7 @@ const ZOO: any = {
     clashEl: 'Earth vs Earth polarization', harmEl: 'Earth-Metal burial', destEl: 'Earth-Earth competition',
     clashDesc: 'Xu-Chen same-element Earth polarization: Dog\'s dry, loyal, protective Earth confronts Dragon\'s wet, transformative, visionary Earth in irresolvable competition. Dragon years bring the loyalty-versus-transformation challenge: Dragon\'s imperial vision disrupts the protective structures Dog has built, transformative initiatives threatening the loyalties and traditions Dog has carefully maintained. Dog\'s deepest anxiety — that loyalty will not be honored, that protective structures will be dismantled — is precisely what Dragon\'s disruptive energy triggers.',
     harmDesc: 'Dog-Rooster: Rooster\'s Metal is gradually buried in Dog\'s Earth — Dog\'s Earth absorbs Rooster\'s analytical precision without recognition, creating the invisible contribution dynamic from Dog\'s perspective. In Rooster years, Dog experiences environments where loyalty and trustworthiness are less valued than technical precision, where Dog\'s authentic moral commitment is evaluated against Rooster\'s standards rather than accepted as intrinsically valuable. Dog\'s anxiety intensifies when evaluation metrics replace trust as the basis for relationship.',
-    destDesc: 'Dog-Goat dry Earth competition: Dog\'s protective conservatism and Goat\'s aesthetic generosity compete for identical caregiving territory. Goat years bring community disputes, resource allocation conflicts between Dog\'s protection-oriented hoarding and Goat\'s relationship-maintenance generosity, social network fragmentation from competing Earth-element values in shared communities.',
+    destDesc: 'Dog-Goat dry Earth competition: Dog\'s protective conservatism and Goat\'s aesthetic generosity compete for identical caregiving territory. Goat years bring community conflicts, social network fragmentation from competing Earth-element values in shared communities.',
     benDesc: '2030 is Dog\'s Ben Ming Nian — loyalty amplified toward possessiveness, protectiveness toward controlling anxiety, moral clarity toward self-righteous rigidity. Digestive vulnerability from intensified anxiety — Dog\'s characteristic worry patterns become physically manifested during the amplification of Ben Ming Nian. Career challenges from inflexibility. Relationship difficulties from excessive vigilance. Yet Dog\'s Ben Ming Nian also represents the peak of genuine integrity — this is the year when Dog\'s authentic trustworthiness reaches its clearest expression, when loyalty is most powerfully demonstrated, when moral clarity can genuinely guide others through complexity.',
     allianceDesc: 'Tiger and Horse form your San He Fire triangle — exceptional for inspired action, community leadership, and passionate defense of meaningful causes. Your Liu He ally is Rabbit — Dog-Rabbit pairing combines Dog\'s loyal Earth protection with Rabbit\'s diplomatic Wood sensitivity, exceptional for creating environments where both safety and beauty can flourish. Rabbit years offer Dog the aesthetic refinement that softens protective vigilance into welcoming warmth.'
   },
@@ -524,14 +525,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
 
     (window as any).renderIntersections = (m: number, d: number, by: number, ry: number) => {
       const cal = [];
-      const birthAnimal = getAnimalFromBirthYear(by);
-      const birthAnimalName = Object.keys(ZOO).find(k => ZOO[k] === birthAnimal) || '';
+      const birthAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(by)) || '';
       const ba = ZOO[birthAnimalName];
 
       for (let y = ry; y <= ry + 18; y++) {
         const py = reduce(m + d + y);
-        const animal = getAnimalFromYear(y);
-        const animalName = Object.keys(ZOO).find(k => ZOO[k] === animal) || '';
+        const animalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(y)) || '';
         const cat = getCategory(birthAnimalName, animalName);
         cal.push({ year: y, py, animalName, cat });
       }
@@ -540,7 +539,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       
       const buildIntersectionCard = (yearData: any, pyNum: number) => {
         const yd = YD[pyNum];
-        const yearAnimal = ZOO[yearData.animalName];
         const cat = yearData.cat;
         let intensity = '';
         let intensityColor = 'var(--cf-rose)';
@@ -595,22 +593,28 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
 
   const renderSynthesis = (py: number, uy: number, lp: number, bv: number, pm: number, pinnNum: number, challenge: number, pinnIdx: number, birthAnimalName: string, m: number, d: number, by: number, ry: number) => {
     const yr = YD[py];
-    const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromYear(ry)) || '';
+    const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(ry)) || '';
     const cat = getCategory(birthAnimalName, yearAnimalName);
     const pmNames = ['', 'New Beginnings', 'Cooperation', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Reflection', 'Power', 'Completion'];
-    const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>. Your Life Path ${lp} (${lpName(lp)}) interacts with the ${yearAnimalName} year (${catLabel(cat)}). Your current Personal Month is ${pm} (${pmNames[pm]}). Your active Pinnacle is ${pinnNum} and active Challenge is ${challenge}.`;
+    const animalLine = `Your ${birthAnimalName} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — ${ 
+      cat === 'clash' ? 'an environment of maximum elemental friction calling for proactive adaptation rather than resistance' : 
+      cat === 'harm' ? 'a year of concealed pressures requiring extra vigilance in trust and documentation' : 
+      cat === 'destruction' ? 'a year when outdated structures may fracture, clearing ground for what genuinely serves you' : 
+      cat === 'ben-ming' ? 'your identity year, when all your characteristic patterns amplify to their fullest expression' : 
+      ['alliance'].includes(cat) ? 'an environmentally supported year where the collective field actively favours your initiatives' : 
+      'a neutral year where outcomes reflect pure personal effort rather than exceptional external forces'
+    }.`;
+    const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>. Your Life Path ${lp} (${lpName(lp)}) interacts with the ${yearAnimalName} year (${catLabel(cat)}). ${animalLine} Your current Personal Month is ${pm} (${pmNames[pm]}). Your active Pinnacle is ${pinnNum} and active Challenge is ${challenge}.`;
     document.getElementById('synthesis-container')!.innerHTML = `<div class="section-header">✦ Oracle Synthesis ✦</div><div id="synthesis-text" class="cp">${synthText}</div><button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)">🔊 Read Aloud</button>`;
   };
 
   const renderYearDive = (py: number, m: number, d: number, by: number, ry: number, birthAnimalName: string) => {
     const yr = YD[py]; if (!yr) return;
-    const currentYearAnimal = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromYear(ry)) || '';
-    const cat = getCategory(birthAnimalName, currentYearAnimal);
     const kws = yr.kw.map((k: string) => `<span class="kw">${k}</span>`).join('');
     const prs = yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('');
     const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
     
-    document.getElementById('year-dive-container')!.innerHTML = `<div class="year-deep-dive y${py}"> <div class="year-dive-header"> <div class="year-num-big">${py}</div> <div class="year-dive-title">${yr.title}</div> </div> <div class="kw-strip">${kws}</div> <div class="tab-nav"> <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button> <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button> <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button> <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button> <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button> <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button> </div> <div class="tab-content"> <div class="tab-panel active" id="tp-ov"> <div class="content-section" id="tp-ov-text">${paras(yr.overview)}</div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button> </div> <div class="tab-panel" id="tp-py"><div id="tp-py-text">${paras(yr.pyth)}</div></div> <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div> <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div> <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div> <div class="tab-panel" id="tp-pr"><div class="practice-grid">${prs}</div></div> </div> </div>`;
+    document.getElementById('year-dive-container')!.innerHTML = `<div class="year-deep-dive y${py}"> <div class="year-dive-header"> <div class="year-num-big" style="color:var(--cf-yc)">${py}</div> <div class="year-dive-title">${yr.title}</div> </div> <div class="kw-strip">${kws}</div> <div class="tab-nav"> <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button> <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button> <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button> <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button> <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button> <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button> </div> <div class="tab-content"> <div class="tab-panel active" id="tp-ov"> <div class="content-section" id="tp-ov-text">${paras(yr.overview)}</div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button> </div> <div class="tab-panel" id="tp-py"><div id="tp-py-text">${paras(yr.pyth)}</div></div> <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div> <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div> <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div> <div class="tab-panel" id="tp-pr"><div class="practice-grid">${prs}</div></div> </div> </div>`;
   };
 
   const renderZodiac = (m: number, d: number, by: number, currentYear: number, birthAnimalName: string) => {
@@ -618,12 +622,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
     const startYear = today.getFullYear();
     const years = [];
     for (let y = startYear; y <= startYear + 11; y++) {
-      const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromYear(y)) || '';
+      const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(y)) || '';
       const cat = getCategory(birthAnimalName, yearAnimalName);
       const py = reduce(m + d + y);
       years.push({ year: y, cat, animal: ZOO[yearAnimalName], py });
     }
-    const chips = years.map(y => `<div class="zc" onclick="window.openZodiacPop('${y.animal.n}','${birthAnimalName}','${y.year}','${y.year-by}','${y.cat}')"> <div class="zc-ani">${y.animal.e}</div> <div class="zc-yr">${y.year}</div> <div class="zc-yr">PY ${y.py}</div> <div class="zc-type" style="color:${catColor(y.cat)}">${catLabel(y.cat)}</div> </div>`).join('');
+    const chips = years.map(y => `<div class="zc" onclick="window.openZodiacPop('${y.animal.e}','${birthAnimalName}','${y.year}','${y.year-by}','${y.cat}')"> <div class="zc-ani">${y.animal.e}</div> <div class="zc-yr">${y.year}</div> <div class="zc-yr">PY ${y.py}</div> <div class="zc-type" style="color:${catColor(y.cat)}">${catLabel(y.cat)}</div> </div>`).join('');
     document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">☯ Zodiac Trajectory ☯</div><div class="zodiac-grid">${chips}</div>`;
   };
 
@@ -637,7 +641,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
     const active = stages.find(s => currentAge >= s.start && currentAge <= s.end) || stages[3];
     
     const cards = stages.map(s => `
-      <div style="background:rgba(18,30,58,.95);border:1px solid ${s.n === active.n ? '#68c268' : 'rgba(200,168,75,.1)'};border-radius:10px;padding:20px;margin-bottom:12px">
+      <div style="background:rgba(18,30,58,.95);border:1px solid ${s.n === active.n ? '#68c268' : 'rgba(200,168,75,.1)'};border-radius:10px;padding:14px;margin-bottom:8px">
         <div style="font-family:'Cinzel',serif;font-size:.6rem;color:var(--cf-silver-dim);margin-bottom:10px;text-transform:uppercase">Pinnacle ${s.n} ${s.n === active.n ? '◈ ACTIVE' : ''} · ${s.label}</div>
         <div style="display:flex;gap:24px;align-items:flex-start">
           <div style="text-align:center">
