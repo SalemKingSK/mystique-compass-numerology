@@ -1,5 +1,6 @@
 /**
  * @fileOverview Complete restoration of Cosmic Fate Map with high-depth narratives and verbatim synthesis logic.
+ * Synchronized Zodiac Trajectory with the selected search year.
  */
 'use client';
 
@@ -39,8 +40,15 @@ const getCategory = (birthSign: string, yearSign: string) => {
   const harms: Record<string, string> = { Rat: 'Goat', Goat: 'Rat', Ox: 'Horse', Horse: 'Ox', Tiger: 'Snake', Snake: 'Tiger', Rabbit: 'Dragon', Dragon: 'Rabbit', Monkey: 'Pig', Pig: 'Monkey', Rooster: 'Dog', Dog: 'Rooster' };
   if (harms[birthSign] === yearSign) return 'harm';
 
-  const dests: Record<string, string> = { Rat: 'Rabbit', Rabbit: 'Rat', Ox: 'Dragon', Dragon: 'Ox', Tiger: 'Pig', Pig: 'Tiger', Snake: 'Monkey', Monkey: 'Snake', Horse: 'Rooster', Rooster: 'Horse', Goat: 'Dog', Dog: 'Goat' };
-  if (dests[birthSign] === yearSign) return 'destruction';
+  const dests: Record<string, string[]> = { 
+    Rat: ['Rabbit'], Rabbit: ['Rat'],
+    Ox: ['Dragon'], Dragon: ['Ox'],
+    Tiger: ['Pig'], Pig: ['Tiger'],
+    Snake: ['Monkey'], Monkey: ['Snake'],
+    Horse: ['Rooster'], Rooster: ['Horse'],
+    Goat: ['Dog'], Dog: ['Goat']
+  };
+  if (dests[birthSign]?.includes(yearSign)) return 'destruction';
 
   const liuHe: Record<string, string> = { Rat: 'Ox', Ox: 'Rat', Tiger: 'Pig', Pig: 'Tiger', Rabbit: 'Dog', Dog: 'Rabbit', Dragon: 'Rooster', Rooster: 'Dragon', Snake: 'Monkey', Monkey: 'Snake', Horse: 'Goat', Goat: 'Horse' };
   if (liuHe[birthSign] === yearSign) return 'alliance';
@@ -60,13 +68,6 @@ const catColor = (c: string) => ({
   'ben-ming': 'var(--cf-gold)', 'clash': 'var(--cf-rose)', 'harm': 'var(--cf-amber)', 
   'destruction': 'var(--cf-amethyst)', 'alliance': 'var(--cf-jade-bright)', 'neutral': 'var(--cf-silver-dim)' 
 }[c] || 'var(--cf-text)');
-
-const getIntersectionStatus = (cat: string) => {
-  if (cat === 'clash' || cat === 'harm') return { label: '🟠 HIGH TENSION', color: 'var(--cf-amber)' };
-  if (cat === 'destruction' || cat === 'ben-ming') return { label: '🟡 ELEVATED FRICTION', color: 'var(--cf-gold)' };
-  if (cat === 'alliance') return { label: '🟢 SUPPORTED', color: 'var(--cf-jade-bright)' };
-  return { label: '◦ NEUTRAL', color: 'var(--cf-silver-dim)' };
-};
 
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const initialized = useRef(false);
@@ -128,7 +129,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Birth Vibration</div> <div class="core-chip-num" style="color:#de78a0">${bv}</div> <div class="core-chip-name">${lpName(bv)}</div> </div>`;
 
-      // Alert Banner - Expanded with full verbatim meanings
+      // Alert Banner
       const ab = document.getElementById('alert-banner')!;
       let alertText = '';
       if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency. Decisions made now have double the impact, as you are swimming with the current of the world's current evolutionary requirements.`;
@@ -154,7 +155,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'synthesis-text')">🔊 Read Aloud</button>
         <div id="synthesis-text" class="cp">${synthText}</div>`;
 
-      // Dive Section - Verbatim full text
+      // Year Dive
       const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
       document.getElementById('year-dive-container')!.innerHTML = `
         <div class="year-deep-dive">
@@ -181,25 +182,33 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           </div>
         </div>`;
 
-      // Intersections - Logic fixed for Dog-Rooster (Harm)
+      // Intersections
       const intersections = [];
       for (let y = ry; y <= ry + 30; y++) {
         const pyn = reduce(reduce(m) + reduce(d) + reduce(y));
         if (pyn === 4 || pyn === 7) {
           const ani = getAnimalFromYear(y);
           const iCat = getCategory(birthSign, ani.n);
-          const iStatus = getIntersectionStatus(iCat);
           const uyn = reduce(y);
+          const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben-ming';
+          
+          let statusLabel = `◦ Critical Personal Year ${pyn} in ${ani.n} Year`;
+          let statusColor = 'var(--cf-silver-dim)';
+          if (isNegative) {
+            statusLabel = `🟠 HIGH TENSION — ${catLabel(iCat).split(' ')[0]} Year + Critical Personal Year`;
+            statusColor = 'var(--cf-amber)';
+          }
+
           const synKey = `${pyn}_${iCat}`;
           const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral');
-          const dyn = ZOO[birthSign][`${iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${ani.n} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
+          const dyn = ZOO[birthSign][`${iCat}Desc`] || ZOO[birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${ani.n} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
 
           intersections.push(`
             <div class="intersection-card p-4">
               <div class="intersection-header">
                 <div class="intersection-year">${y}</div>
-                <div class="intersection-title">Personal Year ${pyn} · ${YD[pyn].title} · ${ani.n} Year ${ani.e}</div>
-                <div class="text-[10px] font-black uppercase mt-1" style="color:${iStatus.color}">${iStatus.label} — ${catLabel(iCat)}</div>
+                <div class="intersection-title">Personal Year ${pyn} · Year of ${pyn === 4 ? 'Foundation' : 'the Mystic'} · ${ani.n} Year ${ani.e}</div>
+                <div class="text-[10px] font-black uppercase mt-1" style="color:${statusColor}">${statusLabel}</div>
               </div>
               <div class="intersection-body">
                 <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'int-text-${y}')">🔊 Read Aloud</button>
@@ -214,9 +223,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
         <div class="px-2">${intersections.join('')}</div>`;
 
-      // Zodiac
+      // Zodiac - Synchronized with ry (Read Year)
       let zHtml = '<div class="zodiac-grid">';
-      for (let y = today.getFullYear(); y <= today.getFullYear() + 11; y++) {
+      for (let y = ry; y <= ry + 11; y++) {
         const ani = getAnimalFromYear(y);
         const zCat = getCategory(birthSign, ani.n);
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
@@ -364,7 +373,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
     (window as any).openZodiacPop = (aniName: string, birthSign: string, year: string, age: string, cat: string) => {
       const ba = ZOO[birthSign]; const ya = ZOO[aniName]; if (!ba || !ya) return;
-      const dyn = ba[`${cat}Desc`] || `This ${year} ${aniName} year is a Neutral period for ${birthSign}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for foundation-building, skill development, and relationship refinement that will serve as a stable platform for the years that follow.`;
+      const dyn = ba[`${cat}Desc`] || ba[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `This ${year} ${aniName} year is a Neutral period for ${birthSign}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for foundation-building, skill development, and relationship refinement that will serve as a stable platform for the years that follow.`;
       
       document.getElementById('pb')!.innerHTML = `
         <button class="tts-btn mb-6 w-full" onclick="window.ttsPlay(this, 'pb-content')">🔊 Read Aloud</button> 
