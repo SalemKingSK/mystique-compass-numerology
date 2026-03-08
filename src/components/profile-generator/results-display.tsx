@@ -135,11 +135,10 @@ function ResultsHeader({
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
                 {newAstroSign}
              </AnimatedTab>
-            <div className="grid grid-cols-4 gap-2 w-full">
+            <div className="grid grid-cols-3 gap-2 w-full">
                 <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astro</AnimatedTab>
                 <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numbers</AnimatedTab>
-                <AnimatedTab isActive={activeTab === 'cosmic'} onClick={() => onTabClick('cosmic')}>Cosmic</AnimatedTab>
-                <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>Cosmic Fate</AnimatedTab>
+                <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>🌌 Cosmic Fate</AnimatedTab>
             </div>
         </div>
     </div>
@@ -252,7 +251,6 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
                 {activeTab === 'astro' && <AstroDisplay insight={insight} />}
                 {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
                 {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
-                {activeTab === 'cosmic' && <div className="text-center p-8 glass-card">Section discarded as per user request. Use Cosmic Fate Map instead.</div>}
                 {activeTab === 'cosmic-fate' && <CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear} />}
               </motion.div>
           </AnimatePresence>
