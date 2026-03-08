@@ -1,3 +1,6 @@
+/**
+ * @fileOverview Complete restoration of Cosmic Fate Map with high-depth narratives and verbatim synthesis logic.
+ */
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -123,17 +126,23 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <div class="core-chip hl-py"> <div class="core-chip-label">Personal Year ${ry}</div> <div class="core-chip-num">${py}</div> <div class="core-chip-name">${YD[py]?.title}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Life Path</div> <div class="core-chip-num" style="color:var(--cf-jade-bright)">${lp}</div> <div class="core-chip-name">${lpName(lp)}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> 
-        <div class="core-chip"> <div class="core-chip-label">Personal Month</div> <div class="core-chip-num" style="color:#de78a0">${pm}</div> <div class="core-chip-name">${pmNames[pm]}</div> </div>`;
+        <div class="core-chip"> <div class="core-chip-label">Birth Vibration</div> <div class="core-chip-num" style="color:#de78a0">${bv}</div> <div class="core-chip-name">${lpName(bv)}</div> </div>`;
 
-      // Alert Banner
+      // Alert Banner - Expanded with full verbatim meanings
       const ab = document.getElementById('alert-banner')!;
       let alertText = '';
-      if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}.`;
-      else if (py === bv) alertText = `<strong>✦ Core Identity Activation:</strong> Personal Year ${py} matches your Birth Vibration ${bv}.`;
-      else if (py === lp) alertText = `<strong>✦ Life Path Activation:</strong> Personal Year ${py} matches your Life Path ${lp}.`;
-      if (alertText) { ab.innerHTML = alertText; ab.classList.add('visible'); } else { ab.classList.remove('visible'); }
+      if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency. Decisions made now have double the impact, as you are swimming with the current of the world's current evolutionary requirements.`;
+      else if (py === bv) alertText = `<strong>✦ Core Identity Activation:</strong> Personal Year ${py} matches your Birth Vibration ${bv} — your deepest nature and current developmental phase in perfect alignment. Unusual clarity about who you are and where you're heading. It is as if the universe is reflecting your core essence back to you, allowing for an effortless expression of your authentic self.`;
+      else if (py === lp) alertText = `<strong>✦ Life Path Activation:</strong> Personal Year ${py} matches your Life Path ${lp} — a year of destiny alignment. The immediate tasks of this year are in direct service to your overall life mission. The resistance you usually encounter when trying to merge your daily reality with your soul's purpose dissolves, creating a streamlined path toward meaningful achievement and legacy building.`;
+      
+      if (alertText) { 
+        ab.innerHTML = `<button class="tts-btn mb-2" onclick="window.ttsPlay(this, 'alert-text')">🔊 Read Aloud</button><div id="alert-text">${alertText}</div>`; 
+        ab.classList.add('visible'); 
+      } else { 
+        ab.classList.remove('visible'); 
+      }
 
-      // Synthesis
+      // Verbatim Synthesis Construction
       const yr = YD[py];
       const lpRelationText = (py === lp) ? "exceptional harmony" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
       const lpInteractionText = (py === lp) ? "match" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "creates notable friction with" : "and";
@@ -145,7 +154,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'synthesis-text')">🔊 Read Aloud</button>
         <div id="synthesis-text" class="cp">${synthText}</div>`;
 
-      // Dive
+      // Dive Section - Verbatim full text
       const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
       document.getElementById('year-dive-container')!.innerHTML = `
         <div class="year-deep-dive">
@@ -172,7 +181,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           </div>
         </div>`;
 
-      // Intersections
+      // Intersections - Logic fixed for Dog-Rooster (Harm)
       const intersections = [];
       for (let y = ry; y <= ry + 30; y++) {
         const pyn = reduce(reduce(m) + reduce(d) + reduce(y));
@@ -182,7 +191,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           const iStatus = getIntersectionStatus(iCat);
           const uyn = reduce(y);
           const synKey = `${pyn}_${iCat}`;
-          const synth = INTERSECTION_SYNTHESIS[synKey] || (INTERSECTION_SYNTHESIS[`${pyn}_neutral`] ? INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral') : '');
+          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral');
           const dyn = ZOO[birthSign][`${iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${ani.n} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
 
           intersections.push(`
@@ -286,10 +295,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const container = document.getElementById(containerId);
       if (!container) return;
 
-      // Wrap text in spans for sentence-level highlighting if not already structured
       if (!container.querySelector('.tts-s')) {
         const text = container.innerHTML;
-        // Regex to split by major punctuation while keeping it attached
         const sentences = text.match(/[^.!?\n]+[.!?\n]*/g);
         if (sentences) {
           container.innerHTML = sentences.map((s, i) => `<span class="tts-s" data-idx="${i}">${s}</span>`).join('');
@@ -311,8 +318,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         spans.forEach(s => s.classList.remove('reading'));
         const span = spans[currentIdx] as HTMLElement;
         span.classList.add('reading');
-        
-        // Auto-scroll the reading element into view
         span.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         const utterance = new SpeechSynthesisUtterance(span.textContent || '');
@@ -387,7 +392,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   return (
     <div className="cosmic-fate-root relative min-h-screen rounded-3xl overflow-hidden bg-black/40">
       <div id="stars-cf"></div>
-      <div className="cf-page">
+      <div className="cf-page p-4">
         <div className="cf-hero">
           <span className="hero-glyph">🌌</span>
           <h1>Cosmic Fate Map</h1>
@@ -398,7 +403,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <div className="calc-title">✦ Forecast Your Destiny ✦</div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <div className="input-group">
-              <label>Year to Forecast</label>
+              <label>Year to Read</label>
               <input type="number" id="cf-readYear" className="bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-center font-bold" defaultValue={new Date().getFullYear()} min={1900} max={2100} onChange={() => (window as any).calculate()} />
             </div>
             <button className="btn-reveal" onClick={() => (window as any).calculate()}>✦ Cast Fate Map</button>
@@ -418,7 +423,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
           </nav>
 
-          <div className="dash-body p-2">
+          <div className="dash-body p-4">
             <div className="dash-panel active" id="panel-synthesis"><div id="synthesis-container"></div></div>
             <div className="dash-panel" id="panel-yeardive"><div id="year-dive-container"></div></div>
             <div className="dash-panel" id="panel-intersections"><div id="personal-intersections-container"></div></div>

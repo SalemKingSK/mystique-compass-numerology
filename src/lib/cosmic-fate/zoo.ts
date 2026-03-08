@@ -1,5 +1,5 @@
 /**
- * @fileOverview Verbatim Animal/Zodiac metadata and relationship descriptions from your chunks.
+ * @fileOverview Verbatim Animal/Zodiac metadata and relationship descriptions from Chunks 02-04.
  */
 export const ZOO: Record<string, any> = {
   Rat: {
