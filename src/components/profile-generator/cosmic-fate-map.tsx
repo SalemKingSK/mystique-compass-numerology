@@ -1,5 +1,6 @@
 /**
  * @fileOverview Complete restoration of Cosmic Fate Map with high-depth narratives and verbatim synthesis logic.
+ * Fixed Next.js Invalid DOM property errors (class -> className, onclick -> onClick).
  * Synchronized Zodiac Trajectory with the selected search year and 2-column visual mirror layout.
  */
 'use client';
@@ -437,12 +438,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <div className="alert-banner" id="alert-banner"></div>
 
           <nav className="dash-nav grid grid-cols-3 gap-1 mb-4" id="dash-nav">
-            <button class="dash-tab active" data-panel="synthesis" onclick="window.switchDash(this)">✦ Oracle</button>
-            <button class="dash-tab" data-panel="yeardive" onclick="window.switchDash(this)">☽ Dive</button>
-            <button class="dash-tab" data-panel="intersections" onclick="window.switchDash(this)">🔥 Critical</button>
-            <button class="dash-tab" data-panel="zodiac" onclick="window.switchDash(this)">☯ Zodiac</button>
-            <button class="dash-tab" data-panel="pinnacles" onclick="window.switchDash(this)">◈ Pinnacles</button>
-            <button class="dash-tab" data-panel="convergence" onclick="window.switchDash(this)">⚠ Enemy</button>
+            <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
+            <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Dive</button>
+            <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical</button>
+            <button className="dash-tab" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
+            <button className="dash-tab" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
+            <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
           </nav>
 
           <div className="dash-body p-4">
@@ -462,7 +463,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <span className="text-6xl mb-4 block text-center" id="pg"></span>
           <div className="text-3xl font-bold text-primary text-center mb-2" id="ph"></div>
           <div className="text-xs uppercase tracking-[0.3em] text-center opacity-60 mb-8" id="ps"></div>
-          <div id="pb" className="text-sm leading-relaxed"></div>
+          <div id="pb" className="className text-sm leading-relaxed"></div>
         </div>
       </div>
     </div>
