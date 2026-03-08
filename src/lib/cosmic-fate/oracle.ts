@@ -42,7 +42,7 @@ In Chaldean practice, the name's total value interacting with Year 1's vibration
   },
   2: {
     title: "Partnership & Patience",
-    sub: "Partnership & Patience",
+    sub: "The Dyad · Late Spring Germination",
     planet: "☽ Moon / Chandra",
     phase: "Late Spring — Germination",
     chakra: "Swadhisthana (Sacral)",
@@ -156,7 +156,7 @@ The 31/4 emphasizes individual creative craftsmanship — building through the g
   },
   5: {
     title: "Year of Liberation",
-    sub: "Year of Liberation",
+    sub: "Change · The Pentad · Late Summer Winds",
     planet: "☿ Mercury / Budha",
     phase: "Late Summer — Harvest Preparation",
     chakra: "Anahata (Heart)",
@@ -194,7 +194,7 @@ The 32/5 (Communication Mastery) suggests Year 5's liberation finds its highest 
   },
   6: {
     title: "Year of Harmony",
-    sub: "Year of Harmony",
+    sub: "Service · The Hexad · Early Autumn Abundance",
     planet: "♀ Venus / Shukra",
     phase: "Early Autumn — Abundance Sharing",
     chakra: "Anahata (Heart — Venus aspect)",
@@ -232,7 +232,7 @@ The 33/6 master number brings Year 6's service orientation to its highest possib
   },
   7: {
     title: "Year of the Mystic",
-    sub: "Year of the Mystic",
+    sub: "Introspection · The Heptad · Mid-Autumn Wisdom",
     planet: "☋ Ketu (South Node)",
     phase: "Mid-Autumn — Inward Turning",
     chakra: "Ajna (Third Eye)",
@@ -270,7 +270,7 @@ The 34/7 (Revelator) promises exceptional spiritual authority and truth-speaking
   },
   8: {
     title: "Year of Power",
-    sub: "Year of Power",
+    sub: "Authority · The Octad · Late Autumn Harvest",
     planet: "♄ Saturn / Shani",
     phase: "Late Autumn — Final Harvest",
     chakra: "Manipura (Solar Plexus — Saturn)",
