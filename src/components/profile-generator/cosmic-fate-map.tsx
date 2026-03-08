@@ -1,11 +1,16 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { ZOO } from '@/lib/cosmic-fate/zoo';
+import { YD } from '@/lib/cosmic-fate/oracle';
+import { CONVERGENCE_CARDS } from '@/lib/cosmic-fate/convergence';
+import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
+import { BOOK } from '@/lib/cosmic-fate/book';
 
 /**
- * @fileOverview Complete, verbatim assembly of all 11 chunks for the Cosmic Fate Map.
- * Integrated with main app data entry and restored with full unabridged descriptions.
- * Refactored layout with reduced padding and simplified outlines to expand text areas.
+ * @fileOverview Refactored Cosmic Fate Map component.
+ * Modularized data to prevent truncation and ensure verbatim rendering of Chunks 01-11.
+ * Integrated with main app search results while retaining local Year Selector.
  */
 
 interface CosmicFateMapProps {
@@ -14,361 +19,7 @@ interface CosmicFateMapProps {
   birthYear: number;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// CHUNKS 02-04: ZOO DATA (VERBATIM)
-const ZOO: any = {
-  Rat: {
-    e: '🐀', i: 0, el: 'Water', pol: 'Yang', br: 'Zi',
-    ben: [1924, 1936, 1948, 1960, 1972, 1984, 1996, 2008, 2020, 2032, 2044],
-    clash: 'Horse', harm: 'Goat', dest: 'Rooster',
-    san: ['Monkey', 'Dragon'], liu: 'Ox',
-    neutral: ['Tiger', 'Rabbit', 'Snake', 'Dog', 'Pig'],
-    organ: 'kidneys, ears', dir: 'North',
-    trait: 'intelligent, adaptable, resourceful, quick-witted',
-    clashEl: 'Water vs Fire', harmEl: 'Water-Earth absorption', destEl: 'Water-Metal corrosion',
-    clashDesc: 'The Zi-Wu clash is Water-Fire mutual extinction at maximum intensity. Your Rat\'s yin Water intelligence and adaptability confronts Horse\'s explosive yang Fire energy head-on. 2026 (Bingwu Fire Horse) is the peak expression — Fire stem doubling Fire branch against your Water nature. Expect forced movement: career disruptions, relationship volatility, geographic shifts. The classical teaching — use movement to respond to movement — means proactive transformation beats reactive resistance. Those who initiate change in Horse years fare dramatically better than those who resist it.',
-    harmDesc: 'The Zi-Wei harm operates through concealed depletion. Goat\'s Earth appears to stabilize your Water, but gradually absorbs and depletes your vitality. Unlike direct clash confrontation, harm year damage is invisible until cumulative — trusted associates with hidden agendas, authority miscommunication that builds quietly, financial drain through seemingly minor ongoing expenses. Your characteristic Rat intelligence becomes a liability when excessive trust is placed in relationships containing concealed adversaries. Verification, documentation, and independent information sources are essential protections.',
-    destDesc: 'Rooster\'s Metal appears productive to Water (Metal generates Water) but becomes corrosive when excessive — fragmenting your fluid Rat adaptability into scattered pieces. Partnership dissolution through accumulated incompatibility, unexpected expenses emerging from overlooked structural weaknesses, projects failing near completion from details that weren\'t tracked. The Rooster year brings the precision and standards that expose what the Rat\'s fluid nature has left insufficiently structured.',
-    benDesc: 'Your Ben Ming Nian intensifies all Rat qualities to maximum expression — a double-edged amplification. Your intelligence becomes hypersensitivity, your adaptability becomes volatility, your resourcefulness becomes anxious over-preparation. Health vulnerabilities center on kidneys, urinary system, and ears. Career recognition tends to be delayed despite genuine effort. Financial instability from unexpected expenses. Yet this year also brings extraordinary perceptive gifts: heightened intuition, accelerated learning capacity, and the ability to see systemic patterns others miss. Strategic practice: structured self-assessment using heightened awareness for deliberate life architecture. Wear red undergarments and accessories received as gifts from elders. Perform An Tai Sui at a temple in the first lunar month.',
-    allianceDesc: 'Dragon and Monkey years form your San He Water triangle, providing multi-directional support: Dragon combines imperial vision with your Water wealth capacity for major career advancement; Monkey\'s cleverness allies with your adaptability for creative problem-solving and negotiation. Ox years offer Liu He alliance — conjugal intimacy energy where your Water intelligence finds grounded expression through Ox\'s Earth manifestation capacity. These alliance windows reward advance preparation: have your proposals, projects, and relationship investments ready to deploy when the environmental support opens.'
-  },
-  Ox: {
-    e: '🐂', i: 1, el: 'Earth', pol: 'Yin', br: 'Chou',
-    ben: [1925, 1937, 1949, 1961, 1973, 1985, 1997, 2009, 2021, 2033, 2045],
-    clash: 'Goat', harm: 'Horse', dest: 'Dragon',
-    san: ['Snake', 'Rooster'], liu: 'Rat',
-    neutral: ['Tiger', 'Rabbit', 'Monkey', 'Dog', 'Pig'],
-    organ: 'digestive system, muscles, spleen', dir: 'Northeast',
-    trait: 'diligent, reliable, methodical, persistent',
-    clashEl: 'Earth vs Earth polarization', harmEl: 'Fire-Earth smothering', destEl: 'Earth-Earth structural conflict',
-    clashDesc: 'The Chou-Wei same-element Earth clash is unusually intractable because neither party can absorb or transform the other — Ox\'s dense yin Earth and Goat\'s dispersed yang Earth claim identical territory through fundamentally incompatible approaches. Goat years create rivalry without resolution: partnership strain from different resource priorities, directional instability in shared ventures, decision paralysis from competing Earth-element values. The 2027 Goat year brings Fire Goat (Ding fire generating Wei Earth) intensifying this tension. Advance partnership assessment and explicit governance protocols are essential preparation.',
-    harmDesc: 'Horse\'s Fire generates Ox\'s Earth productively — but demands recognition that Ox\'s reticent nature fails to provide. The healthy generative relationship curdles into smothering when appreciation is withheld. In 2026 (Fire Horse), the Fire element is maximally heated against your Earth, making authority relationships the central challenge. Superiors who feel unappreciated, colleagues whose visible contributions are absorbed without credit, evaluation processes that measure Earth\'s steady contribution against Fire\'s visible performance. Your natural reliability becomes a vulnerability when others exploit Ox\'s authority-deference. Maintain independent professional networks and document all significant contributions.',
-    destDesc: 'Dragon\'s yang Earth and Ox\'s yin Earth create structural redundancy — two containing Earth forces occupying identical organizational territory. Long-term institutional arrangements that seemed compatible reveal fundamental incompatibility in Dragon years. Property challenges, authority legitimacy contests within organizations where both Dragon and Ox types have established claims, property arrangements that seemed secure proving vulnerable to Earth-element internal conflict.',
-    benDesc: 'Your Ben Ming Nian amplifies characteristic stubbornness into potential rigidity. Persistence becomes refusal-to-adapt, reliability becomes predictability that others take for granted, diligence becomes invisible contribution. Digestive system, joints, and metabolic processes are health vulnerability areas. Career stagnation risk from being reliable without being visible. Financial risk from accumulated obligations. Yet Ben Ming Nian also intensifies Ox\'s extraordinary strengths: sustainability, practical wisdom, and the capacity for sustained effort that outlasts everyone else\'s intensity. Practice deliberate flexibility — expose yourself to perspectives that challenge established patterns. Red accessories worn throughout the lunar year, particularly received as gifts from elders.',
-    allianceDesc: 'Snake and Rooster form your San He Metal triangle: Snake\'s strategic yin Fire containing Metal allied with Rooster\'s precision, creating exceptional conditions for systematic achievement and quality recognition. Ox years are also the Liu He ally of Rat, making you a key alliance partner in Water-type years. Your own Liu He ally is Rat — Rat years bring conjugal-intimacy energy where Water\'s intelligence grounds through your Earth manifestation capacity, ideal for relationship deepening and practical implementation of complex plans.'
-  },
-  Tiger: {
-    e: '🐯', i: 2, el: 'Wood', pol: 'Yang', br: 'Yin',
-    ben: [1926, 1938, 1950, 1962, 1974, 1986, 1998, 2010, 2022, 2034, 2046],
-    clash: 'Monkey', harm: 'Snake', dest: 'Pig',
-    san: ['Horse', 'Dog'], liu: 'Pig',
-    neutral: ['Rat', 'Ox', 'Rabbit', 'Dragon', 'Rooster'],
-    organ: 'liver, nervous system, gallbladder', dir: 'East-Northeast',
-    trait: 'bold, charismatic, competitive, independent',
-    clashEl: 'Wood vs Metal combat', harmEl: 'Wood-Fire excessive generation', destEl: 'Wood-Water overnourishment',
-    clashDesc: 'Yin-Shen Metal-Wood combat: your Yang Wood\'s expansive vision and bold initiative confronts Monkey\'s analytical precision and technological capability directly — Metal cuts Wood. Monkey years bring the systematic challenges that expose Tiger\'s big-picture orientation: legal disputes from insufficient contract detail, competitive losses to more methodical operators, technological disruptions to Tiger\'s intuitive approaches. 2028 (Earth Monkey) amplifies with Earth generating additional Metal. Legal preparation, technical skill development, and systematic contingency planning before Monkey years significantly reduce exposure.',
-    harmDesc: 'Snake\'s yin Fire appears to be nourished by your yang Wood (Wood generates Fire) but becomes excessive and uncontrolled — burning through Tiger\'s resources rather than productively transforming them. Snake harm years bring concealed competitive threat: rivals patiently cultivating advantage while Tiger is distracted by Snake\'s demands for confrontation, strategic position erosion from premature commitment forced by Snake-energy individuals, inflammatory physical conditions from the excessive Fire dynamic. Tiger\'s characteristic boldness becomes its vulnerability when impulsive Snake-influenced forces disrupt the timing that success requires.',
-    destDesc: 'Tiger-Pig Wood-Water overnourishment: Pig\'s generous Water nourishes Tiger\'s Wood to excess, producing unrooted, unsustainable expansion. Pig years bring the over-commitment challenge: projects launched beyond sustainable capacity, financial obligations from optimistic over-assessment, energy deadline from simultaneously pursuing too many Wood-growth initiatives. The destruction comes not from opposition but from too much of a good thing — Pig\'s generosity enabling Tiger\'s inherent tendency to overextend.',
-    benDesc: 'Your Ben Ming Nian amplifies Tiger\'s boldness toward recklessness, competition toward destructive conflict, independence toward isolation. Liver and nervous system are health vulnerability areas — physical fire conditions, inflammatory complaints, stress-related nervous disorders. Career challenges from authority conflicts triggered by Tiger\'s amplified assertiveness. Financial risk from impulsive decisions made with Ben Ming Nian\'s intensified confidence. Yet Tiger\'s Ben Ming Nian is also the most magnetically charismatic personal year of any sign — leadership capacity, inspirational power, and the ability to mobilize others toward meaningful action reaches its peak. Direct this intensity toward genuinely important initiatives rather than reactive assertion.',
-    allianceDesc: 'Horse and Dog form your San He Fire triangle, creating exceptional conditions for inspired action and community building. Horse years provide passionate momentum; Dog years provide loyal protective support. Your Liu He ally is Pig — Pig years offer deeply harmonious conditions for Tiger\'s initiatives, with Pig\'s generous Water nourishing Tiger\'s Wood growth (at sustainable levels). Tiger-Pig years are particularly favorable for relationship formation and collaborative venture launches.'
-  },
-  Rabbit: {
-    e: '🐰', i: 3, el: 'Wood', pol: 'Yin', br: 'Mao',
-    ben: [1927, 1939, 1951, 1963, 1975, 1987, 1999, 2011, 2023, 2035, 2047],
-    clash: 'Rooster', harm: 'Dragon', dest: 'Horse',
-    san: ['Pig', 'Goat'], liu: 'Dog',
-    neutral: ['Rat', 'Ox', 'Tiger', 'Snake', 'Monkey'],
-    organ: 'liver, gallbladder, eyes', dir: 'East',
-    trait: 'gentle, diplomatic, aesthetic, empathetic, conflict-averse',
-    clashEl: 'Wood vs Metal confrontation', harmEl: 'Wood-Earth subjugation', destEl: 'Wood-Fire consumption',
-    clashDesc: 'Mao-You Metal-Wood: Rabbit\'s gentle yin Wood refinement and relationship sensitivity confronts Rooster\'s critical precision and appearance standards directly. Both signs care deeply about beauty and quality — but through incompatible frameworks. Rooster years bring critical evaluation that Rabbit\'s conflict-averse nature finds profoundly destabilizing: romantic disruption from aesthetic incompatibility, professional standards enforcement that feels like personal criticism, social environments where Rabbit\'s diplomatic nuance is overridden by Rooster\'s blunt precision. 2029 (Earth Rooster) exemplifies. Developing capacity for direct communication before Rooster years significantly reduces exposure.',
-    harmDesc: 'Rabbit-Dragon Earth subjugates Wood: Dragon\'s yang Earth appears stable and supportive but gradually absorbs Rabbit\'s Wood vitality without reciprocal nourishment. The harm operates through hidden power imbalance in close relationships — Dragon\'s magnificent energy unconsciously overwhelming Rabbit\'s gentle nature, creative contributions absorbed by larger entities without appropriate credit, authority relationships where Rabbit\'s diplomatic sensitivity is exploited by Dragon\'s imperial demands. Rabbit\'s characteristic conflict avoidance makes this particularly dangerous — problems accumulate without direct confrontation until the imbalance becomes critical.',
-    destDesc: 'Rabbit-Horse Wood-Fire consumption: Horse\'s yang Fire consumes Rabbit\'s yin Wood in a destructive rather than generative relationship. Horse years bring relationships and projects that deplete Rabbit\'s gentle energy without replenishment — romantic partnerships where Rabbit\'s emotional resources are consumed by Horse\'s passionate demands, creative collaborations where Rabbit\'s contributions fuel another\'s visibility, work environments where Rabbit\'s diplomatic capacity is endlessly deployed in service of Horse-type leaders without sustainable reciprocity.',
-    benDesc: 'Rabbit\'s Ben Ming Nian amplifies empathy toward enmeshment, conflict avoidance toward paralysis, aesthetic sensitivity toward anxiety. Liver and gallbladder are health vulnerability areas, alongside eye strain and optical sensitivity. Relationship challenges from excessive accommodation — Rabbit\'s amplified sensitivity making boundaries feel like cruelty. Financial risk from inability to assert appropriate terms. Yet Rabbit\'s Ben Ming Nian also intensifies extraordinary perceptive gifts: the ability to read emotional environments with unprecedented accuracy, aesthetic intelligence that touches the sublime, and diplomatic capacity that can heal community fractures others cannot even perceive. Practice deliberate boundary cultivation — the development of firm-but-kind "no" as spiritual practice.',
-    allianceDesc: 'Pig and Goat form your San He Wood triangle (the most creatively abundant triad), creating exceptional conditions for artistic expression, relationship building, and community flourishing. Dog years offer Liu He alliance — Rabbit-Dog pairing brings harmonious loyal support for Rabbit\'s sensitive initiatives. Your presence in others\' alliance networks (you are part of the Wood trio with Pig and Goat) means your years are sought-after alliance periods for your partners.'
-  },
-  Dragon: {
-    e: '🐉', i: 4, el: 'Earth', pol: 'Yang', br: 'Chen',
-    ben: [1928, 1940, 1952, 1964, 1976, 1988, 2000, 2012, 2024, 2036, 2048],
-    clash: 'Dog', harm: 'Rabbit', dest: 'Ox',
-    san: ['Rat', 'Monkey'], liu: 'Rooster',
-    neutral: ['Tiger', 'Snake', 'Horse', 'Goat', 'Pig'],
-    organ: 'stomach, immune system, skin', dir: 'East-Southeast',
-    trait: 'visionary, imperial, transformative, charismatic, perfectionist',
-    clashEl: 'Earth vs Earth polarization', harmEl: 'Earth-Wood subjugation', destEl: 'Earth-Earth structural conflict',
-    clashDesc: 'Chen-Xu same-element Earth polarization: Dragon\'s wet, transformative, visionary Earth confronts Dog\'s dry, loyal, protective Earth — neither can establish hierarchy, neither can absorb the other. Dog years bring the loyalty challenges that test Dragon\'s transformative leadership: long-term supporters questioning whether Dragon\'s vision serves the community, institutional stakeholders defending existing structures against Dragon\'s disruptive innovation, authority legitimacy contested by those who claim equal Earth-grounded moral standing. Dragon\'s imperial nature finds its deepest humbling in those who refuse to recognize the imperial claim.',
-    harmDesc: 'Dragon\'s yang Earth unconsciously subjugates Rabbit\'s yin Wood — not through malice but through magnitude. In Rabbit years, Dragon must practice deliberate restraint in close relationships, conscious space-creation for partners whose scale is more intuitive than Dragon\'s imperial nature, and recognition that Dragon\'s contributions absorb others\' energy without this being anyone\'s intention. Creative collaborators feeling consumed rather than partnered, relationship partners feeling overshadowed rather than cherished — these are Dragon\'s Rabbit year challenges.',
-    destDesc: 'Dragon-Ox structural Earth competition: two containing, transformative Earth forces create institutional redundancy. Ox years bring challenges where Dragon\'s visionary institutions conflict with Ox\'s practical implementations — the same Earth territory claimed through incompatible means. Long-term structural arrangements revealed as fundamentally incompatible, authority legitimacy contests within organizations where both Dragon and Ox types have established claims, property arrangements that seemed secure proving vulnerable to Earth-element internal conflict.',
-    benDesc: 'Dragon\'s Ben Ming Nian — occurring every 12 years — is simultaneously the most powerful and most dangerous personal year of any sign. Imperial charisma amplified: vision becomes ego-driven distortion, perfectionism becomes tyranny, transformation becomes disruption for its own sake. Immune system and digestive vulnerabilities. Authority conflicts at maximum intensity — Dragon\'s amplified imperial energy provoking challenges from all quadrants. Financial risk from overreach. Yet Dragon\'s Ben Ming Nian is genuinely the most powerful manifestation year in the zodiac — those who have done the preparatory work of the preceding 11 years find this year capable of producing truly extraordinary outcomes. Direct the amplified energy toward genuinely meaningful transformation.',
-    allianceDesc: 'Rat and Monkey form your San He Water triangle — most auspicious for wealth, strategic intelligence, and large-scale achievement. Rooster years offer Liu He alliance — Dragon-Rooster pairing combines Dragon\'s visionary magnitude with Rooster\'s precision execution, exceptional for translating grand vision into quality reality. Dragon years are the most sought-after alliance years in Chinese astrology — you are the centerpiece of multiple triangular alliances, making your support enormously valuable to those who cultivate it.'
-  },
-  Snake: {
-    e: '🐍', i: 5, el: 'Fire', pol: 'Yin', br: 'Si',
-    ben: [1929, 1941, 1953, 1965, 1977, 1989, 2001, 2013, 2025, 2037, 2049],
-    clash: 'Pig', harm: 'Tiger', dest: 'Monkey',
-    san: ['Rooster', 'Ox'], liu: 'Monkey',
-    neutral: ['Rat', 'Rabbit', 'Dragon', 'Goat', 'Dog'],
-    organ: 'heart, small intestine, cardiovascular', dir: 'South-Southeast',
-    trait: 'perceptive, strategic, mysterious, patient, transformative',
-    clashEl: 'Fire vs Water extinction', harmEl: 'Wood-Fire excessive generation', destEl: 'Fire-Metal corrosion',
-    clashDesc: 'Si-Hai Fire-Water extinction: Snake\'s yin Fire strategic intensity confronts Pig\'s yin Water generous abundance — mutual extinction where neither element can fully dominate. Pig years bring the emotional flooding challenge: Pig\'s generous Water extinguishes Snake\'s strategic Fire clarity, financial resources depleted through emotional generosity, boundary dissolution from Pig\'s overwhelming abundance. The strategic control that defines Snake\'s nature is its most vulnerable quality in Pig years — careful preparations overwhelmed by Pig\'s expansive, unconditional giving that disrupts Snake\'s carefully managed information environment.',
-    harmDesc: 'Tiger\'s yang Wood appears to be nourished by your yang Wood (Wood generates Fire) but becomes excessive and uncontrolled — burning through Snake\'s resources rather than productively transforming them. Tiger harm years bring impulsive external forces that disrupt Snake\'s patient timing: premature exposure of strategic preparations, competitive pressure forcing action before Snake is ready, partner\'s bold initiative revealing Snake\'s private strategy to unintended audiences. Snake\'s characteristic patience — its most powerful strategic asset — is precisely what Tiger-energy forces undermine.',
-    destDesc: 'Snake-Monkey Fire-Metal corrosion: both elements degrade through excessive interaction — Metal corrodes Fire, Fire exhausts Metal\'s precision. Monkey years bring implementation challenges: technical over-analysis paralysing Snake\'s intuitive strategy, systematic scrutiny revealing preparation gaps in Snake\'s carefully cultivated plans, public criticism of Snake\'s private methods from Monkey\'s transparent analytical approach. 2028 Earth Monkey is particularly challenging for Snake-born individuals.',
-    benDesc: 'Snake\'s Ben Ming Nian amplifies strategic depth toward obsessive secrecy, perceptiveness toward paranoid vigilance, patience toward strategic paralysis. Cardiovascular system is the primary health vulnerability — sustained internal tension from heightened vigilance creates measurable cardiac stress. Reputation risk from perceived manipulation. Relationship isolation from excessive privacy in a year when all relationships are under magnified scrutiny. Yet Snake\'s Ben Ming Nian also intensifies its most extraordinary gifts: the strategic intelligence that can see seven moves ahead, the transformative capacity that produces genuine metamorphosis, and the perceptive depth that touches the hidden nature of reality. Transparency balance — sufficient disclosure to build trust, sufficient privacy to protect strategic advantage — is the year\'s central practice.',
-    allianceDesc: 'Rooster and Ox form your San He Metal triangle — exceptional for precision achievement, quality recognition, and systematic implementation. Rooster years reward quality demonstration; Ox years reward practical implementation. Your Liu He ally is Monkey — Snake-Monkey pairing combines Snake\'s strategic yin Fire with Monkey\'s technical Metal in a Water-transforming relationship, creating exceptional problem-solving and innovation partnership. Monkey years (including the destructive 2028) offer paradoxical alliance potential for those who consciously navigate the Fire-Metal interaction.'
-  },
-  Horse: {
-    e: '🐎', i: 6, el: 'Fire', pol: 'Yang', br: 'Wu',
-    ben: [1930, 1942, 1954, 1966, 1978, 1990, 2002, 2014, 2026, 2038, 2050],
-    clash: 'Rat', harm: 'Ox', dest: 'Rabbit',
-    san: ['Tiger', 'Dog'], liu: 'Goat',
-    neutral: ['Dragon', 'Snake', 'Monkey', 'Rooster', 'Pig'],
-    organ: 'heart, small intestine, circulatory system', dir: 'South',
-    trait: 'passionate, free-spirited, energetic, charismatic, restless',
-    clashEl: 'Fire vs Water conflict', harmEl: 'Fire-Earth smothering', destEl: 'Fire-Wood consumption',
-    clashDesc: 'Wu-Zi Fire-Water conflict: your yang Fire\'s passionate intensity confronts Rat\'s yin Water strategic intelligence directly. Rat years bring the grounding challenge — Water\'s patient depth opposing Fire\'s expansive immediacy, strategic long-term thinking confronting Horse\'s impulse toward visible action. Career disruptions from those with greater strategic depth, relationship challenges from partners who plan while Horse acts, financial volatility from Water\'s tendency to contain and redirect Horse\'s spending momentum.',
-    harmDesc: 'Horse-Ox (Wu-Chou) harm: your Fire generates Ox\'s Earth productively — but Ox\'s reticent nature fails to provide the recognition that Horse\'s yang energy requires. Horse\'s visible contribution is absorbed without acknowledgment, generating the smothering dynamic. In 2026 — also Horse\'s own Ben Ming Nian — this harm with Ox-born individuals and Ox-type authority figures is particularly intense: the Fire generates Earth maximally while receiving minimal Fire-sustaining recognition.',
-    destDesc: 'Horse-Rabbit destruction: Horse\'s yang Fire consumes Rabbit\'s yin Wood — the generous Wood that should fuel Fire instead burns away without productive transformation. Horse years bring relationships and projects where Rabbit-type individuals\' gentle energy is depleted rather than channeled productively, creative partnerships exhausting Rabbit-energy collaborators, romantic relationships where Horse\'s intensity overwhelms Rabbit\'s gentleness.',
-    benDesc: '2026 is Horse\'s Ben Ming Nian — the year of maximum yang Fire amplification. Passion becomes volatility, restlessness becomes instability, charisma becomes manipulation of those who are mesmerized by Fire\'s light. Cardiovascular system is the critical health vulnerability — the most active fire year in the cycle creates maximum cardiac stress. Yet Horse\'s Ben Ming Nian is the most energetically powerful year of any sign\'s cycle — pure yang Fire at full expression. This is the year when Horse\'s authentic nature must be fully honored: wear red continuously, perform An Tai Sui rituals, and consciously direct the amplified Fire toward genuinely meaningful expression rather than reactive combustion.',
-    allianceDesc: 'Tiger and Dog form your San He Fire triangle — exceptional for passionate leadership, community mobilization, and inspired action. Your Liu He ally is Goat — Horse-Goat pairing is the most harmonious single-animal alliance in the zodiac, combining yang and yin Earth in complementary unity. Goat years offer Horse the grounded aesthetic support that tempers Fire\'s volatility without extinguishing its brilliance.'
-  },
-  Goat: {
-    e: 'RAM', i: 7, el: 'Earth', pol: 'Yin', br: 'Wei',
-    ben: [1931, 1943, 1955, 1967, 1979, 1991, 2003, 2015, 2027, 2039, 2051],
-    clash: 'Ox', harm: 'Rat', dest: 'Dog',
-    san: ['Pig', 'Rabbit'], liu: 'Horse',
-    neutral: ['Tiger', 'Snake', 'Dragon', 'Monkey', 'Rooster'],
-    organ: 'spleen, stomach, digestive system', dir: 'South-Southwest',
-    trait: 'artistic, gentle, empathetic, creative, sensitive',
-    clashEl: 'Earth vs Earth polarization', harmEl: 'Earth-Water absorption', destEl: 'Earth-Earth competition',
-    clashDesc: 'Wei-Chou same-element Earth polarization: Goat\'s yang Earth (dispersed, nurturing, aesthetic) confronts Ox\'s yin Earth (dense, practical, structural) in irresolvable competition for Earth-element territory. Ox years bring the values conflict: resource allocation disputes between Goat\'s relationship-maintenance spending and Ox\'s security-accumulation priorities, pace incompatibility between Goat\'s responsive generosity and Ox\'s methodical deliberation, aesthetic conflicts in shared environments between Goat\'s beauty-oriented standards and Ox\'s functional requirements.',
-    harmDesc: 'Goat-Rat Earth absorbs Water: Goat\'s Earth element inadvertently depletes Rat\'s Water vitality — not through malice but through the absorptive quality of Earth receiving Water without productive return. Goat must practice deliberate reciprocity in Rat years: conscious attention to whether relationships are genuinely nourishing all parties, awareness of the unconscious tendency for Goat\'s Earth to absorb Water-type individuals\' energy without adequate return, and structured practices for ensuring that Goat\'s considerable empathic resources are matched by genuine reciprocal exchange.',
-    destDesc: 'Goat-Dog dry Earth competition: both Goat and Dog are caregiving Earth-element signs, but their Earth expressions are fundamentally incompatible — Goat\'s aesthetic nurturing versus Dog\'s protective vigilance create competition for identical caregiving territory. Dog years bring community conflicts, social network fragmentation from competing relational priorities, resource disputes between Goat\'s generosity and Dog\'s protective hoarding.',
-    benDesc: '2027 is Goat\'s Ben Ming Nian — artistic sensitivity amplified to potentially destabilizing intensity. Empathy becomes emotional absorption of others\' distress, creativity becomes indecision from excessive aesthetic possibilities, dependence on others\' support becomes crisis when support is unavailable. Digestive system and spleen are health vulnerability areas. Financial instability from generosity exceeding sustainable capacity. Yet Goat\'s Ben Ming Nian also intensifies its most extraordinary gifts: artistic expression reaching its most sublime level, empathic capacity touching the genuinely transcendent, and creative output that carries unusual emotional resonance and lasting impact.',
-    allianceDesc: 'Pig and Rabbit form your San He Wood triangle — most creatively abundant alliance, exceptional for artistic expression, relationship building, and community flourishing. Your Liu He ally is Horse — Goat-Horse is the zodiac\'s most harmonious pairing, combining in Earth transformation where each completes what the other lacks. Horse years provide the passionate yang momentum that grounds and energizes Goat\'s yin Earth creativity.'
-  },
-  Monkey: {
-    e: '🐒', i: 8, el: 'Metal', pol: 'Yang', br: 'Shen',
-    ben: [1932, 1944, 1956, 1968, 1980, 1992, 2004, 2016, 2028, 2040, 2052],
-    clash: 'Tiger', harm: 'Pig', dest: 'Snake',
-    san: ['Rat', 'Dragon'], liu: 'Snake',
-    neutral: ['Ox', 'Rabbit', 'Goat', 'Dog', 'Horse'],
-    organ: 'lungs, large intestine, respiratory system', dir: 'West-Southwest',
-    trait: 'clever, innovative, adaptable, strategic, restless',
-    clashEl: 'Metal vs Wood combat', harmEl: 'Metal-Water corrosion', destEl: 'Metal-Fire corrosion',
-    clashDesc: 'Shen-Yin Metal-Wood combat: Monkey\'s yang Metal analytical precision confronts Tiger\'s yang Wood expansive vision — Metal cuts Wood, but Wood\'s growth endurance exhausts Metal\'s cutting edge. Tiger years bring challenges from bold, visionary forces that operate outside Monkey\'s systematic frameworks: impulsive decisions that disrupt careful preparations, creative disruptions that invalidate Monkey\'s analytical conclusions, competitive losses to those who move faster than Monkey\'s verification systems allow. Tiger years require Monkey to develop genuine appreciation for intuitive leaps that cannot be fully systematized.',
-    harmDesc: 'Monkey-Pig Metal corrodes Water: Monkey\'s analytical precision gradually drains Pig\'s generous Water vitality through over-analysis. Pig years bring the emotional intelligence challenge — environments where Monkey\'s systematic approach creates distance in contexts requiring authentic warmth, relationships where technical precision substitutes for genuine connection, partnerships where Monkey\'s cleverness exploits Pig\'s generosity without conscious awareness. Monkey must practice deliberate emotional presence in Pig years: setting aside analytical frameworks in relational contexts.',
-    destDesc: 'Snake-Monkey destruction from Monkey\'s perspective: both Fire and Metal degrade through excessive interaction. Snake years bring strategic conflict: Snake\'s patient hidden preparation confronts Monkey\'s transparent analytical process — Snake\'s secrecy and Monkey\'s systematic exposure create fundamental operating incompatibility. Collaboration failures with strategic-type partners, intellectual property disputes, implementation paralysis from competing analytical and strategic frameworks.',
-    benDesc: '2028 is Monkey\'s Ben Ming Nian — cleverness amplified toward potential manipulation, innovation toward instability, strategic thinking toward paralysis by analysis. Respiratory system and large intestine are health vulnerability areas. Trust challenges from perceived over-cleverness. Financial risk from complex strategies that backfire. Yet Monkey\'s Ben Ming Nian intensifies its most extraordinary gifts: the innovative intelligence that generates genuinely novel solutions, the adaptive capacity that thrives in chaos that defeats others, and the strategic creativity that finds unexpected paths through impossible situations. Direct this year\'s peak mental energy toward genuinely valuable innovation.',
-    allianceDesc: 'Rat and Dragon form your San He Water triangle — exceptional for wealth accumulation, strategic achievement, and large-scale problem-solving. Your Liu He ally is Snake — Monkey-Snake pairing combines Metal\'s analytical precision with Fire\'s strategic depth in a Water-transforming relationship that produces exceptional problem-solving and innovation. Snake-Monkey alliance years are particularly powerful for intellectual and strategic partnership formation.'
-  },
-  Rooster: {
-    e: '🐓', i: 9, el: 'Metal', pol: 'Yin', br: 'You',
-    ben: [1933, 1945, 1957, 1969, 1981, 1993, 2005, 2017, 2029, 2041, 2053],
-    clash: 'Rabbit', harm: 'Dog', dest: 'Rat',
-    san: ['Snake', 'Ox'], liu: 'Dragon',
-    neutral: ['Tiger', 'Horse', 'Goat', 'Monkey', 'Pig'],
-    organ: 'lungs, large intestine, skin', dir: 'West',
-    trait: 'precise, observant, critical, organized, perfectionist',
-    clashEl: 'Metal vs Wood confrontation', harmEl: 'Metal-Earth burial', destEl: 'Metal-Water corrosion',
-    clashDesc: 'You-Mao Metal-Wood confrontation: Rooster\'s yin Metal critical precision confronts Rabbit\'s yin Wood diplomatic harmony — the most aesthetically charged clash in the zodiac. Rabbit years bring environments where Rooster\'s critical standards seem harsh, where diplomatic harmony overrides quality requirements, where aesthetic judgments based on feeling override Rooster\'s standards-based analysis. Romantic disruption from aesthetic incompatibility, professional conflict from precision standards perceived as perfectionism, social environments where Rooster\'s honest criticism disrupts Rabbit\'s carefully maintained harmony.',
-    harmDesc: 'Dog\'s Earth buries Rooster\'s Metal — not through active destruction but through passive absorption that renders Rooster\'s precision invisible. Dog years bring the invisible contribution challenge: systematic efforts going unacknowledged, critical analytical work disappearing into organizational Earth structures without credit, careful execution absorbed by loyal but metrics-averse Dog-type leadership. Rooster\'s best work becoming invisible is the Dog year\'s defining harm dynamic.',
-    destDesc: 'Rooster-Rat Metal-Water: Metal appears to generate Water (productive elemental cycle) but becomes corrosive when excessive — Rooster\'s analytical precision fragmenting Rat\'s fluid adaptability. Rat years bring adaptive-type challenges: flexible individuals whose Water-nature adaptation violates Rooster\'s systematized structures, creative improvisations that undermine established quality frameworks, organizational adaptations that sacrifice Rooster\'s carefully maintained standards for short-term flexibility.',
-    benDesc: '2029 is Rooster\'s Ben Ming Nian — critical precision amplified toward hypercriticism, organization toward rigid inflexibility, observational accuracy toward relentless fault-finding. Respiratory and skin vulnerabilities from Metal element intensification. Professional isolation from excessive critical standards that others experience as impossible to satisfy. Yet Rooster\'s Ben Ming Nian also represents the peak of analytical and organizational power — this is the year to produce genuinely masterwork-quality output, to establish the systematic frameworks that will serve for years, to demonstrate the quality standards that define Rooster\'s highest expression.',
-    allianceDesc: 'Snake and Ox form your San He Metal triangle — exceptional for systematic quality achievement, credential recognition, and precision-based professional success. Your Liu He ally is Dragon — Rooster-Dragon pairing combines Rooster\'s precision execution with Dragon\'s visionary magnitude, exceptional for translating grand vision into quality reality. Dragon years offer Rooster the imperial scale that gives Rooster\'s precision-based work its most meaningful context.'
-  },
-  Dog: {
-    e: '🐕', i: 10, el: 'Earth', pol: 'Yang', br: 'Xu',
-    ben: [1934, 1946, 1958, 1970, 1982, 1994, 2006, 2018, 2030, 2042, 2054],
-    clash: 'Dragon', harm: 'Rooster', dest: 'Goat',
-    san: ['Tiger', 'Horse'], liu: 'Rabbit',
-    neutral: ['Rat', 'Ox', 'Snake', 'Monkey', 'Pig'],
-    organ: 'stomach, spleen, digestive system', dir: 'West-Northwest',
-    trait: 'loyal, protective, honest, anxious, moralistic',
-    clashEl: 'Earth vs Earth polarization', harmEl: 'Earth-Metal burial', destEl: 'Earth-Earth competition',
-    clashDesc: 'Xu-Chen same-element Earth polarization: Dog\'s dry, loyal, protective Earth confronts Dragon\'s wet, transformative, visionary Earth in irresolvable competition. Dragon years bring the loyalty-versus-transformation challenge: Dragon\'s imperial vision disrupts the protective structures Dog has built, transformative initiatives threatening the loyalties and traditions Dog has carefully maintained. Dog\'s deepest anxiety — that loyalty will not be honored, that protective structures will be dismantled — is precisely what Dragon\'s disruptive energy triggers.',
-    harmDesc: 'Dog-Rooster: Rooster\'s Metal is gradually buried in Dog\'s Earth — Dog\'s Earth absorbs Rooster\'s analytical precision without recognition, creating the invisible contribution dynamic from Dog\'s perspective. In Rooster years, Dog experiences environments where loyalty and trustworthiness are less valued than technical precision, where Dog\'s authentic moral commitment is evaluated against Rooster\'s standards rather than accepted as intrinsically valuable. Dog\'s anxiety intensifies when evaluation metrics replace trust as the basis for relationship.',
-    destDesc: 'Dog-Goat dry Earth competition: Dog\'s protective conservatism and Goat\'s aesthetic generosity compete for identical caregiving territory. Goat years bring community conflicts, social network fragmentation from competing Earth-element values in shared communities.',
-    benDesc: '2030 is Dog\'s Ben Ming Nian — loyalty amplified toward possessiveness, protectiveness toward controlling anxiety, moral clarity toward self-righteous rigidity. Digestive vulnerability from intensified anxiety — Dog\'s characteristic worry patterns become physically manifested during the amplification of Ben Ming Nian. Career challenges from inflexibility. Relationship difficulties from excessive vigilance. Yet Dog\'s Ben Ming Nian also represents the peak of genuine integrity — this is the year when Dog\'s authentic trustworthiness reaches its clearest expression, when loyalty is most powerfully demonstrated, when moral clarity can genuinely guide others through complexity.',
-    allianceDesc: 'Tiger and Horse form your San He Fire triangle — exceptional for inspired action, community leadership, and passionate defense of meaningful causes. Your Liu He ally is Rabbit — Dog-Rabbit pairing combines Dog\'s loyal Earth protection with Rabbit\'s diplomatic Wood sensitivity, exceptional for creating environments where both safety and beauty can flourish. Rabbit years offer Dog the aesthetic refinement that softens protective vigilance into welcoming warmth.'
-  },
-  Pig: {
-    e: '🐖', i: 11, el: 'Water', pol: 'Yin', br: 'Hai',
-    ben: [1935, 1947, 1959, 1971, 1983, 1995, 2007, 2019, 2031, 2043, 2055],
-    clash: 'Snake', harm: 'Monkey', dest: 'Tiger',
-    san: ['Rabbit', 'Goat'], liu: 'Tiger',
-    neutral: ['Rat', 'Ox', 'Dragon', 'Rooster', 'Dog'],
-    organ: 'kidneys, reproductive system, ears', dir: 'North-Northwest',
-    trait: 'generous, sincere, sensual, compassionate, naive',
-    clashEl: 'Water vs Fire extinction', harmEl: 'Water-Metal corrosion', destEl: 'Water-Wood overnourishment',
-    clashDesc: 'Hai-Si Water-Fire extinction: Pig\'s yin Water generous abundance confronts Snake\'s yin Fire strategic intensity — Pig\'s greatest elemental challenge. Snake years bring strategic environments that exploit Pig\'s openness: careful calculation meeting genuine generosity, hidden agendas operating within Pig\'s trust-based world, strategic information management by Snake-type individuals whose concealment disrupts Pig\'s authentic relationship approach. Pig\'s generous Water is precisely what Snake\'s strategic Fire needs — and precisely what it consumes without adequate reciprocation.',
-    harmDesc: 'Pig-Monkey Water-Metal: Monkey\'s analytical precision gradually drains Pig\'s generous Water vitality. Monkey years bring over-analytical environments that exhaust Pig\'s spontaneous generosity: technical demands exceeding Pig\'s systematic capacity, analytical scrutiny destroying the authentic spontaneity that Pig\'s best contributions require, partnership environments where clever strategy replaces genuine warmth as the operating currency.',
-    destDesc: 'Pig-Tiger Wood-Water overnourishment: Pig\'s generous Water enables Tiger\'s Wood overextension, creating unsustainable expansion that ultimately collapses. Tiger years bring enabling dynamics: Pig\'s generosity funding Tiger\'s risky initiatives, Pig\'s emotional support sustaining Tiger\'s reckless confidence, Pig\'s resources depleted in service of Tiger\'s overreach. Pig must develop appropriate discernment about which Tigers to support and to what degree during Tiger years.',
-    benDesc: '2031 is Pig\'s Ben Ming Nian — generosity amplified toward dangerous naivety, openness toward exploitation vulnerability, sincerity toward inability to perceive deception. Kidney and reproductive system vulnerabilities from yin Water amplification. Financial depletion from excessive generosity without discernment. Relationship exploitation from misplaced trust in a year when all relationships are under maximum energetic pressure. Yet Pig\'s Ben Ming Nian is the most spiritually abundant year in the zodiac — the deep Water qualities of compassion, intuitive wisdom, and genuine abundance reach their fullest expression. This is the year to channel extraordinary generosity toward deliberately chosen recipients rather than dissipating it indiscriminately.',
-    allianceDesc: 'Rabbit and Goat form your San He Wood triangle — most creatively abundant and relationally harmonious alliance, exceptional for artistic collaboration, community building, and compassionate service. Your Liu He ally is Tiger — Pig-Tiger is one of the zodiac\'s most dynamic pairings, combining Pig\'s generous yin Water with Tiger\'s bold yang Wood in genuine mutual nourishment (at sustainable levels). Tiger years are Pig\'s most supported annual environment for meaningful initiative.'
-  }
-};
-
-// ═══════════════════════════════════════════════════════════════
-// CHUNKS 05-06: YD DATA (VERBATIM)
-const YD: any = {
-  1: {
-    title: "Year of Origins", sub: "New Beginnings · The Monad · Spring Equinox", planet: "☉ Sun / Surya", season: "spring", phase: "Spring Equinox — Seed Planting", chakra: "Manipura (Solar Plexus)",
-    kw: ["Initiation", "Independence", "Self-Definition", "Leadership", "Courage", "Pioneer"],
-    isCrit: false,
-    overview: `Personal Year 1 is the cycle's threshold — the numerological monad, divine unity preceding multiplicity. In Pythagorean philosophy, 1 is the point without dimension that contains all dimensional possibility. In living experience: a year of heightened initiative, self-definition, and pioneering action. The transition from Year 9's completion creates a complete identity shedding — both the external presentation others perceive and the internal self-concept that has defined you through the previous cycle.\n\nThis year carries the strongest energy for breaking old habits and establishing new trajectories. Numerological tradition consistently identifies Year 1 as "the most powerful year for adjustment" — when the cycle's momentum genuinely supports departures from established patterns. The seed choices of Year 1 carry the genetic blueprint of the entire next nine-year arc: what is initiated now determines what will flower, be harvested, and be released through Years 2 through 9.\n\nFresh starts receive energetic support across all life domains: career initiations, relocation, relationship beginnings, and identity transformations. Even those with cooperative Life Path numbers experience increased self-assertion and initiative — this is the yearly force of the monad asserting itself through your personal cycle, regardless of your natal orientation.`,
-    pyth: `Year 1's shadow emerges from its greatest strength. The self-focus enabling clear direction can become self-absorption that alienates potential collaborators precisely when you need them most. The courage to act independently may manifest as impulsivity — moving before adequate information, consultation, or preparation exists. The excitement of new beginnings may mask the unprocessed grief of what Year 9 completed: genuine endings require genuine mourning, and those who skip this processing carry unresolved loss into Year 1's initiatives.\n\nScattered effort is Year 1's most common failure mode. The abundance of possibilities generates simultaneous enthusiasm for too many directions, producing shallow engagement with all of them and mastery of none. Disciplined prioritization — identifying one or two core initiatives and protecting them from the proliferation of exciting alternatives — is the year's central practice for those who want genuine results rather than memorable attempts.\n\nSpiritual challenge: individuation — claiming authentic existence separate from collective definitions. This is not selfishness but its precondition. One cannot give something genuine until one has become someone genuine. The practice appropriate to Year 1 is cultivating presence with the uncertainty of genuine new beginnings rather than prematurely seeking the comfort of familiar patterns in new clothing.`,
-    vedic: `Governed by Surya — the Sun, source of light, life, and conscious will in Vedic cosmology. Surya's influence activates the Manipura chakra (solar plexus), center of personal power, metabolic fire, and the will to manifest. Physical vitality increases, supporting the ambitious undertakings Year 1 calls for.\n\nSurya's domain includes professional identity, positions of public responsibility, and recognition. Year 1 characteristically brings career developments: promotions earned through prior cycle's work, new positions launched, entrepreneurial ventures begun, or significant professional reorientations. The year's Sun energy specifically activates the solar aspects of the personality — courage, leadership presence, and the willingness to be seen in one's genuine power.\n\nKarmically, Year 1 addresses patterns around self-worth, appropriate authority, and the right use of personal power. Surya mantra practice (Gayatri mantra, Surya Namaskar) specifically activates and balances the year's energies. Those with Sun well-placed natally (Leo ascendant or Sun, Aries Sun) experience especially pronounced Year 1 vitality. Those with challenged natal Sun use Year 1 to consciously develop healthy self-assertion.`,
-    chinese: `Maps to the Lo Shu square's North position — Water element, Kan trigram (The Abysmal). Water in Year 1 paradoxically complements the year's initiating energy: effective initiation requires the Water qualities of depth, adaptability, and accurate reading of conditions, not merely the assertion of will. The most powerful Year 1 actions arise from genuine understanding of current conditions rather than willful imposition of predetermined agendas.\n\nThe Qian hexagram (Heaven, pure yang, six unbroken lines) provides Year 1's I Ching resonance: "The creative works sublime success, furthering through perseverance." Qian counsels consistent, integrity-based action — the yang energy of pure initiation most effectively expressed through genuine authenticity rather than strategic performance.\n\nFeng shui for Year 1: Northeast sector (self-cultivation, new beginnings) and North sector (career, life path). Water features in North activate career momentum. Blue and black in key spaces. Clear, unobstructed entryways to allow new energy access. The annual 1 White Star brings writing, study, and career activation — identify and enhance the sector it visits for your home's orientation.`,
-    chald: `The 10/1 compound (Wheel of Fortune) carries karmic momentum — past cycle actions create this year's opportunities. The Wheel has turned in your favor; timing factors are particularly supportive. 19/1 (Sun, carrying karmic complexity) indicates patterns from previous cycles of misused power creating present requirement for genuine ego purification. Success requires combining Sun's radiant confidence with authentic consideration for others' development.\n\nThe 28/1 compound carries the warrior's victory through sustained persistence — success that comes specifically through refusing to abandon what others would have surrendered. Chaldean tradition views 28 as the "fluctuating fame" number, suggesting Year 1 achievements may need consistent reinforcement through Years 2 and 3 before stabilizing into permanent gain.\n\nIn Chaldean practice, the name's total value interacting with Year 1's vibration reveals whether the cycle opens through inspiration (high-vibration compound) or through karmic clearing (13/4 energy carried into Year 1's threshold). Professional name analysis during Year 1 can clarify which pathway the cycle is opening.`,
-    pr: [{ i: "🌅", n: "Solar Meditation", d: "Sunrise practice facing east, breathing gold light into solar plexus" }, { i: "🙏", n: "Surya Namaskar", d: "12-round sun salutation cycle, embodying forward movement" }, { i: "🎯", n: "Vision Architecture", d: "Nine-year arc visualization; commit to 1–3 core initiatives only" }, { i: "⚡", n: "Yang Qigong", d: "Rising energy cultivation through morning movement practice" }]
-  },
-  2: {
-    title: "Year of Receptivity", sub: "Partnership · The Dyad · Late Spring Germination", planet: "☽ Moon / Chandra", season: "spring", phase: "Late Spring — Germination", chakra: "Swadhisthana (Sacral)",
-    kw: ["Partnership", "Cooperation", "Patience", "Intuition", "Diplomacy", "Emotional Intelligence"],
-    isCrit: false,
-    overview: `Personal Year 2 introduces the dyad — polarity, the generative tension between self and other that makes development possible. This year's energy shifts dramatically from Year 1's initiating yang to cultivating yin: patience replaces urgency, cooperation supersedes competition, and emotional intelligence becomes more valuable than decisive action.\n\nFollowing Year 1's planting, Year 2 is late spring's germination phase — when the seed coat breaks and both root and shoot emerge in opposite directions simultaneously. Above ground, nothing visible may exist; below, transformative processes proceed with urgency. This explains Year 2's characteristic experience of apparent stagnation: the most significant developmental work is occurring precisely where it cannot be seen or measured.\n\nThe year's primary opportunities center on relationship development: romantic partnerships deepening or forming, professional collaborations benefiting from enhanced diplomatic skill, community connections strengthening through increased social sensitivity. Intuitive development — less obvious but equally important — reaches a peak: the receptive yin energy heightens sensitivity to emotional undercurrents, unspoken needs, and emerging patterns that Year 1's action-orientation would have missed.`,
-    pyth: `Year 2's challenges emerge from receptive quality taken to excess. Indecision results when multiple perspectives seem equally valid — when no option clearly dominates, when the desire to preserve all relationship possibilities prevents any commitment. The year's characteristic slowed pace can become paralysis, with important decisions deferred indefinitely in the name of "not being ready."\n\nCodependency represents Year 2's most serious shadow: relationship patterns where self-worth becomes contingent on others' approval, where boundaries dissolve in apparent unity, where care for others masks systematic neglect of self. The year's yin receptivity, misapplied, produces excessive deference — the person who cannot be known because they continuously mirror others' preferences rather than revealing their own.\n\nSpiritually, Year 2 practices surrender to timing not self-determined. Where Year 1 acted on will, Year 2 waits on emergence. This is not passive resignation but active receptivity — maintaining prepared openness while allowing development to proceed at its own pace. The gardener who digs up germinating seeds to check their progress destroys the very process they seek to observe.`,
-    vedic: `Assigned to Chandra — the Moon, governor of mind, emotion, memory, and cyclical fluctuation. Chandra's influence activates the Swadhisthana chakra (sacral center), seat of creativity, sexuality, and emotional flow. Mental states become more variable, with mood cycles more pronounced, dream life more vivid, and the emotional body more accessible to both genuine depth and reactive disturbance.\n\nChandra's domains include domestic environment, family relationships, and foundational security patterns — particularly those established in childhood and maintained through the unconscious emotional habits that constitute home. Year 2 frequently brings home relocations or renovations, significant family dynamics requiring conscious attention, or the surfacing of security and belonging wounds that have operated below conscious awareness.\n\nKarmically, Year 2 addresses patterns around nurturing — received and given, denied and demanded. This often specifically involves maternal lineage patterns: what was and wasn't provided by maternal figures, what is being replicated unconsciously, and what needs conscious transformation. Chandra Namaskar (moon salutation) practice, dream journaling, and water element cultivation support Year 2's deepest developmental work.`,
-    chinese: `Occupies the Lo Shu's Southwest — the most yin position, associated with Kun (Earth, pure yin), pure receptivity, devotion, and the Earth's nurturing capacity. Kun comprises six broken yin lines — the perfect complement to Year 1's Qian. Its counsel: "The receptive brings about sublime success, furthering through the perseverance of a mare" — enduring, adaptive, faithful to the process rather than imposing upon it.\n\nFeng shui focus for Year 2: Southwest sector enhancement for relationships and receptivity. Pairs of objects (candles, crystals, artwork) activate partnership energy. Earth tones and ceramics stabilize the yin field. The annual 2 Black Star visiting the Southwest may intensify relationship energy while requiring health protection — Earth element objects (crystals, ceramics, square shapes) provide strengthening support.\n\nThe 2 Black Star's health dimension deserves specific attention: Earth element in excess can affect digestive and reproductive systems. Year 2 individuals benefit from specific focus on digestive health, regular movement to prevent Earth stagnation, and conscious attention to food quality and eating rhythms.`,
-    chald: `The 11/2 compound introduces master number intensity — the Illumination frequency amplifying Year 2's intuitive capacity toward potentially psychic levels while adding the challenge of nervous system hypersensitivity. Individuals experiencing 11/2 years may encounter significant spiritual openings requiring grounded integration practices to prevent the elevated sensitivity from becoming destabilizing overwhelm.\n\nThe 20/2 compound carries the Judgment archetype: spiritual awakening energy, the revelation of what has been hidden beneath ordinary awareness, the hearing of a deeper calling that reorganizes life's priorities around authentic purpose rather than conditioned expectation. Year 2 from 20 often brings a spiritual or vocational revelation that reorients everything.\n\nThe 29/2 carries the "Grace under pressure" vibration — extraordinary emotional resilience developed precisely through being pressed beyond comfortable limits. Year 2 reducing from 29 brings challenges that develop the emotional mastery that only genuine difficulty can produce.`,
-    pr: [{ i: "🌙", n: "Moon Salutations", d: "Evening Chandra Namaskar practice, attuning to lunar rhythms" }, { i: "👂", n: "Deep Listening", d: "Daily practice of listening without formulating response" }, { i: "💧", n: "Dream Journaling", d: "Morning recording of dream imagery and emotional tone" }, { i: "🤝", n: "Partnership Audit", d: "Honest inventory of all collaborative relationships' health and reciprocity" }]
-  },
-  3: {
-    title: "Year of Expression", sub: "Creative Bloom · The Triad · Early Summer", planet: "♃ Jupiter / Guru", season: "spring", phase: "Early Summer — Blossoming", chakra: "Vishuddha (Throat)",
-    kw: ["Creativity", "Joy", "Communication", "Optimism", "Artistic Output", "Social Expansion"],
-    isCrit: false,
-    overview: `Personal Year 3 completes the spring triad with blossoming — the visible expression of two years of invisible cultivation. What was planted in Year 1 and nurtured through Year 2's receptive patience now breaks into visible bloom. This year's energy is expansive, joyful, and creatively fertile in ways that feel almost effortless after Year 2's careful germination work.\n\nJupiter governs Year 3 — the great benefic, Guru of the gods, lord of wisdom and creative progeny. Jupiter's touch transmutes ordinary communication into inspired expression, ordinary relationships into joyful communion, ordinary study into genuine wisdom-seeking. The Vishuddha (throat) chakra activates as the primary channel for this creative outpouring — making Year 3 the cycle's most powerful year for any form of expression: writing, speaking, teaching, performing, or creating.\n\nThe triad's philosophical significance is generative: 1 and 2's polarity produces 3 as their creative offspring. This generative quality means Year 3 often literally produces: artistic works, new projects, relationships, creative businesses, and in some cases children. The year strongly supports: creative business launches, writing and publishing ventures, public speaking and performance, teaching and facilitation, and any work requiring the charismatic engagement of others with an authentic vision.`,
-    pyth: `Year 3's shadow is superficiality and creative scattering. Jupiter's expansiveness without discipline produces creative excess — too many ideas pursued too shallowly, too many social obligations accepted beyond available capacity, too much optimism about realistic timelines. Year 3 individuals are specifically prone to the grief of creative projects abandoned at the doorstep of completion — begun with enthusiasm during Year 3's fertile opening, then abandoned when Year 4's discipline is required to complete them.\n\nGossip, social performance, and the constant stimulation of an expanded social world can consume the year's creative energy if not consciously directed. The throat chakra activation brings words — but not all words serve. The challenge is channeling Year 3's communicative gift into expressions that genuinely matter: the book that needs writing, the teaching that needs sharing, the creative collaboration that needs initiating.\n\nThe spiritual curriculum of Year 3 is recognizing creative expression as sacred — not merely entertainment or self-expression but genuine participation in the ongoing creation of meaning. Jupiter teaches that genuine creative work emerging from authentic inner vision and serving others' growth is not separate from spiritual practice but is itself one of its highest forms.`,
-    vedic: `Jupiter (Guru, Brihaspati) governs Year 3, activating education, wisdom transmission, creative legacy, and the expansion of philosophical understanding. Life areas activated: higher education and teaching, publishing and broadcasting, international travel and philosophical inquiry, children and students, and creative projects of lasting significance. Jupiter's benefic energy creates genuine good fortune when its gifts are received with humility rather than entitlement — the student who knows they are a student receives the most from Jupiter's year.\n\nThe Vishuddha chakra activation makes Year 3 ideal for mantra practice, sound healing, vocal training, and any discipline involving the refinement of expressive capacity. Those with Jupiter well-placed natally (Sagittarius, Pisces, Cancer) experience especially pronounced Year 3 blessings and should take specific advantage of the year's educational and creative opportunities. The year's Jupiter energy also works through children and students — teaching, mentoring, and parenting receive extraordinary support.\n\nKarmically, Year 3 invites the healing of creative suppression wounds: old experiences of having one's expression dismissed, mocked, or ignored that created the inner critic now overriding authentic expression. Jupiter's beneficence provides the courage to speak and create with full authentic force regardless of prior wounding.`,
-    chinese: `Year 3 maps to the East — Wood element, Zhen trigram (The Arousing). Zhen's image is thunder awakening the earth after winter's silence: the sudden, irresistible emergence of growth energy that has been building invisibly through Years 1 and 2. This is precisely Year 3's quality — the creative jolt that disturbs comfortable stasis into genuine aliveness, the emergence of what has been developing underground.\n\nFeng shui for Year 3: East sector activation with Wood element remedies — tall plants, wooden objects, green and teal colors — to support Year 3's blooming momentum. The annual 3 Jade Star brings creativity and celebration but also legal disputes and verbal conflicts from the star's yang Wood argumentative quality. Use this creative energy consciously: channel it into genuine expression rather than reactive confrontation.\n\nThe East also represents the direction of new beginnings in Chinese cosmology — not the absolute new beginning of Year 1's North/Water, but the visible, manifested new beginning of creative works entering the world. Year 3's creative officer, properly directed, carries the cultural impact of genuinely new ideas taking form.`,
-    chald: `The 21/3 (Crown of the Magi) is considered the most auspicious compound number in Year 3's expression — promising victory through creative effort and representing the individual whose authentic vision ultimately succeeds despite obstacles. Year 3 reducing from 21 carries the signature of eventual creative triumph.\n\nThe 12/3 presents the challenge of premature expression: creative gifts offered before sufficient development invite criticism that undermines rather than refines. Year 3 from 12 benefits from maintaining higher standards for what gets shared publicly — the discipline of genuine craft over impressive-but-immature performance.\n\nThe 30/3 carries exceptional creative power combined with the "loner" tendency — extraordinary gifts paired with difficulty sustaining collaborative frameworks. Year 3 from 30 invites conscious attention to genuine openness to others' contributions rather than using collaboration as a vehicle for solo expression.`,
-    pr: [{ i: "🎨", n: "Daily Creation", d: "15 minutes of uncensored creative expression every morning" }, { i: "🗣", n: "Throat Mantra", d: "Ham seed mantra vibration practice for Vishuddha activation" }, { i: "📖", n: "Jupiter Journaling", d: "Evening gratitude extraction and wisdom documentation from each day" }, { i: "🌱", n: "East Activation", d: "Feng shui Wood element placement in the Eastern sector" }]
-  },
-  4: {
-    title: "Year of Foundation", sub: "Structure · The Tetrad · Midsummer Labour", planet: "☊ Rahu (North Node)", season: "summer", phase: "Midsummer — Fruit-Setting", chakra: "Muladhara (Root)",
-    kw: ["Discipline", "Foundation", "Systematic Effort", "Security", "Endurance", "Manifestation"],
-    isCrit: true,
-    overview: `Personal Year 4 corresponds to midsummer's demanding conditions — fruit-setting under sustained heat, when systems must support growth and foundations are tested by pressure. This year's energy is structural, disciplined, and methodical. The individual faces the practical requirements of manifesting visions developed in Years 1-3: financial management, organizational development, skill acquisition, and the unglamorous consistency that turns possibilities into realities.\n\nIn Vedic numerology, Year 4 is uniquely governed by Rahu — the North Node of the Moon, a shadow planet without physical form, associated with karmic compulsion, ambition, materialism, and the insatiable drive toward security. Unlike the clear planetary energies of other years, Rahu operates through obsession and disruption. This makes Year 4 simultaneously the cycle's most productive year for genuine building and its most prone to the anxious over-work that produces exhaustion without foundation.\n\nThe year's genuine power is structural. Career advancement through demonstrated competence rather than charisma is Year 4's professional signature. Financial foundations built this year through disciplined saving, debt reduction, and investment have the longest-lasting impact of any year in the cycle. Health disciplines established in Year 4 create the physical capacity that Years 5-9 will depend upon. Real estate transactions, organizational system building, and technical skill acquisition all benefit from the year's structural momentum.`,
-    pyth: `Year 4's primary danger is conflating busyness with productivity. Rahu's compulsive energy produces workaholism — exhausting effort that fills the calendar while missing the actual foundation-building the year requires. The appearance of disciplined hard work can mask the avoidance of the specific, difficult structural work that the year actually calls for. Identifying the one primary foundation that genuinely needs building — rather than the many that would be nice to address — is Year 4's central discernment practice.\n\nHealth challenges arise from excessive effort without adequate recovery. The Muladhara chakra's activation calls specifically for physical grounding: barefoot earth contact, root chakra focused yoga, embodied practices that connect the overworked mind back to the physical body that is simultaneously being neglected and overused. Financial strain from accumulated responsibilities may trigger anxiety spirals — Rahu's specific shadow — that produce the desperate over-work that creates more debt rather than resolving existing obligations.\n\nSpiritually, Year 4 is the deepest form of trust: trusting the process when the process is hard, slow, and unspectacular. The Muladhara chakra's root questions — Do you trust your body? Your capacity to provide for yourself? The earth beneath you? — are addressed not through contemplation but through the actual labor of building a life worth inhabiting. Root-level security comes from genuine foundation-building, not from Rahu's compulsive accumulation.`,
-    vedic: `Rahu's governance makes Year 4 simultaneously the cycle's most materially productive and spiritually complex year. Rahu amplifies desire for material security while ensuring that no material acquisition fully satisfies — each achieved security creates the hunger for greater security, pointing the seeker beyond matter to the source of genuine stability that Rahu's obsession can never locate through accumulation.\n\nLife areas activated: real estate and property (acquisition, renovation, or resolving existing complications), career structural foundations (organizational positioning, credential development, systematic competence building), long-term financial architecture (retirement planning, debt elimination, investment portfolio establishment), family legacy work, and health system establishment. Rahu's nodal nature means Year 4 frequently brings karmic encounters — relationships, opportunities, or challenges that feel fated, carrying the weight of unresolved past-cycle material.\n\nRahu remedial practices: grounding meditation with specific root chakra focus, Rahu mantras (Om Rahave Namah), hessonite garnet (when in Rahu mahadasha), fasting practices, and deliberate service to marginalized communities — the populations associated with Rahu's domain. The essential Vedic insight: Rahu's dissatisfaction is a spiritual pointer, not a material problem requiring a material solution.`,
-    chinese: `Year 4 occupies the Lo Shu's Southeast — Xun trigram (Gentle Wind, Wood element), associated with wealth accumulation and the patient growth of trees. The tree's wealth builds through root-deepening entirely invisible from the surface — an encouraging and sobering metaphor for Year 4's work: the most important structural building is the work that produces no visible result during the year itself.\n\nThe cultural weight of 4 (sì, phonetically resembling death in Mandarin) adds psychological depth to Year 4 in Chinese numerological tradition. The year is approached with sobriety and heightened respect — not avoidance, but the kind of careful intentionality appropriate to a year when structural choices carry lasting consequences. Year 4's financial decisions have a disproportionate long-term impact compared to other years.\n\nThe annual 4 Green Star governs romance, academic achievement, and writing alongside its Wood element instability. Metal element cures suppress excess Wood: brass objects, white and metallic tones, round shapes. The Southeast wealth sector deserves specific feng shui attention during Year 4 — the foundational year's relationship to wealth accumulation is strongest through this directional enhancement.`,
-    chald: `The 13/4 (Regeneration) carries Year 4's most significant karmic weight: transformation that comes through structural collapse rather than linear building. What falls in a 13/4 year must fall — fighting the collapse prolongs suffering without preventing the eventual clearing. These are the years when the wrong foundation is removed precisely so the right one can be built. Release rather than resistance is the key practice.\n\nThe 22/4 master number year is Year 4's highest octave: the Master Builder vibration, capable of producing material works of enduring significance that serve collective as well as personal purposes. 22/4 years bring extraordinary practical achievement capacity alongside extraordinary responsibility for ethical building — the structures created affect many beyond the individual.\n\nThe 31/4 emphasizes individual creative craftsmanship — building through the genius of singular excellence rather than through systematic frameworks. Those in 31/4 years must resist isolation, recognizing that their craft reaches its highest expression through the discipline of genuine engagement with others rather than solo perfection.`,
-    pr: [{ i: "🌍", n: "Grounding Practice", d: "Daily barefoot earth contact; root chakra meditation before work" }, { i: "📊", n: "Financial Architecture", d: "Build one solid financial system: budget, savings automation, debt plan" }, { i: "🏋️", n: "Physical Discipline", d: "Non-negotiable daily health routine; consistency over intensity always" }, { i: "🔧", n: "Skill Mastery", d: "One technical skill pursued to genuine competence through this year" }]
-  },
-  5: {
-    title: "Year of Liberation", sub: "Change · The Pentad · Late Summer Winds", planet: "☿ Mercury / Budha", season: "summer", phase: "Late Summer — Harvest Preparation", chakra: "Anahata (Heart)",
-    kw: ["Freedom", "Adaptability", "Change", "Travel", "Experimentation", "Transformation"],
-    isCrit: false,
-    overview: `Personal Year 5 introduces late summer's variability — harvest approaches but weather remains unpredictable, demanding adaptability above all else. After Year 4's intensive foundation-building, the completed structures now create the platform from which Year 5 launches into genuine freedom of movement. The individual experiences restlessness with established patterns, seeking new experiences, locations, relationships, and ways of understanding the world.\n\nMercury governs Year 5 — quicksilver lord of commerce, communication, adaptability, and the nervous system. Mercury's energy is chameleonic, rapid, intellectually restless, and fundamentally amoral — it serves whatever intention wields it. Year 5's freedom is therefore a test of character as much as an invitation to adventure. The year strongly supports: learning new skills outside established domains, geographic relocation or extended travel, career exploration or entrepreneurial experiments, social network expansion into unfamiliar territory, and any creative work requiring rapid synthesis and adaptive response.\n\nYear 5 is the cycle's dynamic center — the year of the senses, the body, and the erotic dimension of aliveness. All five senses are activated and seeking engagement. The heart chakra's opening in Year 5 means the year's deepest adventure is simultaneously the most external (travel, experimentation, new people and places) and the most internal (learning to remain genuinely open while remaining genuinely oneself).`,
-    pyth: `Year 5's shadow is instability mistaken for freedom. The compulsive change-seeker who abandons Year 4's foundations at the first sign of restlessness — job-changing without developing expertise, relationship-abandoning without developing intimacy, country-hopping without developing genuine depth — confuses the freedom to leave with the freedom to arrive somewhere meaningful. Mercury's energy unchecked produces brilliant superficiality.\n\nAddictive patterns may emerge or intensify in Year 5 — all five senses simultaneously stimulated and seeking escalating experiences. Financial impulsiveness, sexual restlessness, and appetite for stimulation beyond what genuinely nourishes require honest self-examination without judgment. The year's Mercury energy amplifies whatever patterns of seeking already exist.\n\nThe spiritual curriculum of Year 5 is freedom with integrity — the discovery that genuine liberation is not freedom from commitment but freedom within it. The heart chakra's activation suggests the deepest available adventure is learning to love freely: remaining open to genuine new experience without closing against the vulnerability of authentic connection. The traveler who finds themselves everywhere they go has discovered Year 5's real gift.`,
-    vedic: `Mercury (Budha) governs Year 5, activating commerce, communication, adaptability, and the nervous system's capacity for rapid information processing. Life areas: short travel and siblings, commerce and negotiation, communication media and technology, education and skill development, health (specifically nervous system and digestive health), and all forms of information exchange and synthesis.\n\nMercury's position in the natal chart significantly modifies Year 5's expression. Challenged Mercury may produce scattered thinking, miscommunication creating significant misunderstandings, contract disputes, or nervous exhaustion from excessive stimulation without adequate integration time. Mercury in Gemini or Virgo natally creates especially energized Year 5 experiences.\n\nBudha's remedial practices: mercurial rituals on Wednesdays, green gemstones (emerald for Mercury mahadasha holders), pranayama for nervous system regulation, and deliberate integration practices — regular periods of silence and stillness to process the extraordinary volume of Year 5's incoming information. Without integration practice, Year 5 can produce the phenomenon of having experienced much while retaining little.`,
-    chinese: `Year 5 occupies the Lo Shu's central position — no fixed direction, no fixed element, partaking of all and governing none. This central position creates Year 5's paradox: simultaneously the most pivotal year in the cycle and the most volatile, the year of maximum potential and maximum unpredictability. The center of the Lo Shu square is the point from which all directions radiate — and the point where all the square's energies converge and can conflict.\n\nThe annual 5 Yellow Star is considered the most inauspicious in the flying star system, bringing obstacles, legal disputes, illness, and unexpected reversals when not properly managed. Year 5's numerological centrality combined with the 5 Yellow's disruptive quality requires specific feng shui attention: Metal element cures (brass wind chimes, metal objects, round metallic shapes) suppress the 5 Yellow wherever it visits in your home's annual floor plan.\n\nCritical feng shui guidance for Year 5: avoid disturbing the center of the home — no major renovation, no structural changes, no heavy construction near the center. The center is energetically activated and sensitive; disruption there during Year 5 amplifies the 5 Yellow's negative potential significantly.`,
-    chald: `The 14/5 (inconstancy) carries the specific warning of brilliant starts that lack follow-through — freedom used as escape from the responsibility of genuine completion. Year 5 from 14 benefits from establishing completion protocols before undertaking new initiatives: how will this be finished before the next exciting thing begins?\n\nThe 23/5 (Royal Star of the Lion) is Chaldean Year 5's most fortunate compound — promising success through adaptability, charm, and the ability to attract genuinely powerful assistance from unexpected sources. Year 5 from 23 brings extraordinary networking opportunities and should be used actively for relationship expansion.\n\nThe 32/5 (Communication Mastery) suggests Year 5's liberation finds its highest expression not necessarily in physical adventure but in the mastery of expressive communication — the spoken word, written language, or artistic medium becoming the vehicle of genuine transformation for oneself and others.`,
-    pr: [{ i: "✈️", n: "Intentional Adventure", d: "Plan one meaningful journey beyond your established comfort zone" }, { i: "🧘", n: "Pranayama", d: "Daily breathwork for nervous system regulation, integration, and clarity" }, { i: "📚", n: "Edge Learning", d: "Study one discipline completely outside your established expertise" }, { i: "💚", n: "Heart Opening", d: "Anahata practices: loving-kindness meditation, heart coherence breathing" }]
-  },
-  6: {
-    title: "Year of Harmony", sub: "Service · The Hexad · Early Autumn Abundance", planet: "♀ Venus / Shukra", season: "summer", phase: "Early Autumn — Abundance Sharing", chakra: "Anahata (Heart — Venus aspect)",
-    kw: ["Responsibility", "Beauty", "Service", "Relationships", "Home", "Creative Partnership"],
-    isCrit: false,
-    overview: `Personal Year 6 distributes summer's abundance — harvest shared, responsibilities embraced, harmony restored after Year 5's winds of change. This year's energy is nurturing, service-oriented, and relationally focused in ways that feel both deeply fulfilling and potentially overwhelming. Family matters, domestic concerns, and community involvement come to prominence with unusual intensity.\n\nVenus governs Year 6 — the great feminine benefic, goddess of beauty, love, aesthetics, financial partnership, and the arts. Venus transmutes Year 5's personal freedom into loving service, Year 3's personal creative expression into creative collaboration for communal beauty. The year's central question shifts: from "what do I want?" to "what does this relationship, this family, this community genuinely need from me?" The Hexad's geometry — the honeycomb, the Star of David — represents the form that emerges when individual cells join in service to collective intelligence.\n\nMarriage and committed partnership receive Year 6's strongest support — numerological tradition consistently identifies it as the cycle's most favorable year for formal relationship commitment. Significant creative partnerships also thrive under Venus's governance. Home improvement, domestic beautification, and establishing genuinely nurturing environments yield satisfaction that outlasts the year. Service work — teaching, healing, counseling, caregiving — flows from genuine abundance rather than compulsive depletion.`,
-    pyth: `Year 6's shadow is the martyr pattern — the compulsive over-giver who uses service to avoid their own needs, who defines worth through others' approval, who creates dependency through excessive caretaking rather than genuine empowerment. Venus's shadow is possessive love: love that hoards rather than liberates, that gives in order to bind rather than to set free, that serves in order to be needed rather than to genuinely benefit the beloved.\n\nResentment — the characteristic sign of Year 6's shadow — signals that giving has become obligation rather than freely chosen gift. When resentment appears, it indicates that the martyr pattern has taken hold: genuine service has been replaced by compulsive self-depletion disguised as devotion. The healthy Year 6 individual gives from genuine abundance and maintains the boundaries that preserve that abundance for continued giving.\n\nSpiritual curriculum of Year 6: agape — unconditional care that serves the beloved's genuine wellbeing rather than the lover's need to be needed. This is Venus at her most evolved: not eros's romantic intensity or Year 3's creative delight, but the seasoned, realistic, and therefore genuinely sacrificial love of mature relationship that shows up consistently even when it's inconvenient and unglamorous.`,
-    vedic: `Venus (Shukra, Lakshmi's planetary representative) governs Year 6, activating marriage and committed partnership, aesthetic expression and creative arts, financial partnership, luxury goods and beauty industries, and the reproductive system. Well-placed Venus (Taurus, Libra, Pisces natally) produces extraordinary Year 6 bounty: beauty, love, artistic achievement, and the grace of financial abundance arriving through genuine service.\n\nShukra's auspicious relationship to Lakshmi makes Year 6 genuinely favorable for attracting material abundance when the individual's orientation is authentic service rather than acquisitive grasping. The Vedic teaching here is precise: Lakshmi's blessings come to those who serve without attachment to the fruits of service, not to those who perform service as a transaction for expected reward.\n\nPractices for Year 6: Friday evening Venus rituals (white flowers, natural fragrances, aesthetic cultivation), creative practices dedicated to others' benefit, and the specific practice of beauty-making as spiritual discipline — creating genuinely beautiful environments as an offering to all who inhabit them. Shukra mantra: Om Shukraya Namah.`,
-    chinese: `Year 6 maps to the Northwest — Qian trigram (Heaven, pure yang, Metal element), associated with helpful people, mentors, and heaven's support. Qian in the Northwest means Year 6 activates the highest quality external support: mentors appearing with precisely needed guidance, institutional backing arriving for worthy initiatives, heaven-sent assistance from unexpected directions when the individual's orientation is genuine service.\n\nThe Helpful People sector's activation makes Year 6 the cycle's best year for cultivation of genuinely mutual relationships — not transactional networking but the development of connections rooted in shared values and complementary strengths. The annual 6 White Star brings heaven's luck wherever it visits — identify and specifically enhance this sector in your home's annual flying star chart for Year 6.\n\nFeng shui for Year 6: Northwest sector with Metal element (round metallic objects, white and gold color palette), mentorship imagery, and representations of the beneficial relationships you wish to cultivate. The Qian energy specifically responds to images of genuine authority — respected elders, meaningful institutional connections, and the quality of relationships your life is most enriched by.`,
-    chald: `The 15/6 (Magician) represents Year 6's most auspicious compound in Chaldean practice — the unusual capacity to attract both material support and protective spiritual forces through genuine beauty cultivation and service. 15/6 years carry an almost magical quality of right-place-right-time encounters with precisely the people and resources needed for what genuinely matters.\n\nThe 24/6 (long-term love) emphasizes Year 6's deepest relationship gift: partnerships and commitments formed in a 24/6 year carry unusual staying power, rooted in shared practical vision and genuine complementarity rather than romantic projection alone. The Chaldean tradition specifically considers 24 the most auspicious compound for marriage timing.\n\nThe 33/6 master number brings Year 6's service orientation to its highest possible expression — a year when care for others becomes genuinely healing rather than merely helpful, when creative service touches the soul level, when the individual's authentic loving presence becomes itself a transformative force in others' lives.`,
-    pr: [{ i: "💐", n: "Venus Ritual", d: "Friday evening beauty ritual honoring what you genuinely love and serve" }, { i: "🏠", n: "Home Sanctuary", d: "Beautify your living space as a conscious offering to all who inhabit it" }, { i: "🎭", n: "Creative Service", d: "Offer your specific creative gift in service of a genuine community need" }, { i: "⚖️", n: "Service Audit", d: "Are you giving freely from abundance or from obligation? Recalibrate honestly." }]
-  },
-  7: {
-    title: "Year of the Mystic", sub: "Introspection · The Heptad · Mid-Autumn Wisdom", planet: "☋ Ketu (South Node)", season: "autumn", phase: "Mid-Autumn — Inward Turning", chakra: "Ajna (Third Eye)",
-    kw: ["Introspection", "Analysis", "Spiritual Depth", "Solitude", "Refinement", "Inner Knowing"],
-    isCrit: true,
-    overview: `Personal Year 7 corresponds to mid-autumn's introspective quality — days shortening, attention withdrawing from external achievement to internal processing. This year's energy is analytical, mystical, and solitude-seeking with an urgency that cannot be socially medicated away. The individual experiences a genuine, non-negotiable need for study, reflection, and spiritual deepening — often requiring significant reduction in social engagement to honor what the year genuinely calls for.\n\nKetu governs Year 7 — the South Node of the Moon, the shadow of past mastery, the planet of liberation, detachment, mysticism, and the dissolution of ego-identification. Where Rahu in Year 4 created compulsive forward momentum toward material security, Ketu in Year 7 creates equally compulsive interior gravitational pull — toward the source, the silence, the depth beneath the personal story. This pull is not optional; attempting to override it through social busyness or forced productivity creates the peculiar exhaustion that no amount of rest resolves because the exhaustion is spiritual, not physical.\n\nYear 7 offers what no other year provides: legitimate sanctuary for deep inner work. Academic pursuits — particularly graduate study, advanced research, or genuine technical mastery — receive extraordinary support. Writing projects requiring sustained solitary concentration find their natural completion year. Spiritual retreats, contemplative communities, and intensive healing work align precisely with Year 7's interior momentum. The individual who takes Year 7's invitation seriously emerges in Year 8 with unprecedented authority, clarity, and practical wisdom.`,
-    pyth: `The practical challenge of Year 7 is its invisibility: most of the year's important work occurs internally and produces no immediately measurable external output. Family members, employers, and social networks may perceive the Year 7 individual as withdrawn, unproductive, or depressed when they are engaged in the most sophisticated developmental work of the entire nine-year cycle. Managing others' expectations while honoring the year's genuine interior requirements is Year 7's social challenge.\n\nActual depression can emerge if the individual refuses the year's interior calling. The resistance to going within — especially for extroverts and action-oriented personalities — produces a gathering spiritual pressure that eventually forces the retreat the individual has been refusing to choose. It is far better to choose the solitude Year 7 requires than to have it forced by circumstances — illness, breakdown, the collapse of the structures that were keeping the outer busyness running.\n\nKetu's spiritual curriculum: the direct encounter with the ground of being — the experiential discovery of what exists beneath thought, beneath identity, beneath the personal story. This is not a concept but an event, available to those who genuinely sit in the silence Year 7 provides. Ketu teaches that everything the ego has accumulated is ultimately borrowed from a deeper intelligence that predates the personal self — and Year 7 is the annual opportunity to consciously return to that intelligence.`,
-    vedic: `Ketu's governance makes Year 7 the most spiritually distinctive year in the nine-year cycle. Ketu represents accumulated spiritual merit and its specific demands — the wisdom mastered in previous incarnations that now seeks expression, and the karmic patterns from previous cycles that seek final release. Year 7 activates both dimensions simultaneously: what has been mastered rises as inner knowing, and what has not been integrated surfaces as invitation for conscious resolution.\n\nLife areas activated: spiritual practice and retreat, foreign connections and influences, losses that ultimately liberate, psychic development and enhanced intuitive capacity, past-life resonance (inexplicable attractions to specific lineages, teachers, or practices that carry the feeling of profound remembering), periods of isolation or chosen retreat, and deep research into specialized or esoteric knowledge.\n\nKetu remedial practices: Ketu mantra (Om Ketave Namah), gray and smoky tones in key spaces, cat's-eye gemstone (for those in Ketu mahadasha), regular fasting and simplification practices, deliberate service to animals (Ketu's domain), and extended periods of complete silence. Those simultaneously in Ketu mahadasha during Year 7 experience the most intense expression of this inward pull and should plan accordingly.`,
-    chinese: `Year 7 maps to the West — Dui trigram (Joyous Lake, Metal element), associated with completion, joy, and the harvest of inner refinement. The paradox of Dui's "Joyous Lake": the joy available in Year 7 is not social but solitary — the still, profound joy of the contemplative whose inner lake reflects the sky with perfect, undistorted clarity. Metal element in the West represents refinement, reduction to essence, the cutting away of all that is extraneous to reveal the pure inner form that has been there all along.\n\nThe lake's stillness is Year 7's fundamental invitation. Feng shui for Year 7: West sector enhancement with Metal element (round metal objects, white and gray tones, crystalline structures that reflect light), deliberate creation of retreat space within the living environment, systematic removal of noise and visual clutter from key living areas. The annual 7 Red Star brings volatility, potential for arguments, and theft risk alongside the romance and creative breakthrough it sometimes offers.\n\nThe 7 Red Star's challenge during Year 7 creates a double Metal intensity that requires specific management: excessive Metal can produce depression from over-refinement, isolation from over-purification. Water element remedies (fountains, black objects, flowing forms) balance excessive Metal during Year 7, preventing the refinement from becoming sterile abstraction.`,
-    chald: `The Chaldean tradition views Year 7 with unusual reverence, recognizing its interior depth as having no outer equivalent in the cycle. The 16/7 (Shattered Citadel) indicates that structures built for security — material, social, psychological — may be dismantled by Year 7's forces. Those who have built on genuine values experience this as liberation from what was constraining authentic expression; those who have built on fear experience it as loss of what was providing false security.\n\nThe 25/7 (Strength Through Experience) carries the energy of earned wisdom — this Year 7 brings the full weight of accumulated life experience into conscious awareness as usable resource rather than unconscious burden. Profound insights arise from genuinely reviewing and integrating the cycle's preceding six years.\n\nThe 34/7 (Revelator) promises exceptional spiritual authority and truth-speaking capacity — Year 7 when the individual's deepest knowing finds its most eloquent expression, often through writing, teaching, or creative work of unusual psychological and spiritual depth. Those in 34/7 years frequently produce their most significant intellectual or creative contributions during this seemingly quiet inner year.`,
-    pr: [{ i: "🔮", n: "Meditation Intensive", d: "Establish daily 20+ minute sit; explore one lineage with genuine depth" }, { i: "📜", n: "Deep Study", d: "One area of profound intellectual or spiritual inquiry, pursued to genuine depth" }, { i: "🌌", n: "Ajna Activation", d: "Third eye practices: trataka flame gazing, inner light meditation, active dreamwork" }, { i: "🌿", n: "Radical Simplification", d: "Remove what is genuinely inessential from environment, schedule, and mind" }]
-  },
-  8: {
-    title: "Year of Power", sub: "Authority · The Octad · Late Autumn Harvest", planet: "♄ Saturn / Shani", season: "autumn", phase: "Late Autumn — Final Harvest", chakra: "Manipura (Solar Plexus — Saturn)",
-    kw: ["Achievement", "Authority", "Material Success", "Karma", "Power", "Accountability"],
-    isCrit: false,
-    overview: `Personal Year 8 concentrates autumn's final productive energy — the last harvest, careful accounting, and preparation for winter. This year's energy is powerful, materially focused, and karmically active in ways that feel more fated than any other year in the cycle. The individual faces both opportunities for significant achievement and consequences for prior choices with an inexorable precision that Saturn always brings.\n\nSaturn governs Year 8 — the great disciplinarian, lord of karma, time, authority, limitation, and the harvest of what has been genuinely earned over the preceding seven years. Saturn does not negotiate or accept excuses, and rewards nothing that has not been genuinely developed. This makes Year 8 simultaneously the cycle's most potentially rewarding and most potentially confronting year: those who have done the genuine work of Years 1-7 find Year 8 brings recognition, authority, and material harvest; those who have been performing rather than developing face the exposure that Saturn's precision always delivers.\n\nThe Octad's symbolic significance — eight as infinity rotated, the octave that is simultaneously completion and beginning of a new scale, the eight I Ching trigrams — points to Year 8 as the cycle's moment of fullest material manifestation. Career authority claims, business expansion, executive leadership, real estate investment, and the assumption of genuine institutional responsibility all receive Year 8's most powerful support.`,
-    pyth: `Year 8's challenges are proportional to the gap between self-perception and genuine achievement. Saturn reveals this gap with clinical precision that feels neither cruel nor kind but simply accurate. Those who have been performing competence rather than developing it encounter exposure that is ultimately redemptive — the invitation to build authentically what has been claimed prematurely.\n\nThe year's financial dimension operates with the same Saturnian precision: financial instability in Year 8 typically reflects decisions made in Years 5 or 6 that prioritized immediate gratification over long-term stability. Saturn's harvest is literal — the financial conditions of Year 8 directly reflect the quality of the financial foundation built in Year 4 and the decisions made in the intervening years. Nothing is hidden from Saturn's accounting.\n\nSpiritual curriculum of Year 8: power in service of something genuinely larger than personal ambition. The Manipura chakra at Saturn's frequency activates the authority of the elder rather than Year 1's Sun frequency of the initiator — power that has been seasoned through genuine experience rather than simply claimed through enthusiasm. The master craftsperson, the respected leader, the trusted institutional authority — these are Year 8's potential expressions.`,
-    vedic: `Saturn (Shani) governs Year 8, activating career authority and peak professional expression, karmic accounting for choices made throughout the cycle, encounters with institutional structures and collective law, and the harvest — positive or corrective — of genuine effort versus performed effort. Saturn's natal placement determines whether Year 8 brings deserved harvest or corrective accounting.\n\nWell-placed Saturn (Capricorn, Aquarius, Libra natally — especially exalted in Libra) produces extraordinary Year 8 achievement: genuine advancement, lasting recognition from those whose recognition genuinely matters, and the deeply satisfying experience of having built something real that serves beyond the self. Saturn under significant natal affliction brings Shani's lessons through obstacle, delay, and the revealing humility of encountering exactly where corners were cut.\n\nSaturn remedial practices: Om Sham Shanicharaya Namah mantra practice (especially on Saturdays), blue sapphire (for those in Saturn mahadasha), disciplined fasting practices, systematic service to the elderly and disabled, and the sustained cultivation of patience as the most sophisticated form of power available to a human being.`,
-    chinese: `Year 8 maps to the Northeast — Gen trigram (Keeping Still, Earth element), associated with knowledge, self-cultivation, and the mountain's inherent authority. The mountain commands not by assertion but by virtue of what it genuinely is — the most profound teaching about Year 8's authority. The Saturnian harvest is the mountain's harvest: immovable, self-sufficient, commanding by nature rather than by performance.\n\nIn Chinese cultural numerology, 8 (bā) resonates with prosperity and is considered the most auspicious single digit. Year 8's material auspiciousness is genuine but specifically conditional: the 8\'s good fortune flows to those whose foundation (Year 4's work) was genuinely built rather than performed. The cultural 8-resonance amplifies what is already genuine; it does not create what does not exist.\n\nFeng shui for Year 8: Northeast sector activation with Earth element (crystals, stones, ceramics, square shapes, yellow and beige tones). The annual 8 White Star is the system's most auspicious star — identify the sector it visits in your home's annual flying star chart and specifically enhance it. Year 8's wealth and authority potential is most fully activated through deliberate feng shui support of the 8 White Star's annual location.`,
-    chald: `The 17/8 (Star of the Magi) is Year 8's most powerful compound expression — material success accompanied by genuine spiritual authority, harvest that includes wisdom as well as wealth. This compound appears consistently in the charts of those who become recognized masters or authentic leaders through demonstrated excellence rather than strategic positioning.\n\nThe 26/8 (Saturnian authority with collective responsibility) brings success alongside significant weight of responsibility for others' wellbeing. The 26/8 year's central karmic test: using genuine power in service of collective benefit rather than personal advantage. Those who pass this test receive Saturn's fullest blessing; those who fail create the karmic debt that Year 9 will begin to address.\n\nThe 35/8 rewards creative achievement elevated to institutional significance — the craftsperson whose mastery becomes culturally recognized, the artist whose work achieves lasting institutional presence, the thinker whose framework becomes the field's standard. Year 8 from 35 specifically blesses those who have prioritized genuine creative excellence over strategic career management.`,
-    pr: [{ i: "📋", n: "Karmic Accounting", d: "Honest inventory of what you've genuinely built; consciously release illusions" }, { i: "🏆", n: "Authority Claim", d: "Apply for, seek, or consciously accept the leadership role you've genuinely earned" }, { i: "🕰️", n: "Saturn Discipline", d: "Establish one non-negotiable daily practice and honor it with complete consistency" }, { i: "🌾", n: "Harvest Gratitude", d: "Ritually acknowledge every genuine fruit of the preceding seven years" }]
-  },
-  9: {
-    title: "Year of Completion", sub: "Release · The Ennead · Winter Solstice Return", planet: "♂ Mars / Mangal", season: "autumn", phase: "Winter Solstice — Seed Return", chakra: "Muladhara (Root — Mars completion)",
-    kw: ["Completion", "Release", "Compassion", "Endings", "Integration", "Preparation"],
-    isCrit: false,
-    overview: `Personal Year 9 completes the cycle with winter's approach — release, completion, and the preparation for renewal that is simultaneously an ending and the most profound beginning available. The individual experiences necessary endings: projects completing their purpose, relationships reaching natural conclusions, outgrown patterns dissolving to make room for what genuinely serves the next cycle. Grief and gratitude intermingle as the cycle's full harvest is integrated and the seeds of the next Year 1 begin forming in the dying fruit.\n\nMars governs Year 9 — the warrior planet in service of completion rather than initiation. Genuine courage is required here: Martian courage to release what has been built, to allow relationships to complete, to permit the dissolution of identities that have served their purpose. This is the courage of the elder who passes wisdom forward and releases their claim on the future rather than the pioneer's courage of Year 1 who stakes a claim on new territory.\n\nYear 9 offers what no other year provides: the genuine opportunity to complete with consciousness — to end what needs ending with grace and gratitude rather than through abandonment or resentment. Service work of the most impersonal kind — giving with genuinely no expectation of personal return — flows with extraordinary ease in Year 9's completion energy. Creative work that synthesizes and summarizes the entire cycle's learning produces works of unusual depth and lasting resonance.`,
-    pyth: `Year 9's challenges center on the grief of completion and the terror of the unknown that follows. Clinging to what is completing — to relationships, projects, identities, and life stages whose time is genuinely over — prevents the completion that would allow genuine renewal. The cycle cannot begin anew until Year 9's endings are fully honored; incomplete Year 9 completions accumulate as Year 1's foundational burden.\n\nPhysical exhaustion is Year 9's characteristic companion — the body registers the cycle's completion before the mind does, requiring actual rest, genuinely reduced activity, and specific immune system care. Emotional vulnerability surfaces as completions bring unprocessed grief from throughout the entire nine-year cycle into simultaneous awareness. The challenge is witnessing this grief with compassionate presence rather than being submerged or prematurely bypassing it.\n\nThe Ennead's mathematical paradox is Year 9's spiritual teaching: 9 multiplied by any number always reduces back to 9 (9×7=63, 6+3=9). Nine is the container that absorbs all things without losing itself — the symbol for Year 9's function as integrative completion. Only what is fully released can be genuinely kept; the experiences, wisdom, and love of the cycle are not lost in Year 9's release but transmuted into permanent inner resources for all future cycles.`,
-    vedic: `Mars (Mangal, Kartikeya) governs Year 9, bringing warrior energy to completion and the specific courage required to release what has genuinely served its purpose. Mars's domain in Year 9: completion of long-standing projects reaching natural conclusion, the courageous severing of relationships or situations that have become genuinely harmful, final resolution of recurring conflicts that have persisted through multiple years, and the extraordinary courage sometimes required to honestly acknowledge that a path chosen years ago no longer serves what genuinely matters.\n\nLife areas activated: completion and conscious release across all domains, travel to places of personal significance (closure journeys, pilgrimage, return visits to meaningful locations), honest physical vitality assessment (what the body genuinely needs as the cycle completes), and direct confrontation with what has been persistently avoided throughout the cycle. Mars in Year 9 provides the specific energy for ending what needs ending — not through aggression but through the warrior's clarity about what no longer deserves loyalty.\n\nMars remedial practices: Om Mangalaya Namah mantra, red coral gemstone (for Mars mahadasha holders), vigorous physical exercise for healthy Mars energy discharge, and deliberate completion ceremonies — formal acknowledgments of what is ending, rituals of gratitude and release, conscious marking of the transition between cycles.`,
-    chinese: `Year 9 maps to the South — Li trigram (The Clinging, Fire element), associated with fame, recognition, clarity, and illumination. Fire in Year 9 represents the cycle's final brilliant flaring before the energy returns to the earth that will seed the next cycle. Li's image is the flame that simultaneously illuminates and consumes: Year 9's Fire illuminates what the entire cycle has meant while consuming what is no longer essential to carry forward into Year 1.\n\nThe South's fame and recognition association means Year 9 may bring the cycle's work to its widest audience — or bring the private inner illumination of genuine self-knowledge that is fame's true source. Either expression is valid and valuable; Year 9's Fire illuminates regardless of whether the illumination is externally or internally witnessed.\n\nFeng shui for Year 9: South sector activation with Fire element (candles, triangular shapes, red and orange color accents), completion ritual spaces, and ceremonial release — objects and patterns associated with what is completing can be ceremonially released during Year 9. The annual 9 Purple Star is considered extremely auspicious, associated with joyful completion, celebration, and the recognition of genuinely long-gestating achievement.`,
-    chald: `Nine's sacred status in Chaldean numerology — excluded from letter value assignments because it represents the divine totality itself — gives Year 9 metaphysical weight that no other year carries. Chaldean tradition views Year 9 as the year when the individual most closely touches the divine intelligence governing the entire cycle, if they release enough personal ego attachment to make genuine contact with what has always been present beneath it.\n\nThe 18/9 (Mars fully expressed) indicates Year 9 of significant confrontation and final reckoning — the warrior energy of Mars deployed specifically in service of releasing what has persistently resisted release. Challenging but ultimately liberating if engaged consciously rather than reactively.\n\nThe 27/9 (Sceptre, wisdom recognized) promises that accumulated wisdom receives its fullest recognition and most effective expression this year. The 36/9 carries humanitarian achievement — personal completion opening naturally into collective service, individual journey becoming a gift to community simply through the authentic completeness of its telling.`,
-    pr: [{ i: "🕯️", n: "Completion Ritual", d: "Ceremonially close each significant chapter with genuine gratitude and release" }, { i: "🌊", n: "Grief Honoring", d: "Allow and fully witness the natural grief of genuine ending without bypassing" }, { i: "✍️", n: "Cycle Summary", d: "Write the story of these nine years: what was planted, built, harvested, released" }, { i: "🌱", n: "Seed Visioning", d: "What genuinely wants to be born in the next Year 1? Plant it as clear intention." }]
-  }
-};
-
-const CONVERGENCE_CARDS = [
-  {
-    year: 4,
-    title: "Personal Year 4 × Enemy Year Dynamics",
-    sub: "The Fortress Year — When Structure Becomes a Prison",
-    intro: `Personal Year 4 is governed by Rahu — the North Node of the Moon, shadow planet of karmic compulsion, disruption within structure, and the hunger for material security that can never be fully satisfied. Year 4 demands building: financial foundations, organizational systems, disciplined habits, long-term plans. The danger is not failure to build but building the wrong structure — or mistaking the cage for the cathedral. In the Lo Shu system, Year 4 occupies the Southeast (wealth/prosperity sector), governed by Xun (Gentle Wind, Wood element). The annual flying star interacting with this placement determines whether Year 4's building energy encounters support or resistance. Years when the 5 Yellow Star visits the Southeast create the most challenging foundation-building conditions in the entire Lo Shu cycle.`,
-    chips: [
-      { t: "Life Path 5 in PY 4", p: "The freedom-seeker imprisoned in structure. LP 5 individuals — Mercury-ruled, restless, transformative — experience PY 4 as suffocation. Career locks feel permanent. Routines feel like chains. The resolution: 4's foundations enable future freedom. Build now; fly in Year 5. Suppressing 4's demands creates karmic debt carried into 5." },
-      { t: "Life Path 3 in PY 4", p: "Creative expression meets bureaucratic resistance. LP 3's natural overflow of ideas meets Year 4's demand for systematic execution. The shadow: abandoning creative visions at the 4-year mark repeatedly, never building anything lasting. Year 4 is specifically when the artist must learn the administrator's discipline — or find one who can do it for them." },
-      { t: "Life Path 1 in PY 4", p: "The pioneer in a year that demands consolidation. LP 1's natural initiating energy conflicts with Year 4's requirement to deepen what was already started. The temptation: beginning new ventures to escape Year 4's consolidation requirement. The invitation: apply your pioneer courage to the unglamorous but essential foundational work." },
-      { t: "PY 4 + Universal Year 1 (2026)", p: "Particularly tense convergence: collective initiation energy (UY 1) pulls toward new ventures while PY 4 demands consolidation of existing structures. Caught between the world's call to begin and the soul's requirement to finish. Resolution: stabilize foundations before launching. Use the UY 1 energy to initiate the specific foundational disciplines Year 4 requires." },
-      { t: "Rahu's Karmic Shadow", p: "Rahu governs obsessive seeking without satisfaction. In Year 4, this manifests as workaholic patterns, hoarding behaviors, or building structures driven by fear rather than vision. Rahu's Year 4 lesson: security is never found in accumulation. The foundation must be built on trust in the cycle's wisdom, not on fear of the void between completion and new beginning." },
-      { t: "Lo Shu: The 5 Yellow Center", p: "In Chinese numerology, the annual 5 Yellow Star visiting the center during Year 4 creates maximum obstruction: all directions carry resistance, financial decisions carry heightened risk, structural projects encounter unexpected delays. Metal element cures (brass wind chimes, metallic objects) suppress the 5 Yellow's disruptive influence wherever it visits your home." },
-      { t: "The Chaldean 13/4 Warning", p: "When Year 4 reduces from compound 13, karmic weight intensifies dramatically. 13/4 is Regeneration through Upheaval — transformation forced by structural collapse. Buildings literal and metaphorical may fall before new ones rise. The invitation: release attachment to forms that have outlived their purpose before the collapse makes the choice for you." },
-      { t: "Health Architecture in PY 4", p: "Rahu's compulsive energy combined with Year 4's structural demands creates the highest workaholism risk in the cycle. Physical grounding practices are essential protective measures: barefoot earth contact daily, root chakra yoga, regular sleep regardless of deadlines, and the deliberate scheduling of genuine rest as a non-negotiable structural commitment." }
-    ],
-    warning: "<strong>Navigating PY 4 Enemy Dynamics:</strong> Build deliberately. Choose one primary foundation (career, financial, health, or creative) and commit to it with complete consistency. Reject Rahu's compulsion to secure everything simultaneously. The Lo Shu teaches: water finds its level — true security emerges through patient accumulation, not anxious grasping. What you build in Year 4 with genuine patience and discernment outlasts anything built with frantic urgency."
-  },
-  {
-    year: 7,
-    title: "Personal Year 7 × Enemy Year Dynamics",
-    sub: "The Hermit Year — When Solitude Becomes Exile",
-    intro: `Personal Year 7 is governed by Ketu — the South Node, the shadow of past lives, mysticism, detachment, and the dissolution of ego-identity. Where Rahu in Year 4 hungers for more, Ketu in Year 7 seeks the subtraction of everything inessential. The individual is pulled inward toward study, contemplation, and the terrifying question of who they are when stripped of social roles and material achievement. Year 7 is the most spiritually demanding year in the cycle and the one most consistently misunderstood by the world. Chinese numerology maps Year 7 to the West — Dui trigram (Joyous Lake, Metal element), the direction of harvest completion and autumn's refining intelligence. Forcing Year 7 into social or commercial productivity violates Metal's mandate to refine, cut away, and reveal the essential.`,
-    chips: [
-      { t: "Life Path 6 in PY 7", p: "LP 6 — Venus-ruled, home-centered, relationally responsible — meets Year 7's withdrawal demand with profound conflict. Loved ones need presence; Year 7 requires retreat. The guilt compounds the isolation. Hidden invitation: Year 7 teaches LP 6 that genuine love cannot come from depletion. The hermit who fills their well returns with real sustenance rather than performed giving." },
-      { t: "Life Path 1 in PY 7", p: "LP 1's pioneer identity — built on visible action, leadership, and initiating — dissolves in Year 7's interior fog. The self that knew how to begin find no path to begin. This is not failure but preparation: Year 7 strips the warrior to the mystic, dismantling ego-scaffolding so Year 8's true authority can emerge from inner knowing rather than outer performance." },
-      { t: "Life Path 3 in PY 7", p: "LP 3's creative and communicative nature meets Year 7's requirement for silence and contemplation. The expressive self that flourished in Year 3's bloom finds Year 7's quiet disorienting. The invitation: discover what creative depths become available only through the discipline of silence. Some of the cycle's most important creative insights arrive in Year 7's stillness rather than Year 3's exuberance." },
-      { t: "Ketu's Past-Life Trigger", p: "Year 7 is when ancestral and past-life material rises most urgently. Ketu rules what was mastered in previous incarnations and what must now be released. Recurring dreams, inexplicable fears, sudden spiritual openings, encounters with teachings that feel like profound remembering — all are Ketu's hallmarks. This material cannot be rationalized away; it must be witnessed with presence and allowed to complete its surfacing." },
-      { t: "The Ajna Crisis: Third Eye Opening", p: "Ketu activates the Ajna chakra in Year 7, bringing heightened intuition, psychic sensitivity, and occasionally disturbing perceptions. Some individuals experience depersonalization — reality feels thin, the self feels porous. This is not pathology but spiritual transition. Without grounding practices (earth contact, physical exercise, regular meals, consistent sleep), the Ajna opening becomes destabilizing rather than illuminating." },
-      { t: "PY 7 + Universal Year 1 (2026)", p: "Extreme tension: a collective year of new beginnings presses against the soul's requirement for stillness and dissolution. The individual in PY 7 during UY 1 faces maximum social pressure to launch and begin while deepest wisdom counsels silence and integration. The mature response: honor Year 7's requirement privately while engaging selectively with collective energy, preparing inner foundations for Year 8's emergence." },
-      { t: "7 Red Star Volatility", p: "The annual 7 Red Star's volatility — arguments, theft risk, controversy — combined with Year 7's contemplative requirement creates double Metal intensity. This combination is prone to extreme isolation when the 7 Red Star's conflict energy makes social engagement feel dangerous, further enforcing Year 7's withdrawal. Water element remedies balance excessive Metal: fountain, black objects, flowing forms in key spaces." },
-      { t: "The 16/7 Shattered Citadel", p: "In Chaldean practice, the 16/7 compound indicates that Year 7 may dismantle structures built for security before revealing the eternal beneath. Those who have built their lives on genuine values experience this as liberating; those who have built on fear or performance experience it as devastating loss. Year 7 from 16 tests the authenticity of every structure in your life." }
-    ],
-    warning: "<strong>Navigating PY 7 Enemy Dynamics:</strong> Year 7's greatest enemy is refusing to go inward. Mistaking Ketu's calling for depression, failure, or abnormality — and attempting to medicate or social-activity away the contemplative pull — creates the actual crisis. Those who surrender to Year 7's mandate for retreat, study, and inner work emerge in Year 8 with unprecedented practical wisdom and genuine authority. Ketu's gift is only received in the silence that Year 7 creates whether you choose it or not."
-  }
-];
-
-const PINNACLE_DESC: Record<number, string> = {
-  0: 'The Zero Pinnacle is the rarest and most demanding — a call to complete mastery of all nine vibrations simultaneously. No single quality dominates; every situation requires perfect discernment about which energy is needed. The gift is extraordinary adaptability; the challenge is finding solid ground without a fixed orientation.',
-  1: 'The First Pinnacle emphasises individuation and self-definition. This long arc of life asks: who are you, independent of family and collective expectation? Career independence, entrepreneurial initiative, and the courage to lead authentically are this pinnacle\'s recurring themes.',
-  2: 'The Second Pinnacle deepens emotional intelligence, diplomatic skill, and the capacity for genuine partnership. Relationships — romantic, professional, communal — are the primary classroom. The lesson: genuine cooperation requires genuine self-knowledge, not self-erasure.',
-  3: 'The Third Pinnacle expands creative expression, communication, and joyful engagement with life\'s abundance. This is often a creatively fertile period where artistic, communicative, and social gifts reach their highest expression. The shadow: scattering gifts across too many surfaces.',
-  4: 'The Fourth Pinnacle builds foundations — career structure, financial systems, health discipline, and practical competence. Hard work is not merely required but specifically rewarded during this arc. The invitation: trust the process of methodical building, even when results are slow to appear.',
-  5: 'The Fifth Pinnacle brings freedom, change, and the expansion of experience. Travel, diverse relationships, varied careers, and the fullness of sensory engagement characterise this arc. The lesson: freedom with integrity — liberation that serves genuine development rather than mere escape.',
-  6: 'The Sixth Pinnacle centres on responsibility, service, and the creation of beauty in all its forms — home, family, creative work, community. The deepest call is to love maturely: generously and with clear-eyed realism about both others\' needs and one\'s own limits.',
-  7: 'The Seventh Pinnacle turns attention inward — toward study, spiritual development, philosophical inquiry, and the direct encounter with what lies beneath surface experience. Solitude, specialisation, and depth of understanding characterise this arc\'s most fruitful expression.',
-  8: 'The Eighth Pinnacle activates material mastery, executive authority, and the harvest of genuine competence. Financial achievement, career authority, and the assumption of significant responsibility are this pinnacle\'s signature expressions. Saturn\'s precision: rewards flow precisely to genuine effort, never to performance.',
-  9: 'The Ninth Pinnacle completes a major life chapter through service, creative synthesis, and the integration of accumulated wisdom. Universal compassion, humanitarian contribution, and the graceful release of what has been built characterise this arc\'s highest expression.'
-};
-
-const CHALLENGE_DESC: Record<number, string> = {
-  0: 'The Zero Challenge — the Master Test — asks for complete mastery of all vibrations. No single quality is specifically lacking; every quality must be consciously developed and balanced. This is simultaneously the most open and the most demanding challenge number.',
-  1: 'The Challenge of 1 asks for the development of genuine self-assertion, independent thinking, and appropriate leadership. The pattern being overcome: excessive dependency on others\' approval, fear of standing out, or conversely, domineering assertion that masks underlying insecurity.',
-  2: 'The Challenge of 2 addresses over-sensitivity, excessive compliance, and difficulty maintaining boundaries in relationship. The lesson: genuine cooperation requires clear self-knowledge. Hypersensitivity to criticism and the compulsive need for approval are the specific patterns to develop through.',
-  3: 'The Challenge of 3 invites the development of authentic self-expression and creative confidence. The pattern: self-criticism that suppresses expression before it reaches others, or conversely, superficial social performance that substitutes for genuine creative depth.',
-  4: 'The Challenge of 4 asks for the development of practical discipline, organisational capacity, and willingness to work systematically toward long-term goals. The shadow: resistance to effort, tendency to abandon foundations before completion, or excessive rigidity in established methods.',
-  5: 'The Challenge of 5 addresses excessive freedom-seeking, irresponsibility, or sensory over-indulgence. The lesson: genuine freedom is earned through the discipline of completing what has been begun and honouring commitments even when the horizon calls.',
-  6: 'The Challenge of 6 invites the development of genuine service that comes from abundance rather than obligation, beauty-creation without perfectionist paralysis, and family responsibility that doesn\'t consume individual identity.',
-  7: 'The Challenge of 7 asks for the development of genuine trust — in intuition, in life\'s intelligence, and in the willingness to rest in not-knowing. The pattern: either excessive scepticism that prevents genuine depth, or naive credulity that substitutes spiritual bypassing for genuine development.',
-  8: 'The Challenge of 8 addresses the relationship with power, money, and authority. The lesson: material resources and authority are tools for genuine service, not measures of intrinsic worth. Both excessive materialism and chronic financial self-sabotage are this challenge\'s shadow expressions.',
-  9: 'The Challenge of 9 invites the development of genuine compassion without martyrdom, completion without clinging, and service without the unconscious demand for recognition. The pattern: either cold detachment masking as philosophical non-attachment, or compulsive giving that depletes the giver.'
-};
-
-// ═══════════════════════════════════════════════════════════════
-// LOGIC ENGINE
-// ═══════════════════════════════════════════════════════════════
+// ─── LOGIC ENGINE ─────────────────────────────────────────────────────────────
 
 function reduce(n: number): number {
   let s = n;
@@ -383,16 +34,12 @@ function lpName(n: number) {
     'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
 }
 
-function getAnimalFromBirthYear(by: number) { 
-  const index = ((by - 1900) % 12 + 12) % 12;
-  const signs = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
-  return ZOO[signs[index]];
-}
 function getAnimalFromYear(y: number) { 
   const index = ((y - 1900) % 12 + 12) % 12;
   const signs = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
   return ZOO[signs[index]];
 }
+
 function getCategory(birthAnimalName: string, yearAnimalName: string) {
   const b = ZOO[birthAnimalName]; const y = ZOO[yearAnimalName]; if (!b || !y) return 'neutral';
   if (birthAnimalName === yearAnimalName) return 'ben-ming';
@@ -402,17 +49,38 @@ function getCategory(birthAnimalName: string, yearAnimalName: string) {
   if (b.san.includes(yearAnimalName) || b.liu === yearAnimalName) return 'alliance';
   return 'neutral';
 }
-function catLabel(c: string) { return { 'ben-ming': 'Ben Ming Nian ✦', 'clash': 'Direct Clash ⚡', 'harm': 'Harm Year ⚠', 'destruction': 'Destruction Year 💀', 'alliance': 'Alliance Year ✅', 'neutral': 'Neutral Year ◦' }[c as any] || 'Unknown'; }
-function catColor(c: string) { return { 'ben-ming': 'var(--cf-gold)', 'clash': 'var(--cf-rose)', 'harm': '#d08028', 'destruction': '#9858b8', 'alliance': 'var(--cf-jade-bright)', 'neutral': 'var(--cf-silver-dim)' }[c as any] || 'var(--cf-text)'; }
+
+function catLabel(c: string) { 
+  return { 
+    'ben-ming': 'Ben Ming Nian ✦', 
+    'clash': 'Direct Clash ⚡', 
+    'harm': 'Harm Year ⚠', 
+    'destruction': 'Destruction Year 💀', 
+    'alliance': 'Alliance Year ✅', 
+    'neutral': 'Neutral Year ◦' 
+  }[c as any] || 'Unknown'; 
+}
+
+function catColor(c: string) { 
+  return { 
+    'ben-ming': 'var(--cf-gold)', 
+    'clash': 'var(--cf-rose)', 
+    'harm': '#d08028', 
+    'destruction': '#9858b8', 
+    'alliance': 'var(--cf-jade-bright)', 
+    'neutral': 'var(--cf-silver-dim)' 
+  }[c as any] || 'var(--cf-text)'; 
+}
 
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMapProps) {
   const initialized = useRef(false);
 
   useEffect(() => {
+    // Attach all handlers to window for verbatim HTML onclick events
     (window as any).calculate = () => {
       const ryInput = document.getElementById('cf-readYear') as HTMLInputElement;
       const ry = parseInt(ryInput.value);
-      if (!ry || isNaN(ry)) { alert('Please enter the year to read.'); return; }
+      if (!ry || isNaN(ry)) return;
 
       const m = birthMonth;
       const d = birthDay;
@@ -450,30 +118,198 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       else if (currentAge <= p3end) currentChallenge = c3;
       else currentChallenge = c4;
 
-      const birthAnimalName = Object.keys(ZOO).find(k => ZOO[k] === getAnimalFromBirthYear(by)) || '';
+      const signs = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
+      const birthAnimalName = signs[((by - 1900) % 12 + 12) % 12];
       const ba = ZOO[birthAnimalName];
 
       const coreStrip = document.getElementById('core-strip')!;
-      coreStrip.innerHTML = `<div class="core-chip hl-py y${py}"> <div class="core-chip-label">Personal Year ${ry}</div> <div class="core-chip-num">${py}</div> <div class="core-chip-name">${YD[py]?.title}</div> </div> <div class="core-chip"> <div class="core-chip-label">Personal Month</div> <div class="core-chip-num" style="color:#de78a0">${pm}</div> <div class="core-chip-name">Phase ${pm}</div> </div> <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> <div class="core-chip"> <div class="core-chip-label">Life Path</div> <div class="core-chip-num" style="color:var(--cf-jade-bright)">${lp}</div> <div class="core-chip-name">${lpName(lp)}</div> </div> <div class="core-chip"> <div class="core-chip-label">Birth Vibration</div> <div class="core-chip-num" style="color:var(--cf-silver)">${bv}</div> <div class="core-chip-name">${lpName(bv)}</div> </div> ${ba ? `<div class="core-chip"> <div class="core-chip-label">Chinese Sign</div> <div class="core-chip-num" style="color:var(--cf-gold-bright);font-size:2.2rem">${ba.e}</div> <div class="core-chip-name">${birthAnimalName}</div> </div>` : ''} <div class="core-chip"> <div class="core-chip-label">Pinnacle ${currentPinnacle}</div> <div class="core-chip-num" style="color:#68c268">${currentPinnacleNum}</div> <div class="core-chip-name">Active</div> </div> <div class="core-chip"> <div class="core-chip-label">Challenge ${currentPinnacle}</div> <div class="core-chip-num" style="color:#c86040">${currentChallenge}</div> <div class="core-chip-name">Active</div> </div>`;
+      coreStrip.innerHTML = `
+        <div class="core-chip hl-py"> <div class="core-chip-label">Personal Year ${ry}</div> <div class="core-chip-num">${py}</div> <div class="core-chip-name">${YD[py]?.title}</div> </div> 
+        <div class="core-chip"> <div class="core-chip-label">Personal Month</div> <div class="core-chip-num" style="color:#de78a0">${pm}</div> <div class="core-chip-name">Phase ${pm}</div> </div> 
+        <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> 
+        <div class="core-chip"> <div class="core-chip-label">Life Path</div> <div class="core-chip-num" style="color:var(--cf-jade-bright)">${lp}</div> <div class="core-chip-name">${lpName(lp)}</div> </div> 
+        <div class="core-chip"> <div class="core-chip-label">Birth Vibration</div> <div class="core-chip-num" style="color:var(--cf-silver)">${bv}</div> <div class="core-chip-name">${lpName(bv)}</div> </div> 
+        ${ba ? `<div class="core-chip"> <div class="core-chip-label">Chinese Sign</div> <div class="core-chip-num" style="color:var(--cf-gold-bright);font-size:2.2rem">${ba.e}</div> <div class="core-chip-name">${birthAnimalName}</div> </div>` : ''} 
+        <div class="core-chip"> <div class="core-chip-label">Pinnacle ${currentPinnacle}</div> <div class="core-chip-num" style="color:#68c268">${currentPinnacleNum}</div> <div class="core-chip-name">Active</div> </div> 
+        <div class="core-chip"> <div class="core-chip-label">Challenge ${currentPinnacle}</div> <div class="core-chip-num" style="color:#c86040">${currentChallenge}</div> <div class="core-chip-name">Active</div> </div>`;
 
       const ab = document.getElementById('alert-banner')!;
       let alertText = '';
-      if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy} — both vibrating at the same frequency.`;
+      if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}.`;
       else if (py === bv) alertText = `<strong>✦ Core Identity Activation:</strong> Personal Year ${py} matches your Birth Vibration ${bv}.`;
       else if (py === lp) alertText = `<strong>✦ Life Path Activation:</strong> Personal Year ${py} matches your Life Path ${lp}.`;
-      if ((py === 4 && (lp === 5 || lp === 3)) || (py === 7 && (lp === 1 || lp === 6))) {
-        const extra = `<strong>⚠ Life Path × Personal Year Tension:</strong> Significant dynamic friction detected.`;
-        alertText = alertText ? alertText + '<br><br>' + extra : extra;
-      }
+      
       if (alertText) { ab.innerHTML = alertText; ab.classList.add('visible'); } else { ab.classList.remove('visible'); }
 
-      renderSynthesis(py, uy, lp, bv, pm, currentPinnacleNum, currentChallenge, currentPinnacle, birthAnimalName, m, d, by, ry);
-      renderYearDive(py, m, d, by, ry, birthAnimalName);
-      (window as any).renderIntersections(m, d, by, ry);
-      renderZodiac(m, d, by, ry, birthAnimalName);
-      renderPinnacles(p1, p2, p3, p4, c1, c2, c3, c4, p1end, p2end, p3end, currentAge, lp);
+      renderSynthesis(py, uy, lp, bv, pm, currentPinnacleNum, currentChallenge, birthAnimalName, ry);
+      renderYearDive(py);
+      renderIntersections(birthAnimalName, m, d, ry);
+      renderZodiac(birthAnimalName, by);
+      renderPinnacles(p1, p2, p3, p4, c1, c2, c3, c4, p1end, p2end, p3end, currentAge);
       document.getElementById('result-area')!.classList.remove('result-hidden');
-      (window as any).buildConvergenceCards(true);
+    };
+
+    const renderSynthesis = (py: number, uy: number, lp: number, bv: number, pm: number, pinnNum: number, challenge: number, birthAnimalName: string, ry: number) => {
+      const yr = YD[py];
+      const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(ry)) || '';
+      const cat = getCategory(birthAnimalName, yearAnimalName);
+      const pmNames = ['', 'New Beginnings', 'Cooperation', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Reflection', 'Power', 'Completion'];
+      const animalLine = `Your ${birthAnimalName} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — ${ 
+        cat === 'clash' ? 'an environment of maximum elemental friction calling for proactive adaptation rather than resistance' : 
+        cat === 'harm' ? 'a year of concealed pressures requiring extra vigilance in trust and documentation' : 
+        cat === 'destruction' ? 'a year when outdated structures may fracture, clearing ground for what genuinely serves you' : 
+        cat === 'ben-ming' ? 'your identity year, when all your characteristic patterns amplify to their fullest expression' : 
+        ['alliance'].includes(cat) ? 'an environmentally supported year where the collective field actively favours your initiatives' : 
+        'a neutral year where outcomes reflect pure personal effort rather than exceptional external forces'
+      }.`;
+      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>. Your Life Path ${lp} (${lpName(lp)}) interacts with the ${yearAnimalName} year (${catLabel(cat)}). ${animalLine} Your current Personal Month is ${pm} (${pmNames[pm]}). Your active Pinnacle is ${pinnNum} and active Challenge is ${challenge}.`;
+      document.getElementById('synthesis-container')!.innerHTML = `
+        <div class="section-header">✦ &nbsp; Oracle Synthesis &nbsp; ✦</div>
+        <div id="synthesis-text" class="cp">${synthText}</div>
+        <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)">🔊 Read Aloud</button>`;
+    };
+
+    const renderYearDive = (py: number) => {
+      const yr = YD[py]; if (!yr) return;
+      const kws = yr.kw.map((k: string) => `<span class="kw">${k}</span>`).join('');
+      const prs = yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('');
+      const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
+      
+      document.getElementById('year-dive-container')!.innerHTML = `
+        <div class="year-deep-dive">
+          <div class="year-dive-header">
+            <div class="year-num-big" style="color:var(--cf-gold)">${py}</div>
+            <div class="year-dive-title">${yr.title}</div>
+          </div>
+          <div class="kw-strip">${kws}</div>
+          <div class="tab-nav grid grid-cols-3 md:grid-cols-6 gap-1 p-2">
+            <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button>
+            <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button>
+            <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button>
+            <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button>
+            <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button>
+            <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button>
+          </div>
+          <div class="tab-content">
+            <div class="tab-panel active" id="tp-ov">
+              <div class="content-section" id="tp-ov-text">${paras(yr.overview)}</div>
+              <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button>
+            </div>
+            <div class="tab-panel" id="tp-py"><div id="tp-py-text">${paras(yr.pyth)}</div></div>
+            <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
+            <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
+            <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div>
+            <div class="tab-panel" id="tp-pr"><div class="practice-grid">${prs}</div></div>
+          </div>
+        </div>`;
+    };
+
+    const renderIntersections = (birthAnimalName: string, m: number, d: number, ry: number) => {
+      const cal = [];
+      const ba = ZOO[birthAnimalName];
+      for (let y = ry; y <= ry + 18; y++) {
+        const py = reduce(m + d + y);
+        const ya = getAnimalFromYear(y);
+        const cat = getCategory(birthAnimalName, ya.n);
+        cal.push({ year: y, py, animalName: ya.n, cat, e: ya.e });
+      }
+      
+      const filtered = cal.filter(c => c.py === 4 || c.py === 7);
+      const cards = filtered.map(y => {
+        const cat = y.cat;
+        let intensity = '◦ Critical Personal Year';
+        let color = 'var(--cf-silver-dim)';
+        if (cat === 'clash') { intensity = '🔴 MAXIMUM TENSION — Direct Clash'; color = 'var(--cf-rose)'; }
+        else if (cat === 'harm') { intensity = '🟠 HIGH TENSION — Harm Year'; color = '#d08028'; }
+        else if (cat === 'destruction') { intensity = '🟣 SIGNIFICANT TENSION'; color = '#9858b8'; }
+        else if (cat === 'ben-ming') { intensity = '⭐ DOUBLE AMPLIFICATION'; color = 'var(--cf-gold)'; }
+        else if (cat === 'alliance') { intensity = '✅ SUPPORTED CRITICAL YEAR'; color = 'var(--cf-jade-bright)'; }
+
+        let narrative = `In ${y.year}, your ${y.animalName} year (${y.e}) intersects with Personal Year ${y.py}. `;
+        if (y.py === 4) {
+          if (cat === 'clash') narrative += `This is the most challenging configuration: 4's foundation-building meets Direct Clash... ${ba?.clashDesc || ''}`;
+          else narrative += `Personal Year 4 focus on structure in a ${catLabel(cat)} environment.`;
+        } else {
+          if (cat === 'clash') narrative += `The most spiritually dissonant configuration: 7's introspection meets Direct Clash... ${ba?.clashDesc || ''}`;
+          else narrative += `Personal Year 7 focus on depth in a ${catLabel(cat)} environment.`;
+        }
+
+        return `
+          <div class="intersection-card p-4 mb-4 border border-white/10 rounded-xl bg-slate-900/40">
+            <div class="flex justify-between items-center mb-2">
+              <div class="text-3xl font-serif font-bold text-white">${y.year}</div>
+              <div class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-black/40" style="color:${color}">${intensity}</div>
+            </div>
+            <div class="text-sm font-bold text-primary mb-2">Personal Year ${y.py} · ${YD[y.py].title}</div>
+            <div class="cp text-xs leading-relaxed" id="int-${y.year}">${narrative}</div>
+            <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('int-${y.year}').textContent)">🔊 Read Aloud</button>
+          </div>`;
+      }).join('');
+
+      document.getElementById('personal-intersections-container')!.innerHTML = `
+        <div class="section-header">🔥 &nbsp; Critical Year Intersections &nbsp; 🔥</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${cards}</div>`;
+    };
+
+    const renderZodiac = (birthAnimalName: string, by: number) => {
+      const today = new Date();
+      const startYear = today.getFullYear();
+      const years = [];
+      for (let y = startYear; y <= startYear + 11; y++) {
+        const ya = getAnimalFromYear(y);
+        const cat = getCategory(birthAnimalName, ya.n);
+        const py = reduce(birthMonth + birthDay + y);
+        years.push({ year: y, cat, animal: ya, py });
+      }
+      const chips = years.map(y => `
+        <div class="zc p-3 border border-white/5 rounded-xl bg-slate-900/60 cursor-pointer hover:border-primary/40 transition-all" 
+             onclick="window.openZodiacPop('${y.animal.n}','${birthAnimalName}','${y.year}','${y.year-by}','${y.cat}')">
+          <div class="text-2xl mb-1">${y.animal.e}</div>
+          <div class="text-[10px] font-bold text-white">${y.year}</div>
+          <div class="text-[10px] text-primary">PY ${y.py}</div>
+          <div class="text-[8px] uppercase font-black tracking-tighter" style="color:${catColor(y.cat)}">${catLabel(y.cat)}</div>
+        </div>`).join('');
+      document.getElementById('zodiac-container')!.innerHTML = `
+        <div class="section-header">☯ &nbsp; Zodiac Trajectory &nbsp; ☯</div>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">${chips}</div>`;
+    };
+
+    const renderPinnacles = (p1: number, p2: number, p3: number, p4: number, c1: number, c2: number, c3: number, c4: number, p1end: number, p2end: number, p3end: number, currentAge: number) => {
+      const stages = [
+        { n: 1, p: p1, c: c1, label: `Birth - Age ${p1end}`, start: 0, end: p1end },
+        { n: 2, p: p2, c: c2, label: `Age ${p1end + 1} - ${p2end}`, start: p1end + 1, end: p2end },
+        { n: 3, p: p3, c: c3, label: `Age ${p2end + 1} - ${p3end}`, start: p2end + 1, end: p3end },
+        { n: 4, p: p4, c: c4, label: `Age ${p3end + 1}+`, start: p3end + 1, end: 99 }
+      ];
+      
+      const cards = stages.map(s => {
+        const isActive = currentAge >= s.start && currentAge <= s.end;
+        return `
+          <div class="p-5 mb-4 border rounded-2xl ${isActive ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'border-white/5 bg-slate-900/40'}">
+            <div class="flex justify-between items-center mb-4">
+              <div class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">${s.label}</div>
+              ${isActive ? `<span class="bg-primary text-[8px] px-2 py-0 rounded text-white font-bold">ACTIVE STAGE</span>` : ''}
+            </div>
+            <div class="flex gap-8 mb-4">
+              <div class="text-center">
+                <div class="text-4xl font-serif font-bold text-emerald-400">${s.p}</div>
+                <div class="text-[8px] uppercase tracking-widest text-muted-foreground">Pinnacle</div>
+              </div>
+              <div class="text-center">
+                <div class="text-4xl font-serif font-bold text-rose-400">${s.c}</div>
+                <div class="text-[8px] uppercase tracking-widest text-muted-foreground">Challenge</div>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <p class="text-xs leading-relaxed text-slate-300">${PINNACLE_DESC[s.p]}</p>
+              <p class="text-[11px] leading-relaxed text-rose-300/80 italic font-medium">Challenge ${s.c}: ${CHALLENGE_DESC[s.c]}</p>
+            </div>
+          </div>`;
+      }).join('');
+      
+      document.getElementById('pinnacles-container')!.innerHTML = `
+        <div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${cards}</div>`;
     };
 
     (window as any).ttsPlay = (btnEl: HTMLElement, text: string) => {
@@ -487,9 +323,11 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
     };
 
     (window as any).swT = (name: string, btn: HTMLElement) => {
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`tp-${name}`)?.classList.add('active');
+      const parent = btn.closest('.year-deep-dive');
+      if (!parent) return;
+      parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      parent.querySelector(`#tp-${name}`)?.classList.add('active');
       btn.classList.add('active');
     };
 
@@ -501,7 +339,10 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       document.getElementById(panelId)?.classList.add('active');
     };
 
-    (window as any).closePop = () => { document.getElementById('overlay')!.classList.remove('visible'); document.body.style.overflow = ''; };
+    (window as any).closePop = () => { 
+      document.getElementById('overlay')!.classList.remove('visible'); 
+      document.body.style.overflow = ''; 
+    };
 
     (window as any).openZodiacPop = (animalName: string, birthAnimalName: string, year: string, age: string, cat: string) => {
       const ba = ZOO[birthAnimalName]; const ya = ZOO[animalName]; if (!ba || !ya) return;
@@ -511,9 +352,14 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       else if(cat === 'harm') specificDesc = ba.harmDesc; 
       else if(cat === 'destruction') specificDesc = ba.destDesc; 
       else if(cat === 'alliance') specificDesc = ba.allianceDesc;
-      else specificDesc = `This ${year} ${animalName} year is a Neutral period for ${birthAnimalName}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for the foundation-building, skill development, and relationship maintenance that alliance and challenging years rarely allow time for.`;
+      else specificDesc = `This ${year} ${animalName} year is a Neutral period for ${birthAnimalName}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort determines outcomes.`;
       
-      const body = `<div class="ibox"><strong>${year} (${animalName} Year, Age ${age})</strong> — Tai Sui Relationship: <span style="color:${catColor(cat)}">${catLabel(cat)}</span></div> <div class="content-h2" style="margin-top:16px">Your ${birthAnimalName} in ${animalName} Year</div> ${specificDesc.split('\n\n').map(p=>`<p class="cp">${p}</p>`).join('')} <div class="content-h2">${animalName} Year — General Qualities</div> <p class="cp">The ${animalName} brings ${ya.el} element energy (${ya.pol} polarity, Branch ${ya.br}) to the collective field. ${ya.trait} qualities pervade the year's social and professional atmosphere. Health focus for the collective: ${ya.organ}. Cardinal direction activated: ${ya.dir}.</p>`;
+      const body = `
+        <div class="ibox mb-4"><strong>${year} (${animalName} Year, Age ${age})</strong> — Tai Sui: <span style="color:${catColor(cat)}">${catLabel(cat)}</span></div> 
+        <div class="content-h mb-2 uppercase tracking-widest text-xs opacity-60">Your ${birthAnimalName} Synthesis</div> 
+        ${specificDesc.split('\n\n').map(p=>`<p class="cp mb-3">${p}</p>`).join('')} 
+        <div class="content-h mt-6 mb-2 uppercase tracking-widest text-xs opacity-60">${animalName} Year Qualities</div> 
+        <p class="cp">${ya.trait}. Health: ${ya.organ}. Direction: ${ya.dir}.</p>`;
       
       document.getElementById('pg')!.textContent = ya.e;
       document.getElementById('ph')!.textContent = `${year}: ${animalName} Year`;
@@ -523,180 +369,69 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       document.body.style.overflow = 'hidden';
     };
 
-    (window as any).renderIntersections = (m: number, d: number, by: number, ry: number) => {
-      const cal = [];
-      const birthAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(by)) || '';
-      const ba = ZOO[birthAnimalName];
-
-      for (let y = ry; y <= ry + 18; y++) {
-        const py = reduce(m + d + y);
-        const animalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(y)) || '';
-        const cat = getCategory(birthAnimalName, animalName);
-        cal.push({ year: y, py, animalName, cat });
-      }
-      const py4years = cal.filter(c => c.py === 4);
-      const py7years = cal.filter(c => c.py === 7);
-      
-      const buildIntersectionCard = (yearData: any, pyNum: number) => {
-        const yd = YD[pyNum];
-        const cat = yearData.cat;
-        let intensity = '';
-        let intensityColor = 'var(--cf-rose)';
-        if (cat === 'clash') intensity = '🔴 MAXIMUM TENSION — Direct Clash + Critical Personal Year';
-        else if (cat === 'harm') intensity = '🟠 HIGH TENSION — Harm Year + Critical Personal Year';
-        else if (cat === 'destruction') intensity = '🟣 SIGNIFICANT TENSION — Destruction Year + Critical Personal Year';
-        else if (cat === 'ben-ming') intensity = '⭐ DOUBLE AMPLIFICATION — Ben Ming Nian + Critical Personal Year';
-        else if (cat === 'alliance') { intensity = '✅ SUPPORTED CRITICAL YEAR — Alliance + Personal Year ' + pyNum; intensityColor = 'var(--cf-jade-bright)'; }
-        else { intensity = '◦ Critical Personal Year ' + pyNum + ' in ' + yearData.animalName + ' Year'; intensityColor = 'var(--cf-silver-dim)'; }
-
-        let narrative = '';
-        if (pyNum === 4) {
-          if (cat === 'clash') narrative = `This is the most challenging configuration in your personal cycle: Personal Year 4's requirement for disciplined foundation-building coincides with your Direct Clash year — the Chinese zodiac's most disruptive annual energy. Rahu's compulsive building drive collides with ${yearData.animalName} year's forced disruption... ${ba?.clashDesc || ''}`;
-          else if (cat === 'harm') narrative = `Personal Year 4's systematic foundation-building meets the Harm year's concealed erosion... ${ba?.harmDesc || ''}`;
-          else if (cat === 'destruction') narrative = `Personal Year 4's foundational discipline meets the Destruction year's structural fragmentation... ${ba?.destDesc || ''}`;
-          else if (cat === 'ben-ming') narrative = `Personal Year 4's foundation-building demand coincides with your Ben Ming Nian... ${ba?.benDesc || ''}`;
-          else if (cat === 'alliance') narrative = `Personal Year 4's foundation-building receives the gift of alliance support... ${ba?.allianceDesc || ''}`;
-          else narrative = `Personal Year 4's foundation-building discipline proceeds in a ${yearData.animalName} Neutral year.`;
-        } else if (pyNum === 7) {
-          if (cat === 'clash') narrative = `The most spiritually dissonant configuration in your cycle: Personal Year 7's requirement for interior solitude coincides with your Direct Clash year... ${ba?.clashDesc || ''}`;
-          else if (cat === 'harm') narrative = `Personal Year 7's interior withdrawal coincides with the Harm year's concealed relationship erosion... ${ba?.harmDesc || ''}`;
-          else if (cat === 'destruction') narrative = `Personal Year 7's contemplative dissolution meets the Destruction year's structural fragmentation... ${ba?.destDesc || ''}`;
-          else if (cat === 'ben-ming') narrative = `Personal Year 7's mystical inward turn coincides with your Ben Ming Nian... ${ba?.benDesc || ''}`;
-          else if (cat === 'alliance') narrative = `Personal Year 7's contemplative interior work receives the gift of alliance support... ${ba?.allianceDesc || ''}`;
-          else narrative = `Personal Year 7's contemplative withdrawal proceeds in a ${yearData.animalName} Neutral year.`;
-        }
-        return `<div class="intersection-card"> <div class="intersection-header"> <div class="intersection-year">${yearData.year}</div> <div class="intersection-title">Personal Year ${pyNum} · ${yd.title}</div> <div class="intersection-sub" style="color:${intensityColor}">${intensity}</div> </div> <div class="intersection-body" id="int-${pyNum}-${yearData.year}"> <p class="cp">${narrative}</p> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('int-${pyNum}-${yearData.year}').textContent)">🔊 Read Aloud</button> </div> </div>`;
-      };
-      
-      let finalHtml = `<div class="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>`;
-      if (py4years.length > 0) finalHtml += `<div class="section-header" style="font-size:.6rem">PY 4 — Foundation Year</div>${py4years.map(y => buildIntersectionCard(y, 4)).join('')}`;
-      if (py7years.length > 0) finalHtml += `<div class="section-header" style="font-size:.6rem">PY 7 — Mystic Year</div>${py7years.map(y => buildIntersectionCard(y, 7)).join('')}`;
-      document.getElementById('personal-intersections-container')!.innerHTML = finalHtml;
-    };
-
-    (window as any).buildConvergenceCards = (isInner: boolean) => {
+    (window as any).buildConvergenceCards = () => {
       let html = '';
       CONVERGENCE_CARDS.forEach(c => {
-        const chips = c.chips.map(ch => `<div class="enemy-chip"><div class="enemy-chip-title">${ch.t}</div><p>${ch.p}</p></div>`).join('');
-        html += `<div class="conv-card"> <div class="conv-header"> <div class="conv-title">${c.title}</div> <div class="conv-sub">${c.sub}</div> </div> <div class="conv-body" id="conv-body-${c.year}"> <p class="cp">${c.intro}</p> <div class="enemy-grid">${chips}</div> <div class="wbox">${c.warning}</div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('conv-body-${c.year}').textContent)">🔊 Read Aloud</button> </div> </div>`;
+        const chips = c.chips.map(ch => `<div class="enemy-chip p-3 bg-black/40 rounded-lg border border-white/5"><div class="enemy-chip-title font-bold text-primary text-[10px] mb-1">${ch.t}</div><p class="text-[11px] leading-relaxed text-slate-300">${ch.p}</p></div>`).join('');
+        html += `
+          <div class="conv-card mb-6 border border-primary/20 rounded-2xl overflow-hidden bg-slate-900/60"> 
+            <div class="conv-header p-4 bg-primary/10 border-b border-primary/20"> 
+              <div class="conv-title text-xl font-bold text-primary">${c.title}</div> 
+              <div class="conv-sub text-xs italic text-muted-foreground">${c.sub}</div> 
+            </div> 
+            <div class="conv-body p-4" id="conv-body-${c.year}"> 
+              <p class="cp mb-4">${c.intro}</p> 
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">${chips}</div> 
+              <div class="wbox p-3 bg-rose-900/20 border-l-2 border-rose-500 rounded-r-lg text-xs italic text-rose-200">${c.warning}</div> 
+              <button class="tts-btn mt-4" onclick="window.ttsPlay(this, document.getElementById('conv-body-${c.year}').textContent)">🔊 Read Aloud</button> 
+            </div> 
+          </div>`;
       });
-      const target = isInner ? document.getElementById('convergence-cards-inner') : document.getElementById('convergence-cards');
-      if (target) target.innerHTML = html;
+      document.getElementById('convergence-cards')!.innerHTML = html;
     };
 
     if (!initialized.current) {
-      (window as any).buildConvergenceCards(false);
+      (window as any).buildConvergenceCards();
       (window as any).calculate();
       initialized.current = true;
     }
   }, [birthDay, birthMonth, birthYear]);
 
-  const renderSynthesis = (py: number, uy: number, lp: number, bv: number, pm: number, pinnNum: number, challenge: number, pinnIdx: number, birthAnimalName: string, m: number, d: number, by: number, ry: number) => {
-    const yr = YD[py];
-    const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(ry)) || '';
-    const cat = getCategory(birthAnimalName, yearAnimalName);
-    const pmNames = ['', 'New Beginnings', 'Cooperation', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Reflection', 'Power', 'Completion'];
-    const animalLine = `Your ${birthAnimalName} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — ${ 
-      cat === 'clash' ? 'an environment of maximum elemental friction calling for proactive adaptation rather than resistance' : 
-      cat === 'harm' ? 'a year of concealed pressures requiring extra vigilance in trust and documentation' : 
-      cat === 'destruction' ? 'a year when outdated structures may fracture, clearing ground for what genuinely serves you' : 
-      cat === 'ben-ming' ? 'your identity year, when all your characteristic patterns amplify to their fullest expression' : 
-      ['alliance'].includes(cat) ? 'an environmentally supported year where the collective field actively favours your initiatives' : 
-      'a neutral year where outcomes reflect pure personal effort rather than exceptional external forces'
-    }.`;
-    const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>. Your Life Path ${lp} (${lpName(lp)}) interacts with the ${yearAnimalName} year (${catLabel(cat)}). ${animalLine} Your current Personal Month is ${pm} (${pmNames[pm]}). Your active Pinnacle is ${pinnNum} and active Challenge is ${challenge}.`;
-    document.getElementById('synthesis-container')!.innerHTML = `<div class="section-header">✦ Oracle Synthesis ✦</div><div id="synthesis-text" class="cp">${synthText}</div><button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)">🔊 Read Aloud</button>`;
-  };
-
-  const renderYearDive = (py: number, m: number, d: number, by: number, ry: number, birthAnimalName: string) => {
-    const yr = YD[py]; if (!yr) return;
-    const kws = yr.kw.map((k: string) => `<span class="kw">${k}</span>`).join('');
-    const prs = yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('');
-    const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
-    
-    document.getElementById('year-dive-container')!.innerHTML = `<div class="year-deep-dive y${py}"> <div class="year-dive-header"> <div class="year-num-big" style="color:var(--cf-yc)">${py}</div> <div class="year-dive-title">${yr.title}</div> </div> <div class="kw-strip">${kws}</div> <div class="tab-nav"> <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button> <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button> <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button> <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button> <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button> <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button> </div> <div class="tab-content"> <div class="tab-panel active" id="tp-ov"> <div class="content-section" id="tp-ov-text">${paras(yr.overview)}</div> <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button> </div> <div class="tab-panel" id="tp-py"><div id="tp-py-text">${paras(yr.pyth)}</div></div> <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div> <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div> <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div> <div class="tab-panel" id="tp-pr"><div class="practice-grid">${prs}</div></div> </div> </div>`;
-  };
-
-  const renderZodiac = (m: number, d: number, by: number, currentYear: number, birthAnimalName: string) => {
-    const today = new Date();
-    const startYear = today.getFullYear();
-    const years = [];
-    for (let y = startYear; y <= startYear + 11; y++) {
-      const yearAnimalName = Object.keys(ZOO).find(k => ZOO[k].ben.includes(y)) || '';
-      const cat = getCategory(birthAnimalName, yearAnimalName);
-      const py = reduce(m + d + y);
-      years.push({ year: y, cat, animal: ZOO[yearAnimalName], py });
-    }
-    const chips = years.map(y => `<div class="zc" onclick="window.openZodiacPop('${y.animal.e}','${birthAnimalName}','${y.year}','${y.year-by}','${y.cat}')"> <div class="zc-ani">${y.animal.e}</div> <div class="zc-yr">${y.year}</div> <div class="zc-yr">PY ${y.py}</div> <div class="zc-type" style="color:${catColor(y.cat)}">${catLabel(y.cat)}</div> </div>`).join('');
-    document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">☯ Zodiac Trajectory ☯</div><div class="zodiac-grid">${chips}</div>`;
-  };
-
-  const renderPinnacles = (p1: number, p2: number, p3: number, p4: number, c1: number, c2: number, c3: number, c4: number, p1end: number, p2end: number, p3end: number, currentAge: number, lp: number) => {
-    const stages = [
-      { n: 1, p: p1, c: c1, label: `Birth - Age ${p1end}`, start: 0, end: p1end },
-      { n: 2, p: p2, c: c2, label: `Age ${p1end + 1} - ${p2end}`, start: p1end + 1, end: p2end },
-      { n: 3, p: p3, c: c3, label: `Age ${p2end + 1} - ${p3end}`, start: p2end + 1, end: p3end },
-      { n: 4, p: p4, c: c4, label: `Age ${p3end + 1}+`, start: p3end + 1, end: 99 }
-    ];
-    const active = stages.find(s => currentAge >= s.start && currentAge <= s.end) || stages[3];
-    
-    const cards = stages.map(s => `
-      <div style="background:rgba(18,30,58,.95);border:1px solid ${s.n === active.n ? '#68c268' : 'rgba(200,168,75,.1)'};border-radius:10px;padding:14px;margin-bottom:8px">
-        <div style="font-family:'Cinzel',serif;font-size:.6rem;color:var(--cf-silver-dim);margin-bottom:10px;text-transform:uppercase">Pinnacle ${s.n} ${s.n === active.n ? '◈ ACTIVE' : ''} · ${s.label}</div>
-        <div style="display:flex;gap:24px;align-items:flex-start">
-          <div style="text-align:center">
-            <div style="font-size:2.2rem;color:#68c268;font-family:'Cinzel Decorative'">${s.p}</div>
-            <div style="font-size:.5rem;text-transform:uppercase">Pinnacle</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:2.2rem;color:#c86040;font-family:'Cinzel Decorative'">${s.c}</div>
-            <div style="font-size:.5rem;text-transform:uppercase">Challenge</div>
-          </div>
-          <div style="flex:1">
-            <p style="font-size:.92rem;line-height:1.6">${PINNACLE_DESC[s.p]}</p>
-            <p style="font-size:.88rem;color:#ff6060;font-style:italic;margin-top:10px">Challenge ${s.c}: ${CHALLENGE_DESC[s.c]}</p>
-          </div>
-        </div>
-      </div>`).join('');
-    
-    document.getElementById('pinnacles-container')!.innerHTML = `<div class="section-header">◈ Pinnacles & Challenges ◈</div><div>${cards}</div>`;
-  };
-
   return (
-    <div className="cosmic-fate-root relative min-h-screen overflow-hidden rounded-2xl">
+    <div className="cosmic-fate-root relative min-h-screen rounded-2xl overflow-hidden">
       <div id="stars-cf"></div>
-      <div className="cf-page">
-        <div className="cf-hero">
-          <span className="hero-glyph">🌌</span>
-          <h1>Cosmic Fate Map</h1>
-          <p className="hero-sub">Trajectory & Enemy Year Oracle</p>
+      <div className="cf-page relative z-10 p-2 md:p-4">
+        <div className="cf-hero text-center py-8">
+          <span className="hero-glyph text-5xl mb-4 block">🌌</span>
+          <h1 className="text-3xl font-bold text-primary tracking-widest uppercase mb-2">Cosmic Fate Map</h1>
+          <p className="hero-sub text-[10px] tracking-[0.3em] uppercase opacity-60">Trajectory & Enemy Year Oracle</p>
         </div>
 
-        <div className="calc-card">
-          <div className="calc-title">✦ Forecast Your Destiny ✦</div>
-          <div className="calc-inputs">
+        <div className="calc-card bg-slate-900/80 border border-primary/20 p-4 rounded-2xl mb-6">
+          <div className="calc-title text-[10px] tracking-widest uppercase text-center opacity-60 mb-4">✦ Forecast Your Destiny ✦</div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <div className="input-group">
-              <label>Year to Read</label>
-              <input type="number" id="cf-readYear" defaultValue={new Date().getFullYear()} min={1900} max={2100} />
+              <label className="text-[8px] uppercase tracking-widest opacity-60 mb-1">Year to Read</label>
+              <input type="number" id="cf-readYear" className="bg-black/40 border border-white/10 rounded px-3 py-2 text-center font-bold" defaultValue={new Date().getFullYear()} min={1900} max={2100} />
             </div>
+            <button className="btn-reveal bg-primary px-6 py-3 rounded-full font-bold uppercase text-[10px] tracking-widest hover:scale-105 transition-transform" onClick={() => (window as any).calculate()}>✦ Cast Fate Map</button>
           </div>
-          <button className="btn-reveal" onClick={() => (window as any).calculate()}>✦ Cast Your Fate Map</button>
         </div>
 
         <div id="result-area" className="result-hidden">
-          <div className="core-strip" id="core-strip"></div>
-          <div className="alert-banner" id="alert-banner"></div>
+          <div className="core-strip grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6" id="core-strip"></div>
+          <div className="alert-banner p-3 bg-primary/10 border border-primary/20 rounded-xl mb-6 text-center text-xs" id="alert-banner"></div>
 
-          <nav className="dash-nav" id="dash-nav">
-            <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
-            <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Year Dive</button>
-            <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical Years</button>
-            <button className="dash-tab" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
-            <button className="dash-tab" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
-            <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Convergence</button>
+          <nav className="dash-nav grid grid-cols-3 gap-1 mb-1" id="dash-nav">
+            <button className="dash-tab active p-3 text-[10px] font-bold uppercase tracking-widest rounded-t-xl bg-slate-900/80 border-x border-t border-white/10" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
+            <button className="dash-tab p-3 text-[10px] font-bold uppercase tracking-widest rounded-t-xl bg-slate-900/80 border-x border-t border-white/10" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Dive</button>
+            <button className="dash-tab p-3 text-[10px] font-bold uppercase tracking-widest rounded-t-xl bg-slate-900/80 border-x border-t border-white/10" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical</button>
+            <button className="dash-tab p-3 text-[10px] font-bold uppercase tracking-widest bg-slate-900/80 border-x border-t border-white/10" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
+            <button className="dash-tab p-3 text-[10px] font-bold uppercase tracking-widest bg-slate-900/80 border-x border-t border-white/10" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
+            <button className="dash-tab p-3 text-[10px] font-bold uppercase tracking-widest bg-slate-900/80 border-x border-t border-white/10" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
           </nav>
 
-          <div className="dash-body">
+          <div className="dash-body bg-slate-900/80 border border-white/10 rounded-b-2xl min-h-[500px] p-4 mb-12">
             <div className="dash-panel active" id="panel-synthesis"><div id="synthesis-container"></div></div>
             <div className="dash-panel" id="panel-yeardive"><div id="year-dive-container"></div></div>
             <div className="dash-panel" id="panel-intersections"><div id="personal-intersections-container"></div></div>
@@ -706,20 +441,19 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           </div>
         </div>
 
-        <div className="conv-outer" id="convergence-outer">
-          <div className="section-header">⚠ Critical Convergence ⚠</div>
+        <div className="conv-outer mt-12">
+          <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
           <div id="convergence-cards"></div>
         </div>
       </div>
 
-      <div className="cf-overlay" id="overlay" onClick={(e) => (e.target === e.currentTarget) && (window as any).closePop()}>
-        <div className="popover-cf" id="popover">
-          <button className="pop-close" onClick={() => (window as any).closePop()}>✕</button>
-          <span className="pop-glyph" id="pg"></span>
-          <div className="pop-h" id="ph"></div>
-          <div className="pop-sub" id="ps"></div>
-          <div className="pop-div"></div>
-          <div id="pb"></div>
+      <div className="cf-overlay fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity" id="overlay" onClick={(e) => (e.target === e.currentTarget) && (window as any).closePop()}>
+        <div className="popover-cf bg-slate-900 border border-primary/40 rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 relative">
+          <button className="absolute top-4 right-4 text-white/40 hover:text-white" onClick={() => (window as any).closePop()}>✕</button>
+          <span className="text-5xl mb-2 block text-center" id="pg"></span>
+          <div className="text-2xl font-bold text-primary text-center mb-1" id="ph"></div>
+          <div className="text-[10px] uppercase tracking-widest text-center opacity-60 mb-6" id="ps"></div>
+          <div id="pb" className="text-sm leading-relaxed"></div>
         </div>
       </div>
     </div>
