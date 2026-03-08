@@ -1,8 +1,8 @@
 /**
- * @fileOverview Verbatim Pinnacle and Challenge definitions from Chunk 08.
+ * @fileOverview Verbatim Pinnacle and Challenge stage definitions from your chunks.
  */
 export const PINNACLE_DESC: Record<number, string> = {
-  0: 'The Zero Pinnacle is the rarest and most demanding — a call to complete mastery of all nine vibrations simultaneously. No single quality dominates; every situation requires perfect discernment about which energy is needed. The gift is extraordinary adaptability; the challenge is finding solid ground without a fixed orientation.',
+  0: 'The Zero Pinnacle is the rarest and most demanding — a call to complete mastery of all vibrations simultaneously. No single quality dominates; every situation requires perfect discernment about which energy is needed. The gift is extraordinary adaptability; the challenge is finding solid ground without a fixed orientation.',
   1: 'The First Pinnacle emphasises individuation and self-definition. This long arc of life asks: who are you, independent of family and collective expectation? Career independence, entrepreneurial initiative, and the courage to lead authentically are this pinnacle\'s recurring themes.',
   2: 'The Second Pinnacle deepens emotional intelligence, diplomatic skill, and the capacity for genuine partnership. Relationships — romantic, professional, communal — are the primary classroom. The lesson: genuine cooperation requires genuine self-knowledge, not self-erasure.',
   3: 'The Third Pinnacle expands creative expression, communication, and joyful engagement with life\'s abundance. This is often a creatively fertile period where artistic, communicative, and social gifts reach their highest expression. The shadow: scattering gifts across too many surfaces.',

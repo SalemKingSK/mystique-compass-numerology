@@ -1,5 +1,5 @@
 /**
- * @fileOverview Verbatim Enemy Year Dynamics from Chunk 07.
+ * @fileOverview Verbatim Enemy Year Dynamics for Personal Years 4 and 7.
  */
 export const CONVERGENCE_CARDS = [
   {

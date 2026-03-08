@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
 import { YD } from '@/lib/cosmic-fate/oracle';
 import { CONVERGENCE_CARDS } from '@/lib/cosmic-fate/convergence';
@@ -8,13 +8,11 @@ import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { BOOK } from '@/lib/cosmic-fate/book';
 import { INTERSECTION_SYNTHESIS } from '@/lib/cosmic-fate/intersections';
 
-interface CosmicFateMapProps {
+interface Props {
   birthDay: number;
   birthMonth: number;
   birthYear: number;
 }
-
-// ─── UTILITIES ───────────────────────────────────────────────────────────────
 
 const reduce = (n: number): number => {
   let s = Math.abs(n);
@@ -33,23 +31,18 @@ const getAnimalFromYear = (y: number) => {
 const getCategory = (birthSign: string, yearSign: string) => {
   if (birthSign === yearSign) return 'ben-ming';
   
-  // Clashes
   const clashes: Record<string, string> = { Rat: 'Horse', Horse: 'Rat', Ox: 'Goat', Goat: 'Ox', Tiger: 'Monkey', Monkey: 'Tiger', Rabbit: 'Rooster', Rooster: 'Rabbit', Dragon: 'Dog', Dog: 'Dragon', Snake: 'Pig', Pig: 'Snake' };
   if (clashes[birthSign] === yearSign) return 'clash';
 
-  // Harms
   const harms: Record<string, string> = { Rat: 'Goat', Goat: 'Rat', Ox: 'Horse', Horse: 'Ox', Tiger: 'Snake', Snake: 'Tiger', Rabbit: 'Dragon', Dragon: 'Rabbit', Monkey: 'Pig', Pig: 'Monkey', Rooster: 'Dog', Dog: 'Rooster' };
   if (harms[birthSign] === yearSign) return 'harm';
 
-  // Destructions
   const dests: Record<string, string> = { Rat: 'Rabbit', Rabbit: 'Rat', Ox: 'Dragon', Dragon: 'Ox', Tiger: 'Pig', Pig: 'Tiger', Snake: 'Monkey', Monkey: 'Snake', Horse: 'Rooster', Rooster: 'Horse', Goat: 'Dog', Dog: 'Goat' };
   if (dests[birthSign] === yearSign) return 'destruction';
 
-  // Liu He (Secret Friends)
   const liuHe: Record<string, string> = { Rat: 'Ox', Ox: 'Rat', Tiger: 'Pig', Pig: 'Tiger', Rabbit: 'Dog', Dog: 'Rabbit', Dragon: 'Rooster', Rooster: 'Dragon', Snake: 'Monkey', Monkey: 'Snake', Horse: 'Goat', Goat: 'Horse' };
   if (liuHe[birthSign] === yearSign) return 'alliance';
 
-  // San He (Triads)
   const sanHe = [['Rat', 'Dragon', 'Monkey'], ['Snake', 'Rooster', 'Ox'], ['Tiger', 'Horse', 'Dog'], ['Rabbit', 'Goat', 'Pig']];
   if (sanHe.some(triad => triad.includes(birthSign) && triad.includes(yearSign))) return 'alliance';
 
@@ -62,8 +55,8 @@ const catLabel = (c: string) => ({
 }[c] || 'Neutral Year ◦');
 
 const catColor = (c: string) => ({ 
-  'ben-ming': 'var(--cf-gold)', 'clash': 'var(--cf-rose)', 'harm': '#d08028', 
-  'destruction': '#9858b8', 'alliance': 'var(--cf-jade-bright)', 'neutral': 'var(--cf-silver-dim)' 
+  'ben-ming': 'var(--cf-gold)', 'clash': 'var(--cf-rose)', 'harm': 'var(--cf-amber)', 
+  'destruction': 'var(--cf-amethyst)', 'alliance': 'var(--cf-jade-bright)', 'neutral': 'var(--cf-silver-dim)' 
 }[c] || 'var(--cf-text)');
 
 const getIntersectionStatus = (cat: string) => {
@@ -73,9 +66,7 @@ const getIntersectionStatus = (cat: string) => {
   return { label: '◦ NEUTRAL', color: 'var(--cf-silver-dim)' };
 };
 
-// ─── COMPONENT ───────────────────────────────────────────────────────────────
-
-export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMapProps) {
+export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -128,14 +119,14 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       const ya = getAnimalFromYear(ry);
       const cat = getCategory(birthSign, ya.n);
 
-      // 1. Core Chips
+      // Core Chips
       document.getElementById('core-strip')!.innerHTML = `
         <div class="core-chip hl-py"> <div class="core-chip-label">Personal Year ${ry}</div> <div class="core-chip-num">${py}</div> <div class="core-chip-name">${YD[py]?.title}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Life Path</div> <div class="core-chip-num" style="color:var(--cf-jade-bright)">${lp}</div> <div class="core-chip-name">${lpName(lp)}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Personal Month</div> <div class="core-chip-num" style="color:#de78a0">${pm}</div> <div class="core-chip-name">${pmNames[pm]}</div> </div>`;
 
-      // 2. Alert Banner
+      // Alert Banner
       const ab = document.getElementById('alert-banner')!;
       let alertText = '';
       if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}.`;
@@ -143,16 +134,19 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       else if (py === lp) alertText = `<strong>✦ Life Path Activation:</strong> Personal Year ${py} matches your Life Path ${lp}.`;
       if (alertText) { ab.innerHTML = alertText; ab.classList.add('visible'); } else { ab.classList.remove('visible'); }
 
-      // 3. Render Synthesis
+      // Synthesis
       const yr = YD[py];
-      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${ya.n} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) and Personal Year ${py} (${yr?.title}) are in productive dialogue — neither in obvious tension nor exceptional harmony, allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${ry}.`;
+      const lpRelationText = (py === lp) ? "exceptional harmony" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "notable friction" : "productive dialogue";
+      const lpInteractionText = (py === lp) ? "match" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "creates notable friction with" : "and";
+      
+      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${ya.n} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) ${lpInteractionText} Personal Year ${py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${ry}.`;
       
       document.getElementById('synthesis-container')!.innerHTML = `
         <div class="section-header">✦ &nbsp; Your ${ry} Reading — Oracle Synthesis &nbsp; ✦</div>
         <div id="synthesis-text" class="cp">${synthText}</div>
         <button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)">🔊 Read Aloud</button>`;
 
-      // 4. Render Dive
+      // Dive
       const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
       document.getElementById('year-dive-container')!.innerHTML = `
         <div class="year-deep-dive">
@@ -169,7 +163,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
             <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button>
             <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button>
           </div>
-          <div class="tab-content">
+          <div class="tab-content p-2">
             <div class="tab-panel active" id="tp-ov"><div id="tp-ov-text">${paras(yr.overview)}</div><button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button></div>
             <div class="tab-panel" id="tp-py"><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div><button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-py-text').textContent)">🔊 Read Aloud</button></div>
             <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div><button class="tts-btn" onclick="window.ttsPlay(this, document.getElementById('tp-ve-text').textContent)">🔊 Read Aloud</button></div>
@@ -179,10 +173,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           </div>
         </div>`;
 
-      // 5. Render Intersections
+      // Intersections
       const intersections = [];
-      const scanYears = 30;
-      for (let y = ry; y <= ry + scanYears; y++) {
+      for (let y = ry; y <= ry + 30; y++) {
         const pyn = reduce(reduce(m) + reduce(d) + reduce(y));
         if (pyn === 4 || pyn === 7) {
           const ani = getAnimalFromYear(y);
@@ -190,11 +183,11 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           const iStatus = getIntersectionStatus(iCat);
           const uyn = reduce(y);
           const synKey = `${pyn}_${iCat}`;
-          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('${yearSign}', ani.n);
+          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral');
           const dyn = ZOO[birthSign][`${iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${ani.n} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
 
           intersections.push(`
-            <div class="intersection-card">
+            <div class="intersection-card p-4">
               <div class="intersection-header">
                 <div class="intersection-year">${y}</div>
                 <div class="intersection-title">Personal Year ${pyn} · ${YD[pyn].title} · ${ani.n} Year ${ani.e}</div>
@@ -213,10 +206,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
         <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
         <div class="px-2">${intersections.join('')}</div>`;
 
-      // 6. Render Zodiac
-      const startYear = new Date().getFullYear();
+      // Zodiac
       let zHtml = '<div class="zodiac-grid">';
-      for (let y = startYear; y <= startYear + 11; y++) {
+      for (let y = today.getFullYear(); y <= today.getFullYear() + 11; y++) {
         const ani = getAnimalFromYear(y);
         const zCat = getCategory(birthSign, ani.n);
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
@@ -229,7 +221,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
       }
       document.getElementById('zodiac-container')!.innerHTML = `<div class="section-header">☯ &nbsp; Zodiac Trajectory &nbsp; ☯</div>` + zHtml + '</div>';
 
-      // 7. Render Pinnacles
+      // Pinnacles
       const pStages = [
         { n: 1, p: p1, c: c1, label: `Birth - Age ${p1end}`, active: age <= p1end },
         { n: 2, p: p2, c: c2, label: `Age ${p1end+1} - ${p2end}`, active: age > p1end && age <= p2end },
@@ -259,7 +251,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
         </div>`).join('');
       document.getElementById('pinnacles-container')!.innerHTML = `<div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">${pCards}</div>`;
 
-      // 8. Convergence
+      // Convergence
       let cHtml = '';
       CONVERGENCE_CARDS.forEach(c => {
         cHtml += `
@@ -349,7 +341,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           <p className="hero-sub">Destiny Synthesis & Critical Year Oracle</p>
         </div>
 
-        <div className="calc-card">
+        <div className="calc-card p-4">
           <div className="calc-title">✦ Forecast Your Destiny ✦</div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <div className="input-group">
@@ -364,7 +356,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
           <div className="core-strip" id="core-strip"></div>
           <div className="alert-banner" id="alert-banner"></div>
 
-          <nav className="dash-nav grid grid-cols-3 gap-1" id="dash-nav">
+          <nav className="dash-nav grid grid-cols-3 gap-1 mb-4" id="dash-nav">
             <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
             <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Dive</button>
             <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical</button>
@@ -373,7 +365,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: CosmicFateMap
             <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
           </nav>
 
-          <div className="dash-body">
+          <div className="dash-body p-2">
             <div className="dash-panel active" id="panel-synthesis"><div id="synthesis-container"></div></div>
             <div className="dash-panel" id="panel-yeardive"><div id="year-dive-container"></div></div>
             <div className="dash-panel" id="panel-intersections"><div id="personal-intersections-container"></div></div>
