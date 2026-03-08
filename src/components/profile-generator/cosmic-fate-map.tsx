@@ -142,7 +142,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       
       document.getElementById('synthesis-container')!.innerHTML = `
         <div class="section-header">✦ &nbsp; Your ${ry} Reading — Oracle Synthesis &nbsp; ✦</div>
-        <button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('synthesis-text').textContent)">🔊 Read Aloud</button>
+        <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'synthesis-text')">🔊 Read Aloud</button>
         <div id="synthesis-text" class="cp">${synthText}</div>`;
 
       // Dive
@@ -163,11 +163,11 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button>
           </div>
           <div class="tab-content p-2">
-            <div class="tab-panel active" id="tp-ov"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('tp-ov-text').textContent)">🔊 Read Aloud</button><div id="tp-ov-text">${paras(yr.overview)}</div></div>
-            <div class="tab-panel" id="tp-py"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('tp-py-text').textContent)">🔊 Read Aloud</button><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div></div>
-            <div class="tab-panel" id="tp-ve"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('tp-ve-text').textContent)">🔊 Read Aloud</button><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
-            <div class="tab-panel" id="tp-ch"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('tp-ch-text').textContent)">🔊 Read Aloud</button><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
-            <div class="tab-panel" id="tp-ca"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('tp-ca-text').textContent)">🔊 Read Aloud</button><div id="tp-ca-text">${paras(yr.chald)}</div></div>
+            <div class="tab-panel active" id="tp-ov"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ov-text')">🔊 Read Aloud</button><div id="tp-ov-text">${paras(yr.overview)}</div></div>
+            <div class="tab-panel" id="tp-py"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-py-text')">🔊 Read Aloud</button><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div></div>
+            <div class="tab-panel" id="tp-ve"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ve-text')">🔊 Read Aloud</button><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
+            <div class="tab-panel" id="tp-ch"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ch-text')">🔊 Read Aloud</button><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
+            <div class="tab-panel" id="tp-ca"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ca-text')">🔊 Read Aloud</button><div id="tp-ca-text">${paras(yr.chald)}</div></div>
             <div class="tab-panel" id="tp-pr"><div class="practice-grid">${yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('')}</div></div>
           </div>
         </div>`;
@@ -182,7 +182,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           const iStatus = getIntersectionStatus(iCat);
           const uyn = reduce(y);
           const synKey = `${pyn}_${iCat}`;
-          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral');
+          const synth = INTERSECTION_SYNTHESIS[synKey] || (INTERSECTION_SYNTHESIS[`${pyn}_neutral`] ? INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral') : '');
           const dyn = ZOO[birthSign][`${iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${ani.n} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
 
           intersections.push(`
@@ -193,7 +193,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                 <div class="text-[10px] font-black uppercase mt-1" style="color:${iStatus.color}">${iStatus.label} — ${catLabel(iCat)}</div>
               </div>
               <div class="intersection-body">
-                <button class="tts-btn mb-4" onclick="window.ttsPlay(this, document.getElementById('int-text-${y}').textContent)">🔊 Read Aloud</button>
+                <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'int-text-${y}')">🔊 Read Aloud</button>
                 <div class="text-xs text-muted-foreground mb-3">Universal Year ${uyn} — ${YD[uyn].title}  |  Chinese: ${catLabel(iCat)}</div>
                 <div class="cp text-sm leading-relaxed mb-4" id="int-text-${y}">${synth}<br/><br/><strong>Specific dynamics:</strong> ${dyn}</div>
               </div>
@@ -250,7 +250,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         </div>`).join('');
       document.getElementById('pinnacles-container')!.innerHTML = `
         <div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
-        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, document.getElementById('pinnacles-list').textContent)">🔊 Read Aloud Stages</button>
+        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'pinnacles-list')">🔊 Read Aloud Stages</button>
         <div id="pinnacles-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">${pCards}</div>`;
 
       // Convergence
@@ -262,8 +262,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
               <div class="conv-title text-2xl font-bold text-primary">${c.title}</div> 
               <div class="conv-sub text-sm italic text-muted-foreground">${c.sub}</div> 
             </div> 
-            <div class="conv-body p-6" id="conv-body-${c.year}"> 
-              <button class="tts-btn mb-6" onclick="window.ttsPlay(this, document.getElementById('conv-text-${c.year}').textContent)">🔊 Read Aloud</button> 
+            <div class="conv-body p-6"> 
+              <button class="tts-btn mb-6" onclick="window.ttsPlay(this, 'conv-text-${c.year}')">🔊 Read Aloud</button> 
               <div id="conv-text-${c.year}">
                 <p class="cp mb-6 text-sm leading-relaxed">${c.intro}</p> 
                 <div class="enemy-grid">
@@ -279,19 +279,63 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       document.getElementById('result-area')!.classList.remove('result-hidden');
     };
 
-    (window as any).ttsPlay = (btnEl: HTMLElement, text: string) => {
+    (window as any).ttsPlay = (btnEl: HTMLElement, containerId: string) => {
       if (!window.speechSynthesis) return;
       if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.onstart = () => btnEl.classList.add('playing');
-      utterance.onend = () => btnEl.classList.remove('playing');
-      window.speechSynthesis.speak(utterance);
+      
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      // Wrap text in spans for sentence-level highlighting if not already structured
+      if (!container.querySelector('.tts-s')) {
+        const text = container.innerHTML;
+        // Regex to split by major punctuation while keeping it attached
+        const sentences = text.match(/[^.!?\n]+[.!?\n]*/g);
+        if (sentences) {
+          container.innerHTML = sentences.map((s, i) => `<span class="tts-s" data-idx="${i}">${s}</span>`).join('');
+        } else {
+          container.innerHTML = `<span class="tts-s" data-idx="0">${text}</span>`;
+        }
+      }
+
+      const spans = container.querySelectorAll('.tts-s');
+      let currentIdx = 0;
+
+      const speak = () => {
+        if (currentIdx >= spans.length) {
+          btnEl.classList.remove('playing');
+          spans.forEach(s => s.classList.remove('reading'));
+          return;
+        }
+
+        spans.forEach(s => s.classList.remove('reading'));
+        const span = spans[currentIdx] as HTMLElement;
+        span.classList.add('reading');
+        
+        // Auto-scroll the reading element into view
+        span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const utterance = new SpeechSynthesisUtterance(span.textContent || '');
+        utterance.rate = 0.9;
+        utterance.onstart = () => btnEl.classList.add('playing');
+        utterance.onend = () => {
+          currentIdx++;
+          speak();
+        };
+        utterance.onerror = () => {
+          btnEl.classList.remove('playing');
+          spans.forEach(s => s.classList.remove('reading'));
+        };
+        window.speechSynthesis.speak(utterance);
+      };
+
+      speak();
     };
 
     (window as any).closePop = () => {
       document.getElementById('overlay')!.classList.remove('visible');
       document.body.style.overflow = '';
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
     };
 
     (window as any).swT = (name: string, btn: HTMLElement) => {
@@ -301,6 +345,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       parent.querySelector(`#tp-${name}`)?.classList.add('active');
       btn.classList.add('active');
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
     };
 
     (window as any).switchDash = (btn: HTMLElement) => {
@@ -309,6 +354,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       btn.classList.add('active');
       const panelId = 'panel-' + (btn as any).dataset.panel;
       document.getElementById(panelId)?.classList.add('active');
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
     };
 
     (window as any).openZodiacPop = (aniName: string, birthSign: string, year: string, age: string, cat: string) => {
@@ -316,7 +362,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const dyn = ba[`${cat}Desc`] || `This ${year} ${aniName} year is a Neutral period for ${birthSign}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for foundation-building, skill development, and relationship refinement that will serve as a stable platform for the years that follow.`;
       
       document.getElementById('pb')!.innerHTML = `
-        <button class="tts-btn mb-6 w-full" onclick="window.ttsPlay(this, document.getElementById('pb-content').textContent)">🔊 Read Aloud</button> 
+        <button class="tts-btn mb-6 w-full" onclick="window.ttsPlay(this, 'pb-content')">🔊 Read Aloud</button> 
         <div id="pb-content">
           <div class="ibox mb-6"><strong>${year} (${aniName} Year, Age ${age})</strong> — Tai Sui: <span style="color:${catColor(cat)}">${catLabel(cat)}</span></div> 
           <div class="content-h mb-3 uppercase tracking-widest text-xs opacity-60">YOUR ${birthSign.toUpperCase()} IN ${aniName.toUpperCase()} YEAR</div> 
