@@ -1,16 +1,18 @@
 /**
- * @fileOverview Complete restoration of Cosmic Fate Map with high-depth narratives and verbatim synthesis logic.
- * Fixed Next.js Invalid DOM property errors (class -> className, onclick -> onClick).
- * Synchronized Zodiac Trajectory with the selected search year and 2-column visual mirror layout.
+ * @fileOverview Precision-engineered Cosmic Fate Map with exact Lunar calendar tracking.
+ * Fixed birth sign determination for early-year births (e.g., Feb 1st, 1978).
+ * Implements full relationship mapping (Harms, Destructions, Love-Hate) and critical year logic.
+ * Enhanced Read Aloud with sentence highlighting and auto-scrolling.
  */
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
 import { YD } from '@/lib/cosmic-fate/oracle';
 import { CONVERGENCE_CARDS } from '@/lib/cosmic-fate/convergence';
 import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { INTERSECTION_SYNTHESIS } from '@/lib/cosmic-fate/intersections';
+import { CHINESE_CALENDAR } from '@/lib/new-astrology/chinese-calendar';
 
 interface Props {
   birthDay: number;
@@ -26,12 +28,34 @@ const reduce = (n: number): number => {
 
 const lpName = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
 
-const getAnimalFromYear = (y: number) => { 
-  const index = ((y - 1900) % 12 + 12) % 12;
+/**
+ * Gets the exact animal for a specific date using the Chinese Calendar data.
+ */
+const getAnimalForDate = (d: number, m: number, y: number) => {
+  const date = new Date(y, m - 1, d);
+  date.setHours(0, 0, 0, 0);
+
+  const entry = CHINESE_CALENDAR.find(e => {
+    const s = new Date(e.start);
+    const end = new Date(e.end);
+    s.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    return date >= s && date <= end;
+  });
+
+  if (entry) {
+    const parts = entry.title.split(' ');
+    return parts[parts.length - 1]; // Return "Snake", "Horse", etc.
+  }
+
+  // Fallback to simple modulo for years outside standard range
   const signs = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
-  return ZOO[signs[index]];
+  return signs[((y - 1900) % 12 + 12) % 12];
 };
 
+/**
+ * Determines relationship category between birth sign and year animal.
+ */
 const getCategory = (birthSign: string, yearSign: string) => {
   if (birthSign === yearSign) return 'ben';
   
@@ -66,7 +90,7 @@ const catLabel = (c: string) => ({
 }[c] || 'NEUTRAL');
 
 const getStatusLabelShort = (c: string) => ({ 
-  'ben': 'BEN', 'clash': 'DIRECT', 'harm': 'HARM', 
+  'ben': 'BEN', 'clash': 'CLASH', 'harm': 'HARM', 
   'destruction': 'DESTRUCTION', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
 }[c] || 'NEUTRAL');
 
@@ -79,28 +103,24 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const ry = parseInt(ryInput.value);
       if (!ry || isNaN(ry)) return;
 
-      const m = birthMonth;
-      const d = birthDay;
-      const by = birthYear;
-
-      const py = reduce(reduce(m) + reduce(d) + reduce(ry));
+      const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(ry));
       const uy = reduce(ry);
-      const lp = reduce(reduce(m) + reduce(d) + reduce(by));
-      const bv = reduce(d);
+      const lp = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(birthYear));
+      const bv = reduce(birthDay);
       
       const today = new Date();
       const currentMonthIndex = ry === today.getFullYear() ? today.getMonth() + 1 : 1;
       const pm = reduce(py + currentMonthIndex);
       const pmNames = ['', 'Initiation', 'Partnership', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Retreat', 'Power', 'Completion'];
 
-      const p1 = reduce(reduce(m) + reduce(d));
-      const p2 = reduce(reduce(d) + reduce(by));
+      const p1 = reduce(reduce(birthMonth) + reduce(birthDay));
+      const p2 = reduce(reduce(birthDay) + reduce(birthYear));
       const p3 = reduce(p1 + p2);
-      const p4 = reduce(reduce(m) + reduce(by));
+      const p4 = reduce(reduce(birthMonth) + reduce(birthYear));
       const p1end = 36 - lp;
       const p2end = p1end + 9;
       const p3end = p2end + 9;
-      const age = ry - by;
+      const age = ry - birthYear;
       
       let pNum, pStage;
       if (age <= p1end) { pStage = 1; pNum = p1; }
@@ -108,20 +128,21 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       else if (age <= p3end) { pStage = 3; pNum = p3; }
       else { pStage = 4; pNum = p4; }
 
-      const c1 = Math.abs(reduce(m) - reduce(d));
-      const c2 = Math.abs(reduce(d) - reduce(by));
+      const c1 = Math.abs(reduce(birthMonth) - reduce(birthDay));
+      const c2 = Math.abs(reduce(birthDay) - reduce(birthYear));
       const c3 = Math.abs(c1 - c2);
-      const c4 = Math.abs(reduce(m) - reduce(by));
+      const c4 = Math.abs(reduce(birthMonth) - reduce(birthYear));
       let cNum;
       if (age <= p1end) cNum = c1;
       else if (age <= p2end) cNum = c2;
       else if (age <= p3end) cNum = c3;
       else cNum = c4;
 
-      const signs = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
-      const birthSign = signs[((by - 1900) % 12 + 12) % 12];
-      const ya = getAnimalFromYear(ry);
-      const cat = getCategory(birthSign, ya.n);
+      const birthSign = getAnimalForDate(birthDay, birthMonth, birthYear);
+      // We take the animal that starts in the selected "Read Year" for the year status
+      const yearAnimalName = getAnimalForDate(15, 6, ry); // Mid-year check for general year sign
+      const ya = ZOO[yearAnimalName];
+      const cat = getCategory(birthSign, yearAnimalName);
 
       // Core Chips
       document.getElementById('core-strip')!.innerHTML = `
@@ -149,17 +170,18 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const lpRelationText = (py === lp) ? "exceptional harmony" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
       const lpInteractionText = (py === lp) ? "match" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "creates notable friction with" : "and";
       
-      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${ya.n} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) ${lpInteractionText} Personal Year ${py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${ry}.`;
+      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) ${lpInteractionText} Personal Year ${py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${ry}.`;
       
       document.getElementById('synthesis-container')!.innerHTML = `
+        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'synthesis-text')">🔊 Read Aloud</button>
         <div class="section-header">✦ &nbsp; Your ${ry} Reading — Oracle Synthesis &nbsp; ✦</div>
-        <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'synthesis-text')">🔊 Read Aloud</button>
         <div id="synthesis-text" class="cp">${synthText}</div>`;
 
       // Year Dive
       const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
       document.getElementById('year-dive-container')!.innerHTML = `
         <div class="year-deep-dive">
+          <button class="tts-btn mb-2 w-full" onclick="window.ttsPlay(this, 'year-dive-content-wrapper')">🔊 Read Aloud Section</button>
           <div class="year-dive-header">
             <div class="year-num-big" style="color:var(--cf-gold)">${py}</div>
             <div class="year-dive-title">${yr.title}</div>
@@ -173,12 +195,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button>
             <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button>
           </div>
-          <div class="tab-content p-2">
-            <div class="tab-panel active" id="tp-ov"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ov-text')">🔊 Read Aloud</button><div id="tp-ov-text">${paras(yr.overview)}</div></div>
-            <div class="tab-panel" id="tp-py"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-py-text')">🔊 Read Aloud</button><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div></div>
-            <div class="tab-panel" id="tp-ve"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ve-text')">🔊 Read Aloud</button><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
-            <div class="tab-panel" id="tp-ch"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ch-text')">🔊 Read Aloud</button><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
-            <div class="tab-panel" id="tp-ca"><button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'tp-ca-text')">🔊 Read Aloud</button><div id="tp-ca-text">${paras(yr.chald)}</div></div>
+          <div class="tab-content p-2" id="year-dive-content-wrapper">
+            <div class="tab-panel active" id="tp-ov"><div id="tp-ov-text">${paras(yr.overview)}</div></div>
+            <div class="tab-panel" id="tp-py"><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div></div>
+            <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
+            <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
+            <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div>
             <div class="tab-panel" id="tp-pr"><div class="practice-grid">${yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('')}</div></div>
           </div>
         </div>`;
@@ -186,49 +208,53 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       // Intersections
       const intersections = [];
       for (let y = ry; y <= ry + 30; y++) {
-        const pyn = reduce(reduce(m) + reduce(d) + reduce(y));
+        const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
         if (pyn === 4 || pyn === 7) {
-          const ani = getAnimalFromYear(y);
-          const iCat = getCategory(birthSign, ani.n);
+          const yearAni = getAnimalForDate(15, 6, y);
+          const iCat = getCategory(birthSign, yearAni);
           const uyn = reduce(y);
           const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
           
-          let statusLabel = `◦ Critical Personal Year ${pyn} in ${ani.n} Year`;
+          let statusLabel = `◦ Critical Personal Year ${pyn} in ${yearAni} Year`;
           let statusColor = 'var(--cf-silver-dim)';
+          let badge = '';
           if (isNegative) {
-            statusLabel = `🟠 HIGH TENSION — ${catLabel(iCat).split(' ')[0]} Year + Critical Personal Year`;
+            badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-amber)">🟠 HIGH TENSION — ${getStatusLabelShort(iCat)} Year + Critical Personal Year</div>`;
             statusColor = 'var(--cf-amber)';
+          } else {
+            badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-silver-dim)">◦ Critical Personal Year ${pyn} in ${yearAni} Year</div>`;
           }
 
           const synKey = `${pyn}_${iCat}`;
-          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', ani.n + ' Neutral');
-          const dyn = ZOO[birthSign][`${iCat}Desc`] || ZOO[birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${ani.n} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
+          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', yearAni + ' Neutral');
+          const dyn = ZOO[birthSign][`${iCat}Desc`] || ZOO[birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${yearAni} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
 
           intersections.push(`
             <div class="intersection-card p-4">
+              <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'int-text-${y}')">🔊 Read Aloud</button>
               <div class="intersection-header">
                 <div class="intersection-year">${y}</div>
-                <div class="intersection-title">Personal Year ${pyn} · Year of ${pyn === 4 ? 'Foundation' : 'the Mystic'} · ${ani.n} Year ${ani.e}</div>
-                <div class="text-[10px] font-black uppercase mt-1" style="color:${statusColor}">${statusLabel}</div>
+                <div class="intersection-title">Personal Year ${pyn} · Year of ${pyn === 4 ? 'Foundation' : 'the Mystic'} · ${yearAni} Year ${ZOO[yearAni].e}</div>
+                ${badge}
               </div>
-              <div class="intersection-body">
-                <button class="tts-btn mb-4" onclick="window.ttsPlay(this, 'int-text-${y}')">🔊 Read Aloud</button>
+              <div class="intersection-body" id="int-text-${y}">
                 <div class="text-xs text-muted-foreground mb-3">Universal Year ${uyn} — ${YD[uyn].title}  |  Chinese: ${catLabel(iCat)}</div>
-                <div class="cp text-sm leading-relaxed mb-4" id="int-text-${y}">${synth}<br/><br/><strong>Specific dynamics:</strong> ${dyn}</div>
+                <div class="cp text-sm leading-relaxed mb-4">${synth}<br/><br/><strong>Specific dynamics:</strong> ${dyn}</div>
               </div>
             </div>`);
         }
       }
       document.getElementById('personal-intersections-container')!.innerHTML = `
+        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'personal-intersections-list')">🔊 Read Aloud All</button>
         <div class="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>
         <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
-        <div class="px-2">${intersections.join('')}</div>`;
+        <div class="px-2" id="personal-intersections-list">${intersections.join('')}</div>`;
 
       // Zodiac Trajectory - 2 Column Mirror Grid
       let zHtml = '<div class="zodiac-grid grid grid-cols-2 gap-3 px-2">';
       for (let y = ry; y <= ry + 11; y++) {
-        const ani = getAnimalFromYear(y);
-        const zCat = getCategory(birthSign, ani.n);
+        const yearAni = getAnimalForDate(15, 6, y);
+        const zCat = getCategory(birthSign, yearAni);
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
         
         let labelColor = 'var(--cf-text-dim)';
@@ -240,14 +266,15 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         else if (zCat === 'destruction') labelColor = '#a78bfa'; // Purple
         else if (zCat === 'clash') labelColor = '#f87171'; // Red
 
-        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border border-white/5 rounded-2xl text-center" onclick="window.openZodiacPop('${ani.n}','${birthSign}','${y}','${y-by}','${zCat}')">
-          <div class="text-4xl mb-3">${ani.e}</div>
+        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border border-white/5 rounded-2xl text-center" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
+          <div class="text-4xl mb-3">${ZOO[yearAni].e}</div>
           <div class="text-[13px] font-bold text-white mb-1">${y}</div>
           <div class="text-[11px] text-primary mb-1">PY ${pyn}</div>
           <div class="text-[10px] font-black uppercase tracking-tighter" style="color:${labelColor}">${getStatusLabelShort(zCat)}</div>
         </div>`;
       }
       document.getElementById('zodiac-container')!.innerHTML = `
+        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'zodiac-container')">🔊 Read Aloud List</button>
         <div class="section-header">☯ &nbsp; ZODIAC TRAJECTORY &nbsp; ☯</div>` + zHtml + '</div>';
 
       // Pinnacles
@@ -279,8 +306,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           </div>
         </div>`).join('');
       document.getElementById('pinnacles-container')!.innerHTML = `
-        <div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
         <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'pinnacles-list')">🔊 Read Aloud Stages</button>
+        <div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
         <div id="pinnacles-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">${pCards}</div>`;
 
       // Convergence
@@ -288,13 +315,13 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       CONVERGENCE_CARDS.forEach(c => {
         cHtml += `
           <div class="conv-card mb-8"> 
+            <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'conv-text-${c.year}')">🔊 Read Aloud</button> 
             <div class="conv-header p-6 bg-primary/10 border-b border-primary/20"> 
               <div class="conv-title text-2xl font-bold text-primary">${c.title}</div> 
               <div class="conv-sub text-sm italic text-muted-foreground">${c.sub}</div> 
             </div> 
-            <div class="conv-body p-6"> 
-              <button class="tts-btn mb-6" onclick="window.ttsPlay(this, 'conv-text-${c.year}')">🔊 Read Aloud</button> 
-              <div id="conv-text-${c.year}">
+            <div class="conv-body p-6" id="conv-text-${c.year}"> 
+              <div>
                 <p class="cp mb-6 text-sm leading-relaxed">${c.intro}</p> 
                 <div class="enemy-grid">
                   ${c.chips.map(ch => `<div class="enemy-chip"><div class="enemy-chip-title font-bold text-primary text-xs mb-2">${ch.t}</div><p class="text-xs leading-relaxed text-slate-300">${ch.p}</p></div>`).join('')}
@@ -304,7 +331,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             </div> 
           </div>`;
       });
-      document.getElementById('convergence-cards')!.innerHTML = cHtml;
+      document.getElementById('convergence-cards')!.innerHTML = `<div class="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>` + cHtml;
 
       document.getElementById('result-area')!.classList.remove('result-hidden');
     };
@@ -317,7 +344,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       if (!container) return;
 
       if (!container.querySelector('.tts-s')) {
-        const text = container.innerHTML;
+        const text = container.innerText;
         const sentences = text.match(/[^.!?\n]+[.!?\n]*/g);
         if (sentences) {
           container.innerHTML = sentences.map((s, i) => `<span class="tts-s" data-idx="${i}">${s}</span>`).join('');
@@ -341,7 +368,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         span.classList.add('reading');
         span.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        const utterance = new SpeechSynthesisUtterance(span.textContent || '');
+        const utterance = new SpeechSynthesisUtterance(span.innerText || '');
         utterance.rate = 0.9;
         utterance.onstart = () => btnEl.classList.add('playing');
         utterance.onend = () => {
@@ -399,9 +426,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <p class="cp text-sm">${ya.trait}. Health focus: ${ya.organ}. Direction: ${ya.dir}.</p>
         </div>`;
       
-      document.getElementById('pg')!.textContent = ya.e;
-      document.getElementById('ph')!.textContent = `${year}: ${aniName} Year`;
-      document.getElementById('ps')!.textContent = `${birthSign} × ${aniName} — ${catLabel(cat)}`;
+      document.getElementById('pg')!.innerText = ya.e;
+      document.getElementById('ph')!.innerText = `${year}: ${aniName} Year`;
+      document.getElementById('ps')!.innerText = `${birthSign} × ${aniName} — ${catLabel(cat)}`;
       document.getElementById('overlay')!.classList.add('visible');
       document.body.style.overflow = 'hidden';
     };
@@ -463,7 +490,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <span className="text-6xl mb-4 block text-center" id="pg"></span>
           <div className="text-3xl font-bold text-primary text-center mb-2" id="ph"></div>
           <div className="text-xs uppercase tracking-[0.3em] text-center opacity-60 mb-8" id="ps"></div>
-          <div id="pb" className="className text-sm leading-relaxed"></div>
+          <div id="pb" className="text-sm leading-relaxed"></div>
         </div>
       </div>
     </div>
