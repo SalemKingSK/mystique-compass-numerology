@@ -1,7 +1,7 @@
 /**
  * @fileOverview Precision-engineered Cosmic Fate Map with exact Lunar calendar tracking.
- * Fixed birth sign determination for early-year births (e.g., Feb 1st, 1978).
- * Implements full relationship mapping (Harms, Destructions, Love-Hate) and critical year logic.
+ * Adopts the corrected Tai Sui relationship matrix across all animals.
+ * Implements full relationship mapping (Harms, Destructions, Alliances) and critical year logic.
  * Enhanced Read Aloud with sentence highlighting and auto-scrolling.
  */
 'use client';
@@ -55,32 +55,45 @@ const getAnimalForDate = (d: number, m: number, y: number) => {
 };
 
 /**
- * Determines relationship category between birth sign and year animal.
+ * Determines relationship category between birth sign and year animal based on the requested matrix.
  */
 const getCategory = (birthSign: string, yearSign: string) => {
   if (birthSign === yearSign) return 'ben';
   
-  const clashes: Record<string, string> = { Rat: 'Horse', Horse: 'Rat', Ox: 'Goat', Goat: 'Ox', Tiger: 'Monkey', Monkey: 'Tiger', Rabbit: 'Rooster', Rooster: 'Rabbit', Dragon: 'Dog', Dog: 'Dragon', Snake: 'Pig', Pig: 'Snake' };
-  if (clashes[birthSign] === yearSign) return 'clash';
+  // CLASH PAIRS
+  const clashes = [
+    ['Rat', 'Horse'], ['Ox', 'Goat'], ['Tiger', 'Monkey'],
+    ['Rabbit', 'Rooster'], ['Dragon', 'Dog'], ['Snake', 'Pig']
+  ];
+  if (clashes.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'clash';
 
-  const harms: Record<string, string> = { Rat: 'Goat', Goat: 'Rat', Ox: 'Horse', Horse: 'Ox', Tiger: 'Snake', Snake: 'Tiger', Rabbit: 'Dragon', Dragon: 'Rabbit', Monkey: 'Pig', Pig: 'Monkey', Rooster: 'Dog', Dog: 'Rooster' };
-  if (harms[birthSign] === yearSign) return 'harm';
+  // HARM PAIRS
+  const harms = [
+    ['Rat', 'Goat'], ['Ox', 'Horse'], ['Tiger', 'Snake'],
+    ['Rabbit', 'Dragon'], ['Monkey', 'Pig'], ['Rooster', 'Dog']
+  ];
+  if (harms.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'harm';
 
-  const dests: Record<string, string[]> = { 
-    Rat: ['Rabbit'], Rabbit: ['Rat'],
-    Ox: ['Dragon'], Dragon: ['Ox'],
-    Tiger: ['Pig'], Pig: ['Tiger'],
-    Snake: ['Monkey'], Monkey: ['Snake'],
-    Horse: ['Rooster'], Rooster: ['Horse'],
-    Goat: ['Dog'], Dog: ['Goat']
-  };
-  if (dests[birthSign]?.includes(yearSign)) return 'destruction';
+  // DESTRUCTION PAIRS
+  const destructions = [
+    ['Rat', 'Rooster'], ['Ox', 'Dragon'], ['Tiger', 'Pig'],
+    ['Rabbit', 'Horse'], ['Goat', 'Dog'], ['Monkey', 'Snake']
+  ];
+  if (destructions.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'destruction';
 
-  const liuHe: Record<string, string> = { Rat: 'Ox', Ox: 'Rat', Tiger: 'Pig', Pig: 'Tiger', Rabbit: 'Dog', Dog: 'Rabbit', Dragon: 'Rooster', Rooster: 'Dragon', Snake: 'Monkey', Monkey: 'Snake', Horse: 'Goat', Goat: 'Horse' };
-  if (liuHe[birthSign] === yearSign) return 'alliance';
-
-  const sanHe = [['Rat', 'Dragon', 'Monkey'], ['Snake', 'Rooster', 'Ox'], ['Tiger', 'Horse', 'Dog'], ['Rabbit', 'Goat', 'Pig']];
+  // SAN HE TRIANGLES
+  const sanHe = [
+    ['Tiger', 'Horse', 'Dog'], ['Monkey', 'Rat', 'Dragon'],
+    ['Pig', 'Rabbit', 'Goat'], ['Snake', 'Rooster', 'Ox']
+  ];
   if (sanHe.some(triad => triad.includes(birthSign) && triad.includes(yearSign))) return 'alliance';
+
+  // LIU HE PAIRS
+  const liuHe = [
+    ['Rat', 'Ox'], ['Tiger', 'Pig'], ['Rabbit', 'Dog'],
+    ['Dragon', 'Rooster'], ['Snake', 'Monkey'], ['Horse', 'Goat']
+  ];
+  if (liuHe.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'alliance';
 
   return 'neutral';
 };
@@ -101,8 +114,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   useEffect(() => {
     (window as any).calculate = () => {
       const ryInput = document.getElementById('cf-readYear') as HTMLInputElement;
-      const ry = parseInt(ryInput.value);
-      if (!ry || isNaN(ry)) return;
+      const ryValue = parseInt(ryInput.value);
+      if (!ryValue || isNaN(ryValue)) return;
+      const ry = ryValue;
 
       const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(ry));
       const uy = reduce(ry);
@@ -210,7 +224,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           const uyn = reduce(y);
           const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
           
-          let statusLabel = `◦ Critical Personal Year ${pyn} in ${yearAni} Year`;
           let badge = '';
           if (isNegative) {
             badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-amber)">🟠 HIGH TENSION — ${getStatusLabelShort(iCat)} Year + Critical Personal Year</div>`;
