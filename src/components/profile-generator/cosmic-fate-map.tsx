@@ -105,7 +105,7 @@ const catLabel = (c: string) => ({
 }[c] || 'NEUTRAL');
 
 const getStatusLabelShort = (c: string) => ({ 
-  'ben': 'BEN', 'clash': 'CLASH', 'harm': 'HARM', 
+  'ben': 'BEN MING NIAN', 'clash': 'CLASH', 'harm': 'HARM', 
   'destruction': 'DESTRUCTION', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
 }[c] || 'NEUTRAL');
 
@@ -267,30 +267,54 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         
         let labelColor = 'var(--cf-text-dim)';
         let statusTag = getStatusLabelShort(zCat);
+        let borderClass = 'border-white/5';
         
-        if (pyn === 7 && zCat === 'clash') labelColor = '#b91c1c'; 
-        else if ((pyn === 1 || pyn === 9) && zCat === 'alliance') labelColor = '#065f46'; 
-        else if (zCat === 'alliance') labelColor = '#34d399'; 
-        else if (zCat === 'harm') labelColor = '#fbbf24'; 
-        else if (zCat === 'ben') labelColor = '#c8a84b'; 
-        else if (zCat === 'destruction') labelColor = '#a78bfa'; 
-        else if (zCat === 'clash') labelColor = '#f87171'; 
+        if (pyn === 7 && zCat === 'clash') {
+          labelColor = '#b91c1c';
+          borderClass = 'border-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.4)]';
+        } else if ((pyn === 1 || pyn === 9) && zCat === 'alliance') {
+          labelColor = '#065f46';
+          borderClass = 'border-emerald-600 shadow-[0_0_15px_rgba(5,150,105,0.3)]';
+        } else if (zCat === 'alliance') {
+          labelColor = '#34d399';
+          borderClass = 'border-emerald-500/20';
+        } else if (zCat === 'harm') {
+          labelColor = '#fbbf24';
+          borderClass = 'border-amber-500/30';
+        } else if (zCat === 'ben') {
+          labelColor = '#c8a84b';
+          borderClass = 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]';
+        } else if (zCat === 'destruction') {
+          labelColor = '#a78bfa';
+          borderClass = 'border-violet-500/30';
+        } else if (zCat === 'clash') {
+          labelColor = '#f87171';
+          borderClass = 'border-rose-500/30';
+        }
 
-        // Update statusTag based on Critical Legend
         const isEnemy = zCat === 'clash' || zCat === 'harm' || zCat === 'destruction';
-        if (isEnemy && (pyn === 4 || pyn === 7)) statusTag = "⚠️ ENEMY × PY " + pyn;
-        else if (zCat === 'ben' && (pyn === 4 || pyn === 7)) statusTag = "⭐ BEN MING + PY " + pyn;
-        else if (pyn === 4 || pyn === 7) statusTag = "◈ CRITICAL PY " + pyn;
+        if (isEnemy && (pyn === 4 || pyn === 7)) {
+          statusTag = "⚠️ ENEMY × PY " + pyn;
+          borderClass = 'border-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.4)]';
+        } else if (zCat === 'ben' && (pyn === 4 || pyn === 7)) {
+          statusTag = "⭐ BEN MING + PY " + pyn;
+          borderClass = 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]';
+        } else if (pyn === 4 || pyn === 7) {
+          statusTag = "◈ CRITICAL PY " + pyn;
+          borderClass = 'border-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.2)]';
+        } else if (zCat === 'ben') {
+          statusTag = "BEN MING NIAN ✦";
+        }
 
-        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border border-white/5 rounded-2xl text-center" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
+        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border ${borderClass} rounded-2xl text-center" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
           <div class="text-4xl mb-3">${ZOO[yearAni].e}</div>
           <div class="text-[13px] font-bold text-white mb-1">${y}</div>
           <div class="text-[11px] text-primary mb-1">PY ${pyn}</div>
           <div class="text-[10px] font-black uppercase tracking-tighter" style="color:${labelColor}">${statusTag}</div>
+          <div class="text-[10px] text-muted-foreground mt-1">Age ${y-birthYear}</div>
         </div>`;
       }
 
-      // Zodiac Top Section implementation
       const zodiacTopHtml = `
         <div class="text-center mb-8 px-4 animate-in fade-in slide-in-from-top-4 duration-700">
           <div class="flex items-center justify-center gap-4 mb-6">
@@ -307,18 +331,22 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <span class="text-slate-400">${bz.dir}</span>. Below are your next 12 years mapped through Tai Sui astrology — click any year for detailed analysis.
           </div>
 
-          <div class="flex flex-wrap justify-center gap-3 mb-6">
-            <div class="px-3 py-1.5 rounded-lg border border-rose-500/50 bg-rose-500/10 text-[10px] font-black uppercase text-rose-400">
-              ⚠️ ENEMY × PY 4 OR 7
+          <div class="flex flex-col items-center gap-3 mb-6">
+            <div class="flex gap-3">
+              <div class="px-3 py-1.5 rounded-lg border border-rose-500/50 bg-rose-500/10 text-[10px] font-black uppercase text-rose-400">
+                ⚠️ ENEMY × PY 4 OR 7
+              </div>
+              <div class="px-3 py-1.5 rounded-lg border border-yellow-500/50 bg-yellow-500/10 text-[10px] font-black uppercase text-yellow-400">
+                ⭐ BEN MING + PY 4/7
+              </div>
             </div>
-            <div class="px-3 py-1.5 rounded-lg border border-yellow-500/50 bg-yellow-500/10 text-[10px] font-black uppercase text-yellow-400">
-              ⭐ BEN MING + PY 4/7
-            </div>
-            <div class="px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/10 text-[10px] font-black uppercase text-indigo-400">
-              ◈ CRITICAL PY ONLY
-            </div>
-            <div class="px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 text-[10px] font-black uppercase text-primary/70">
-              PY # = PERSONAL YEAR NUMBER
+            <div class="flex gap-3">
+              <div class="px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/10 text-[10px] font-black uppercase text-indigo-400">
+                ◈ CRITICAL PY ONLY
+              </div>
+              <div class="px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 text-[10px] font-black uppercase text-primary/70">
+                PY # = PERSONAL YEAR NUMBER
+              </div>
             </div>
           </div>
         </div>
