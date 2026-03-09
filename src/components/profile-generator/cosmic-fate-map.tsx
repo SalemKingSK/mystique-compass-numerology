@@ -101,11 +101,11 @@ const getCategory = (birthSign: string, yearSign: string) => {
 
 const catLabel = (c: string) => ({ 
   'ben': 'BEN MING NIAN', 'clash': 'DIRECT CLASH', 'harm': 'HARM YEAR', 
-  'destruction': 'DESTRUCTION YEAR', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
-}[c] || 'NEUTRAL');
+  'destruction': 'DESTRUCTION YEAR', 'alliance': 'ALLIANCE YEAR', 'neutral': 'NEUTRAL YEAR' 
+}[c] || 'NEUTRAL YEAR');
 
 const getStatusLabelShort = (c: string) => ({ 
-  'ben': 'BEN MING NIAN', 'clash': 'CLASH', 'harm': 'HARM', 
+  'ben': 'BEN MING', 'clash': 'CLASH', 'harm': 'HARM', 
   'destruction': 'DESTRUCTION', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
 }[c] || 'NEUTRAL');
 
@@ -259,59 +259,60 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
         <div class="px-2" id="personal-intersections-list">${intersections.join('')}</div>`;
 
+      const pyColors: Record<number, string> = {
+        1: "#e8b830", 2: "#98b4de", 3: "#68c268", 4: "#c86040", 5: "#dca030", 6: "#de78a0", 7: "#8870c8", 8: "#a8b5cc", 9: "#c84848"
+      };
+
+      const getIcon = (c: string) => ({
+        'clash': '⚡', 'harm': '⚠', 'destruction': '💀', 'alliance': '✅', 'ben': '✦', 'neutral': '◦'
+      }[c] || '◦');
+
       let zHtml = '<div class="zodiac-grid grid grid-cols-2 gap-3 px-2">';
       for (let y = ry; y <= ry + 11; y++) {
         const yearAni = getAnimalForDate(15, 6, y);
         const zCat = getCategory(birthSign, yearAni);
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
         
-        let labelColor = 'var(--cf-text-dim)';
-        let statusTag = getStatusLabelShort(zCat);
-        let borderClass = 'border-white/5';
-        
-        if (pyn === 7 && zCat === 'clash') {
-          labelColor = '#b91c1c';
-          borderClass = 'border-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.4)]';
-        } else if ((pyn === 1 || pyn === 9) && zCat === 'alliance') {
-          labelColor = '#065f46';
-          borderClass = 'border-emerald-600 shadow-[0_0_15px_rgba(5,150,105,0.3)]';
-        } else if (zCat === 'alliance') {
-          labelColor = '#34d399';
-          borderClass = 'border-emerald-500/20';
-        } else if (zCat === 'harm') {
-          labelColor = '#fbbf24';
-          borderClass = 'border-amber-500/30';
-        } else if (zCat === 'ben') {
-          labelColor = '#c8a84b';
-          borderClass = 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]';
-        } else if (zCat === 'destruction') {
-          labelColor = '#a78bfa';
-          borderClass = 'border-violet-500/30';
-        } else if (zCat === 'clash') {
-          labelColor = '#f87171';
-          borderClass = 'border-rose-500/30';
-        }
-
+        const isCritical = pyn === 4 || pyn === 7;
         const isEnemy = zCat === 'clash' || zCat === 'harm' || zCat === 'destruction';
-        if (isEnemy && (pyn === 4 || pyn === 7)) {
-          statusTag = "⚠️ ENEMY × PY " + pyn;
-          borderClass = 'border-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.4)]';
-        } else if (zCat === 'ben' && (pyn === 4 || pyn === 7)) {
-          statusTag = "⭐ BEN MING + PY " + pyn;
-          borderClass = 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]';
-        } else if (pyn === 4 || pyn === 7) {
-          statusTag = "◈ CRITICAL PY " + pyn;
-          borderClass = 'border-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.2)]';
-        } else if (zCat === 'ben') {
-          statusTag = "BEN MING NIAN ✦";
+        const isBen = zCat === 'ben';
+        const isAlliance = zCat === 'alliance';
+
+        let cardStyle = "";
+        let badgeHtml = "";
+        let statusLabelColor = "";
+        const statusTag = getStatusLabelShort(zCat);
+        const icon = getIcon(zCat);
+
+        if (isEnemy && isCritical) {
+          cardStyle = "background: linear-gradient(140deg, rgba(180,20,40,.35), rgba(7,13,28,.98)); border: 2px solid rgba(200,30,50,.7); box-shadow: 0 0 24px rgba(200,30,50,.4);";
+          badgeHtml = `<div class="mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-rose-500/20 text-rose-500 border border-rose-500/30">⚠ PY${pyn} + ${statusTag}</div>`;
+          statusLabelColor = "color: #ef4444;";
+        } else if (isBen && isCritical) {
+          cardStyle = "background: linear-gradient(140deg, rgba(220,140,0,.2), rgba(7,13,28,.98)); border: 2px solid rgba(220,140,0,.6);";
+          badgeHtml = `<div class="mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30">⭐ BEN MING + PY4/7</div>`;
+          statusLabelColor = "color: #f59e0b;";
+        } else if (isCritical) {
+          cardStyle = "background: linear-gradient(140deg, rgba(100,70,180,.18), rgba(7,13,28,.98)); border: 1px solid rgba(136,112,200,.45);";
+          badgeHtml = `<div class="mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-purple-500/20 text-purple-400 border border-purple-500/30">PY${pyn} CRITICAL</div>`;
+          statusLabelColor = "color: #a78bfa;";
+        } else if (isAlliance) {
+          cardStyle = "background: linear-gradient(140deg, rgba(50,160,90,.1), rgba(7,13,28,.95)); border: 1px solid rgba(50,160,90,.45);";
+          statusLabelColor = "color: #4daa78;";
+        } else {
+          cardStyle = "background: linear-gradient(140deg, rgba(14,24,46,.9), rgba(8,14,28,.95)); border: 1px solid rgba(200,168,75,.13);";
+          statusLabelColor = `color: ${isEnemy ? '#ef4444' : isBen ? '#fbbf24' : 'var(--cf-text-dim)'};`;
         }
 
-        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border ${borderClass} rounded-2xl text-center" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
+        const pyColor = pyColors[pyn] || "#ffffff";
+
+        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 rounded-2xl text-center transition-all hover:scale-[1.02]" style="${cardStyle}" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
           <div class="text-4xl mb-3">${ZOO[yearAni].e}</div>
           <div class="text-[13px] font-bold text-white mb-1">${y}</div>
-          <div class="text-[11px] text-primary mb-1">PY ${pyn}</div>
-          <div class="text-[10px] font-black uppercase tracking-tighter" style="color:${labelColor}">${statusTag}</div>
+          <div class="text-[18px] font-black" style="color:${pyColor}">PY ${pyn}</div>
+          <div class="text-[10px] font-black uppercase tracking-tighter" style="${statusLabelColor}">${statusTag} YEAR ${icon}</div>
           <div class="text-[10px] text-muted-foreground mt-1">Age ${y-birthYear}</div>
+          ${badgeHtml}
         </div>`;
       }
 
@@ -345,7 +346,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                 ◈ CRITICAL PY ONLY
               </div>
               <div class="px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 text-[10px] font-black uppercase text-primary/70">
-                PY # = PERSONAL YEAR NUMBER
+                PY # Legend
               </div>
             </div>
           </div>
