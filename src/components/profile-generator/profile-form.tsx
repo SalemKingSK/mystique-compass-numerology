@@ -152,7 +152,7 @@ export function ProfileForm({
                 y="100"
                 dominantBaseline="middle"
                 textAnchor="middle"
-                fontFamily="Poppins, sans-serif"
+                fontFamily="'Cinzel Decorative', serif"
                 fontSize="48"
                 fontWeight="600"
                 fill="url(#gold-gradient)"
@@ -166,7 +166,7 @@ export function ProfileForm({
                 y="130"
                 dominantBaseline="middle"
                 textAnchor="middle"
-                fontFamily="Poppins, sans-serif"
+                fontFamily="'Cinzel', serif"
                 fontSize="24"
                 fontWeight="400"
                 fill="url(#gold-gradient)"
@@ -177,12 +177,12 @@ export function ProfileForm({
               </text>
             </svg>
         </div>
-        <p className="text-white/70 italic text-sm -mt-2">Giving your life a Meaning.</p>
+        <p className="text-white/70 italic text-sm -mt-2 font-body">Giving your life a Meaning.</p>
       </header>
       <div className="flex-grow flex items-center justify-center">
         <form onSubmit={onSubmit} className="space-y-6 w-full glass-card p-6 md:p-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-white font-decorative">
               Generate Profile
             </h2>
             <Button
@@ -200,7 +200,7 @@ export function ProfileForm({
             <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
               <PopoverTrigger asChild>
                 <div className="space-y-2">
-                  <Label htmlFor="search">Search Database or Wikipedia...</Label>
+                  <Label htmlFor="search" className="font-cinzel uppercase tracking-wider text-[0.65rem]">Search Database or Wikipedia...</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                     <Input
@@ -218,7 +218,7 @@ export function ProfileForm({
                              setIsSearchOpen(true);
                          }
                       }}
-                      className="pl-10"
+                      className="pl-10 font-body"
                       autoComplete="off"
                     />
                   </div>
@@ -228,7 +228,7 @@ export function ProfileForm({
                   <div className="max-h-80 overflow-y-auto">
                       {searchResults.length > 0 && (
                           <div className="border-b border-white/10 pb-1">
-                              <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-white/40 font-bold bg-white/5">Local Database</div>
+                              <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-white/40 font-bold bg-white/5 font-cinzel">Local Database</div>
                               {searchResults.map((person, index) => (
                               <div
                                   key={`${person.name}-${index}`}
@@ -236,9 +236,9 @@ export function ProfileForm({
                                     e.preventDefault();
                                     handleSelectPerson(person)
                                   }}
-                                  className="p-3 hover:bg-white/10 cursor-pointer text-sm"
+                                  className="p-3 hover:bg-white/10 cursor-pointer text-sm font-body"
                               >
-                                  {person.name} <span className="text-xs text-white/50">({person.tags.join(', ')})</span>
+                                  {person.name} <span className="text-xs text-white/50 font-cinzel">({person.tags.join(', ')})</span>
                               </div>
                               ))}
                           </div>
@@ -249,7 +249,7 @@ export function ProfileForm({
                           e.preventDefault();
                           handleWikiSearch();
                         }}
-                        className="p-3 hover:bg-purple-500/20 cursor-pointer text-sm flex items-center gap-2 text-purple-200 font-medium"
+                        className="p-3 hover:bg-purple-500/20 cursor-pointer text-sm flex items-center gap-2 text-purple-200 font-medium font-cinzel"
                       >
                         {isWikiLoading ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -264,20 +264,21 @@ export function ProfileForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name" className="font-cinzel uppercase tracking-wider text-[0.65rem]">Full Name</Label>
             <Input
               id="name"
               name="name"
               placeholder="e.g., Jane Doe"
               value={formData.name}
               onChange={onFieldChange}
+              className="font-body"
               required
             />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="day">Day</Label>
+              <Label htmlFor="day" className="font-cinzel uppercase tracking-wider text-[0.65rem]">Day</Label>
               <Input
                 id="day"
                 name="day"
@@ -285,13 +286,14 @@ export function ProfileForm({
                 placeholder="DD"
                 value={formData.day || ''}
                 onChange={onFieldChange}
+                className="font-body"
                 required
                 min="1"
                 max="31"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="month">Month</Label>
+              <Label htmlFor="month" className="font-cinzel uppercase tracking-wider text-[0.65rem]">Month</Label>
               <Input
                 id="month"
                 name="month"
@@ -299,13 +301,14 @@ export function ProfileForm({
                 placeholder="MM"
                 value={formData.month || ''}
                 onChange={onFieldChange}
+                className="font-body"
                 required
                 min="1"
                 max="12"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="year">Year</Label>
+              <Label htmlFor="year" className="font-cinzel uppercase tracking-wider text-[0.65rem]">Year</Label>
               <Input
                 id="year"
                 name="year"
@@ -313,6 +316,7 @@ export function ProfileForm({
                 placeholder="YYYY"
                 value={formData.year || ''}
                 onChange={onFieldChange}
+                className="font-body"
                 required
                 min="1"
                 max={new Date().getFullYear()}
@@ -321,12 +325,12 @@ export function ProfileForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="gender">Gender</Label>
+            <Label htmlFor="gender" className="font-cinzel uppercase tracking-wider text-[0.65rem]">Gender</Label>
             <Select onValueChange={onSelectChange} value={formData.gender}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full font-body">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="font-body">
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
               </SelectContent>
@@ -336,7 +340,7 @@ export function ProfileForm({
           <div className="flex flex-col items-center gap-4">
             <Button
               type="submit"
-              className="w-full font-bold text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+              className="w-full font-cinzel font-bold text-sm tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 uppercase"
               disabled={isPending}
             >
               {isPending ? 'Generating...' : 'Generate Profile'}
@@ -344,7 +348,7 @@ export function ProfileForm({
           </div>
         </form>
       </div>
-      <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">
+      <footer className="text-center p-4 text-white/50 text-[0.65rem] whitespace-pre-line font-body italic leading-relaxed">
         {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
       </footer>
     </div>

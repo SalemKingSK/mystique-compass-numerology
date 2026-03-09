@@ -10,8 +10,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['"Cormorant Garamond"', 'serif'],
+        decorative: ['"Cinzel Decorative"', 'serif'],
+        cinzel: ['"Cinzel"', 'serif'],
+        serif: ['"Cormorant Garamond"', 'serif'],
         code: ['monospace'],
       },
       colors: {

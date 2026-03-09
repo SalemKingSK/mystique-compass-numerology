@@ -28,15 +28,15 @@ const TABS: { name: string; icon: React.ElementType }[] = [
 
 function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
     if (!compatibilities || Object.keys(compatibilities).length === 0) {
-        return <p className="text-slate-400">No compatibility information available.</p>;
+        return <p className="font-body text-slate-400">No compatibility information available.</p>;
     }
 
     return (
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger>With the {sign}</AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionTrigger className="font-cinzel text-[0.7rem] uppercase tracking-wider">With the {sign}</AccordionTrigger>
+                    <AccordionContent className="font-body text-base leading-relaxed">
                         <AccordionContentWithPlayer text={String(text)} />
                     </AccordionContent>
                 </AccordionItem>
@@ -47,7 +47,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
 
 function FutureDisplay({ futures }: { futures: any }) {
     if (!futures || Object.keys(futures).length === 0) {
-        return <p className="text-slate-400">No future predictions available.</p>;
+        return <p className="font-body text-slate-400">No future predictions available.</p>;
     }
 
     const currentYear = new Date().getFullYear();
@@ -56,7 +56,7 @@ function FutureDisplay({ futures }: { futures: any }) {
         .sort((a, b) => parseInt(a) - parseInt(b));
 
     if (futureYears.length === 0) {
-        return <p className="text-slate-400">Future predictions begin from next year.</p>;
+        return <p className="font-body text-slate-400">Future predictions begin from next year.</p>;
     }
     
     return (
@@ -66,8 +66,8 @@ function FutureDisplay({ futures }: { futures: any }) {
                 const text = data.prediction;
                 return (
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                        <AccordionTrigger>{year} - Year of the {data.year}</AccordionTrigger>
-                        <AccordionContent>
+                        <AccordionTrigger className="font-cinzel text-[0.7rem] uppercase tracking-wider">{year} - Year of the {data.year}</AccordionTrigger>
+                        <AccordionContent className="font-body text-base leading-relaxed">
                           <AccordionContentWithPlayer text={text} />
                         </AccordionContent>
                     </AccordionItem>
@@ -133,7 +133,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                     key={tab.name}
                     variant={current === index ? 'default' : 'outline'}
                     size="sm"
-                    className="h-auto py-2 px-3 flex flex-col items-center justify-center text-xs md:text-sm"
+                    className="h-auto py-2 px-3 flex flex-col items-center justify-center text-[0.6rem] font-cinzel uppercase tracking-widest"
                     onClick={() => scrollTo(index)}
                 >
                     <tab.icon className="h-4 w-4 mb-1" />
@@ -151,19 +151,21 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
                           <div className="p-1 h-96">
                               <ScrollArea className="h-full w-full rounded-md p-4 bg-black/20">
                                   <div className="flex justify-between items-center mb-2">
-                                      <h3 className="text-xl font-bold text-primary flex items-center gap-2">
+                                      <h3 className="text-xl font-bold text-primary flex items-center gap-2 font-cinzel uppercase tracking-widest">
                                           <TabIcon className="h-6 w-6" /> {item.title}
                                       </h3>
                                   </div>
-                                  <div>{item.component}</div>
+                                  <div className="font-body text-base leading-relaxed">
+                                    {item.component}
+                                  </div>
                               </ScrollArea>
                           </div>
                       </CarouselItem>
                    )
               })}
           </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious className="hidden md:flex" />
+          <CarouselNext className="hidden md:flex" />
       </Carousel>
     </div>
   );

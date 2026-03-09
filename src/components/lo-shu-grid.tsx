@@ -48,7 +48,7 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
 
 export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, numberCounts, repeatedNumberMeanings }: LoShuGridProps) {
   if (!gridData || gridData.length !== 3) {
-    return <p>Grid data is not available.</p>;
+    return <p className="font-body">Grid data is not available.</p>;
   }
   
   const getPathKeyForArrow = (arrow: ArrowData) => {
@@ -78,16 +78,16 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
 
     const cellContent = (
       <div
-        className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-2xl font-bold text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
+        className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
       >
         <div className="flex-grow flex items-center justify-center">
             {cell ? (
-            <span className="truncate">{cell}</span>
+            <span className="truncate font-decorative text-2xl">{cell}</span>
             ) : (
-            <span className="opacity-20">{gridNum}</span>
+            <span className="opacity-20 font-decorative text-2xl">{gridNum}</span>
             )}
         </div>
-        <div className="text-[10px] h-4 font-normal text-purple-300/50 mt-1">
+        <div className="text-[0.45rem] font-cinzel h-4 font-normal text-purple-300/50 mt-1 uppercase tracking-wider text-center">
             {PLANETARY_LABELS[gridNum]}
         </div>
       </div>
@@ -99,10 +99,12 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
           <PopoverTrigger asChild>{cellContent}</PopoverTrigger>
           <PopoverContent className="w-80">
             <div className="space-y-2">
-              <h4 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
+              <h4 className="font-cinzel font-semibold text-[0.8rem] text-primary mb-2 flex items-center gap-2 uppercase tracking-widest">
                 <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count > 1 ? 's' : ''})
               </h4>
-              <AccordionContentWithPlayer text={meaning!} />
+              <div className="font-body text-sm leading-relaxed">
+                <AccordionContentWithPlayer text={meaning!} />
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -116,10 +118,14 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
   return (
     // The main container that establishes the coordinate system for the overlay
     <div className="relative aspect-square w-full max-w-[400px] mx-auto glass-card p-4">
-        <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M3 3v18h18" /><path d="M7 16v-4h4" /><path d="m15.5 15.5-8-8" /></svg>
-            {title}
-        </h3>
+        <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <h3 className="font-cinzel font-semibold text-[0.7rem] text-primary flex items-center gap-2 uppercase tracking-[0.25em] text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M3 3v18h18" /><path d="M7 16v-4h4" /><path d="m15.5 15.5-8-8" /></svg>
+                {title}
+            </h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        </div>
       
       {/* 1. The Grid of Numbers (the base layer) */}
       <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2">

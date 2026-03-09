@@ -41,7 +41,7 @@ function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onCli
     <div className="animated-border">
       <button
           onClick={onClick}
-          className={`w-full h-full rounded-lg py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 relative ${
+          className={`w-full h-full rounded-lg py-2 px-4 text-[0.65rem] font-cinzel tracking-widest font-medium cursor-pointer transition-colors duration-300 relative uppercase ${
             isActive ? 'text-yellow-300' : 'text-white/70'
           }`}
       >
@@ -76,7 +76,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                             key={tab.key}
                             variant={current === index ? 'default' : 'outline'}
                             size="sm"
-                            className="h-auto py-2 px-3 flex flex-col items-center justify-center text-xs md:text-sm"
+                            className="h-auto py-2 px-3 flex flex-col items-center justify-center text-[0.6rem] font-cinzel uppercase tracking-widest"
                             onClick={() => scrollTo(index)}
                         >
                             <tab.icon className="h-4 w-4 mb-1" />
@@ -94,19 +94,21 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
                                 <div className="p-1 h-96">
                                     <ScrollArea className="h-full w-full rounded-md p-4 bg-black/20">
                                         <div className="flex justify-between items-center mb-2">
-                                            <h3 className="text-xl font-bold text-primary flex items-center gap-2">
-                                                <tab.icon className="h-6 w-6" /> {tab.name}
+                                            <h3 className="text-lg font-bold text-primary flex items-center gap-2 font-cinzel uppercase tracking-widest">
+                                                <tab.icon className="h-5 w-5" /> {tab.name}
                                             </h3>
                                         </div>
-                                        <AccordionContentWithPlayer text={String(text)} />
+                                        <div className="font-body text-base leading-relaxed">
+                                            <AccordionContentWithPlayer text={String(text)} />
+                                        </div>
                                     </ScrollArea>
                                 </div>
                             </CarouselItem>
                          )
                     })}
                 </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
             </Carousel>
         </div>
     );
@@ -127,10 +129,10 @@ function ResultsHeader({
 }) {
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
-        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center">
+        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center font-decorative mb-2">
             {name}
         </h1>
-        <p className="text-sm text-white/50 mt-1">{birthDate}</p>
+        <p className="text-[0.7rem] text-white/50 mt-1 font-cinzel uppercase tracking-[0.2em]">{birthDate}</p>
         <div className='relative grid grid-cols-2 gap-3 w-full max-w-2xl mx-auto mt-6 px-4'>
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
                 {newAstroSign}
@@ -152,7 +154,7 @@ function ResultsHeader({
 function ResultsFooter() {
     return (
         <div className="flex flex-col items-center justify-center mt-8 pb-24 w-full max-w-4xl mx-auto px-4">
-             <footer className="text-center p-4 text-white/50 text-xs whitespace-pre-line">
+             <footer className="text-center p-4 text-white/50 text-[0.65rem] whitespace-pre-line font-body italic leading-relaxed">
                 {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
             </footer>
         </div>

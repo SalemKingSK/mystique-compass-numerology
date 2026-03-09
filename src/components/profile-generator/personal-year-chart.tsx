@@ -45,7 +45,7 @@ const PERSONAL_YEAR_MEANINGS: { [key: number]: string } = {
     2: `PERSONAL YEAR 2 – A SPIRITUAL GROWTH YEAR OF SHARING Though not with the power of a peak number, this is a year in which its own powerful nature can be significant enough to cause many a turbulent personality to embrace calmness. Spiritual development is the primary feature of this year with an enhanced awareness of life's more subtle qualities. Rather than being a year of major change, it is one in which the development of emotional control, spiritual awareness and accentuated intuition can be expected. Central to the growth under this year's vibration is the need to actively develop the power of meditation. By this means, more than any other, the body's cellular alignment is restored to achieve the inner power we all want as our limitless energy reserve and our magnetic essence. By this means, we learn to be in command of our emotions, to act rather than react, to replace uncertainty and doubt with confidence and security, and to wisely discriminate between the more important and the less important aspects of our daily life. Following the two previous years of progress, some people develop a tendency to rest on their laurels or lapse into complacency. It is then that negativity takes the opportunity to develop those reactive emotions of fear, nervousness, argumentativeness and insecurity that can sometimes manifest in the most unexpected ways to make an otherwise likeable person seem quite obnoxious or unbearably power-crazed. Realise it as a year for cooperation, for working together in one or more partnerships (home, work, sports, and so on). To satisfactorily achieve this, we need to be more loving and more accepting – further growth aspects of this year. Ruling 2 and Ruling 11 people will be especially susceptible to the increased sensitivity accompanying this year's vibrations. It should not be surprising for them if their psychic awareness takes on a significantly elevated level of expression, almost projecting their consciousness into another dimension. Their cooperation with this development by allowing adequate time for meditation and spiritual studies will be powerfully beneficial for their own understanding of its power, as well as for their role in guiding others.`,
     3: `PERSONAL YEAR 3 – A MIND-EXPANSIVE YEAR Between the peak PYNs and the trough of the PY4 comes this year of surprisingly intensified mental power that provides the appropriate rounded development for this portion of the Personal Year cycle. Under this vibration, our thinking and observing faculties are attuned to an acute peak of alertness. It is a year when the intellect thirsts for knowledge and expression. For some, it could involve study of an academic nature. Others might prefer to investigate life and its philosophies, while some might seek enlightenment through personal growth. The usual means of mental expansion this year are either through an educational course or extensive travel. Whatever the choice, it is important to realise that this year is one in which the further development of memory is vital, for the 3 vibration is the gateway to the mind through memory. We should always realise that memory is the foundation of self-esteem and self-confidence, as well as the bridge between our conscious and unconscious minds. The continual alertness and growing capacity of our memory is invariably distinguishable between the ageing and the ageless people. On the lighter side of the PY3, we should recognize the need for balance by ensuring that time is allowed in our lives for humour, happy occasions, bright company and the appreciation of a good joke. Ruling 3 people will be especially attuned to this year's vibrations, but they must learn to control their high level of rationality to ensure that it does not swamp their feelings. For them, the enhanced mental alertness they will experience this year needs to be channelled into avenues of constructive and expansive awareness for their personal satisfaction and for the peace of mind of those with whom they associate (who may otherwise grow tired of an overbalanced mentality and become the subject of frequent destructive criticism).`,
     4: `PERSONAL YEAR 4 — A YEAR OF CONSOLIDATION Physical and material factors dominate this trough year. Rest and stability are vital to regenerate and consolidate the previous five years' development. It is a year of squaring (as symbolised geometrically by the four-sided figure), when everything is brought to a reckoning and the unwanted aspects are eliminated, as a vine is pruned in winter to make way for the coming new growth the following spring. This is an ideal year for integrating Basic Self (body and emotions) Conscious Self (thoughts and ideas) with High Self (the eternal soul). Those who do not follow the need for time out to relax and adjust could find themselves in a state of disharmony, leading to frustration, confusion and fear. Any attempt at major changes in affairs or lifestyles during this year are rarely successful, leading instead to material loss in either finances, health or both. People who are usually regarded as being highly strung, whose nerves are ever tense and whose sensitivities are acute, should be especially careful to avoid any disharmony in their dealings with others this year. For them, a relaxed vacation will be most beneficial. Ruling 4 people cannot be blamed for feeling quite frustrated under this year's vibrations. Invariably, they will fail to recognise it as a year of consolidation, trying instead to maintain the impetus of the progress achieved during the previous four years. As a result, their nerves take a severe battering. For them, increased rest and reduced emotional disturbances (such as avoiding TV, movie "thrillers," and domestic or work arguments) will help reduce the toll on their health. The inclusion in their diet of adequate B-complex vitamins will be of enormous help in restoring nerve energy, as will appropriate homoeopathic nerve tonics; but addictive drugs should be avoided, for they only incite secondary problems. Ruling 22/4 people should accept the same advice, but with the additional suggestion that they recognize their more spiritual essence and organise their daily routines to permit periods for meditation and relaxation. Additional spiritual nourishment for them includes time to read appropriate spiritual books, listen to harmonious music or, more ideally, become involved in creating music or writing books aided by their powerful intuition.`,
-    5: `PERSONAL YEAR 5 – A YEAR OF FREEDOM Spiritual and emotional factors prevail this year. Its vibrations span the gap between last year's trough and next year's creative mini-peak, igniting the power of freedom, generated by heightened psychic awareness and personal expression. This leads to the development of our talents to find release from material and social confinement, replacing them with a new focus on artistic expression, whether for a hobby or professionally. Some have launched the basis for a new career under this vibration. Others have discovered their freedom in a change of home, moving to the country and away from city confinement. Ruling 5 people will find this a year in which their desires for freedom become almost obsessive. However, they must realize that it is not always physical freedom they need, though it is sometimes easier to believe so, thereby rationalising and masking an emptiness in personal understanding. Their primary need is for freedom of expression, a quality that is comparatively new to human life but, thankfully, becoming more and more universal. This expression can best be achieved through the arts, for it is soon realised that to express ourselves freely demands far more than just words. Music, painting, pottery or any similar form of artistic expression provide the vent for our sensitivity and much needed nourishment for the nerves, helping us to develop that all-important personal calmness.`,
+    5: `PERSONAL YEAR 5 – A YEAR OF FREEDOM Spiritual and emotional factors prevail this year. Its vibrations span the gap between last year's trough and next year's creative mini-peak, igniting the power of freedom, generated by heightened psychic awareness and personal expression. This leads to the development of our talents to find release from material and social confinement, replacing them with a new focus on artistic expression, whether for a hobby or professionally. Some have launched the basis for a new career under this vibration. Others have discovered their freedom in a change of home, moving to the country and away from city confinement. Ruling 5 people will find this a year in which their desires for freedom become almost obsessive. However, they must realize that it is not always physical freedom they need, though it is sometimes easier to believe so, thereby rationalising and masking an emptiness in personal understanding. Their primary need is for freedom of expression, a quality that is comparatively new to human life but, thankfully, becoming more and more universal. Music, painting, pottery or any similar form of artistic expression provide the vent for our sensitivity and much needed nourishment for the nerves, helping us to develop that all-important personal calmness.`,
     6: `PERSONAL YEAR 6 – A YEAR OF CREATIVITY This is the year of the mini-peak, its focus on accumulation of power that seeks vent through one's investment in creative time. New creative projects undertaken this year will have the most favourable aspects for success, especially if their underlying principle is directed toward the upliftment of humankind. It is a year in which the formation of any worthwhile business undertaking will considerably benefit. It is also a year of focus on the home and on personal relationships. Creative activities related to the home will receive a significant boost under this vibration. In the area of relationships, many are either secured or released as underlying integrity casts free any falseness or negativity. Persisting with such undesirable traits will ensure that this is a most difficult year, inciting intense anxiety, arguments and hatred. Clearly, the lesson of this year is to come to terms with facts as they are. It's also important to recognise what it is to have personal honesty and integrity, and a positive attitude. Then it will be a most rewarding year, crowned by happiness, creative achievement and sound financial success. Ruling 6 people are the most tested under this vibration, for the intensification of their creativity and personal integrity combine to make it a powerful, yet cleansing period. Those engaged in the positive aspects of the 6 will find their creativity boosted as they attain a new high in happiness. They would have it no other way. Though there are many Ruling 6s that have not yet seen the light, preferring to dwell in the mud-hole of negativity, adopting worry and anxiety as their trademarks. They are already sick and will only become sicker as their bodies become more enervated and their attitude to life leads to further loneliness. Adopting the positive, creative approach is their only answer.`,
     7: `PERSONAL YEAR 7 – A TROUGH YEAR OF FOCUS Similar to the PY4, this is a trough year of consolidation when no major change should be undertaken. However, it is a highly significant year in which we learn to intensely focus on previous years’ growth with a view to better understand our life. As such, it is a vital year for learning through personal experience. For many, this implies sacrifice brought about by a failure to recognise and apply guidance from the higher powers and their own natural wisdom. When we live in thoughtless reaction, we expose ourselves to the need for firm corrective measures – prompt karma we might call it. Such sacrifices invariably result in the loss of money, health and or love. They always have a purpose, for they are designed to awaken and return us to the Path. It is wise to avoid any major changes in financial or domestic affairs during this year, for it is a period of stabilisation, as opposed to expansion, of pruning dead wood to make way for the new growth of the ensuring years. It is also a powerful teaching/sharing year in which frequent opportunities present themselves for guiding others toward our level of understanding. Ruling 7 people will often suffer seemingly severe hardships under this vibration but their experience will invariably appear far worse to the outsider. These people are not unfamiliar with sacrifice, for this is their established pattern of learning. And it will continue to be that way until they attain a sufficient degree of personal awareness and wisdom. Once this is achieved, they become excellent teachers, practical philosophers and helpers to humankind, thereby fulfilling the purpose intended by their Ruling Number.`,
     8: `PERSONAL YEAR 8 – A YEAR OF INDEPENDENCE AND WISDOM This is a year of rapid change as we emerge from a consolidating trough onto the steep rise toward our next peak and the start of a new cycle of growth and prosperity. Many new opportunities manifest under this vibration as we assert our independence with growing wisdom. For some, it will be in the form of a significant improvement in their financial affairs. For the majority, there will emerge a heightened spiritual independence in which they recognise how much emotional control and understanding they have achieved and how much more emphasis they now place on living (acting), rather than existing (reacting). Ruling 8 people have already acquired an appreciable measure of independence and wisdom to the extent that their living has been positive. Otherwise, they will have built around themselves an isolating wall, confusing aloofness with independence and experiencing difficulties in communicating with their close associates, whom they so often take for granted.`,
@@ -132,14 +132,14 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
         {
           label: 'Proportion of Power',
           data: cycleData.map(d => d.power),
-          borderColor: '#ff00ff',
+          borderColor: '#c8a84b',
           backgroundColor: gradient,
           fill: true,
           tension: 0.4,
           borderWidth: 5,
           pointRadius: cycleData.map((_, i) => i === currentIndex ? 14 : 8),
-          pointBackgroundColor: cycleData.map((_, i) => i === currentIndex ? '#fceabb' : '#ff00ff'),
-          pointBorderColor: '#ff00ff',
+          pointBackgroundColor: cycleData.map((_, i) => i === currentIndex ? '#fceabb' : '#c8a84b'),
+          pointBorderColor: '#c8a84b',
           pointBorderWidth: 3,
           pointHitRadius: 30,
         },
@@ -166,17 +166,17 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
       y: { display: false, min: 0, max: 12 },
       x: {
         ticks: { 
-          color: '#fceabb', 
-          font: { size: 14, weight: 'bold' },
+          color: '#7a6228', 
+          font: { size: 12, family: 'Cinzel', weight: 'bold' },
           maxRotation: 45,
           minRotation: 45
         },
-        grid: { color: '#333' },
+        grid: { color: 'rgba(200,168,75,0.1)' },
       },
     },
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'Personal Year Cycle', color: '#fceabb', font: { size: 22 } },
+      title: { display: false },
       tooltip: {
         callbacks: {
           label: (ctx: any) => {
@@ -191,19 +191,9 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
             type: 'line',
             xMin: currentIndex,
             xMax: currentIndex,
-            borderColor: '#fceabb',
-            borderDash: [10, 5],
-            borderWidth: 4,
-          },
-          label: {
-            type: 'label',
-            xValue: currentIndex,
-            yValue: 11,
-            content: `Current: ${currentYear}`,
-            backgroundColor: '#fceabb',
-            color: '#000',
-            font: { size: 14, weight: 'bold' },
-            padding: 8,
+            borderColor: 'rgba(200,168,75,0.55)',
+            borderDash: [6, 4],
+            borderWidth: 2,
           },
         },
       },
@@ -211,11 +201,11 @@ export const PersonalYearChart: React.FC<PersonalYearChartProps> = ({
   };
 
   return (
-    <div className="glass-card p-6 rounded-2xl bg-[#0f0f1e]">
-      <div style={{ height: '520px' }}>
+    <div className="glass-card p-6 rounded-2xl bg-[#09101e]/80">
+      <div style={{ height: '400px' }}>
         <Line ref={chartRef} data={chartData} options={options} />
       </div>
-      <p className="text-sm text-purple-200/80 text-center mt-4 italic">
+      <p className="text-[0.6rem] font-cinzel text-purple-200/80 text-center mt-4 italic uppercase tracking-widest">
         Personal Years cycle 1–9 • Click point for meaning
       </p>
     </div>

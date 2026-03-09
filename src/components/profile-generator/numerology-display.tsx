@@ -18,9 +18,9 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
     >
         <div className="flex items-center gap-2 text-purple-200/80">
             {icon}
-            <p className="text-base font-medium">{title}</p>
+            <p className="text-[0.6rem] font-cinzel uppercase tracking-widest">{title}</p>
         </div>
-        <p className="text-5xl font-bold text-yellow-300 mt-2">{value || ''}</p>
+        <p className="text-5xl font-bold text-yellow-300 mt-2 font-decorative shadow-yellow-500/20 drop-shadow-lg">{value || ''}</p>
     </div>
 );
 
@@ -32,11 +32,11 @@ const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string
             <Accordion type="single" collapsible className="w-full" value={open ? id : ""} onValueChange={onToggle}>
                 <AccordionItem value={id} className="glass-card px-4">
                     <AccordionTrigger>
-                        <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                        <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             {icon || <Wand2 className="h-5 w-5" />} {title}
                         </span>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="font-body text-base leading-relaxed">
                        <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
@@ -56,11 +56,11 @@ const PsychicMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
             <Accordion type="single" collapsible className="w-full" value={open ? `psychic-${number}`: ''} onValueChange={onToggle}>
                 <AccordionItem value={`psychic-${number}`} className="border-b-0">
                     <AccordionTrigger>
-                        <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
+                        <h3 className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             <BookUser className="h-5 w-5" /> Psychic Number {number}: {title}
                         </h3>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="font-body text-base leading-relaxed">
                         <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
@@ -78,11 +78,11 @@ const SpecialTraitDisplay = React.forwardRef<HTMLDivElement, { number: number, m
             <Accordion type="single" collapsible className="w-full" value={open ? `special-trait-${number}` : ""} onValueChange={onToggle}>
                 <AccordionItem value={`special-trait-${number}`} className="glass-card px-4">
                     <AccordionTrigger>
-                        <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                        <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             <Star className="h-5 w-5" /> Special Trait of Birth Day {number}
                         </span>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="font-body text-base leading-relaxed">
                        <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
@@ -101,11 +101,11 @@ const DestinyMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
             <Accordion type="single" collapsible className="w-full" value={open ? `destiny-${number}`: ''} onValueChange={onToggle}>
                 <AccordionItem value={`destiny-${number}`} className="border-b-0">
                     <AccordionTrigger>
-                        <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
+                        <h3 className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             <Star className="h-5 w-5" /> Destiny Number {number}: {title}
                         </h3>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="font-body text-base leading-relaxed">
                         <AccordionContentWithPlayer text={meaning} />
                     </AccordionContent>
                 </AccordionItem>
@@ -123,9 +123,9 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
         return (
             <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
                 <AccordionTrigger>
-                    <span className="text-left">Arrow of {type}: {arrow.name}</span>
+                    <span className="text-left font-cinzel text-[0.7rem] uppercase tracking-wider">Arrow of {type}: {arrow.name}</span>
                 </AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="font-body text-base leading-relaxed">
                    <AccordionContentWithPlayer text={arrow.description} />
                 </AccordionContent>
             </AccordionItem>
@@ -134,10 +134,13 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
 
     return (
         <div className="glass-card p-4 space-y-3" ref={ref}>
-             <h3 className="font-semibold text-lg text-primary mb-2 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                Arrows of Power
-            </h3>
+             <div className="flex items-center gap-4 mb-4">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                <h3 className="font-cinzel font-semibold text-[0.75rem] text-primary flex items-center gap-2 uppercase tracking-[0.3em]">
+                    <Activity className="h-4 w-4" /> Arrows of Power
+                </h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            </div>
             <Accordion type="multiple" className="w-full space-y-1" value={openItems} onValueChange={onToggle}>
                  {arrowsOfStrength.map(arrow => <ArrowItem key={arrow.name} arrow={arrow} type="Strength" />)}
                  {arrowsOfWeakness.map(arrow => <ArrowItem key={arrow.name} arrow={arrow} type="Weakness" />)}
@@ -156,16 +159,40 @@ const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: 
                 <Accordion type="single" collapsible value={open ? 'kua-section' : ''} onValueChange={onToggle}>
                     <AccordionItem value="kua-section" className="border-none">
                          <div className="glass-card p-4 space-y-3 mt-4">
-                            <h3 className="font-semibold text-lg text-primary mb-2">Feng Shui Compass</h3>
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                                <h3 className="font-cinzel font-semibold text-[0.75rem] text-primary uppercase tracking-[0.3em]">Feng Shui Compass</h3>
+                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                            </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-sm">
-                                <div><p className="text-purple-200/70 text-xs">Success</p><p>{kuaAttributes.directions.Success}</p></div>
-                                <div><p className="text-purple-200/70 text-xs">Health</p><p>{kuaAttributes.directions.Health}</p></div>
-                                <div><p className="text-purple-200/70 text-xs">Family</p><p>{kuaAttributes.directions.Family}</p></div>
-                                <div><p className="text-purple-200/70 text-xs">Personal Growth</p><p>{kuaAttributes.directions['Personal-Growth']}</p></div>
+                                <div className="p-2 bg-white/5 rounded-lg">
+                                    <p className="font-cinzel text-purple-200/70 text-[0.55rem] uppercase tracking-widest mb-1">Success</p>
+                                    <p className="font-body text-sm font-bold text-yellow-300">{kuaAttributes.directions.Success}</p>
+                                </div>
+                                <div className="p-2 bg-white/5 rounded-lg">
+                                    <p className="font-cinzel text-purple-200/70 text-[0.55rem] uppercase tracking-widest mb-1">Health</p>
+                                    <p className="font-body text-sm font-bold text-yellow-300">{kuaAttributes.directions.Health}</p>
+                                </div>
+                                <div className="p-2 bg-white/5 rounded-lg">
+                                    <p className="font-cinzel text-purple-200/70 text-[0.55rem] uppercase tracking-widest mb-1">Family</p>
+                                    <p className="font-body text-sm font-bold text-yellow-300">{kuaAttributes.directions.Family}</p>
+                                </div>
+                                <div className="p-2 bg-white/5 rounded-lg">
+                                    <p className="font-cinzel text-purple-200/70 text-[0.55rem] uppercase tracking-widest mb-1">Growth</p>
+                                    <p className="font-body text-sm font-bold text-yellow-300">{kuaAttributes.directions['Personal-Growth']}</p>
+                                </div>
                             </div>
                              <div className="grid grid-cols-2 gap-2 text-center text-sm pt-2">
-                                <div><p className="text-purple-200/70 text-xs">Element</p><p>{kuaAttributes.element}</p></div>
-                                <div><p className="text-purple-200/70 text-xs">Lucky Colors</p><p>{kuaAttributes.lucky_colours?.join(', ')}</p></div>
+                                <div className="p-2 bg-white/5 rounded-lg">
+                                    <p className="font-cinzel text-purple-200/70 text-[0.55rem] uppercase tracking-widest mb-1">Element</p>
+                                    <p className="font-body text-sm">{kuaAttributes.element}</p>
+                                </div>
+                                <div className="p-2 bg-white/5 rounded-lg">
+                                    <p className="font-cinzel text-purple-200/70 text-[0.55rem] uppercase tracking-widest mb-1">Lucky Colors</p>
+                                    <div className="flex items-center justify-center gap-2 mt-1">
+                                        <p className="font-body text-sm">{kuaAttributes.lucky_colours?.join(', ')}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </AccordionItem>
@@ -299,6 +326,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         transition={{ duration: 0.7 }}
         className="mt-10"
       >
+        <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <h2 className="font-cinzel font-semibold text-[0.75rem] text-primary uppercase tracking-[0.3em]">Personal Year Cycle</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        </div>
         <PersonalYearChart
           birthDay={birthDay}
           birthMonth={birthMonth}
@@ -320,11 +352,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
               <Accordion type="single" collapsible defaultValue="personal-year-detail" value={selectedPersonalYear ? "personal-year-detail" : ""}>
                 <AccordionItem value="personal-year-detail">
                   <AccordionTrigger>
-                    <span className="font-semibold text-lg text-primary flex items-center gap-2">
+                    <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                       <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent>
+                  <AccordionContent className="font-body text-base leading-relaxed">
                     <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
                   </AccordionContent>
                 </AccordionItem>
