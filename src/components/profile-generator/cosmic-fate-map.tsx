@@ -13,6 +13,7 @@ import { CONVERGENCE_CARDS } from '@/lib/cosmic-fate/convergence';
 import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { INTERSECTION_SYNTHESIS } from '@/lib/cosmic-fate/intersections';
 import { CHINESE_CALENDAR } from '@/lib/new-astrology/chinese-calendar';
+import { BOOK } from '@/lib/cosmic-fate/book';
 
 interface Props {
   birthDay: number;
@@ -139,19 +140,16 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       else cNum = c4;
 
       const birthSign = getAnimalForDate(birthDay, birthMonth, birthYear);
-      // We take the animal that starts in the selected "Read Year" for the year status
-      const yearAnimalName = getAnimalForDate(15, 6, ry); // Mid-year check for general year sign
+      const yearAnimalName = getAnimalForDate(15, 6, ry); 
       const ya = ZOO[yearAnimalName];
       const cat = getCategory(birthSign, yearAnimalName);
 
-      // Core Chips
       document.getElementById('core-strip')!.innerHTML = `
         <div class="core-chip hl-py"> <div class="core-chip-label">Personal Year ${ry}</div> <div class="core-chip-num">${py}</div> <div class="core-chip-name">${YD[py]?.title}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Life Path</div> <div class="core-chip-num" style="color:var(--cf-jade-bright)">${lp}</div> <div class="core-chip-name">${lpName(lp)}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> 
         <div class="core-chip"> <div class="core-chip-label">Birth Vibration</div> <div class="core-chip-num" style="color:#de78a0">${bv}</div> <div class="core-chip-name">${lpName(bv)}</div> </div>`;
 
-      // Alert Banner
       const ab = document.getElementById('alert-banner')!;
       let alertText = '';
       if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency. Decisions made now have double the impact, as you are swimming with the current of the world's current evolutionary requirements.`;
@@ -165,7 +163,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         ab.classList.remove('visible'); 
       }
 
-      // Verbatim Synthesis Construction
       const yr = YD[py];
       const lpRelationText = (py === lp) ? "exceptional harmony" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
       const lpInteractionText = (py === lp) ? "match" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "creates notable friction with" : "and";
@@ -177,7 +174,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <div class="section-header">✦ &nbsp; Your ${ry} Reading — Oracle Synthesis &nbsp; ✦</div>
         <div id="synthesis-text" class="cp">${synthText}</div>`;
 
-      // Year Dive
       const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
       document.getElementById('year-dive-container')!.innerHTML = `
         <div class="year-deep-dive">
@@ -205,7 +201,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           </div>
         </div>`;
 
-      // Intersections
       const intersections = [];
       for (let y = ry; y <= ry + 30; y++) {
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
@@ -216,11 +211,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
           
           let statusLabel = `◦ Critical Personal Year ${pyn} in ${yearAni} Year`;
-          let statusColor = 'var(--cf-silver-dim)';
           let badge = '';
           if (isNegative) {
             badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-amber)">🟠 HIGH TENSION — ${getStatusLabelShort(iCat)} Year + Critical Personal Year</div>`;
-            statusColor = 'var(--cf-amber)';
           } else {
             badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-silver-dim)">◦ Critical Personal Year ${pyn} in ${yearAni} Year</div>`;
           }
@@ -250,7 +243,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
         <div class="px-2" id="personal-intersections-list">${intersections.join('')}</div>`;
 
-      // Zodiac Trajectory - 2 Column Mirror Grid
       let zHtml = '<div class="zodiac-grid grid grid-cols-2 gap-3 px-2">';
       for (let y = ry; y <= ry + 11; y++) {
         const yearAni = getAnimalForDate(15, 6, y);
@@ -258,13 +250,13 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
         
         let labelColor = 'var(--cf-text-dim)';
-        if (pyn === 7 && zCat === 'clash') labelColor = '#b91c1c'; // Deep Red
-        else if ((pyn === 1 || pyn === 9) && zCat === 'alliance') labelColor = '#065f46'; // Deep Green
-        else if (zCat === 'alliance') labelColor = '#34d399'; // Emerald
-        else if (zCat === 'harm') labelColor = '#fbbf24'; // Amber
-        else if (zCat === 'ben') labelColor = '#c8a84b'; // Gold
-        else if (zCat === 'destruction') labelColor = '#a78bfa'; // Purple
-        else if (zCat === 'clash') labelColor = '#f87171'; // Red
+        if (pyn === 7 && zCat === 'clash') labelColor = '#b91c1c'; 
+        else if ((pyn === 1 || pyn === 9) && zCat === 'alliance') labelColor = '#065f46'; 
+        else if (zCat === 'alliance') labelColor = '#34d399'; 
+        else if (zCat === 'harm') labelColor = '#fbbf24'; 
+        else if (zCat === 'ben') labelColor = '#c8a84b'; 
+        else if (zCat === 'destruction') labelColor = '#a78bfa'; 
+        else if (zCat === 'clash') labelColor = '#f87171'; 
 
         zHtml += `<div class="zc flex flex-col items-center justify-center p-6 bg-slate-900/40 border border-white/5 rounded-2xl text-center" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
           <div class="text-4xl mb-3">${ZOO[yearAni].e}</div>
@@ -274,10 +266,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         </div>`;
       }
       document.getElementById('zodiac-container')!.innerHTML = `
-        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'zodiac-container')">🔊 Read Aloud List</button>
-        <div class="section-header">☯ &nbsp; ZODIAC TRAJECTORY &nbsp; ☯</div>` + zHtml + '</div>';
+        <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'zodiac-list-wrapper')">🔊 Read Aloud List</button>
+        <div class="section-header">☯ &nbsp; ZODIAC TRAJECTORY &nbsp; ☯</div><div id="zodiac-list-wrapper">` + zHtml + '</div></div>';
 
-      // Pinnacles
       const pStages = [
         { n: 1, p: p1, c: c1, label: `Birth - Age ${p1end}`, active: age <= p1end },
         { n: 2, p: p2, c: c2, label: `Age ${p1end+1} - ${p2end}`, active: age > p1end && age <= p2end },
@@ -310,10 +301,9 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
         <div id="pinnacles-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">${pCards}</div>`;
 
-      // Convergence
-      let cHtml = '';
+      let convHtml = '';
       CONVERGENCE_CARDS.forEach(c => {
-        cHtml += `
+        convHtml += `
           <div class="conv-card mb-8"> 
             <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'conv-text-${c.year}')">🔊 Read Aloud</button> 
             <div class="conv-header p-6 bg-primary/10 border-b border-primary/20"> 
@@ -331,7 +321,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             </div> 
           </div>`;
       });
-      document.getElementById('convergence-cards')!.innerHTML = `<div class="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>` + cHtml;
+      document.getElementById('convergence-cards')!.innerHTML = `<div class="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>` + convHtml;
 
       document.getElementById('result-area')!.classList.remove('result-hidden');
     };
@@ -415,13 +405,18 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const dyn = ba[`${cat}Desc`] || ba[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `This ${year} ${aniName} year is a Neutral period for ${birthSign}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for foundation-building, skill development, and relationship refinement that will serve as a stable platform for the years that follow.`;
       
       const labelColor = (cat === 'clash') ? '#f87171' : (cat === 'alliance') ? '#34d399' : (cat === 'harm') ? '#fbbf24' : (cat === 'ben') ? '#c8a84b' : (cat === 'destruction') ? '#a78bfa' : 'var(--cf-silver-dim)';
+      const catDef = BOOK.categories[cat === 'destruction' ? 'destruction' : cat] || '';
 
       document.getElementById('pb')!.innerHTML = `
         <button class="tts-btn mb-6 w-full" onclick="window.ttsPlay(this, 'pb-content')">🔊 Read Aloud</button> 
         <div id="pb-content">
           <div class="ibox mb-6"><strong>${year} (${aniName} Year, Age ${age})</strong> — Tai Sui: <span style="color:${labelColor}">${catLabel(cat)}</span></div> 
+          
+          ${catDef ? `<div class="sbox mb-6 text-sm" style="border-left-color:${labelColor}">${catDef}</div>` : ''}
+
           <div class="content-h mb-3 uppercase tracking-widest text-xs opacity-60">YOUR ${birthSign.toUpperCase()} IN ${aniName.toUpperCase()} YEAR</div> 
           ${dyn.split('\n\n').map(p=>`<p class="cp mb-4 text-sm leading-relaxed">${p}</p>`).join('')} 
+          
           <div class="content-h mt-8 mb-3 uppercase tracking-widest text-xs opacity-60">${aniName.toUpperCase()} YEAR QUALITIES</div> 
           <p class="cp text-sm">${ya.trait}. Health focus: ${ya.organ}. Direction: ${ya.dir}.</p>
         </div>`;
