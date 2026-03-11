@@ -9,7 +9,7 @@ import { AccordionContentWithPlayer } from '@/components/profile-generator/accor
 // Props for the LoShuGrid component
 interface LoShuGridProps {
   gridData: (string | null)[][];
-  arrows: (ArrowData & { type: 'strength' | 'weakness' })[];
+  arrows: (ArrowData & { type: 'strength' | 'weakness' | 'shadow' })[];
   numberCounts: { [key: string]: number };
   repeatedNumberMeanings: { [key: string]: string };
   onArrowClick?: (arrowName: string) => void;
@@ -52,9 +52,7 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
   }
   
   const getPathKeyForArrow = (arrow: ArrowData) => {
-    // Sort numbers to create a consistent key (e.g., 8-1-6 becomes 1-6-8)
-    const sortedNumbers = [...arrow.numbers].sort((a, b) => a - b).join('-');
-    // Find a key in ARROW_PATHS that contains the same numbers
+    // Only return path keys for straight lines defined in ARROW_PATHS
     const directMatch = Object.keys(ARROW_PATHS).find(key => {
         const keyNumbers = new Set(key.split('-').map(Number));
         const arrowNumbers = new Set(arrow.numbers);
@@ -116,7 +114,6 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
 
 
   return (
-    // The main container that establishes the coordinate system for the overlay
     <div className="relative aspect-square w-full max-w-[400px] mx-auto glass-card p-4">
         <div className="flex items-center gap-4 mb-4">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -127,12 +124,10 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
       
-      {/* 1. The Grid of Numbers (the base layer) */}
       <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2">
         {gridOrder.map((gridNum, index) => renderCell(gridNum, index))}
       </div>
 
-      {/* 2. The SVG Overlay for drawing arrows (sits on top of the grid) */}
       <svg
         className="absolute top-0 left-0 w-full h-full p-4 pointer-events-none"
         viewBox="0 0 100 100"
@@ -159,9 +154,9 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
                 <marker
                   id={markerId}
                   viewBox="0 0 10 10"
-                  refX="5" // Center the arrowhead on the line end
+                  refX="5"
                   refY="5"
-                  markerWidth="5" // Smaller arrowhead
+                  markerWidth="5"
                   markerHeight="5"
                   orient="auto-start-reverse"
                 >
@@ -172,7 +167,6 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
           })}
         </defs>
 
-        {/* Render the unified, animated lines */}
         {arrows.map((arrow, index) => {
           const pathKey = getPathKeyForArrow(arrow);
           if (!pathKey) return null;
@@ -196,12 +190,12 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
                     x1={pathInfo.x1} y1={pathInfo.y1}
                     x2={pathInfo.x2} y2={pathInfo.y2}
                     stroke={`url(#${gradientId})`}
-                    strokeWidth="1.5" // Thinner line
+                    strokeWidth="1.5"
                     strokeLinecap="round"
                     markerEnd={`url(#${markerId})`}
                     style={{
                         animation: `arrow-pulse 4s infinite ${index * 0.3}s ease-in-out`,
-                        strokeDasharray: isStrength ? 'none' : '3 3' // More subtle dash for weakness
+                        strokeDasharray: isStrength ? 'none' : '3 3'
                     }}
                 />
             </g>

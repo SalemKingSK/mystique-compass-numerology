@@ -4,7 +4,7 @@
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
-import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star, Activity } from "lucide-react";
+import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star, Activity, ChevronRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -117,13 +117,21 @@ DestinyMeaningDisplay.displayName = 'DestinyMeaningDisplay';
 
 const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: ArrowData[], arrowsOfWeakness: ArrowData[], openItems: string[], onToggle: (value: string[]) => void }>(
     ({ arrowsOfStrength, arrowsOfWeakness, openItems, onToggle }, ref) => {
-    if (arrowsOfStrength.length === 0 && arrowsOfWeakness.length === 0) return null;
+    
+    const categories = Array.from(new Set([
+        ...arrowsOfStrength.map(a => a.category),
+        ...arrowsOfWeakness.map(a => a.category)
+    ])).filter(Boolean);
 
-    const ArrowItem = ({ arrow, type }: { arrow: ArrowData, type: 'Strength' | 'Weakness' }) => {
+    const renderArrowItem = (arrow: ArrowData) => {
+        const isShadow = arrow.type === 'shadow' || arrow.type === 'weakness';
         return (
-            <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4">
+            <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4 mb-1">
                 <AccordionTrigger>
-                    <span className="text-left font-cinzel text-[0.7rem] uppercase tracking-wider">Arrow of {type}: {arrow.name}</span>
+                    <span className={`text-left font-cinzel text-[0.7rem] uppercase tracking-wider flex items-center gap-2 ${isShadow ? 'text-rose-400' : 'text-emerald-400'}`}>
+                        {isShadow ? <ChevronRight className="h-3 w-3 rotate-90" /> : <ChevronRight className="h-3 w-3" />}
+                        {arrow.name}
+                    </span>
                 </AccordionTrigger>
                 <AccordionContent className="font-body text-base leading-relaxed">
                    <AccordionContentWithPlayer text={arrow.description} />
@@ -133,18 +141,27 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
     }
 
     return (
-        <div className="glass-card p-4 space-y-3" ref={ref}>
-             <div className="flex items-center gap-4 mb-4">
+        <div className="glass-card p-4 space-y-6" ref={ref}>
+             <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                 <h3 className="font-cinzel font-semibold text-[0.75rem] text-primary flex items-center gap-2 uppercase tracking-[0.3em]">
                     <Activity className="h-4 w-4" /> Arrows of Power
                 </h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
             </div>
-            <Accordion type="multiple" className="w-full space-y-1" value={openItems} onValueChange={onToggle}>
-                 {arrowsOfStrength.map(arrow => <ArrowItem key={arrow.name} arrow={arrow} type="Strength" />)}
-                 {arrowsOfWeakness.map(arrow => <ArrowItem key={arrow.name} arrow={arrow} type="Weakness" />)}
-            </Accordion>
+
+            {categories.map(cat => (
+                <div key={cat} className="space-y-2">
+                    <h4 className="font-cinzel text-[0.6rem] text-muted-foreground uppercase tracking-[0.2em] mb-2 px-2 border-l border-primary/30">
+                        {cat}
+                    </h4>
+                    <Accordion type="multiple" className="w-full" value={openItems} onValueChange={onToggle}>
+                        {[...arrowsOfStrength, ...arrowsOfWeakness]
+                            .filter(a => a.category === cat)
+                            .map(renderArrowItem)}
+                    </Accordion>
+                </div>
+            ))}
         </div>
     );
 });
@@ -294,7 +311,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-20">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={handlePsycheClick} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
@@ -311,9 +328,9 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             repeatedNumberMeanings={repeatedNumberMeanings}
         />
         <LoShuGrid
-            title="Lo Shu Grid - Arrows"
+            title="Lo Shu Grid - Planes"
             gridData={loShuGrid}
-            arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'weakness' as const}))]}
+            arrows={[...arrowsOfStrength.map(a => ({ ...a, type: 'strength' as const})), ...arrowsOfWeakness.map(a => ({ ...a, type: 'shadow' as const}))]}
             onArrowClick={handleArrowClick}
             numberCounts={numberCounts}
             repeatedNumberMeanings={repeatedNumberMeanings}

@@ -8,7 +8,12 @@ import {
   REPEATED_NUMBER_MEANINGS,
   lindaGoodmanMeanings
 } from './numerology/data';
-import { ARROWS_OF_STRENGTH, ARROWS_OF_WEAKNESS } from './numerology/data/arrowMeanings';
+import { 
+  PRIMARY_PLANES, 
+  SECONDARY_ARROWS, 
+  DEFICIENCY_ARROWS, 
+  MINOR_ARROWS 
+} from './numerology/data/arrowMeanings';
 
 // --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
@@ -46,8 +51,6 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
 };
 
 export const calculateKua = (year: number, gender: string): number => {
-  
-  // 1. Helper function to reduce any number to a single digit
   const reduceToSingleDigit = (n: number): number => {
     if (n <= 9) return n;
     const sum = n.toString()
@@ -80,7 +83,10 @@ export interface ArrowData {
     name: string;
     description: string;
     numbers: number[];
+    category?: string;
+    type?: 'strength' | 'weakness' | 'shadow';
 }
+
 export interface NumerologyData {
   birthDay: number;
   birthMonth: number;
@@ -154,11 +160,9 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
                        String(month).split('').reduce((a, b) => a + Number(b), 0) +
                        String(year).split('').reduce((a, b) => a + Number(b), 0);
   
-  // Compound Fate Logic: Hide if single digit (< 10) or meaning is missing
   const compoundNum = (birthDateSum >= 10 && COMPOUND_NUMBER_MEANINGS[birthDateSum as keyof typeof COMPOUND_NUMBER_MEANINGS]) ? birthDateSum : null;
   const compoundMeaning = compoundNum ? COMPOUND_NUMBER_MEANINGS[compoundNum as keyof typeof COMPOUND_NUMBER_MEANINGS] : null;
   
-  // Inherent Fate Logic: Hide if single digit or meaning is missing
   const firstReduction = reduceOnce(birthDateSum);
   let reducedCompoundNum: number | null = null;
   let reducedCompoundMeaning: string | null = null;
@@ -168,7 +172,6 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
       reducedCompoundMeaning = COMPOUND_NUMBER_MEANINGS[firstReduction as keyof typeof COMPOUND_NUMBER_MEANINGS];
   }
   
-  // Karmic Fate Logic: Hide if single digit or meaning is missing
   const rawKarmicSum = day + month + year;
   const karmicCandidate = String(rawKarmicSum).split('').reduce((a, b) => a + Number(b), 0);
   const karmicFateNum = (karmicCandidate >= 10 && lindaGoodmanMeanings[karmicCandidate]) ? karmicCandidate : null;
@@ -186,17 +189,78 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
         }
     });
 
-    for (const arrow of ARROWS_OF_STRENGTH) {
+    // 1. Primary Planes (Strengths and Shadows)
+    for (const arrow of PRIMARY_PLANES) {
         if (arrow.numbers.every(n => presentNumbers.has(n))) {
-            strength.push(arrow);
+            strength.push({
+                name: arrow.name,
+                description: `${arrow.strength}${arrow.additional ? '\n\n' + arrow.additional : ''}`,
+                numbers: arrow.numbers,
+                category: "Primary Plane",
+                type: 'strength'
+            });
+        } else if (arrow.numbers.every(n => !presentNumbers.has(n))) {
+            weakness.push({
+                name: arrow.name + " (Shadow Side)",
+                description: arrow.shadow || "",
+                numbers: arrow.numbers,
+                category: "Primary Shadow",
+                type: 'shadow'
+            });
         }
     }
 
-    for (const arrow of ARROWS_OF_WEAKNESS) {
-        if (arrow.numbers.every(n => !presentNumbers.has(n))) {
-            weakness.push(arrow);
+    // 2. Secondary Arrows
+    for (const arrow of SECONDARY_ARROWS) {
+        if (arrow.numbers.every(n => presentNumbers.has(n))) {
+            strength.push({
+                name: arrow.name,
+                description: arrow.strength,
+                numbers: arrow.numbers,
+                category: "Secondary Arrow",
+                type: 'strength'
+            });
         }
     }
+
+    // 3. Deficiency Arrows
+    for (const arrow of DEFICIENCY_ARROWS) {
+        if (arrow.numbers.every(n => !presentNumbers.has(n))) {
+            weakness.push({
+                name: arrow.name,
+                description: arrow.desc,
+                numbers: arrow.numbers,
+                category: "Deficiency",
+                type: 'weakness'
+            });
+        }
+    }
+
+    // 4. Minor Arrows
+    for (const arrow of MINOR_ARROWS) {
+        if (arrow.numbers.every(n => presentNumbers.has(n))) {
+            strength.push({
+                name: arrow.name,
+                description: arrow.desc,
+                numbers: arrow.numbers,
+                category: "Minor Arrow",
+                type: 'strength'
+            });
+        }
+    }
+
+    // 5. Special Configs
+    const allNumbers = [1,2,3,4,5,6,7,8,9];
+    if (allNumbers.every(n => presentNumbers.has(n))) {
+        strength.push({
+            name: "The King’s Arrow / Arrow of Perfection",
+            description: "Rarely found, this indicates a person who has 'brought everything with them' into this life. They have the mental, emotional, and physical tools to handle any situation. However, this often leads to a very busy, demanding life as they are expected to do everything. The challenge for the King's Arrow is a lack of focus; because they are good at everything, they may struggle to choose one path.",
+            numbers: allNumbers,
+            category: "Rare Configuration",
+            type: 'strength'
+        });
+    }
+
     return { strength, weakness };
   }
 
@@ -214,7 +278,6 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const psychicMeaning = PSYCHIC_NUMBER_MEANINGS[psycheNum as keyof typeof PSYCHIC_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this psychic number.'};
   const destinyMeaning = DESTINY_NUMBER_MEANINGS[destinyNum as keyof typeof DESTINY_NUMBER_MEANINGS] || { title: 'Unknown', description: 'No specific meaning available for this destiny number.'};
   
-  // Special Trait of Birth Day applies only to compound birth days (10-31)
   const specialTraitMeaning = (day >= 10 && day <= 31) 
     ? (COMPOUND_NUMBER_MEANINGS[day as keyof typeof COMPOUND_NUMBER_MEANINGS] || null) 
     : null;
