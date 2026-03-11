@@ -30,7 +30,7 @@ const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string
     return (
         <div ref={ref}>
             <Accordion type="single" collapsible className="w-full" value={open ? id : ""} onValueChange={onToggle}>
-                <AccordionItem value={id} className="glass-card px-4">
+                <AccordionItem value={id} className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
                     <AccordionTrigger>
                         <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             {icon || <Wand2 className="h-5 w-5" />} {title}
@@ -54,7 +54,7 @@ const PsychicMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
     return (
         <div className="glass-card p-4 space-y-3" ref={ref}>
             <Accordion type="single" collapsible className="w-full" value={open ? `psychic-${number}`: ''} onValueChange={onToggle}>
-                <AccordionItem value={`psychic-${number}`} className="border-b-0">
+                <AccordionItem value={`psychic-${number}`} className="border-b-0 border-l-[3px] border-l-[#c8a84b]/40 pl-4">
                     <AccordionTrigger>
                         <h3 className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             <BookUser className="h-5 w-5" /> Psychic Number {number}: {title}
@@ -76,7 +76,7 @@ const SpecialTraitDisplay = React.forwardRef<HTMLDivElement, { number: number, m
     return (
         <div ref={ref}>
             <Accordion type="single" collapsible className="w-full" value={open ? `special-trait-${number}` : ""} onValueChange={onToggle}>
-                <AccordionItem value={`special-trait-${number}`} className="glass-card px-4">
+                <AccordionItem value={`special-trait-${number}`} className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
                     <AccordionTrigger>
                         <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             <Star className="h-5 w-5" /> Special Trait of Birth Day {number}
@@ -99,7 +99,7 @@ const DestinyMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
     return (
         <div className="glass-card p-4 space-y-3" ref={ref}>
             <Accordion type="single" collapsible className="w-full" value={open ? `destiny-${number}`: ''} onValueChange={onToggle}>
-                <AccordionItem value={`destiny-${number}`} className="border-b-0">
+                <AccordionItem value={`destiny-${number}`} className="border-b-0 border-l-[3px] border-l-[#c8a84b]/40 pl-4">
                     <AccordionTrigger>
                         <h3 className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
                             <Star className="h-5 w-5" /> Destiny Number {number}: {title}
@@ -126,11 +126,11 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
     const renderArrowItem = (arrow: ArrowData) => {
         const isShadow = arrow.type === 'shadow' || arrow.type === 'weakness';
         return (
-            <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4 mb-1">
+            <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4 mb-1 border-l-[3px] border-l-[#c8a84b]/40">
                 <AccordionTrigger>
                     <span className={`text-left font-cinzel text-[0.7rem] uppercase tracking-wider flex items-center gap-2 ${isShadow ? 'text-rose-400' : 'text-emerald-400'}`}>
                         {isShadow ? <ChevronRight className="h-3 w-3 rotate-90" /> : <ChevronRight className="h-3 w-3" />}
-                        {arrow.name}
+                        {arrow.name} ({arrow.numbers.join('-')})
                     </span>
                 </AccordionTrigger>
                 <AccordionContent className="font-body text-base leading-relaxed">
@@ -365,7 +365,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             transition={{ duration: 0.4 }}
             className="mt-6"
           >
-            <div className="glass-card px-4">
+            <div className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
               <Accordion type="single" collapsible defaultValue="personal-year-detail" value={selectedPersonalYear ? "personal-year-detail" : ""}>
                 <AccordionItem value="personal-year-detail">
                   <AccordionTrigger>
