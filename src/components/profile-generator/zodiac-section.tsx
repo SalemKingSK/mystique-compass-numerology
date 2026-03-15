@@ -47,30 +47,35 @@ const getAnimalForDate = (d: number, m: number, y: number) => {
 const getCategory = (birthSign: string, yearSign: string) => {
   if (birthSign === yearSign) return 'ben';
   
+  // CLASH PAIRS
   const clashes = [
     ['Rat', 'Horse'], ['Ox', 'Goat'], ['Tiger', 'Monkey'],
     ['Rabbit', 'Rooster'], ['Dragon', 'Dog'], ['Snake', 'Pig']
   ];
   if (clashes.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'clash';
 
+  // HARM PAIRS
   const harms = [
     ['Rat', 'Goat'], ['Ox', 'Horse'], ['Tiger', 'Snake'],
     ['Rabbit', 'Dragon'], ['Monkey', 'Pig'], ['Rooster', 'Dog']
   ];
   if (harms.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'harm';
 
+  // DESTRUCTION PAIRS
   const destructions = [
     ['Rat', 'Rooster'], ['Ox', 'Dragon'], ['Tiger', 'Pig'],
     ['Rabbit', 'Horse'], ['Goat', 'Dog'], ['Monkey', 'Snake']
   ];
   if (destructions.some(p => (p[0] === birthSign && p[1] === yearSign) || (p[1] === birthSign && p[0] === yearSign))) return 'destruction';
 
+  // SAN HE TRIANGLES
   const sanHe = [
     ['Tiger', 'Horse', 'Dog'], ['Monkey', 'Rat', 'Dragon'],
     ['Pig', 'Rabbit', 'Goat'], ['Snake', 'Rooster', 'Ox']
   ];
   if (sanHe.some(triad => triad.includes(birthSign) && triad.includes(yearSign))) return 'alliance';
 
+  // LIU HE PAIRS
   const liuHe = [
     ['Rat', 'Ox'], ['Tiger', 'Pig'], ['Rabbit', 'Dog'],
     ['Dragon', 'Rooster'], ['Snake', 'Monkey'], ['Horse', 'Goat']
@@ -137,33 +142,49 @@ export function ZodiacSection({ birthDay, birthMonth, birthYear }: ZodiacSection
     const pyColor = pyColors[pyn] || "#ffffff";
     const statusTag = getStatusLabelShort(category);
 
-    let cardStyle = "";
+    let cardStyles: React.CSSProperties = {};
     let badge = "";
     let statusColor = "rgba(120, 136, 160, 0.6)";
 
     if (state === 1) {
-      cardStyle = "background: linear-gradient(140deg, rgba(180,20,40,.35), rgba(7,13,28,.98)); border: 2px solid rgba(200,30,50,.7); box-shadow: 0 0 24px rgba(200,30,50,.4);";
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(180,20,40,.35), rgba(7,13,28,.98))",
+        border: "2px solid rgba(200,30,50,.7)",
+        boxShadow: "0 0 24px rgba(200,30,50,.4)"
+      };
       badge = `⚠ PY${pyn} + ${statusTag}`;
       statusColor = "#ef4444";
     } else if (state === 2) {
-      cardStyle = "background: linear-gradient(140deg, rgba(220,140,0,.2), rgba(7,13,28,.98)); border: 2px solid rgba(220,140,0,.6);";
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(220,140,0,.2), rgba(7,13,28,.98))",
+        border: "2px solid rgba(220,140,0,.6)"
+      };
       badge = "⭐ BEN MING + PY4/7";
       statusColor = "#f59e0b";
     } else if (state === 3) {
-      cardStyle = "background: linear-gradient(140deg, rgba(100,70,180,.18), rgba(7,13,28,.98)); border: 1px solid rgba(136,112,200,.45);";
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(100,70,180,.18), rgba(7,13,28,.98))",
+        border: "1px solid rgba(136,112,200,.45)"
+      };
       badge = `PY${pyn} CRITICAL`;
       statusColor = "#a78bfa";
     } else if (state === 4) {
-      cardStyle = "background: linear-gradient(140deg, rgba(50,160,90,.1), rgba(7,13,28,.95)); border: 1px solid rgba(50,160,90,.45);";
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(50,160,90,.1), rgba(7,13,28,.95))",
+        border: "1px solid rgba(50,160,90,.45)"
+      };
       statusColor = "#4daa78";
     } else {
-      cardStyle = "background: linear-gradient(140deg, rgba(14,24,46,.9), rgba(8,14,28,.95)); border: 1px solid rgba(200,168,75,.13);";
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(14,24,46,.9), rgba(8,14,28,.95))",
+        border: "1px solid rgba(200,168,75,.13)"
+      };
     }
 
     return (
       <div 
         key={year} 
-        style={{ ...Object.fromEntries(cardStyle.split(';').map(s => s.split(':').map(v => v?.trim())).filter(p => p.length === 2)) }}
+        style={cardStyles}
         className="flex flex-col items-center justify-center p-6 rounded-2xl text-center transition-all hover:scale-[1.02] cursor-pointer"
         onClick={() => setSelectedYear(item)}
       >
