@@ -5,6 +5,7 @@ import type { ArrowData } from '@/lib/numerology';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Layers } from 'lucide-react';
 import { AccordionContentWithPlayer } from '@/components/profile-generator/accordion-content-with-player';
+import LoshuNumberDetailPanel from '@/components/LoshuNumberDetailPanel';
 
 // Props for the LoShuGrid component
 interface LoShuGridProps {
@@ -14,6 +15,7 @@ interface LoShuGridProps {
   repeatedNumberMeanings: { [key: string]: string };
   onArrowClick?: (arrowName: string) => void;
   title: string;
+  birthDate: string;
 }
 
 const PLANETARY_LABELS: { [key: number]: string } = {
@@ -46,7 +48,7 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
 };
 
 
-export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, numberCounts, repeatedNumberMeanings }: LoShuGridProps) {
+export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, numberCounts, repeatedNumberMeanings, birthDate }: LoShuGridProps) {
   if (!gridData || gridData.length !== 3) {
     return <p className="font-body">Grid data is not available.</p>;
   }
@@ -69,14 +71,13 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
 
   const renderCell = (gridNum: number, index: number) => {
     const cell = gridData.flat().find(c => c?.startsWith(String(gridNum)));
-    const count = numberCounts[String(gridNum)];
-    const meaningKey = count ? `${gridNum}_${Math.min(count, 5)}` : null;
-    const meaning = meaningKey ? repeatedNumberMeanings[meaningKey] : null;
-    const isClickable = !!cell && !!meaning;
+    const count = numberCounts[String(gridNum)] || 0;
+    const meaning = repeatedNumberMeanings[`${gridNum}_${Math.min(count || 1, 5)}`];
+    const isClickable = true; // Numbers are always clickable to show definitions
 
     const cellContent = (
       <div
-        className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-white/90 p-2 aspect-square ${isClickable ? 'cursor-pointer transition-all duration-300 hover:bg-purple-500/20' : ''}`}
+        className={`flex flex-col items-center justify-center bg-black/20 rounded-lg text-white/90 p-2 aspect-square cursor-pointer transition-all duration-300 hover:bg-purple-500/20`}
       >
         <div className="flex-grow flex items-center justify-center">
             {cell ? (
@@ -91,25 +92,31 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
       </div>
     );
 
-    if (isClickable) {
-      return (
-        <Popover key={index}>
-          <PopoverTrigger asChild>{cellContent}</PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="space-y-2">
-              <h4 className="font-cinzel font-semibold text-[0.8rem] text-primary mb-2 flex items-center gap-2 uppercase tracking-widest">
-                <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count > 1 ? 's' : ''})
-              </h4>
-              <div className="font-body text-sm leading-relaxed">
-                <AccordionContentWithPlayer text={meaning!} />
-              </div>
+    return (
+      <Popover key={index}>
+        <PopoverTrigger asChild>{cellContent}</PopoverTrigger>
+        <PopoverContent className="w-80 max-h-[80vh] overflow-y-auto">
+          <div className="space-y-4">
+            <h4 className="font-cinzel font-semibold text-[0.8rem] text-primary mb-2 flex items-center gap-2 uppercase tracking-widest">
+              <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count !== 1 ? 's' : ''})
+            </h4>
+            
+            <div className="font-body text-sm leading-relaxed">
+              <AccordionContentWithPlayer text={meaning || `Number ${gridNum} represents foundational ${PLANETARY_LABELS[gridNum]} energy.`} />
             </div>
-          </PopoverContent>
-        </Popover>
-      );
-    }
 
-    return <div key={index}>{cellContent}</div>;
+            <div className="pt-4 border-t border-white/10">
+              <LoshuNumberDetailPanel
+                number={gridNum}
+                count={count}
+                existingMeaning={meaning || ""}
+                birthDate={birthDate}
+              />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
   }
 
 
@@ -146,10 +153,9 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
             return (
               <React.Fragment key={uniqueId}>
                 <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1={pathInfo.x1} y1={pathInfo.y1} x2={pathInfo.x2} y2={pathInfo.y2}>
-                  <stop offset="0%" stopColor="hsl(var(--color-quaternary-hsl))" />
-                  <stop offset="33%" stopColor="hsl(var(--color-primary-hsl))" />
-                  <stop offset="66%" stopColor="hsl(var(--color-secondary-hsl))" />
-                  <stop offset="100%" stopColor="hsl(var(--color-tertiary-hsl))" />
+                  <stop offset="0%" stopColor="#ff00ff" />
+                  <stop offset="50%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#f472b6" />
                 </linearGradient>
                 <marker
                   id={markerId}

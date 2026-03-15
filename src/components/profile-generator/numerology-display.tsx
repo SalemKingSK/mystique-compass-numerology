@@ -311,6 +311,8 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const karmicId = `karmic-fate`;
     const kuaId = 'kua-section';
 
+    const birthDateString = `${birthDay}-${birthMonth}-${birthYear}`;
+
 
   return (
     <div className="space-y-4 pb-20">
@@ -328,6 +330,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             arrows={[]}
             numberCounts={numberCounts}
             repeatedNumberMeanings={repeatedNumberMeanings}
+            birthDate={birthDateString}
         />
         <LoShuGrid
             title="Lo Shu Grid - Planes"
@@ -336,6 +339,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             onArrowClick={handleArrowClick}
             numberCounts={numberCounts}
             repeatedNumberMeanings={repeatedNumberMeanings}
+            birthDate={birthDateString}
         />
       </div>
 
