@@ -3,8 +3,9 @@
 import React from 'react';
 import type { ArrowData } from '@/lib/numerology';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Layers } from 'lucide-react';
+import { Layers, X } from 'lucide-react';
 import LoshuNumberDetailPanel from '@/components/LoshuNumberDetailPanel';
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 // Props for the LoShuGrid component
 interface LoShuGridProps {
@@ -93,16 +94,20 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
     return (
       <Popover key={index}>
         <PopoverTrigger asChild>{cellContent}</PopoverTrigger>
-        <PopoverContent className="w-80 max-h-[80vh] overflow-y-auto">
+        <PopoverContent className="w-80 max-h-[80vh] overflow-y-auto relative">
+          <PopoverPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-primary">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </PopoverPrimitive.Close>
           <div className="space-y-4">
-            <h4 className="font-cinzel font-semibold text-[0.8rem] text-primary mb-2 flex items-center gap-2 uppercase tracking-widest">
+            <h4 className="font-cinzel font-semibold text-[0.8rem] text-primary mb-2 flex items-center gap-2 uppercase tracking-widest pr-8">
               <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count !== 1 ? 's' : ''})
             </h4>
             
             <LoshuNumberDetailPanel
               number={gridNum}
               count={count}
-              existingMeaning={meaning || `Number ${gridNum} represents foundational ${PLANETARY_LABELS[gridNum]} energy.`}
+              existingMeaning={meaning || `Number {gridNum} represents foundational ${PLANETARY_LABELS[gridNum]} energy.`}
               birthDate={birthDate}
             />
           </div>

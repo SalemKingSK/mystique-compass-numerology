@@ -155,7 +155,9 @@ export default function LoshuNumberDetailPanel({
                     <span className="loshu-count-row-label" style={{ color: cappedCount === lvl ? elColor : undefined }}>
                       {definition.counts[lvl].label}
                     </span>
-                    <p className="loshu-count-row-text">{definition.counts[lvl].meaning}</p>
+                    <div className="loshu-count-row-text">
+                      <AccordionContentWithPlayer text={definition.counts[lvl].meaning} />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -183,7 +185,9 @@ export default function LoshuNumberDetailPanel({
 
         {openLayer === 3 && isDrowning && (
           <div className="loshu-accordion-body">
-            <p className="loshu-drowning-intro">{DROWNING_SECTION_INTRO}</p>
+            <div className="loshu-drowning-intro">
+              <AccordionContentWithPlayer text={DROWNING_SECTION_INTRO} />
+            </div>
             <SectionDivider label="Energetic Interference" />
             <div className="loshu-drowning-card">
               <div className="loshu-drowning-flame">🔥</div>
@@ -222,7 +226,9 @@ export default function LoshuNumberDetailPanel({
 
         {openLayer === 4 && (
           <div className="loshu-accordion-body">
-            <p className="loshu-hw-intro">{HARDWARE_SOFTWARE_INTRO}</p>
+            <div className="loshu-hw-intro">
+              <AccordionContentWithPlayer text={HARDWARE_SOFTWARE_INTRO} />
+            </div>
             <div className="loshu-hw-row">
               <div className="loshu-hw-box" style={{ borderColor: elColor }}>
                 <span className="loshu-hw-title">Hardware</span>
