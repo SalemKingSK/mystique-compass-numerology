@@ -18,6 +18,13 @@ const reduce = (n: number): number => {
 };
 
 /**
+ * HELPER: Strip HTML tags for TTS
+ */
+const stripHtml = (html: string) => {
+  return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ');
+};
+
+/**
  * HELPER: Get exact animal for a specific date using Chinese Calendar data
  */
 const getAnimalForDate = (d: number, m: number, y: number) => {
@@ -271,7 +278,7 @@ export function ZodiacSection({ birthDay, birthMonth, birthYear }: ZodiacSection
 
               {BOOK.categories[selectedYear.category === 'destruction' ? 'destruction' : selectedYear.category] && (
                 <div className="p-4 bg-white/5 border-l-[3px] border-primary/40 rounded-r-lg font-body text-sm leading-relaxed text-slate-300">
-                  <div dangerouslySetInnerHTML={{ __html: BOOK.categories[selectedYear.category === 'destruction' ? 'destruction' : selectedYear.category] }} />
+                  <AccordionContentWithPlayer text={stripHtml(BOOK.categories[selectedYear.category === 'destruction' ? 'destruction' : selectedYear.category])} />
                 </div>
               )}
 
