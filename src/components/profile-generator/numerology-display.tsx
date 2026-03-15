@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PersonalYearChart } from './personal-year-chart';
+import { ZodiacSection } from './zodiac-section';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -125,12 +126,13 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
 
     const renderArrowItem = (arrow: ArrowData) => {
         const isShadow = arrow.type === 'shadow' || arrow.type === 'weakness';
+        const numbersString = arrow.numbers.join('-');
         return (
             <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4 mb-1 border-l-[3px] border-l-[#c8a84b]/40">
                 <AccordionTrigger>
                     <span className={`text-left font-cinzel text-[0.7rem] uppercase tracking-wider flex items-center gap-2 ${isShadow ? 'text-rose-400' : 'text-emerald-400'}`}>
                         {isShadow ? <ChevronRight className="h-3 w-3 rotate-90" /> : <ChevronRight className="h-3 w-3" />}
-                        {arrow.name} ({arrow.numbers.join('-')})
+                        {arrow.name} ({numbersString})
                     </span>
                 </AccordionTrigger>
                 <AccordionContent className="font-body text-base leading-relaxed">
@@ -355,6 +357,23 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
           onYearSelect={handleYearSelect}
         />
       </motion.div>
+
+      <div className="mt-6">
+          <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="zodiac-trajectory" className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
+                  <AccordionTrigger className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
+                      <span className="flex items-center gap-2">☯ Zodiac Trajectory</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                      <ZodiacSection 
+                        birthDay={birthDay} 
+                        birthMonth={birthMonth} 
+                        birthYear={birthYear} 
+                      />
+                  </AccordionContent>
+              </AccordionItem>
+          </Accordion>
+      </div>
 
       <AnimatePresence>
         {selectedPersonalYear && (
