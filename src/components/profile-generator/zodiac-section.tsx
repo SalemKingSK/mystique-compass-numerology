@@ -1,3 +1,4 @@
+// src/components/profile-generator/zodiac-section.tsx
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -224,13 +225,9 @@ export function ZodiacSection({ birthDay, birthMonth, birthYear }: ZodiacSection
           <span className="text-2xl">{bz.e}</span>
         </div>
         
-        <p className="text-lg leading-relaxed text-slate-300 max-w-2xl mx-auto mb-8 font-body text-center">
-          Born in a <strong className="text-primary">{birthSign}</strong> year — {bz.el} element, 
-          {bz.pol} polarity, Branch {az?.br || bz.br}. Your characteristic nature: 
-          <em className="text-slate-400 italic">{bz.trait}</em>. Your health domains: 
-          <span className="text-slate-400">{bz.organ}</span>. Your cardinal direction: 
-          <span className="text-slate-400">{bz.dir}</span>. Below are your next 12 years mapped through Tai Sui astrology — click any year for detailed analysis.
-        </p>
+        <div className="cp text-lg leading-relaxed text-slate-300 max-w-2xl mx-auto mb-8 font-body text-center">
+          <AccordionContentWithPlayer text={`Born in a ${birthSign} year — ${bz.el} element, ${bz.pol} polarity, Branch ${az?.br || bz.br}. Your characteristic nature: ${bz.trait}. Your health domains: ${bz.organ}. Your cardinal direction: ${bz.dir}. Below are your next 12 years mapped through Tai Sui astrology — click any year for detailed analysis.`} />
+        </div>
 
         <div className="flex flex-col items-center gap-3 mb-6">
           <div className="flex flex-wrap justify-center gap-3">
@@ -270,10 +267,7 @@ export function ZodiacSection({ birthDay, birthMonth, birthYear }: ZodiacSection
             </DialogHeader>
             <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin">
               <div className="p-4 bg-primary/5 border-l-[3px] border-primary rounded-r-lg font-body italic text-sm text-slate-300">
-                <strong>{selectedYear.year} ({selectedYear.yearAni} Year, Age {selectedYear.age})</strong> — Tai Sui: 
-                <span className="ml-2 font-bold" style={{ color: selectedYear.state === 1 ? '#f87171' : selectedYear.state === 4 ? '#34d399' : '#c8a84b' }}>
-                  {catLabel(selectedYear.category)}
-                </span>
+                <AccordionContentWithPlayer text={`${selectedYear.year} (${selectedYear.yearAni} Year, Age ${selectedYear.age}) — Tai Sui: ${catLabel(selectedYear.category)}`} />
               </div>
 
               {BOOK.categories[selectedYear.category === 'destruction' ? 'destruction' : selectedYear.category] && (
@@ -295,9 +289,9 @@ export function ZodiacSection({ birthDay, birthMonth, birthYear }: ZodiacSection
                 <h4 className="font-cinzel text-xs uppercase tracking-widest opacity-60">
                   {selectedYear.yearAni.toUpperCase()} Year Qualities
                 </h4>
-                <p className="font-body text-sm text-slate-400">
-                  {ZOO[selectedYear.yearAni].trait}. Health focus: {ZOO[selectedYear.yearAni].organ}. Direction: {ZOO[selectedYear.yearAni].dir}.
-                </p>
+                <div className="font-body text-sm text-slate-400">
+                  <AccordionContentWithPlayer text={`${ZOO[selectedYear.yearAni].trait}. Health focus: ${ZOO[selectedYear.yearAni].organ}. Direction: ${ZOO[selectedYear.yearAni].dir}.`} />
+                </div>
               </div>
             </div>
           </DialogContent>

@@ -1,3 +1,4 @@
+// src/components/LoshuNumberDetailPanel.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -7,6 +8,7 @@ import {
   HARDWARE_SOFTWARE_INTRO,
   LOSHU_NUMBER_DEFINITIONS
 } from "@/lib/loshu-definitions";
+import { AccordionContentWithPlayer } from "./profile-generator/accordion-content-with-player";
 
 const ELEMENT_COLORS: Record<string, string> = {
   Fire: "#e05c3a",
@@ -97,7 +99,7 @@ export default function LoshuNumberDetailPanel({
   return (
     <div className="loshu-detail-root">
       <div className="loshu-layer-1">
-        <p className="loshu-existing-meaning">{existingMeaning}</p>
+        <AccordionContentWithPlayer text={existingMeaning} />
       </div>
 
       <div className="loshu-accordion">
@@ -140,9 +142,9 @@ export default function LoshuNumberDetailPanel({
               <p className="loshu-count-meaning-label" style={{ color: elColor }}>
                 {definition.counts[cappedCount as 1 | 2 | 3 | 4]?.label}
               </p>
-              <p className="loshu-count-meaning-text">
-                {definition.counts[cappedCount as 1 | 2 | 3 | 4]?.meaning}
-              </p>
+              <div className="loshu-count-meaning-text">
+                <AccordionContentWithPlayer text={definition.counts[cappedCount as 1 | 2 | 3 | 4]?.meaning} />
+              </div>
             </div>
 
             <details className="loshu-all-counts">
@@ -186,7 +188,9 @@ export default function LoshuNumberDetailPanel({
             <div className="loshu-drowning-card">
               <div className="loshu-drowning-flame">🔥</div>
               <p className="loshu-drowning-headline">{`${intensityLabel} ${number} — Saturation Active`}</p>
-              <p className="loshu-drowning-body">{definition.counts[cappedCount as 3 | 4]?.meaning}</p>
+              <div className="loshu-drowning-body">
+                <AccordionContentWithPlayer text={definition.counts[cappedCount as 3 | 4]?.meaning} />
+              </div>
             </div>
             {drownsNumbers.length > 0 && (
               <>
@@ -239,7 +243,9 @@ export default function LoshuNumberDetailPanel({
                   <p className="loshu-conflict-badge">⚠ Psychodynamic Conflict</p>
                   <p className="loshu-conflict-purpose"><strong>Core Purpose:</strong> {lifePathConflict.corePurpose}</p>
                   <p className="loshu-conflict-condition"><strong>Condition:</strong> {lifePathConflict.condition}</p>
-                  <p className="loshu-conflict-result">{lifePathConflict.psychodynamicResult}</p>
+                  <div className="loshu-conflict-result">
+                    <AccordionContentWithPlayer text={lifePathConflict.psychodynamicResult} />
+                  </div>
                 </div>
               </>
             ) : (
@@ -253,14 +259,18 @@ export default function LoshuNumberDetailPanel({
                 <span className="loshu-remedy-icon">✦</span>
                 <div>
                   <p className="loshu-remedy-type">If Missing (Void)</p>
-                  <p className="loshu-remedy-text">{remedy.missing}</p>
+                  <div className="loshu-remedy-text">
+                    <AccordionContentWithPlayer text={remedy.missing} />
+                  </div>
                 </div>
               </div>
               <div className="loshu-remedy-card loshu-remedy-overloaded" style={{ borderColor: elColor + "55" }}>
                 <span className="loshu-remedy-icon" style={{ color: elColor }}>◉</span>
                 <div>
                   <p className="loshu-remedy-type" style={{ color: elColor }}>If Overloaded (Drowning)</p>
-                  <p className="loshu-remedy-text">{remedy.overloaded}</p>
+                  <div className="loshu-remedy-text">
+                    <AccordionContentWithPlayer text={remedy.overloaded} />
+                  </div>
                 </div>
               </div>
             </div>

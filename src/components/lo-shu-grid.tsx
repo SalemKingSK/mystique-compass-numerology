@@ -4,7 +4,6 @@ import React from 'react';
 import type { ArrowData } from '@/lib/numerology';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Layers } from 'lucide-react';
-import { AccordionContentWithPlayer } from '@/components/profile-generator/accordion-content-with-player';
 import LoshuNumberDetailPanel from '@/components/LoshuNumberDetailPanel';
 
 // Props for the LoShuGrid component
@@ -73,7 +72,6 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
     const cell = gridData.flat().find(c => c?.startsWith(String(gridNum)));
     const count = numberCounts[String(gridNum)] || 0;
     const meaning = repeatedNumberMeanings[`${gridNum}_${Math.min(count || 1, 5)}`];
-    const isClickable = true; // Numbers are always clickable to show definitions
 
     const cellContent = (
       <div
@@ -101,18 +99,12 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
               <Layers className="h-5 w-5" /> Number {gridNum} ({count} time{count !== 1 ? 's' : ''})
             </h4>
             
-            <div className="font-body text-sm leading-relaxed">
-              <AccordionContentWithPlayer text={meaning || `Number ${gridNum} represents foundational ${PLANETARY_LABELS[gridNum]} energy.`} />
-            </div>
-
-            <div className="pt-4 border-t border-white/10">
-              <LoshuNumberDetailPanel
-                number={gridNum}
-                count={count}
-                existingMeaning={meaning || ""}
-                birthDate={birthDate}
-              />
-            </div>
+            <LoshuNumberDetailPanel
+              number={gridNum}
+              count={count}
+              existingMeaning={meaning || `Number ${gridNum} represents foundational ${PLANETARY_LABELS[gridNum]} energy.`}
+              birthDate={birthDate}
+            />
           </div>
         </PopoverContent>
       </Popover>
