@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
+import { ZOO } from '@/lib/cosmic-fate/zoo';
 
 
 // --- SUB-COMPONENTS ---
@@ -35,7 +36,7 @@ function CompatibilityDisplay({ compatibilities }: { compatibilities: any }) {
         <Accordion type="multiple" className="w-full space-y-1">
             {Object.entries(compatibilities).map(([sign, text]) => (
                 <AccordionItem value={sign} key={sign} className="glass-card px-4 bg-black/20">
-                    <AccordionTrigger className="font-cinzel text-[0.7rem] uppercase tracking-wider">With the {sign}</AccordionTrigger>
+                    <AccordionTrigger className="font-cinzel text-[0.7rem] uppercase tracking-wider">With the {sign} {ZOO[sign]?.e || ''}</AccordionTrigger>
                     <AccordionContent className="font-body text-base leading-relaxed">
                         <AccordionContentWithPlayer text={String(text)} />
                     </AccordionContent>
@@ -66,7 +67,7 @@ function FutureDisplay({ futures }: { futures: any }) {
                 const text = data.prediction;
                 return (
                     <AccordionItem value={year} key={year} className="glass-card px-4 bg-black/20">
-                        <AccordionTrigger className="font-cinzel text-[0.7rem] uppercase tracking-wider">{year} - Year of the {data.year}</AccordionTrigger>
+                        <AccordionTrigger className="font-cinzel text-[0.7rem] uppercase tracking-wider">{year} - Year of the {data.year} {ZOO[data.year]?.e || ''}</AccordionTrigger>
                         <AccordionContent className="font-body text-base leading-relaxed">
                           <AccordionContentWithPlayer text={text} />
                         </AccordionContent>
@@ -87,6 +88,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const { introduction, elements, compatibilities, futures } = zodiacData;
 
   const signElementData = elements?.[element as keyof typeof elements];
+  const animalEmoji = ZOO[sign]?.e || '';
 
   React.useEffect(() => {
     if (!api) return;
@@ -103,7 +105,7 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
   const contentMap = [
     {
       key: 'introduction',
-      title: `Your Animal Sign: The ${sign}`,
+      title: `${animalEmoji} Your Animal Sign: The ${sign} ${animalEmoji}`,
       component: <AccordionContentWithPlayer text={introduction || "No introduction available."} />,
     },
     {

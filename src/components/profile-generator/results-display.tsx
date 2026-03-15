@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/carousel";
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import InstallButton from '../InstallButton';
+import { ZOO } from '@/lib/cosmic-fate/zoo';
 
 
 // --- SUB-COMPONENTS ---
@@ -55,6 +56,9 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
     const [api, setApi] = React.useState<any>(null);
     const [current, setCurrent] = React.useState(0);
 
+    const animalName = sign.split('/')[1]?.trim();
+    const animalEmoji = ZOO[animalName]?.e || '';
+
     React.useEffect(() => {
         if (!api) return;
         setCurrent(api.selectedScrollSnap());
@@ -70,6 +74,13 @@ function NewAstroSignDetails({ sign, signData }: { sign: string, signData: Astro
     return (
         <div className="glass-card p-4">
              <div className="py-2 text-center text-sm text-muted-foreground">
+                <div className="mb-4">
+                    <h2 className="font-decorative text-xl text-primary flex items-center justify-center gap-3">
+                        <span>{animalEmoji}</span>
+                        {sign}
+                        <span>{animalEmoji}</span>
+                    </h2>
+                </div>
                 <div className="flex justify-center gap-1 md:gap-2">
                     {NEW_ASTRO_TABS.map((tab, index) => (
                         <Button
@@ -127,6 +138,9 @@ function ResultsHeader({
   onTabClick: (tab: string) => void,
   activeTab: string
 }) {
+  const animalName = newAstroSign.split('/')[1]?.trim();
+  const animalEmoji = ZOO[animalName]?.e || '';
+
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
         <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center font-decorative mb-2">
@@ -135,7 +149,7 @@ function ResultsHeader({
         <p className="text-[0.7rem] text-white/50 mt-1 font-cinzel uppercase tracking-[0.2em]">{birthDate}</p>
         <div className='relative grid grid-cols-2 gap-3 w-full max-w-2xl mx-auto mt-6 px-4'>
              <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
-                {newAstroSign}
+                {animalEmoji} {newAstroSign} {animalEmoji}
              </AnimatedTab>
              <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>
                 Astrology
