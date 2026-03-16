@@ -7,6 +7,7 @@ import {
   SHADOW_PRESENCE_INTRO,
   SHADOW_ABSENCE_INTRO,
 } from "@/lib/arrow-definitions";
+import { REMEDIES } from "@/lib/loshu-definitions";
 import { AccordionContentWithPlayer } from "./profile-generator/accordion-content-with-player";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -60,6 +61,10 @@ export default function LoshuArrowDetailPanel({
   function toggle(layer: 2 | 3 | 4) {
     setOpenLayer((p) => (p === layer ? null : layer));
   }
+
+  // Logic for optimization tips (Layer 2)
+  const isPrimary = definition.isPrimary;
+  const missingPrimaryNumbers = isPrimary && !status.isActive ? status.missingNumbers : [];
 
   return (
     <div className="arr-root">
@@ -153,11 +158,21 @@ export default function LoshuArrowDetailPanel({
               )}
             </div>
 
+            {/* Optimization Tip for Primary Planes */}
+            {missingPrimaryNumbers.length > 0 && (
+              <div className="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">⚡ Optimization Guidance</p>
+                <div className="text-sm italic text-slate-300">
+                  <AccordionContentWithPlayer text={`To activate this primary plane, focus on the elemental remedies for your missing number(s): ${missingPrimaryNumbers.map(n => `\n\nNumber ${n}: ${REMEDIES[n]?.missing || 'General grounding'}`).join('')}`} />
+                </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
 
-      {/* ── LAYER 3: Positive Potential (If available) ── */}
+      {/* ── LAYER 3: Positive Potential ── */}
       {definition.potentialBody && (
         <div className="arr-accordion">
           <button
@@ -169,7 +184,7 @@ export default function LoshuArrowDetailPanel({
               <span className="arr-layer-badge" style={{ background: "#4caf7d22", color: "#4caf7d", borderColor: "#4caf7d55" }}>
                 Layer 3
               </span>
-              <span className="arr-acc-title">Positive Potential · {definition.potentialTitle}</span>
+              <span className="arr-acc-title">{isPrimary ? "Primary Power Plane" : "Constructive Potential"} · {definition.potentialTitle}</span>
             </div>
             <span className="arr-acc-arrow" style={{ transform: openLayer === 3 ? "rotate(180deg)" : "rotate(0)" }}>▾</span>
           </button>
@@ -177,7 +192,7 @@ export default function LoshuArrowDetailPanel({
           {openLayer === 3 && (
             <div className="arr-acc-body">
               <div className="arr-potential-card">
-                <p className="arr-potential-headline" style={{ color: "#4caf7d" }}>{definition.potentialTitle}</p>
+                <p className="arr-potential-headline" style={{ color: "#4caf7d" }}>{isPrimary ? "Core Strength" : definition.potentialTitle}</p>
                 <div className="arr-potential-text">
                   <AccordionContentWithPlayer text={definition.potentialBody} />
                 </div>
@@ -257,7 +272,7 @@ export default function LoshuArrowDetailPanel({
                       >
                         {n}
                       </span>
-                      <span className="arr-drowned-state">
+                      <span className="arr-rowned-state">
                         {present ? "present" : "absent"}
                       </span>
                     </div>
@@ -427,6 +442,7 @@ export default function LoshuArrowDetailPanel({
           line-height: 1.65;
           color: #d8cff0;
           margin: 0;
+          font-style: italic;
         }
 
         /* Status row */
@@ -526,7 +542,7 @@ export default function LoshuArrowDetailPanel({
           font-size: 22px;
           font-weight: 700;
         }
-        .arr-drowned-state {
+        .arr-rowned-state {
           font-size: 10px;
           letter-spacing: 0.05em;
           color: #7a6fa0;
