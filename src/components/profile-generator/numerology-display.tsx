@@ -250,9 +250,15 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     
     const [openSections, setOpenSections] = React.useState<string[]>([]);
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
+    const [personalYearAccordionValue, setPersonalYearAccordionValue] = React.useState<string>("");
 
     const handleYearSelect = (data: PersonalYearData | null) => {
         setSelectedPersonalYear(data);
+        if (data) {
+            setPersonalYearAccordionValue("personal-year-detail");
+        } else {
+            setPersonalYearAccordionValue("");
+        }
     };
 
     const psychicRef = React.useRef<HTMLDivElement>(null);
@@ -389,7 +395,12 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
             className="mt-6"
           >
             <div className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
-              <Accordion type="single" collapsible defaultValue="personal-year-detail" value={selectedPersonalYear ? "personal-year-detail" : ""}>
+              <Accordion 
+                type="single" 
+                collapsible 
+                value={personalYearAccordionValue} 
+                onValueChange={setPersonalYearAccordionValue}
+              >
                 <AccordionItem value="personal-year-detail">
                   <AccordionTrigger>
                     <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
