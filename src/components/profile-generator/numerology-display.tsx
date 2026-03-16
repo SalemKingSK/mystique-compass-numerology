@@ -255,6 +255,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const handleYearSelect = (data: PersonalYearData | null) => {
         setSelectedPersonalYear(data);
         if (data) {
+            // Force open the detail when a year is selected from graph
             setPersonalYearAccordionValue("personal-year-detail");
         } else {
             setPersonalYearAccordionValue("");

@@ -85,7 +85,9 @@ export default function LoshuNumberDetailPanel({
 }: LoshuNumberDetailPanelProps) {
   const [openLayer, setOpenLayer] = useState<2 | 3 | 4 | null>(null);
 
-  const analysis = analyzeNumber(number, birthDate);
+  // We pass the actual count to ensure 'isDrowning' is correct even if repetitions 
+  // come from Psyche/Destiny/Kua calculation.
+  const analysis = analyzeNumber(number, birthDate, count);
   const { definition, isDrowning, drownsNumbers, remedy, lifePathConflict, lifePath } =
     analysis;
   const elColor = ELEMENT_COLORS[definition.element] ?? "#9b8ec4";
@@ -98,10 +100,12 @@ export default function LoshuNumberDetailPanel({
 
   return (
     <div className="loshu-detail-root">
+      {/* LAYER 1: Existing Meaning */}
       <div className="loshu-layer-1">
         <AccordionContentWithPlayer text={existingMeaning} />
       </div>
 
+      {/* LAYER 2: Numerical Saturation */}
       <div className="loshu-accordion">
         <button
           className="loshu-accordion-header"
@@ -166,6 +170,7 @@ export default function LoshuNumberDetailPanel({
         )}
       </div>
 
+      {/* LAYER 3: Drowning Effect */}
       <div className={`loshu-accordion ${!isDrowning ? "loshu-locked" : ""}`}>
         <button
           className="loshu-accordion-header"
@@ -213,6 +218,7 @@ export default function LoshuNumberDetailPanel({
         )}
       </div>
 
+      {/* LAYER 4: Hardware vs Software */}
       <div className="loshu-accordion">
         <button className="loshu-accordion-header" onClick={() => toggleLayer(4)}>
           <div className="loshu-accordion-left">

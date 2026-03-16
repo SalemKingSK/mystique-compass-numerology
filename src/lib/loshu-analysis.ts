@@ -12,12 +12,13 @@ import {
 
 /** Reduces a number to a single digit (1–9). */
 export function reduceToSingleDigit(n: number): number {
-  while (n > 9) {
-    n = String(n)
+  let val = Math.abs(n);
+  while (val > 9) {
+    val = String(val)
       .split("")
       .reduce((sum, d) => sum + parseInt(d, 10), 0);
   }
-  return n || 9;
+  return val || 9;
 }
 
 /** Calculates Life Path from date digits. */
@@ -53,12 +54,18 @@ export interface NumberAnalysis {
   lifePath: number;
 }
 
+/**
+ * Analyzes a number. 
+ * actualCount is provided because the grid includes Psyche/Destiny/Kua digits 
+ * which aren't in the raw birthDate string.
+ */
 export function analyzeNumber(
   number: number,
-  birthDate: string
+  birthDate: string,
+  actualCount?: number
 ): NumberAnalysis {
   const counts = getGridCounts(birthDate);
-  const count = counts[number] ?? 0;
+  const count = actualCount !== undefined ? actualCount : (counts[number] ?? 0);
   const definition = LOSHU_NUMBER_DEFINITIONS[number];
   const lifePath = calculateLifePath(birthDate);
 
