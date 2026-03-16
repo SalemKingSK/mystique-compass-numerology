@@ -1,20 +1,22 @@
-/**
- * @fileOverview Verbatim shadow meanings for all 16 Lo Shu arrows.
- * Full arrows (8) = Shadow of Presence. Empty arrows (8) = Shadow of Absence.
- */
+// src/lib/arrow-definitions.ts
+// ALL VERBATIM — canonical shadow and potential meanings for all Lo Shu arrows.
 
 export type ArrowState = "full" | "empty";
 
 export interface ArrowDefinition {
   id: string;
   name: string;
-  numbers: number[];      // the three grid numbers that form this arrow
-  type: "horizontal" | "vertical" | "diagonal";
+  numbers: number[];      // the numbers that form this arrow (2 or 3)
+  type: "horizontal" | "vertical" | "diagonal" | "bridge";
   state: ArrowState;
-  coreTrait: string;      
-  shadowTitle: string;    
-  shadowBody: string;     
+  coreTrait: string;      // existing short summary
+  potentialTitle?: string;
+  potentialBody?: string;
+  shadowTitle?: string;
+  shadowBody?: string;
 }
+
+// ─── Part I: Major Arrows (Primary Planes) ───────────────────────────────────
 
 export const FULL_ARROW_DEFINITIONS: ArrowDefinition[] = [
   {
@@ -106,7 +108,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [4, 5, 6],
     type: "horizontal",
     state: "empty",
-    coreTrait: "When present: balance, contentment, and a stable center.",
+    coreTrait: "Regular disappointment and depression. Hidden aggression when things don't go as planned.",
     shadowTitle: "Chronic Dissatisfaction",
     shadowBody: 'When the central horizontal line is missing, the person feels a deep, soul-level "itch" that they cannot scratch. No matter what they achieve, it feels insufficient. The shadow manifests as a tendency to blame the "universe" or "luck" for their unhappiness. They often feel like an outsider looking in, convinced that everyone else has the "secret key" to happiness that they lack.',
   },
@@ -116,7 +118,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [1, 5, 9],
     type: "diagonal",
     state: "empty",
-    coreTrait: "When present: decisive will and clear directional purpose.",
+    coreTrait: "Lacks the 'killer instinct.' Tasks are left halfway. High potential for procrastination.",
     shadowTitle: "The Eternal Procrastinator",
     shadowBody: 'The absence of this diagonal creates a "vacuum of will." The shadow side is a life lived in the waiting room. The person waits for the perfect sign, the perfect mood, or the perfect partner before they act. They may become "professional students," constantly collecting information but never applying it, leading to a profound sense of wasted potential.',
   },
@@ -126,7 +128,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [3, 5, 7],
     type: "horizontal",
     state: "empty",
-    coreTrait: "When present: spiritual trust, intuition, and faith.",
+    coreTrait: "Deep lack of trust. Only accepts proven facts. Often cynical about the motives of others.",
     shadowTitle: "The Cynical Fortress",
     shadowBody: 'Without the soul plane, the person struggles to trust anything they cannot see or touch. The shadow is a bitter cynicism. They may view love as a biological transaction and spirituality as a scam. This creates a "fortress of one," where the individual is safe from being fooled but is also entirely alone, unable to experience the "magic" of the irrational or the unseen.',
   },
@@ -136,7 +138,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [7, 8, 9],
     type: "horizontal",
     state: "empty",
-    coreTrait: "When present: follow-through, completion, and harvesting results.",
+    coreTrait: "Lacks motivation. High 'talk' but very little 'walk.' Often fails to plan for the future.",
     shadowTitle: "Fear of the Finish Line",
     shadowBody: 'When the bottom row (or vertical action line in some systems) is missing, the person starts with fire but ends with a whimper. The shadow is the "90% completion" curse. They abandon projects, relationships, and goals just as they are about to bear fruit. This is often a subconscious defense mechanism — if they never finish, they can never be judged as a failure.',
   },
@@ -146,7 +148,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [1, 4, 7],
     type: "vertical",
     state: "empty",
-    coreTrait: "When present: physical grounding and material competence.",
+    coreTrait: "Lives in a dream world. Too much logic or emotion without 'common sense.' Highly idealistic.",
     shadowTitle: "The Starving Artist",
     shadowBody: 'Without the physical foundation, the person lives entirely in the "clouds." The shadow is a total inability to navigate the material world. They may be brilliant philosophers but cannot pay a utility bill on time. This leads to a life of dependency on others, which eventually turns into resentment, as they feel the "world" doesn\'t appreciate their genius enough to take care of their mundane needs.',
   },
@@ -156,7 +158,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [2, 5, 8],
     type: "vertical",
     state: "empty",
-    coreTrait: "When present: inner anchor, emotional steadiness, and self-knowledge.",
+    coreTrait: "Easily hurt and very shy. May develop an inferiority complex to hide deep sensitivity.",
     shadowTitle: "The Reactive Mirror",
     shadowBody: 'Without the central vertical emotional column, there is no "inner anchor." The shadow is a person who is a slave to their environment. If the room is happy, they are happy; if the room is tense, they have a panic attack. They lack a stable sense of self, often "shape-shifting" their personality to match whoever they are with, leading to a fragmented and exhausting existence.',
   },
@@ -166,7 +168,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [3, 6, 9],
     type: "horizontal",
     state: "empty",
-    coreTrait: "When present: intellectual drive, curiosity, and critical thinking.",
+    coreTrait: "Forgetful nature that worsens over time. Struggles to retain complex information.",
     shadowTitle: "Cognitive Avoidance",
     shadowBody: 'When the top mental plane is empty, the person finds intellectual exertion painful or boring. The shadow side is a retreat into "low-vibration" distractions. They may become addicted to mindless entertainment, scrolling, or gossip to avoid the "heavy lifting" of critical thinking. This leads to a life of being easily manipulated by others\' opinions because they haven\'t developed their own.',
   },
@@ -176,15 +178,317 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [3, 5, 7],
     type: "diagonal",
     state: "empty",
-    coreTrait: "When present: coherent life narrative and retention of wisdom.",
+    coreTrait: "Disconnected life narrative and retention of wisdom.",
     shadowTitle: "The Disconnected Narrative",
     shadowBody: 'In systems where this indicates a lack of mental retention, the shadow is a "fractured life." The person fails to learn from their mistakes because the "lesson" doesn\'t stick. They find themselves repeating the same toxic cycles every few years, genuinely surprised each time the same result occurs. The shadow is a life that feels like a series of disconnected episodes rather than a coherent journey of growth.',
+  },
+];
+
+// ─── Part II: Secondary (Diagonal) Arrows ────────────────────────────────────
+
+export const SECONDARY_ARROW_DEFINITIONS: ArrowDefinition[] = [
+  {
+    id: "prosperity",
+    name: "The Arrow of Prosperity",
+    numbers: [4, 5, 6],
+    type: "diagonal",
+    state: "full",
+    coreTrait: "The Golden Yog: a mark of rare alignment between discipline, internal power, and responsibility.",
+    potentialTitle: "The Conscious Manifestor",
+    potentialBody: "This diagonal represents a perfect alignment between discipline (4), adaptability (5), and the appreciation of quality (6). The potential here is the ability to generate abundance not through luck, but through a consistent 'flow state.' These individuals have a natural sense of 'divine timing' in business and personal growth. They don't just accumulate wealth; they create environments of luxury and security that benefit their entire community. \n\n* The Key: When balanced, this arrow allows for a life where material success and spiritual peace coexist without one compromising the other.",
+  },
+  {
+    id: "stability-emotional",
+    name: "The Arrow of Emotional Stability",
+    numbers: [2, 5, 8],
+    type: "diagonal",
+    state: "full",
+    coreTrait: "The Property Yog: provides a profound internal shock-absorber and Silver resonance.",
+    potentialTitle: "The Anchor of Peace",
+    potentialBody: "Connecting the heart (2), the center (5), and the ground (8), this arrow is the 'Master of Composure.' The light side is a profound emotional intelligence. These individuals possess an internal shock-absorber that allows them to remain calm during crises. They are the natural mediators of the world, capable of feeling deeply (2) without being swept away by the current. \n\n* The Key: Their presence is grounding to others. They possess a 'knowing' that life is cyclical, which grants them the patience to wait for the right moment to act.",
+  },
+];
+
+// ─── Part III: Minor Arrows (2-Digit Power Bridges) ──────────────────────────
+
+export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
+  {
+    id: "4-9-bridge",
+    name: "The 4-9 Bridge",
+    numbers: [4, 9],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Combines Wood’s discipline with Fire’s vision.",
+    potentialTitle: "The High-Level Strategist",
+    potentialBody: "The light side is the 'General's Mind.' They can see 10 steps ahead and have the organizational grit to ensure every step is executed. They excel at turning abstract concepts into institutional realities.",
+  },
+  {
+    id: "9-2-bridge",
+    name: "The 9-2 Bridge",
+    numbers: [9, 2],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking fame with sensitivity.",
+    potentialTitle: "The Magnetic Influencer",
+    potentialBody: "The potential here is 'Social Grace.' These individuals move through the world with an effortless charisma because they truly listen to the emotional undertones of a room. They use their influence to uplift others, making everyone in their presence feel seen and significant.",
+  },
+  {
+    id: "3-5-bridge",
+    name: "The 3-5 Bridge",
+    numbers: [3, 5],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Links the plan (3) with internal power (5).",
+    potentialTitle: "The Courageous Creative",
+    potentialBody: "The light side is 'Dynamic Innovation.' They have the guts to try ideas that others are afraid of. They are the pioneers who can build a bridge while they are walking on it, possessing a rare blend of imagination and bravery.",
+  },
+  {
+    id: "5-7-bridge",
+    name: "The 5-7 Bridge",
+    numbers: [5, 7],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking centered power with the lessons of the 7.",
+    potentialTitle: "The Intuitive Sage",
+    potentialBody: "The potential is 'Wisdom through Experience.' These individuals process their challenges into profound insights. They have a 'built-in truth detector' and often act as spiritual or philosophical guides who lead by the example of their own transformation.",
+  },
+  {
+    id: "8-1-bridge",
+    name: "The 8-1 Bridge",
+    numbers: [8, 1],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Combining knowledge with career drive.",
+    potentialTitle: "The Ethical Professional",
+    potentialBody: "The light side is 'Integrity in Action.' These are the professionals who do the right thing when no one is watching. They have an immense capacity for detailed work and building long-term, stable careers based on a foundation of genuine expertise.",
+  },
+  {
+    id: "1-6-bridge",
+    name: "The 1-6 Bridge",
+    numbers: [1, 6],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking career with home and duty.",
+    potentialTitle: "The Harmonious Leader",
+    potentialBody: "The potential is 'Empathetic Governance.' They view their professional team as a family. They create work environments that are beautiful, supportive, and highly functional, understanding that people perform best when they feel secure and appreciated.",
+  },
+  {
+    id: "4-3-bridge",
+    name: "The 4-3 Bridge",
+    numbers: [4, 3],
+    type: "bridge",
+    state: "full",
+    coreTrait: "The double-wood energy of discipline and planning.",
+    potentialTitle: "The Master of Craft",
+    potentialBody: "The light side is 'Exceptional Precision.' Whether they are building a house or writing code, they possess a 'golden touch' for detail. They find deep satisfaction in the process of creation, not just the finished product.",
+  },
+  {
+    id: "3-8-bridge",
+    name: "The 3-8 Bridge",
+    numbers: [3, 8],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking planning with earth energy.",
+    potentialTitle: "The Scholar of Life",
+    potentialBody: "The light side is 'Structural Intellect.' They have a gift for taking complex systems of knowledge and organizing them so others can understand. They are the lifelong learners who stay mentally sharp well into old age because they treat the mind as a garden to be tended.",
+  },
+  {
+    id: "9-5-bridge",
+    name: "The 9-5 Bridge",
+    numbers: [9, 5],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Fire of recognition meets the power of the center.",
+    potentialTitle: "The Charismatic Authority",
+    potentialBody: "The light side is 'Authentic Presence.' When they walk into a room, the energy shifts. They lead not through force, but through a radiant self-confidence that inspires others to find their own power.",
+  },
+  {
+    id: "5-1-bridge",
+    name: "The 5-1 Bridge",
+    numbers: [5, 1],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Connecting the center to self-expression.",
+    potentialTitle: "The Fluid Communicator",
+    potentialBody: "The light side is 'Articulate Adaptability.' They can explain anything to anyone. They are the ultimate translators of ideas, able to shift their communication style to meet the needs of their audience without losing their core message.",
+  },
+  {
+    id: "2-7-bridge",
+    name: "The 2-7 Bridge",
+    numbers: [2, 7],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Intense, volatile emotional drives and compassionate analysis.",
+    potentialTitle: "The High-Octane Heart",
+    potentialBody: "The potential is 'Transformative Empathy.' They feel things more intensely than others, which allows them to create art or provide healing that reaches deep into the human soul. When they master their volatility, they become beacons of authentic expression. They can look at a problem—or a person—and see the hidden patterns, balancing objective data with subjective feeling.",
+  },
+  {
+    id: "7-6-bridge",
+    name: "The 7-6 Bridge",
+    numbers: [7, 6],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking spiritual analysis with domestic harmony.",
+    potentialTitle: "The Aesthetic Refiner",
+    potentialBody: "The light side is 'Sophisticated Grace.' They have a natural talent for making life beautiful. They are the curators of culture, creating homes and communities that act as 'sanctuaries' for the soul, where everything has meaning and place.",
+  },
+  {
+    id: "4-5-bridge",
+    name: "The 4-5 Bridge",
+    numbers: [4, 5],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking wealth with central power.",
+    potentialTitle: "The Grounded Expander",
+    potentialBody: "The light side is 'Sustainable Growth.' They don't believe in 'get-rich-quick' schemes. They build their lives brick by brick, ensuring that every new level of success is supported by a solid foundation. They are the anchors of their families' financial legacy.",
+  },
+  {
+    id: "5-6-bridge",
+    name: "The 5-6 Bridge",
+    numbers: [5, 6],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking central power with protection.",
+    potentialTitle: "The Community Guardian",
+    potentialBody: "The light side is 'The Protective Heart.' They use their strength to shield the vulnerable. They are often the 'glue' that holds a group together, providing a safe space for others to grow while maintaining a healthy boundary of mutual respect.",
+  },
+  {
+    id: "8-5-bridge",
+    name: "The 8-5 Bridge",
+    numbers: [8, 5],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Linking knowledge with centered stability.",
+    potentialTitle: "The Practical Philosopher",
+    potentialBody: "The light side is 'Living Wisdom.' They don't just study concepts; they live them. They have a rare ability to apply high-level philosophy to mundane, everyday problems, making them excellent advisors and mentors.",
+  },
+  {
+    id: "5-2-bridge",
+    name: "The 5-2 Bridge",
+    numbers: [5, 2],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Link between the power center and high sensitivity.",
+    potentialTitle: "The Intuitive Mirror",
+    potentialBody: "The light side is 'Radiant Empathy.' They have the ability to reflect the best parts of others back to them. By being fully present, they help people see their own potential, acting as a 'catalyst' for the growth of everyone they encounter.",
+  },
+  {
+    id: "2-4-bridge",
+    name: "The Arrow of Wisdom (2-4 Bridge)",
+    numbers: [2, 4],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Logic and intuition interacting to produce resourcefulness.",
+    potentialTitle: "The Intuitive Logician",
+    potentialBody: "The potential is a 'double-check' system where the gut feeling is instantly verified by logic. These individuals excel in high-stakes environments because they can trust their instincts while simultaneously calculating the risks.",
+  },
+  {
+    id: "6-8-bridge",
+    name: "The Arrow of Compassion (6-8 Bridge)",
+    numbers: [6, 8],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Strong tendency to pursue risks and protect others.",
+    potentialTitle: "The Sincere Protector",
+    potentialBody: "The potential is 'Servant Leadership.' They use their material stability (8) and sense of home/duty (6) to create a sanctuary for others. They are the silent pillars of their communities, often taking on burdens for the collective without asking for recognition.",
+  },
+  {
+    id: "4-8-bridge",
+    name: "The Arrow of Stability (4-8 Bridge)",
+    numbers: [4, 8],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Combination of perseverance and persistence.",
+    potentialTitle: "The Solid Foundation",
+    potentialBody: "The light side is 'The Unshakeable Spirit.' In a world of chaos, these people are the fixed point. They have the ability to stick with a vision for decades, building legacies that outlast their own lifetimes.",
+  },
+  {
+    id: "2-6-bridge",
+    name: "The Arrow of Harmony (2-6 Bridge)",
+    numbers: [2, 6],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Gentle and generous personality.",
+    potentialTitle: "The Approachable Diplomat",
+    potentialBody: "This is the bridge of 'Social Lubrication.' They have the gift of making anyone feel at home. Their potential lies in their ability to bridge gaps between conflicting parties, using their innate kindness to soften hard hearts.",
+  },
+  {
+    id: "1-2-bridge",
+    name: "The Arrow of Detail (1-2 Bridge)",
+    numbers: [1, 2],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Intense focus on small facts and data.",
+    potentialTitle: "The Precision Specialist",
+    potentialBody: "The potential is 'Excellence through Awareness.' They don't just see a project; they see the atoms of it. This makes them invaluable in fields requiring high accuracy, from coding and engineering to surgery and fine art.",
+  },
+  {
+    id: "3-9-bridge",
+    name: "The Arrow of Curiosity (3-9 Bridge)",
+    numbers: [3, 9],
+    type: "bridge",
+    state: "full",
+    coreTrait: "A mind that never stops asking 'Why?'",
+    potentialTitle: "The Eternal Questioner",
+    potentialBody: "The potential is 'Lifelong Growth.' They are the 'Evolutionaries' who refuse to become stagnant. By constantly seeking new knowledge, they act as the scouts for humanity, bringing back new ideas from the frontiers of thought.",
+  },
+  {
+    id: "5-9-bridge",
+    name: "The Arrow of Courage (5-9 Bridge)",
+    numbers: [5, 9],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Bravery in the face of physical and existential danger.",
+    potentialTitle: "The Fearless Pioneer",
+    potentialBody: "The light side is 'Inspiring Initiative.' They don't just talk about change; they embody it. Their courage acts as a catalyst, giving others the permission to face their own fears and step into their power.",
+  },
+  {
+    id: "1-2-3-bridge",
+    name: "The Arrow of Art / Science",
+    numbers: [1, 2, 3],
+    type: "bridge",
+    state: "full",
+    coreTrait: "Merges scientific precision with artistic flair.",
+    potentialTitle: "The Aesthetic Visionary",
+    potentialBody: "The potential is 'The Master Craftsman.' They find the symmetry in math and the logic in music. They are the ones who can build a machine that is also a work of art, or write code that is as elegant as a poem.",
+  },
+  {
+    id: "peace-of-mind",
+    name: "Arrow of Peace of Mind",
+    numbers: [3, 6, 9],
+    type: "horizontal",
+    state: "full",
+    coreTrait: "Serene and tranquil nature with excellent memory.",
+    potentialTitle: "Sublime Contentment",
+    potentialBody: "They possess a clear conscience and a balanced approach to the past, present, and future, serving as an anchor of tranquility for stressed environments.",
+  },
+  {
+    id: "vitality",
+    name: "Arrow of Activity / Vitality",
+    numbers: [7, 8, 9],
+    type: "horizontal",
+    state: "full",
+    coreTrait: "High-energy individual needing to be 'on the move'.",
+    potentialTitle: "Unstoppable Momentum",
+    potentialBody: "They are the high-energy 'Engines' of society, possessing the physical robustness to manifest big visions through sheer stamina.",
+  },
+  {
+    id: "intuition-experience",
+    name: "Arrow of Intuition / Experience",
+    numbers: [1, 4, 7],
+    type: "vertical",
+    state: "full",
+    coreTrait: "Grounded and realistic, learning by doing.",
+    potentialTitle: "Pragmatic Mastery",
+    potentialBody: "They are the 'Street-Smart' geniuses who learn by doing. Their potential lies in their ability to read physical reality and fix what is broken with intuitive ease.",
   },
 ];
 
 export const ALL_ARROW_DEFINITIONS: ArrowDefinition[] = [
   ...FULL_ARROW_DEFINITIONS,
   ...EMPTY_ARROW_DEFINITIONS,
+  ...SECONDARY_ARROW_DEFINITIONS,
+  ...MINOR_ARROW_DEFINITIONS,
 ];
 
 export const SHADOW_PRESENCE_INTRO = "When these lines are completed, the energy is powerful but can become a \"runaway train\" if not balanced by other numbers.";

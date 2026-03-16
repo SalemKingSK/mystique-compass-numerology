@@ -8,12 +8,7 @@ import {
   REPEATED_NUMBER_MEANINGS,
   lindaGoodmanMeanings
 } from './numerology/data';
-import { 
-  PRIMARY_PLANES, 
-  SECONDARY_ARROWS, 
-  DEFICIENCY_ARROWS, 
-  MINOR_ARROWS 
-} from './numerology/data/arrowMeanings';
+import { getActiveArrows } from './arrow-analysis';
 
 // --- HELPER FUNCTIONS ---
 const reduceToSingleDigit = (n: number): number => {
@@ -58,7 +53,7 @@ export const calculateKua = (year: number, gender: string): number => {
 
 // --- DATA INTERFACES ---
 export interface ArrowData {
-    id: string; // Added for diagnostic lookup
+    id: string;
     name: string;
     description: string;
     numbers: number[];
@@ -96,26 +91,6 @@ export interface NumerologyData {
   arrowsOfWeakness: ArrowData[];
   personalYears?: PersonalYearData[];
 }
-
-// Map arrow names to IDs for the detail panel
-const ARROW_ID_MAP: Record<string, string> = {
-  "Arrow of Thought / Mental Plane": "thought",
-  "Arrow of the Heart / Spiritual Plane": "spirituality",
-  "Arrow of Material Success / Practical Plane": "practicality",
-  "Arrow of the Planner / Thought Plane": "planning",
-  "Arrow of Determination / Will Plane": "willpower",
-  "Arrow of Execution / Action Plane": "action",
-  "Arrow of Willpower / Golden Yog": "determination",
-  "Arrow of Emotion / Silver Yog": "compassion",
-  "Arrow of Frustration": "frustration",
-  "Arrow of Indecision": "indecision",
-  "Arrow of Scepticism": "scepticism",
-  "Arrow of Poor Memory": "poor-memory",
-  "Arrow of Sensitivity": "emotional-instability",
-  "Arrow of Impracticality": "impracticality",
-  "Arrow of Inactivity": "hesitation",
-  "Arrow of Mental Fatigue": "mental-fatigue",
-};
 
 // --- MAIN GRID GENERATION FUNCTION ---
 export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
@@ -162,64 +137,31 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const karmicFateNum = (karmicCandidate >= 10 && lindaGoodmanMeanings[karmicCandidate]) ? karmicCandidate : null;
   const karmicFateMeaning = karmicFateNum ? lindaGoodmanMeanings[karmicFateNum] : null;
 
-  const calculateArrows = (grid: (string | null)[][]) => {
-    const strength: ArrowData[] = [];
-    const weakness: ArrowData[] = [];
-    const presentNumbers = new Set<number>();
-    grid.flat().forEach(cell => { if(cell) presentNumbers.add(parseInt(cell.charAt(0))); });
+  const birthDateString = `${day}-${month}-${year}`;
+  const allActiveArrows = getActiveArrows(birthDateString, numberCounts);
 
-    for (const arrow of PRIMARY_PLANES) {
-        if (arrow.numbers.every(n => presentNumbers.has(n))) {
-            strength.push({
-                id: ARROW_ID_MAP[arrow.name] || arrow.name.toLowerCase().replace(/\s+/g, '-'),
-                name: arrow.name,
-                description: `${arrow.strength}${arrow.additional ? '\n\n' + arrow.additional : ''}`,
-                numbers: arrow.numbers,
-                category: "Primary Plane",
-                type: 'strength'
-            });
-        } else if (arrow.numbers.every(n => !presentNumbers.has(n))) {
-            weakness.push({
-                id: ARROW_ID_MAP[arrow.name] || arrow.name.toLowerCase().replace(/\s+/g, '-'),
-                name: arrow.name + " (Shadow Side)",
-                description: arrow.shadow || "",
-                numbers: arrow.numbers,
-                category: "Primary Shadow",
-                type: 'shadow'
-            });
-        }
-    }
+  const arrowsOfStrength: ArrowData[] = allActiveArrows
+    .filter(s => s.definition.state === 'full')
+    .map(s => ({
+      id: s.definition.id,
+      name: s.definition.name,
+      description: s.definition.coreTrait,
+      numbers: s.definition.numbers,
+      category: s.definition.type === 'bridge' ? 'Minor Bridge' : s.definition.type === 'diagonal' && (s.definition.id === 'prosperity' || s.definition.id === 'stability-emotional') ? 'Secondary Plane' : 'Primary Plane',
+      type: 'strength'
+    }));
 
-    for (const arrow of SECONDARY_ARROWS) {
-        if (arrow.numbers.every(n => presentNumbers.has(n))) {
-            strength.push({
-                id: ARROW_ID_MAP[arrow.name] || arrow.name.toLowerCase().replace(/\s+/g, '-'),
-                name: arrow.name,
-                description: arrow.strength,
-                numbers: arrow.numbers,
-                category: "Secondary Arrow",
-                type: 'strength'
-            });
-        }
-    }
+  const arrowsOfWeakness: ArrowData[] = allActiveArrows
+    .filter(s => s.definition.state === 'empty')
+    .map(s => ({
+      id: s.definition.id,
+      name: s.definition.name,
+      description: s.definition.coreTrait,
+      numbers: s.definition.numbers,
+      category: 'Deficiency',
+      type: 'shadow'
+    }));
 
-    for (const arrow of DEFICIENCY_ARROWS) {
-        if (arrow.numbers.every(n => !presentNumbers.has(n))) {
-            weakness.push({
-                id: ARROW_ID_MAP[arrow.name] || arrow.name.toLowerCase().replace(/\s+/g, '-'),
-                name: arrow.name,
-                description: arrow.desc,
-                numbers: arrow.numbers,
-                category: "Deficiency",
-                type: 'weakness'
-            });
-        }
-    }
-
-    return { strength, weakness };
-  }
-
-  const arrows = calculateArrows(loShuGrid);
   let kuaLookupKey = String(kuaNum);
   if (kuaNum === 2 && gender.toLowerCase() === 'male' && String(year).split('').reduce((a, b) => a + Number(b), 0) % 9 === 5) kuaLookupKey = '5_male';
   else if (kuaNum === 8 && gender.toLowerCase() === 'female' && String(year).split('').reduce((a, b) => a + Number(b), 0) % 9 === 5) kuaLookupKey = '5_female';
@@ -247,8 +189,8 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
     psychicMeaning,
     specialTraitMeaning,
     destinyMeaning,
-    arrowsOfStrength: arrows.strength,
-    arrowsOfWeakness: arrows.weakness,
+    arrowsOfStrength,
+    arrowsOfWeakness,
     kuaAttributes: kuaAttributes || { directions: {} }
   };
 };
