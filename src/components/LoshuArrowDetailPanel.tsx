@@ -64,7 +64,7 @@ export default function LoshuArrowDetailPanel({
   return (
     <div className="arr-root">
 
-      {/* ── LAYER 1: existing meaning — untouched ── */}
+      {/* ── LAYER 1: existing meaning ── */}
       <div className="arr-layer1">
         <AccordionContentWithPlayer text={existingMeaning} />
       </div>
@@ -187,7 +187,7 @@ export default function LoshuArrowDetailPanel({
         </div>
       )}
 
-      {/* ── LAYER 4: Shadow (Upcoming) ── */}
+      {/* ── LAYER 4: Shadow ── */}
       {definition.shadowBody && (
         <div className="arr-accordion">
           <button

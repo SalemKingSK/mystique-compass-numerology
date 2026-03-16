@@ -1,15 +1,15 @@
 // src/lib/arrow-definitions.ts
-// ALL VERBATIM — canonical shadow and potential meanings for all Lo Shu arrows.
+// ALL VERBATIM — canonical potential and shadow meanings for all Lo Shu arrows.
 
 export type ArrowState = "full" | "empty";
 
 export interface ArrowDefinition {
   id: string;
   name: string;
-  numbers: number[];      // the numbers that form this arrow (2 or 3)
+  numbers: number[];      
   type: "horizontal" | "vertical" | "diagonal" | "bridge";
   state: ArrowState;
-  coreTrait: string;      // existing short summary
+  coreTrait: string;      
   potentialTitle?: string;
   potentialBody?: string;
   shadowTitle?: string;
@@ -97,7 +97,7 @@ export const FULL_ARROW_DEFINITIONS: ArrowDefinition[] = [
     state: "full",
     coreTrait: "Heart-centered awareness and empathic depth.",
     shadowTitle: "Emotional Enmeshment",
-    shadowBody: 'While similar to the spiritual plane, this diagonal focuses on the "heart-center." Its shadow is the inability to maintain a boundary. The person "leaks" emotionally, absorbing the pain of the world until they are paralyzed by it. They may use their sensitivity as a shield to avoid responsibility, claiming they are "too sensitive" for the harsh realities of life.',
+    shadowBody: 'While similar to the spiritual plane, this diagonal focuses on the "heart-center." Its shadow is the inability to maintain a boundary. The person "leaks" emotionally, absorbing the pain of the world until they are paralyzed by it. They may use their sensitivity as a shield to avoid responsibility, claiming they are "too sensitive for the harsh realities of life.',
   },
 ];
 
@@ -110,7 +110,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     state: "empty",
     coreTrait: "Regular disappointment and depression. Hidden aggression when things don't go as planned.",
     shadowTitle: "Chronic Dissatisfaction",
-    shadowBody: 'When the central horizontal line is missing, the person feels a deep, soul-level "itch" that they cannot scratch. No matter what they achieve, it feels insufficient. The shadow manifests as a tendency to blame the "universe" or "luck" for their unhappiness. They often feel like an outsider looking in, convinced that everyone else has the "secret key" to happiness that they lack.',
+    shadowBody: 'When the central horizontal line is missing, the person feels a deep, soul-level "itch" that they cannot scratch. No matter what they achieve, it feels insufficient. The shadow manifests as a tendency to blame the "universe" or "luck" for their unhappiness. They often feel like an outsider looking in, convinced that everyone else has the "secret key" to happiness that they lack. This creates a "structural leak" in fortune. The person may work harder than everyone else but feels like they are constantly fighting an invisible headwind. The shadow is a victim mentality where they believe they are "cursed" by fate, leading to financial self-sabotage.',
   },
   {
     id: "indecision",
@@ -130,7 +130,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     state: "empty",
     coreTrait: "Deep lack of trust. Only accepts proven facts. Often cynical about the motives of others.",
     shadowTitle: "The Cynical Fortress",
-    shadowBody: 'Without the soul plane, the person struggles to trust anything they cannot see or touch. The shadow is a bitter cynicism. They may view love as a biological transaction and spirituality as a scam. This creates a "fortress of one," where the individual is safe from being fooled but is also entirely alone, unable to experience the "magic" of the irrational or the unseen.',
+    shadowBody: 'Without the soul plane, the person struggles to trust anything they cannot see or touch. The shadow is a bitter cynicism. They may view love as a biological transaction and spirituality as a scam. This creates a "fortress of one," where the individual is safe from being fooled but is also entirely alone, unable to experience the "magic" of the irrational or the unseen. This is an "Island Personality" that suffers in absolute silence, viewing isolation as superiority.',
   },
   {
     id: "hesitation",
@@ -160,7 +160,7 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     state: "empty",
     coreTrait: "Easily hurt and very shy. May develop an inferiority complex to hide deep sensitivity.",
     shadowTitle: "The Reactive Mirror",
-    shadowBody: 'Without the central vertical emotional column, there is no "inner anchor." The shadow is a person who is a slave to their environment. If the room is happy, they are happy; if the room is tense, they have a panic attack. They lack a stable sense of self, often "shape-shifting" their personality to match whoever they are with, leading to a fragmented and exhausting existence.',
+    shadowBody: 'Without the central vertical emotional column, there is no "inner anchor." This creates the "Emotional Seesaw." The shadow is a person who is a slave to their environment. If the room is happy, they are happy; if the room is tense, they have a panic attack. They lack a stable sense of self, often "shape-shifting" their personality to match whoever they are with, leading to a fragmented and exhausting existence. They are hyper-reactive to the moods of others.',
   },
   {
     id: "mental-fatigue",
@@ -182,6 +182,26 @@ export const EMPTY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     shadowTitle: "The Disconnected Narrative",
     shadowBody: 'In systems where this indicates a lack of mental retention, the shadow is a "fractured life." The person fails to learn from their mistakes because the "lesson" doesn\'t stick. They find themselves repeating the same toxic cycles every few years, genuinely surprised each time the same result occurs. The shadow is a life that feels like a series of disconnected episodes rather than a coherent journey of growth.',
   },
+  {
+    id: "loss",
+    name: "Arrow of Loss",
+    numbers: [2, 4, 6],
+    type: "bridge",
+    state: "empty",
+    coreTrait: "Potential for structural leaks in plans and legal boundaries.",
+    shadowTitle: "The Leaky Vessel",
+    shadowBody: "This configuration suggests a life where success 'slips through the fingers.' The shadow side is a subconscious pattern of self-sabotage. Just as they reach the pinnacle of a project, they may make a careless legal error or trust the wrong person, resulting in a total loss. It feels like 'fate,' but it is often an internal lack of boundaries.",
+  },
+  {
+    id: "delusion",
+    name: "Arrow of Delusion",
+    numbers: [8, 5, 2],
+    type: "diagonal",
+    state: "empty",
+    coreTrait: "Tendency to construct protective mental narratives.",
+    shadowTitle: "The Hall of Mirrors",
+    shadowBody: "Without the 'Silver Yog' (8-5-2), the person lacks an emotional anchor. The shadow is a tendency to lie to oneself to avoid pain. They construct elaborate fantasies and narratives to explain away their failures, eventually becoming unable to distinguish between the truth and the story they’ve told so often.",
+  },
 ];
 
 // ─── Part II: Secondary (Diagonal) Arrows ────────────────────────────────────
@@ -195,7 +215,9 @@ export const SECONDARY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     state: "full",
     coreTrait: "The Golden Yog: a mark of rare alignment between discipline, internal power, and responsibility.",
     potentialTitle: "The Conscious Manifestor",
-    potentialBody: "This diagonal represents a perfect alignment between discipline (4), adaptability (5), and the appreciation of quality (6). The potential here is the ability to generate abundance not through luck, but through a consistent 'flow state.' These individuals have a natural sense of 'divine timing' in business and personal growth. They don't just accumulate wealth; they create environments of luxury and security that benefit their entire community. \n\n* The Key: When balanced, this arrow allows for a life where material success and spiritual peace coexist without one compromising the other.",
+    potentialBody: "This diagonal represents a perfect alignment between discipline (4), adaptability (5), and the appreciation of quality (6). The individual doesn't just attract luck; they build a magnetic field for success through consistent, balanced action. The potential is a life where material abundance serves a higher purpose. These individuals have a 'midas touch' because they understand that wealth is a tool for creating security and harmony for others. \n\n* The Key: When balanced, this arrow allows for a life where material success and spiritual peace coexist without one compromising the other.",
+    shadowTitle: "The Ethical Shortcut",
+    shadowBody: "While known as the 'Golden Yog,' the shadow manifests as a 'mercenary' soul. When this diagonal is heavily saturated, the individual treats life as a transaction where 'winning' is the only metric of value. They may become morally flexible, believing that the end justifies the means. The shadow side creates a person who achieves great wealth but finds themselves surrounded by people who only value them for their utility, leading to a profound sense of being a 'successful fraud.' Trigger logic: If Number 4 or 6 is tripled, this creates 'The Material Greed Trap.'",
   },
   {
     id: "stability-emotional",
@@ -205,7 +227,9 @@ export const SECONDARY_ARROW_DEFINITIONS: ArrowDefinition[] = [
     state: "full",
     coreTrait: "The Property Yog: provides a profound internal shock-absorber and Silver resonance.",
     potentialTitle: "The Anchor of Peace",
-    potentialBody: "Connecting the heart (2), the center (5), and the ground (8), this arrow is the 'Master of Composure.' The light side is a profound emotional intelligence. These individuals possess an internal shock-absorber that allows them to remain calm during crises. They are the natural mediators of the world, capable of feeling deeply (2) without being swept away by the current. \n\n* The Key: Their presence is grounding to others. They possess a 'knowing' that life is cyclical, which grants them the patience to wait for the right moment to act.",
+    potentialBody: "Connecting the heart (2), the center (5), and the ground (8), these individuals possess a 'Silver' resonance—they can process intense emotional data without losing their grounding. The light side is exceptional emotional intelligence (EQ). They are the natural mediators of the world, capable of feeling deeply (2) without being swept away by the current. \n\n* The Key: Their presence is grounding to others. They possess a 'knowing' that life is cyclical, which grants them the patience to wait for the right moment to act.",
+    shadowTitle: "The Impenetrable Ice",
+    shadowBody: "This 'Silver Yog' can become a 'Silver Prison.' The shadow side is 'emotional bypassing'—using balance as a shield against intimacy. The person becomes so 'balanced' that they appear robotic or unfeeling. They may use logic or spiritual concepts to avoid the messiness of true human connection. This creates a partner or friend who is 'perfect' on paper but impossible to reach emotionally; they offer a solution for every problem but never a shoulder to cry on. Trigger logic: If Number 5 is missing but 2 and 8 are present, this creates 'The Emotional Seesaw.'",
   },
 ];
 
@@ -218,9 +242,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [4, 9],
     type: "bridge",
     state: "full",
-    coreTrait: "Combines Wood’s discipline with Fire’s vision.",
+    coreTrait: "Mental Intensity: Combines Wood’s discipline with Fire’s vision.",
     potentialTitle: "The High-Level Strategist",
     potentialBody: "The light side is the 'General's Mind.' They can see 10 steps ahead and have the organizational grit to ensure every step is executed. They excel at turning abstract concepts into institutional realities.",
+    shadowTitle: "The Intellectual Tyrant",
+    shadowBody: "When these two are active without the 2, the mind is a high-speed engine with no brakes. The shadow is a ruthless arrogance. This person doesn't just want to be right; they want to prove everyone else is wrong. They use their intellect as a weapon to dominate conversations and can become pedantic, obsessing over 'facts' while ignoring the human context.",
   },
   {
     id: "9-2-bridge",
@@ -228,9 +254,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [9, 2],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking fame with sensitivity.",
-    potentialTitle: "The Magnetic Influencer",
+    coreTrait: "Performance Drama: Linking fame with sensitivity.",
+    potentialTitle: "The Professional Victim",
     potentialBody: "The potential here is 'Social Grace.' These individuals move through the world with an effortless charisma because they truly listen to the emotional undertones of a room. They use their influence to uplift others, making everyone in their presence feel seen and significant.",
+    shadowTitle: "The Performer of Pain",
+    shadowBody: "This bridge links fame with sensitivity. The shadow is the 'Performer of Pain.' The person may subconsciously exaggerate their problems or emotional state to gain attention or 'fame' within their social circle. They are 'addicted' to the spotlight that comes from crisis, often creating drama just to have a reason to express their sensitivity.",
   },
   {
     id: "3-5-bridge",
@@ -238,9 +266,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [3, 5],
     type: "bridge",
     state: "full",
-    coreTrait: "Links the plan (3) with internal power (5).",
+    coreTrait: "Impulsive Drive: Links the plan (3) with internal power (5).",
     potentialTitle: "The Courageous Creative",
     potentialBody: "The light side is 'Dynamic Innovation.' They have the guts to try ideas that others are afraid of. They are the pioneers who can build a bridge while they are walking on it, possessing a rare blend of imagination and bravery.",
+    shadowTitle: "The Scattered Fire",
+    shadowBody: "Linking creative planning with emotional power, this shadow is 'creative arson.' The person starts brilliant projects but burns them down out of boredom or a sudden emotional whim. They are the 'eternal beginner' who has a drawer full of half-finished masterpieces but no completed work, leading to a life of loud promises and quiet failures.",
   },
   {
     id: "5-7-bridge",
@@ -248,9 +278,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [5, 7],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking centered power with the lessons of the 7.",
+    coreTrait: "The Restless Seeker: Linking centered power with the lessons of the 7.",
     potentialTitle: "The Intuitive Sage",
     potentialBody: "The potential is 'Wisdom through Experience.' These individuals process their challenges into profound insights. They have a 'built-in truth detector' and often act as spiritual or philosophical guides who lead by the example of their own transformation.",
+    shadowTitle: "The Spiritual Tourist",
+    shadowBody: "This connects stability with spiritual loss. The shadow is a 'divine restlessness.' The person moves from one philosophy, diet, or lifestyle to another, never staying long enough to gain true wisdom. They are searching for a 'magic bullet' to fix their internal discomfort, using 'seeking' as a way to avoid the hard work of actually changing themselves.",
   },
   {
     id: "8-1-bridge",
@@ -258,9 +290,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [8, 1],
     type: "bridge",
     state: "full",
-    coreTrait: "Combining knowledge with career drive.",
+    coreTrait: "Practical Start: Combining knowledge with career drive.",
     potentialTitle: "The Ethical Professional",
     potentialBody: "The light side is 'Integrity in Action.' These are the professionals who do the right thing when no one is watching. They have an immense capacity for detailed work and building long-term, stable careers based on a foundation of genuine expertise.",
+    shadowTitle: "The Workhorse Paradox",
+    shadowBody: "This bridge focuses on the beginning of tasks. The shadow is a 'startup addiction.' The person is excellent at the physical logistics of starting a business or project but lacks the vision (9) to see where it should go. They become stuck in a loop of 'setting things up' and can become workaholics who are busy but never actually productive.",
   },
   {
     id: "1-6-bridge",
@@ -268,9 +302,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [1, 6],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking career with home and duty.",
+    coreTrait: "Status Ambition: Linking career with home and duty.",
     potentialTitle: "The Harmonious Leader",
     potentialBody: "The potential is 'Empathetic Governance.' They view their professional team as a family. They create work environments that are beautiful, supportive, and highly functional, understanding that people perform best when they feel secure and appreciated.",
+    shadowTitle: "The False Facade",
+    shadowBody: "Connecting career with luxury, the shadow is 'Empty Elegance.' The person becomes obsessed with the image of success. They may live in a mansion they can barely afford or spend hours curated a social media profile that bears no resemblance to their real life. They value the 'Northwest' energy of luxury so much that they lose the 'Water' energy of authentic self-expression.",
   },
   {
     id: "4-3-bridge",
@@ -278,9 +314,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [4, 3],
     type: "bridge",
     state: "full",
-    coreTrait: "The double-wood energy of discipline and planning.",
+    coreTrait: "Rigid Planning: The double-wood energy of discipline and planning.",
     potentialTitle: "The Master of Craft",
     potentialBody: "The light side is 'Exceptional Precision.' Whether they are building a house or writing code, they possess a 'golden touch' for detail. They find deep satisfaction in the process of creation, not just the finished product.",
+    shadowTitle: "The Micromanager",
+    shadowBody: "The shadow here is a 'stranglehold on reality.' Because they have the wood energy of both discipline and planning, they can become terrified of chaos. They plan their vacations down to the minute and their relationships like business mergers. The shadow is a life without 'breathing room,' where spontaneity is viewed as a threat rather than a joy.",
   },
   {
     id: "3-8-bridge",
@@ -288,9 +326,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [3, 8],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking planning with earth energy.",
+    coreTrait: "Intellectual Stubbornness: Linking planning with earth energy.",
     potentialTitle: "The Scholar of Life",
     potentialBody: "The light side is 'Structural Intellect.' They have a gift for taking complex systems of knowledge and organizing them so others can understand. They are the lifelong learners who stay mentally sharp well into old age because they treat the mind as a garden to be tended.",
+    shadowTitle: "The Closed Circuit",
+    shadowBody: "Connecting planning with knowledge, this shadow is a 'mental dead-end.' Once this person has learned something, they stop listening. They believe their knowledge is a finished product rather than a growing process. This leads to becoming 'old before their time,' stuck in outdated ways of thinking because they equate 'learning' with 'admitting weakness.'",
   },
   {
     id: "9-5-bridge",
@@ -298,9 +338,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [9, 5],
     type: "bridge",
     state: "full",
-    coreTrait: "Fire of recognition meets the power of the center.",
+    coreTrait: "Force over Flow: Fire of recognition meets the power of the center.",
     potentialTitle: "The Charismatic Authority",
     potentialBody: "The light side is 'Authentic Presence.' When they walk into a room, the energy shifts. They lead not through force, but through a radiant self-confidence that inspires others to find their own power.",
+    shadowTitle: "The Tank",
+    shadowBody: "This combines fire with central power. The shadow is 'The Tank.' The person believes that enough willpower can solve any problem. They don't negotiate; they overwhelm. In relationships, this shadow manifests as a 'my way or the highway' attitude that eventually leaves them standing alone at the top of a mountain they climbed by themselves.",
   },
   {
     id: "5-1-bridge",
@@ -308,9 +350,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [5, 1],
     type: "bridge",
     state: "full",
-    coreTrait: "Connecting the center to self-expression.",
+    coreTrait: "The Drifter: Connecting the center to self-expression.",
     potentialTitle: "The Fluid Communicator",
     potentialBody: "The light side is 'Articulate Adaptability.' They can explain anything to anyone. They are the ultimate translators of ideas, able to shift their communication style to meet the needs of their audience without losing their core message.",
+    shadowTitle: "The Ghost",
+    shadowBody: "Linking the center to the career/self, the shadow is 'The Ghost.' Without the fire of the 9 to give them direction, the 5-1 energy can become a person who just 'is.' They drift from job to job and partner to partner with no internal 'why.' They are the ultimate 'chameleon,' losing their own identity to blend into whatever environment they find themselves in.",
   },
   {
     id: "2-7-bridge",
@@ -318,9 +362,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [2, 7],
     type: "bridge",
     state: "full",
-    coreTrait: "Intense, volatile emotional drives and compassionate analysis.",
+    coreTrait: "Compassionate Analyst: Intense, volatile emotional drives and analytical depth.",
     potentialTitle: "The High-Octane Heart",
     potentialBody: "The potential is 'Transformative Empathy.' They feel things more intensely than others, which allows them to create art or provide healing that reaches deep into the human soul. When they master their volatility, they become beacons of authentic expression. They can look at a problem—or a person—and see the hidden patterns, balancing objective data with subjective feeling.",
+    shadowTitle: "Resentful Sacrifice",
+    shadowBody: "This bridge links sensitivity with the analytical loss of the 7. The shadow is the person who gives 'with a receipt.' They help others, sacrifice their time, and listen to problems—but they keep a secret tally. When they don't get the specific recognition they feel they've earned, they explode in a 'volcano of resentment,' weaponizing their past kindness.",
   },
   {
     id: "7-6-bridge",
@@ -328,9 +374,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [7, 6],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking spiritual analysis with domestic harmony.",
+    coreTrait: "Creative Control: Linking spiritual analysis with domestic harmony.",
     potentialTitle: "The Aesthetic Refiner",
     potentialBody: "The light side is 'Sophisticated Grace.' They have a natural talent for making life beautiful. They are the curators of culture, creating homes and communities that act as 'sanctuaries' for the soul, where everything has meaning and place.",
+    shadowTitle: "The Perfectionist Prison",
+    shadowBody: "Connecting the analysis of the 7 with the home/harmony of the 6. The shadow is a home that feels like a museum. The person is so focused on the 'perfect' environment that no one is allowed to actually live in it. This shadow creates a spouse or parent who berates their family over a misplaced coaster, valuing 'order' more than the people the order was meant to serve.",
   },
   {
     id: "4-5-bridge",
@@ -338,9 +386,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [4, 5],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking wealth with central power.",
+    coreTrait: "Financial Hoarding: Linking wealth with central power.",
     potentialTitle: "The Grounded Expander",
     potentialBody: "The light side is 'Sustainable Growth.' They don't believe in 'get-rich-quick' schemes. They build their lives brick by brick, ensuring that every new level of success is supported by a solid foundation. They are the anchors of their families' financial legacy.",
+    shadowTitle: "The Hoarder",
+    shadowBody: "This Earth/Wood bridge focuses on wealth and stability. The shadow is 'The Hoarder.' No matter how much money is in the bank, they feel poor. They may deprive themselves of joy or comfort to save for a 'rainy day' that never comes. This shadow is a life lived in fear of loss, which paradoxically prevents them from ever enjoying what they have gained.",
   },
   {
     id: "5-6-bridge",
@@ -348,9 +398,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [5, 6],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking central power with protection.",
+    coreTrait: "The Smotherer: Linking central power with protection.",
     potentialTitle: "The Community Guardian",
     potentialBody: "The light side is 'The Protective Heart.' They use their strength to shield the vulnerable. They are often the 'glue' that holds a group together, providing a safe space for others to grow while maintaining a healthy boundary of mutual respect.",
+    shadowTitle: "Enmeshed Protection",
+    shadowBody: "The shadow here is 'love as a cage.' The 6's focus on family and the 5's power create a person who cannot let go. They may use guilt or 'safety' as a way to control their children or partners. They believe they are being helpful, but they are actually preventing the people they love from growing, all because they fear being alone.",
   },
   {
     id: "8-5-bridge",
@@ -358,9 +410,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [8, 5],
     type: "bridge",
     state: "full",
-    coreTrait: "Linking knowledge with centered stability.",
+    coreTrait: "The Academic Elitist: Linking knowledge with centered stability.",
     potentialTitle: "The Practical Philosopher",
     potentialBody: "The light side is 'Living Wisdom.' They don't just study concepts; they live them. They have a rare ability to apply high-level philosophy to mundane, everyday problems, making them excellent advisors and mentors.",
+    shadowTitle: "Dry Logic",
+    shadowBody: "Connecting knowledge with the center. The shadow is a person who has 'all the facts and none of the truth.' They can explain the chemical composition of a rose but can't smell its beauty. They often treat emotions as 'errors in data' and can be incredibly dismissive of anything that isn't peer-reviewed or mathematically proven.",
   },
   {
     id: "5-2-bridge",
@@ -368,9 +422,11 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     numbers: [5, 2],
     type: "bridge",
     state: "full",
-    coreTrait: "Link between the power center and high sensitivity.",
+    coreTrait: "The Illusionist: Link between the power center and high sensitivity.",
     potentialTitle: "The Intuitive Mirror",
     potentialBody: "The light side is 'Radiant Empathy.' They have the ability to reflect the best parts of others back to them. By being fully present, they help people see their own potential, acting as a 'catalyst' for the growth of everyone they encounter.",
+    shadowTitle: "The Hall of Mirrors",
+    shadowBody: "The link between the emotional center and high sensitivity. The shadow is 'emotional fiction.' This person perceives slights where there are none and creates complex narratives about others' motivations that have no basis in reality. They live in a world of 'feelings as facts,' which makes them impossible to argue with because their reality is constructed entirely from their own shifting moods.",
   },
   {
     id: "2-4-bridge",
@@ -381,6 +437,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Logic and intuition interacting to produce resourcefulness.",
     potentialTitle: "The Intuitive Logician",
     potentialBody: "The potential is a 'double-check' system where the gut feeling is instantly verified by logic. These individuals excel in high-stakes environments because they can trust their instincts while simultaneously calculating the risks.",
+    shadowTitle: "The Schemer",
+    shadowBody: "When logic (4) and intuition (2) link without the grounding of the central plane, the mind becomes 'too smart for its own good.' The shadow manifests as the ability to exploit loopholes and manipulate systems. They breeze through life by cutting corners, eventually losing the ability to find satisfaction in honest, hard-won achievements.",
   },
   {
     id: "6-8-bridge",
@@ -391,6 +449,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Strong tendency to pursue risks and protect others.",
     potentialTitle: "The Sincere Protector",
     potentialBody: "The potential is 'Servant Leadership.' They use their material stability (8) and sense of home/duty (6) to create a sanctuary for others. They are the silent pillars of their communities, often taking on burdens for the collective without asking for recognition.",
+    shadowTitle: "The Resentful Martyr",
+    shadowBody: "This bridge links the responsibility of the 6 with the knowledge/materiality of the 8. The shadow is a 'transactional kindness.' They care for others and take risks to protect people, but they keep a secret tally. When the recognition they feel they’ve earned isn’t provided, they collapse into a 'volcano of resentment,' weaponizing their past kindness against those they helped.",
   },
   {
     id: "4-8-bridge",
@@ -401,6 +461,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Combination of perseverance and persistence.",
     potentialTitle: "The Solid Foundation",
     potentialBody: "The light side is 'The Unshakeable Spirit.' In a world of chaos, these people are the fixed point. They have the ability to stick with a vision for decades, building legacies that outlast their own lifetimes.",
+    shadowTitle: "The Rigidity Trap",
+    shadowBody: "This is the ultimate 'comfort zone' shadow. The combination of perseverance and logic creates a person who is terrified of change. They become so dependent on a fixed setting or routine that any disruption—be it a move, a career change, or a breakup—causes a total system crash. They choose a miserable stability over a hopeful uncertainty.",
   },
   {
     id: "2-6-bridge",
@@ -411,6 +473,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Gentle and generous personality.",
     potentialTitle: "The Approachable Diplomat",
     potentialBody: "This is the bridge of 'Social Lubrication.' They have the gift of making anyone feel at home. Their potential lies in their ability to bridge gaps between conflicting parties, using their innate kindness to soften hard hearts.",
+    shadowTitle: "The Enabler",
+    shadowBody: "The shadow of this gentle personality is 'peace at any price.' To maintain the appearance of harmony, they will suppress their own truth and enable the toxic behavior of others. They are easily cheated because they prioritize 'not making a scene' over their own boundaries, leading to deep internal depression and a feeling of being a 'doormat.'",
   },
   {
     id: "1-2-bridge",
@@ -421,6 +485,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Intense focus on small facts and data.",
     potentialTitle: "The Precision Specialist",
     potentialBody: "The potential is 'Excellence through Awareness.' They don't just see a project; they see the atoms of it. This makes them invaluable in fields requiring high accuracy, from coding and engineering to surgery and fine art.",
+    shadowTitle: "The Pedant",
+    shadowBody: "This bridge creates an intense focus on small facts. The shadow is 'micro-obsession.' The person loses the ability to see the 'Big Picture' because they are fixated on a single, trivial detail. In projects, they may stall an entire team's progress because one minor font or data point isn't 'correct,' missing the deadline entirely.",
   },
   {
     id: "3-9-bridge",
@@ -431,6 +497,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "A mind that never stops asking 'Why?'",
     potentialTitle: "The Eternal Questioner",
     potentialBody: "The potential is 'Lifelong Growth.' They are the 'Evolutionaries' who refuse to become stagnant. By constantly seeking new knowledge, they act as the scouts for humanity, bringing back new ideas from the frontiers of thought.",
+    shadowTitle: "The Mental Drifter",
+    shadowBody: "The mind that never stops asking 'Why?' can become a mind that never starts 'Doing.' The shadow is 'Information Addiction.' They collect degrees, books, and facts like trophies but never apply them to build a life. They know everything about how the world works but cannot manage their own daily affairs.",
   },
   {
     id: "5-9-bridge",
@@ -441,6 +509,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Bravery in the face of physical and existential danger.",
     potentialTitle: "The Fearless Pioneer",
     potentialBody: "The light side is 'Inspiring Initiative.' They don't just talk about change; they embody it. Their courage acts as a catalyst, giving others the permission to face their own fears and step into their power.",
+    shadowTitle: "The Reckless Gambler",
+    shadowBody: "This combines central power with fire. The shadow side is a disregard for consequences. Their bravery is not calculated; it is impulsive. They take physical, financial, and emotional risks just to feel the 'rush' of the 5-9 energy, often leaving a trail of chaos for others to clean up.",
   },
   {
     id: "1-2-3-bridge",
@@ -451,6 +521,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Merges scientific precision with artistic flair.",
     potentialTitle: "The Aesthetic Visionary",
     potentialBody: "The potential is 'The Master Craftsman.' They find the symmetry in math and the logic in music. They are the ones who can build a machine that is also a work of art, or write code that is as elegant as a poem.",
+    shadowTitle: "The Starving Perfectionist",
+    shadowBody: "The conceptual 'Artistic Soul' bridge often suffers from 'The Execution Gap.' Because they have a deep need for symmetry and beauty, they may refuse to release any work that is less than perfect. The shadow is a life of unfinished masterpieces and 'what ifs,' as they are too afraid of being judged for their imperfections.",
   },
   {
     id: "peace-of-mind",
@@ -461,6 +533,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Serene and tranquil nature with excellent memory.",
     potentialTitle: "Sublime Contentment",
     potentialBody: "They possess a clear conscience and a balanced approach to the past, present, and future, serving as an anchor of tranquility for stressed environments.",
+    shadowTitle: "The Detached Observer",
+    shadowBody: "The shadow side is a retreat into emotional numbness. The peace is maintained by refusing to engage with life's messy but necessary conflicts.",
   },
   {
     id: "vitality",
@@ -471,6 +545,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "High-energy individual needing to be 'on the move'.",
     potentialTitle: "Unstoppable Momentum",
     potentialBody: "They are the high-energy 'Engines' of society, possessing the physical robustness to manifest big visions through sheer stamina.",
+    shadowTitle: "Burnout Exhaustion",
+    shadowBody: "The shadow side is 'Inactivity' when the tank runs dry. They push so hard that they eventually collapse, leading to long periods of forced rest and depression.",
   },
   {
     id: "intuition-experience",
@@ -481,6 +557,8 @@ export const MINOR_ARROW_DEFINITIONS: ArrowDefinition[] = [
     coreTrait: "Grounded and realistic, learning by doing.",
     potentialTitle: "Pragmatic Mastery",
     potentialBody: "They are the 'Street-Smart' geniuses who learn by doing. Their potential lies in their ability to read physical reality and fix what is broken with intuitive ease.",
+    shadowTitle: "Materialistic Skepticism",
+    shadowBody: "The shadow side is a refusal to believe in anything that cannot be touched or measured. They may dismiss spiritual or emotional intelligence as 'useless fluff.'",
   },
 ];
 

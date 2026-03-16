@@ -155,6 +155,7 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
               arrowId={selectedArrow.id} 
               existingMeaning={selectedArrow.description} 
               birthDate={birthDate} 
+              externalCounts={numberCounts as any}
             />
           )}
         </DialogContent>
