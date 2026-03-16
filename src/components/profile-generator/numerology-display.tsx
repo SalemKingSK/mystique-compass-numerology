@@ -10,6 +10,7 @@ import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PersonalYearChart } from './personal-year-chart';
 import { ZodiacSection } from './zodiac-section';
+import LoshuArrowDetailPanel from '@/components/LoshuArrowDetailPanel';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -116,8 +117,8 @@ const DestinyMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number,
 });
 DestinyMeaningDisplay.displayName = 'DestinyMeaningDisplay';
 
-const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: ArrowData[], arrowsOfWeakness: ArrowData[], openItems: string[], onToggle: (value: string[]) => void }>(
-    ({ arrowsOfStrength, arrowsOfWeakness, openItems, onToggle }, ref) => {
+const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: ArrowData[], arrowsOfWeakness: ArrowData[], openItems: string[], onToggle: (value: string[]) => void, birthDate: string, numberCounts: Record<number, number> }>(
+    ({ arrowsOfStrength, arrowsOfWeakness, openItems, onToggle, birthDate, numberCounts }, ref) => {
     
     const categories = Array.from(new Set([
         ...arrowsOfStrength.map(a => a.category),
@@ -136,7 +137,12 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
                     </span>
                 </AccordionTrigger>
                 <AccordionContent className="font-body text-base leading-relaxed">
-                   <AccordionContentWithPlayer text={arrow.description} />
+                   <LoshuArrowDetailPanel 
+                      arrowId={arrow.id} 
+                      existingMeaning={arrow.description} 
+                      birthDate={birthDate} 
+                      externalCounts={numberCounts as any}
+                   />
                 </AccordionContent>
             </AccordionItem>
         );
@@ -253,12 +259,13 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const [personalYearAccordionValue, setPersonalYearAccordionValue] = React.useState<string>("");
 
     const handleYearSelect = (data: PersonalYearData | null) => {
-        setSelectedPersonalYear(data);
-        if (data) {
-            // Force open the detail when a year is selected from graph
-            setPersonalYearAccordionValue("personal-year-detail");
-        } else {
-            setPersonalYearAccordionValue("");
+        if (data?.year !== selectedPersonalYear?.year) {
+            setSelectedPersonalYear(data);
+            if (data) {
+                setPersonalYearAccordionValue("personal-year-detail");
+            } else {
+                setPersonalYearAccordionValue("");
+            }
         }
     };
 
@@ -430,7 +437,15 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
       {destinyMeaning && <DestinyMeaningDisplay ref={destinyRef} number={destinyNum} title={destinyMeaning.title} meaning={destinyMeaning.description} open={openSections.includes(destinyId)} onToggle={() => handleToggle(destinyId)} />}
 
-      <ArrowsDisplay ref={arrowsRef} arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} openItems={openSections} onToggle={handleToggleMultiple} />
+      <ArrowsDisplay 
+        ref={arrowsRef} 
+        arrowsOfStrength={arrowsOfStrength} 
+        arrowsOfWeakness={arrowsOfWeakness} 
+        openItems={openSections} 
+        onToggle={handleToggleMultiple} 
+        birthDate={birthDateString}
+        numberCounts={numberCounts as any}
+      />
 
       <div ref={kuaRef}>
           <KuaDisplay kuaAttributes={kuaAttributes} open={openSections.includes(kuaId)} onToggle={() => handleToggle(kuaId)} />

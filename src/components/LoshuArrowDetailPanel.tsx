@@ -32,19 +32,21 @@ interface LoshuArrowDetailPanelProps {
   arrowId: string;
   existingMeaning: string;
   birthDate: string;
+  externalCounts?: Record<number, number>;
 }
 
 export default function LoshuArrowDetailPanel({
   arrowId,
   existingMeaning,
   birthDate,
+  externalCounts
 }: LoshuArrowDetailPanelProps) {
   const [openLayer, setOpenLayer] = useState<2 | 3 | null>(null);
 
   const definition = ALL_ARROW_DEFINITIONS.find((a) => a.id === arrowId);
   if (!definition) return null;
 
-  const status   = getArrowStatus(definition, birthDate);
+  const status   = getArrowStatus(definition, birthDate, externalCounts);
   const typeMeta = TYPE_META[definition.type];
   const stateMeta = STATE_META[definition.state];
   const isPresence = definition.state === "full";

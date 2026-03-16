@@ -85,8 +85,6 @@ export default function LoshuNumberDetailPanel({
 }: LoshuNumberDetailPanelProps) {
   const [openLayer, setOpenLayer] = useState<2 | 3 | 4 | null>(null);
 
-  // We pass the actual count to ensure 'isDrowning' is correct even if repetitions 
-  // come from Psyche/Destiny/Kua calculation.
   const analysis = analyzeNumber(number, birthDate, count);
   const { definition, isDrowning, drownsNumbers, remedy, lifePathConflict, lifePath } =
     analysis;
@@ -262,7 +260,7 @@ export default function LoshuNumberDetailPanel({
               </>
             ) : (
               <div className="loshu-no-conflict">
-                <p>Your Life Path ({lifePath}) does not share a direct psychodynamic conflict with this grid number. The system is in relative balance.</p>
+                <AccordionContentWithPlayer text={`Your Life Path (${lifePath}) does not share a direct psychodynamic conflict with this grid number. The system is in relative balance.`} />
               </div>
             )}
             <SectionDivider label={`Remedies for Number ${number}`} />
@@ -293,7 +291,6 @@ export default function LoshuNumberDetailPanel({
       <style>{`
         .loshu-detail-root { display: flex; flex-direction: column; gap: 0; }
         .loshu-layer-1 { padding: 0 0 16px; }
-        .loshu-existing-meaning { font-size: 15px; line-height: 1.7; color: #e2daf5; margin: 0; }
         .loshu-accordion { border-top: 1px solid #2a2340; margin-top: 2px; }
         .loshu-accordion-header { width: 100%; background: transparent; border: none; padding: 14px 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 10px; }
         .loshu-accordion-left { display: flex; align-items: center; gap: 10px; }
