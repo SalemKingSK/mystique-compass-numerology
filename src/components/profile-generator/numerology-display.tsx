@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PersonalYearChart } from './personal-year-chart';
 import { ZodiacSection } from './zodiac-section';
 import LoshuArrowDetailPanel from '@/components/LoshuArrowDetailPanel';
+import { FateChambers } from './fate-chambers';
 
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
@@ -25,30 +26,6 @@ const InfoCard = ({ title, value, icon, onClick }: { title: string, value: strin
         <p className="text-5xl font-bold text-yellow-300 mt-2 font-decorative shadow-yellow-500/20 drop-shadow-lg">{value || ''}</p>
     </div>
 );
-
-const FateDisplay = React.forwardRef<HTMLDivElement, { id: string, title: string, meaning: string | null, open: boolean, onToggle: () => void, icon?: React.ReactNode }>(
-  ({ id, title, meaning, open, onToggle, icon }, ref) => {
-    if (!meaning) return null;
-    return (
-        <div ref={ref}>
-            <Accordion type="single" collapsible className="w-full" value={open ? id : ""} onValueChange={onToggle}>
-                <AccordionItem value={id} className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
-                    <AccordionTrigger>
-                        <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
-                            {icon || <Wand2 className="h-5 w-5" />} {title}
-                        </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="font-body text-base leading-relaxed">
-                       <AccordionContentWithPlayer text={meaning} />
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-        </div>
-    );
-  }
-);
-FateDisplay.displayName = 'FateDisplay';
-
 
 const PsychicMeaningDisplay = React.forwardRef<HTMLDivElement, { number: number, title: string, meaning: string, open: boolean, onToggle: () => void }>(
     ({ number, title, meaning, open, onToggle }, ref) => {
@@ -272,9 +249,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const psychicRef = React.useRef<HTMLDivElement>(null);
     const specialTraitRef = React.useRef<HTMLDivElement>(null);
     const destinyRef = React.useRef<HTMLDivElement>(null);
-    const compoundRef = React.useRef<HTMLDivElement>(null);
-    const inherentRef = React.useRef<HTMLDivElement>(null);
-    const karmicRef = React.useRef<HTMLDivElement>(null);
+    const chambersRef = React.useRef<HTMLDivElement>(null);
     const kuaRef = React.useRef<HTMLDivElement>(null);
     const arrowsRef = React.useRef<HTMLDivElement>(null);
 
@@ -320,9 +295,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const psychicId = `psychic-${psycheNum}`;
     const specialTraitId = `special-trait-${birthDay}`;
     const destinyId = `destiny-${destinyNum}`;
-    const compoundId = `compound-fate`;
-    const inherentId = `inherent-fate`;
-    const karmicId = `karmic-fate`;
     const kuaId = 'kua-section';
 
     const birthDateString = `${birthDay}-${birthMonth}-${birthYear}`;
@@ -334,7 +306,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={handlePsycheClick} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleScrollAndOpen(destinyRef, destinyId)} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleScrollAndOpen(kuaRef, kuaId)} />
-        {compoundNum && <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleScrollAndOpen(compoundRef, compoundId)}/>}
+        {compoundNum && <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} />}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -425,10 +397,15 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         )}
       </AnimatePresence>
 
-      <div className="space-y-4">
-         {compoundNum && <FateDisplay ref={compoundRef} id={compoundId} title={`Compound Fate: ${compoundNum}`} meaning={compoundMeaning} open={openSections.includes(compoundId)} onToggle={() => handleToggle(compoundId)}/>}
-         {reducedCompoundNum && <FateDisplay ref={inherentRef} id={inherentId} title={`Inherent Fate: ${reducedCompoundNum}`} meaning={reducedCompoundMeaning} open={openSections.includes(inherentId)} onToggle={() => handleToggle(inherentId)} />}
-         {karmicFateNum && <FateDisplay ref={karmicRef} id={karmicId} title={`Karmic Fate: ${karmicFateNum}`} meaning={karmicFateMeaning} open={openSections.includes(karmicId)} onToggle={() => handleToggle(karmicId)} icon={<Activity className="h-5 w-5" />} />}
+      <div ref={chambersRef}>
+        <FateChambers 
+          compoundNum={compoundNum}
+          compoundMeaning={compoundMeaning}
+          reducedCompoundNum={reducedCompoundNum}
+          reducedCompoundMeaning={reducedCompoundMeaning}
+          karmicFateNum={karmicFateNum}
+          karmicFateMeaning={karmicFateMeaning}
+        />
       </div>
 
       {psychicMeaning && <PsychicMeaningDisplay ref={psychicRef} number={psycheNum} title={psychicMeaning.title} meaning={psychicMeaning.description} open={openSections.includes(psychicId)} onToggle={() => handleToggle(psychicId)} />}
