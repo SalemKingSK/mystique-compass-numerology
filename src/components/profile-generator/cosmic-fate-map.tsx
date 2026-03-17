@@ -15,7 +15,7 @@ import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { INTERSECTION_SYNTHESIS } from '@/lib/cosmic-fate/intersections';
 import { CHINESE_CALENDAR } from '@/lib/new-astrology/chinese-calendar';
 import { BOOK } from '@/lib/cosmic-fate/book';
-import { ANIMALS } from '@/lib/cosmic-fate/constants';
+import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
 import { CosmicRiskScanner } from './cosmic-risk-scanner';
 
 interface Props {
@@ -101,6 +101,7 @@ const getStatusLabelShort = (c: string) => ({
 
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const initialized = useRef(false);
+  const [readYearState, setReadYearState] = useState(new Date().getFullYear());
 
   useEffect(() => {
     (window as any).calculate = () => {
@@ -109,6 +110,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const ryValue = parseInt(ryInput.value);
       if (!ryValue || isNaN(ryValue)) return;
       const ry = ryValue;
+      
+      setReadYearState(ry);
 
       const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(ry));
       const uy = reduce(ry);
@@ -432,112 +435,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       }
     };
 
-    (window as any).ttsPlay = (btnEl: HTMLElement, containerId: string) => {
-      if (!window.speechSynthesis) return;
-      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-      
-      const container = document.getElementById(containerId);
-      if (!container) return;
-
-      if (!container.querySelector('.tts-s')) {
-        const text = container.innerText;
-        const sentences = text.match(/[^.!?\n]+[.!?\n]*/g);
-        if (sentences) {
-          container.innerHTML = sentences.map((s, i) => `<span class="tts-s" data-idx="${i}">${s}</span>`).join('');
-        } else {
-          container.innerHTML = `<span class="tts-s" data-idx="0">${text}</span>`;
-        }
-      }
-
-      const spans = container.querySelectorAll('.tts-s');
-      let currentIdx = 0;
-
-      const speak = () => {
-        if (currentIdx >= spans.length) {
-          btnEl.classList.remove('playing');
-          spans.forEach(s => (s as HTMLElement).classList.remove('reading'));
-          return;
-        }
-
-        spans.forEach(s => (s as HTMLElement).classList.remove('reading'));
-        const span = spans[currentIdx] as HTMLElement;
-        span.classList.add('reading');
-        span.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        const utterance = new SpeechSynthesisUtterance(span.innerText || '');
-        utterance.rate = 0.9;
-        utterance.onstart = () => btnEl.classList.add('playing');
-        utterance.onend = () => {
-          currentIdx++;
-          speak();
-        };
-        utterance.onerror = () => {
-          btnEl.classList.remove('playing');
-          spans.forEach(s => (s as HTMLElement).classList.remove('reading'));
-        };
-        window.speechSynthesis.speak(utterance);
-      };
-
-      speak();
-    };
-
-    (window as any).closePop = () => {
-      const overlay = document.getElementById('overlay');
-      if (overlay) overlay.classList.remove('visible');
-      document.body.style.overflow = '';
-      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-    };
-
-    (window as any).swT = (name: string, btn: HTMLElement) => {
-      const parent = btn.closest('.year-deep-dive');
-      if (!parent) return;
-      parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      parent.querySelector(`#tp-${name}`)?.classList.add('active');
-      btn.classList.add('active');
-      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-    };
-
-    (window as any).switchDash = (btn: HTMLElement) => {
-      document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      const panelId = 'panel-' + (btn as any).dataset.panel;
-      document.getElementById(panelId)?.classList.add('active');
-      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-    };
-
-    (window as any).openZodiacPop = (aniName: string, birthSign: string, year: string, age: string, cat: string) => {
-      const ba = ZOO[birthSign]; const ya = ZOO[aniName]; if (!ba || !ya) return;
-      const dyn = ba[`${cat}Desc`] || ba[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `This ${year} ${aniName} year is a Neutral period for ${birthSign}. No special Tai Sui relationship creates extraordinary support or challenge. Individual effort and existing momentum determine outcomes. This is an excellent year for foundation-building, skill development, and relationship refinement that will serve as a stable platform for the years that follow.`;
-      
-      const labelColor = (cat === 'clash') ? '#f87171' : (cat === 'alliance') ? '#34d399' : (cat === 'harm') ? '#fbbf24' : (cat === 'ben') ? '#c8a84b' : (cat === 'destruction') ? '#a78bfa' : 'var(--cf-silver-dim)';
-      const catDef = BOOK.categories[cat === 'destruction' ? 'destruction' : cat] || '';
-
-      const pb = document.getElementById('pb');
-      if (pb) {
-        pb.innerHTML = `
-          <button class="tts-btn mb-6 w-full" onclick="window.ttsPlay(this, 'pb-content')">🔊 Read Aloud</button> 
-          <div id="pb-content">
-            <div class="ibox mb-6"><strong>${year} (${aniName} Year, Age ${age})</strong> — Tai Sui: <span style="color:${labelColor}">${catLabel(cat)}</span></div> 
-            
-            ${catDef ? `<div class="sbox mb-6 text-sm" style="border-left-color:${labelColor}">${catDef}</div>` : ''}
-
-            <div class="content-h mb-3 uppercase tracking-widest text-xs opacity-60">YOUR ${birthSign.toUpperCase()} IN ${aniName.toUpperCase()} YEAR</div> 
-            ${dyn.split('\n\n').map((p: string)=>`<p class="cp mb-4 text-sm leading-relaxed">${p}</p>`).join('')} 
-            
-            <div class="content-h mt-8 mb-3 uppercase tracking-widest text-xs opacity-60">${aniName.toUpperCase()} YEAR QUALITIES</div> 
-            <p class="cp text-sm">${ya.trait}. Health focus: ${ya.organ}. Direction: ${ya.dir}.</p>
-          </div>`;
-      }
-      
-      const pg = document.getElementById('pg'); if (pg) pg.innerText = ya.e;
-      const ph = document.getElementById('ph'); if (ph) ph.innerText = `${year}: ${aniName} Year`;
-      const ps = document.getElementById('ps'); if (ps) ps.innerText = `${birthSign} × ${aniName} — ${catLabel(cat)}`;
-      const overlay = document.getElementById('overlay'); if (overlay) overlay.classList.add('visible');
-      document.body.style.overflow = 'hidden';
-    };
-
     if (!initialized.current) {
       (window as any).calculate();
       initialized.current = true;
@@ -587,7 +484,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <div className="dash-panel" id="panel-pinnacles"><div id="pinnacles-container"></div></div>
             <div className="dash-panel" id="panel-convergence"><div id="convergence-cards"></div></div>
             <div className="dash-panel" id="panel-scanner">
-              <CosmicRiskScanner />
+              <CosmicRiskScanner targetYear={readYearState} />
             </div>
           </div>
         </div>
