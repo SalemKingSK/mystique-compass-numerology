@@ -4,8 +4,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Zap, RotateCcw, Loader2, 
-  ChevronDown, ChevronUp, ExternalLink,
-  Telescope, FilterX, Globe, Trash2
+  ExternalLink, Telescope, Trash2, History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,9 +31,9 @@ const DANGER_TIERS = [
 ];
 
 const DEPTHS = [
-  { label: "Standard", sub: "~100/yr", perYear: 100 },
-  { label: "Deep", sub: "~300/yr", perYear: 300 },
-  { label: "Global Discovery", sub: "~500/yr", perYear: 500 },
+  { label: "Quick", sub: "~50/yr", perYear: 50 },
+  { label: "Global", sub: "~250/yr", perYear: 250 },
+  { label: "Infinite", sub: "~500/yr", perYear: 500 },
 ];
 
 function getDangerTier(total: number) {
@@ -87,13 +86,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const [running, setRunning] = useState(false);
   const [stats, setStats] = useState({ checked: 0, flagged: 0, done: false, phase: "" });
   const [found, setFound] = useState<any[]>([]);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [scanLog, setScanLog] = useState<any[]>([]);
   const [filterQuery, setFilterQuery] = useState("");
   const [continueTokens, setContinueTokens] = useState<Record<number, string | null>>({});
   
   const abort = useRef(false);
   const foundRef = useRef<any[]>([]);
+  const statsRef = useRef({ checked: 0, flagged: 0 });
+  const tokensRef = useRef<Record<number, string | null>>({});
 
   // Calculate dynamic context based on targetYear
   const targetSign = useMemo(() => {
@@ -118,7 +119,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     Object.entries(CF_CONFIG).forEach(([type, config]) => {
       if (!config.animal) return;
       const animalIdx = ANIMALS.findIndex(a => a.n === config.animal);
-      // Scan 4 cycles back (approx age 24 to 72)
+      // Scan 5 cycles back
       [2, 3, 4, 5, 6].forEach(cycle => {
         list.push({ year: targetYear - (cycle * 12) + (animalIdx - (targetYear - 1900) % 12), type, config });
       });
@@ -126,34 +127,54 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     return list.filter(y => y.year > 1900 && y.year < targetYear).sort((a, b) => b.year - a.year);
   }, [targetYear, CF_CONFIG]);
 
-  // Persistent storage logic
+  // LOAD Persistent State
   useEffect(() => {
-    const saved = localStorage.getItem(`discovery_${targetYear}`);
+    const key = `scanner_posterity_v4_${targetYear}`;
+    const saved = localStorage.getItem(key);
     if (saved) {
-      const data = JSON.parse(saved);
-      setFound(data);
-      foundRef.current = data;
-      setStats(s => ({ ...s, flagged: data.length, done: true }));
+      try {
+        const state = JSON.parse(saved);
+        setFound(state.found || []);
+        foundRef.current = state.found || [];
+        setStats(state.stats || { checked: 0, flagged: 0, done: true, phase: "" });
+        statsRef.current = state.stats || { checked: 0, flagged: 0 };
+        setContinueTokens(state.tokens || {});
+        tokensRef.current = state.tokens || {};
+      } catch (e) {
+        console.error("Failed to load scanner state", e);
+      }
     } else {
       setFound([]);
       foundRef.current = [];
-      setStats({ checked: 0, flagged: 0, done: false, phase: "" });
+      const freshStats = { checked: 0, flagged: 0, done: false, phase: "" };
+      setStats(freshStats);
+      statsRef.current = freshStats;
+      setContinueTokens({});
+      tokensRef.current = {};
     }
-    setContinueTokens({});
     setScanLog([]);
   }, [targetYear]);
 
-  const saveFound = (data: any[]) => {
-    localStorage.setItem(`discovery_${targetYear}`, JSON.stringify(data));
+  const persistState = () => {
+    const key = `scanner_posterity_v4_${targetYear}`;
+    localStorage.setItem(key, JSON.stringify({
+      found: foundRef.current,
+      stats: statsRef.current,
+      tokens: tokensRef.current
+    }));
   };
 
   const clearData = () => {
-    localStorage.removeItem(`discovery_${targetYear}`);
+    if (!confirm(`Clear all discovered data for the year ${targetYear}?`)) return;
+    const key = `scanner_posterity_v4_${targetYear}`;
+    localStorage.removeItem(key);
     setFound([]);
     foundRef.current = [];
+    statsRef.current = { checked: 0, flagged: 0 };
     setStats({ checked: 0, flagged: 0, done: false, phase: "" });
-    setScanLog([]);
     setContinueTokens({});
+    tokensRef.current = {};
+    setScanLog([]);
   };
 
   const startScan = async (isContinuing: boolean = false) => {
@@ -161,20 +182,29 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setRunning(true);
     
     if (!isContinuing) {
-      setStats(s => ({ ...s, done: false, phase: "Initializing Engine..." }));
-    } else {
-      setStats(s => ({ ...s, done: false, phase: "Resuming Scan..." }));
+      if (confirm("Reset current progress and start from the beginning of alphabetical lists? Stored results will be cleared.")) {
+        tokensRef.current = {};
+        statsRef.current = { checked: 0, flagged: 0 };
+        setFound([]);
+        foundRef.current = [];
+        setContinueTokens({});
+      } else {
+        setRunning(false);
+        return;
+      }
     }
 
+    setStats(s => ({ ...s, done: false, phase: "Initializing Engine..." }));
+
     const perYear = DEPTHS[depthIdx].perYear;
-    let localChecked = isContinuing ? stats.checked : 0;
-    let localFlagged = isContinuing ? stats.flagged : 0;
 
     for (const item of SCAN_YEARS_DYNAMIC) {
       if (abort.current) break;
       const { year, type, config } = item;
-      const currentToken = continueTokens[year] || undefined;
       
+      const currentToken = tokensRef.current[year];
+      if (isContinuing && currentToken === "COMPLETED") continue;
+
       setScanLog(p => {
         const existing = p.find(l => l.year === year);
         if (existing) return p.map(l => l.year === year ? { ...l, status: "loading" } : l);
@@ -186,10 +216,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       let titles: string[] = [];
       let nextToken: string | null = null;
       try {
-        const result = await fetchCategoryMembers(year, perYear, currentToken);
+        const result = await fetchCategoryMembers(year, perYear, (currentToken === "COMPLETED" ? undefined : currentToken) || undefined);
         titles = result.titles;
         nextToken = result.cmcontinue;
-        setContinueTokens(prev => ({ ...prev, [year]: nextToken }));
+        tokensRef.current[year] = nextToken || "COMPLETED";
+        setContinueTokens({ ...tokensRef.current });
       } catch (e) {
         setScanLog(p => p.map(l => l.year === year ? { ...l, status: "error" } : l));
         continue;
@@ -219,7 +250,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           const bd = wt ? extractBirthDate(wt) : null;
           
           yearChecked++;
-          localChecked++;
+          statsRef.current.checked++;
 
           if (bd) {
             const py = reduce(bd.day + bd.month + targetUY);
@@ -242,32 +273,32 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`
               };
               
-              // Prevent duplicates
               if (!foundRef.current.find(f => f.name === entry.name)) {
                 yearFound++;
-                localFlagged++;
+                statsRef.current.flagged++;
                 foundRef.current = [...foundRef.current, entry].sort((a, b) => b.totalScore - a.totalScore);
                 setFound([...foundRef.current]);
-                saveFound(foundRef.current);
               }
             }
           }
           
           setStats(s => ({
             ...s,
-            checked: localChecked,
-            flagged: localFlagged,
+            checked: statsRef.current.checked,
+            flagged: statsRef.current.flagged,
             phase: `Scanning ${year} Births... (${yearChecked}/${titles.length})`
           }));
         }
         setScanLog(p => p.map(l => l.year === year ? { ...l, checked: l.checked + yearChecked, found: l.found + yearFound, status: "scanning" } : l));
+        persistState();
         if (!abort.current) await new Promise(r => setTimeout(r, 50));
       }
-      setScanLog(p => p.map(l => l.year === year ? { ...l, status: "done" } : l));
+      setScanLog(p => p.map(l => l.year === year ? { ...l, status: tokensRef.current[year] === "COMPLETED" ? "done" : "ready" } : l));
     }
 
     setRunning(false);
     setStats(s => ({ ...s, done: true, phase: "Batch Complete" }));
+    persistState();
   };
 
   const filteredFound = useMemo(() => {
@@ -302,107 +333,71 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
             </h2>
             <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest">
-              Discovery Context: {targetYear} {targetSign.n} Year ({targetSign.e})
+              DISCOVERY CONTEXT: {targetYear} {targetSign.n} YEAR ({targetSign.e})
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {found.length > 0 && (
-              <Button variant="ghost" size="icon" onClick={clearData} className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+            <Button variant="ghost" size="icon" onClick={clearData} className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
+              <Trash2 className="h-4 w-4" />
+            </Button>
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
               WIKIPEDIA LIVE FEED
             </Badge>
           </div>
         </div>
 
-        {!running && !stats.done && found.length === 0 && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-500">
-            <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
-              <p className="text-sm leading-relaxed text-slate-300 font-body">
-                This engine scans Wikipedia's <strong className="text-primary">Category:{targetYear}_births</strong> system to automatically discover notable figures facing volatile energy in the {targetYear} {targetSign.n} cycle.
-              </p>
-            </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+            <div className="text-2xl font-black text-primary font-decorative">{stats.checked}</div>
+            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Total Checked</div>
+          </div>
+          <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+            <div className="text-2xl font-black text-orange-400 font-decorative">{found.length}</div>
+            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Flagged Risks</div>
+          </div>
+          <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+            <div className="text-2xl font-black text-rose-500 font-decorative">{found.filter(f => f.totalScore >= 5).length}</div>
+            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Critical/Severe</div>
+          </div>
+          <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+            <div className="text-2xl font-black text-blue-400 font-decorative">{found.filter(f => f.totalScore <= 3).length}</div>
+            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Elevated/Notable</div>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-              {Object.entries(CF_CONFIG).map(([type, cf]) => (
-                <div key={type} className="p-3 rounded-lg border flex flex-col items-center text-center gap-1" style={{ backgroundColor: cf.bg, borderColor: cf.border, color: cf.color }}>
-                  <span className="text-xl">{cf.glyph}</span>
-                  <div className="text-[10px] font-black uppercase font-cinzel">{cf.label}</div>
-                  <div className="text-[9px] opacity-70 tracking-tighter">{cf.animal || 'N/A'} conflict</div>
-                </div>
+        {running ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-3 w-3 animate-spin" /> {stats.phase}
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => (abort.current = true)} className="h-6 text-rose-400 text-[9px] uppercase">
+                Stop
+              </Button>
+            </div>
+            <Progress value={(stats.checked % 7500 / 7500) * 100} className="h-1 bg-white/5" />
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex items-center gap-2 bg-black/20 p-1 rounded-full border border-white/10 w-full sm:w-auto">
+              {DEPTHS.map((d, i) => (
+                <button
+                  key={d.label}
+                  onClick={() => setDepthIdx(i)}
+                  className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all font-cinzel ${
+                    depthIdx === i ? 'bg-primary text-primary-foreground' : 'text-slate-500'
+                  }`}
+                >
+                  {d.label}
+                </button>
               ))}
             </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-white/5">
-              <div className="flex items-center gap-2 bg-black/20 p-1 rounded-full border border-white/10 w-full sm:w-auto">
-                {DEPTHS.map((d, i) => (
-                  <button
-                    key={d.label}
-                    onClick={() => setDepthIdx(i)}
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all font-cinzel ${
-                      depthIdx === i ? 'bg-primary text-primary-foreground' : 'text-slate-500'
-                    }`}
-                  >
-                    {d.label}
-                  </button>
-                ))}
-              </div>
-              <Button 
-                onClick={() => startScan(false)} 
-                className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8"
-              >
-                <Zap className="mr-2 h-4 w-4" /> Start Discovery
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {(running || found.length > 0) && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-primary font-decorative">{stats.checked}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Total Checked</div>
-              </div>
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-orange-400 font-decorative">{found.length}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Flagged Risks</div>
-              </div>
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-rose-500 font-decorative">{found.filter(f => f.totalScore >= 5).length}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Critical/Severe</div>
-              </div>
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-blue-400 font-decorative">{found.filter(f => f.totalScore <= 3).length}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Elevated/Notable</div>
-              </div>
-            </div>
-
-            {running && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-3 w-3 animate-spin" /> {stats.phase}
-                  </span>
-                  <Button variant="ghost" size="sm" onClick={() => (abort.current = true)} className="h-6 text-rose-400 text-[9px] uppercase">
-                    Stop
-                  </Button>
-                </div>
-                <Progress value={(stats.checked % 7500 / 7500) * 100} className="h-1 bg-white/5" />
-              </div>
-            )}
-
-            {!running && stats.done && (
-              <Button 
-                variant="outline" 
-                onClick={() => startScan(true)}
-                className="w-full text-orange-400 border-orange-500/30 hover:bg-orange-500/5 h-10 text-[10px] uppercase font-cinzel font-bold"
-              >
-                ⚡ Scan Next Batch (Perpetual Discovery)
-              </Button>
-            )}
+            <Button 
+              onClick={() => startScan(true)} 
+              className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8"
+            >
+              <Zap className="mr-2 h-4 w-4" /> {found.length > 0 ? 'Scan Next Batch (Perpetual Discovery)' : 'Start Discovery'}
+            </Button>
           </div>
         )}
       </Card>
@@ -417,6 +412,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               onChange={(e) => setFilterQuery(e.target.value)}
               className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12"
             />
+          </div>
+
+          <div className="flex items-center gap-2 mb-2">
+            <History className="h-4 w-4 text-primary/60" />
+            <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">Total Discovered for {targetYear}: {found.length}</span>
           </div>
 
           {resultsByTier.map(({ tier, items }) => (
@@ -435,7 +435,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                   >
                     <button 
                       className="w-full p-4 flex items-center justify-between text-left gap-4"
-                      onClick={() => setExpandedId(expandedId === idx ? null : idx)}
+                      onClick={() => setExpandedId(expandedId === person.name ? null : person.name)}
                     >
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
@@ -459,7 +459,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                     </button>
 
                     <AnimatePresence>
-                      {expandedId === idx && (
+                      {expandedId === person.name && (
                         <motion.div 
                           initial={{ height: 0 }}
                           animate={{ height: 'auto' }}
