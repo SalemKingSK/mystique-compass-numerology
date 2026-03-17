@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2,
-  ExternalLink, Telescope, Trash2, History, Globe
+  ExternalLink, Telescope, Trash2, History, Globe, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function reduce(n: number) {
   let s = Math.abs(n);
@@ -50,7 +50,8 @@ function extractBirthDate(wikitext: string) {
   return null;
 }
 
-// ─── FIX 1: Retry with exponential backoff ────────────────────────────────────
+// ─── Network helpers ───────────────────────────────────────────────────────────
+
 async function fetchWithRetry(url: string, retries = 3, delay = 1200) {
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
@@ -73,26 +74,18 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1200) {
   }
 }
 
-// ─── FIX 2: Pagination loop — THIS is what was broken ────────────────────────
-// Old code called fetchCategoryMembers ONCE and stopped.
-// This loops with cmcontinue tokens until we have `limit` titles or Wikipedia
-// has no more entries for that birth year category.
 async function fetchAllMembersForYear(
   year: number,
   limit: number,
   resumeToken?: string | null
 ): Promise<{ titles: string[]; finalToken: string | null }> {
   const titles: string[] = [];
-  // Wikipedia API max per request is 500; we use 50 to be polite
   const PAGE_SIZE = 50;
   let cmcontinue: string | null = resumeToken || null;
 
   while (titles.length < limit) {
     const need = Math.min(PAGE_SIZE, limit - titles.length);
-    const contParam = cmcontinue
-      ? `&cmcontinue=${encodeURIComponent(cmcontinue)}`
-      : '';
-
+    const contParam = cmcontinue ? `&cmcontinue=${encodeURIComponent(cmcontinue)}` : '';
     const url =
       `https://en.wikipedia.org/w/api.php?` +
       `action=query&list=categorymembers` +
@@ -101,37 +94,28 @@ async function fetchAllMembersForYear(
       contParam;
 
     const data = await fetchWithRetry(url);
-    if (!data) break; // network failure — stop gracefully, resume later
+    if (!data) break;
 
     const page = (data.query?.categorymembers || []).map((m: any) => m.title);
     titles.push(...page);
-
     cmcontinue = data.continue?.cmcontinue || null;
-    if (!cmcontinue) break; // Wikipedia: no more pages for this year
-
-    // FIX 4: Respectful pacing between pagination requests
+    if (!cmcontinue) break;
     await new Promise(r => setTimeout(r, 650));
   }
 
-  return {
-    titles,
-    // Non-null = we hit our limit and can resume from here next scan
-    // Null = Wikipedia is genuinely exhausted for this birth year
-    finalToken: cmcontinue,
-  };
+  return { titles, finalToken: cmcontinue };
 }
 
-// ─── Metadata batch fetch (unchanged logic, now via fetchWithRetry) ───────────
-async function batchFetchMetadata(titles: string[]): Promise<Record<string, { wikitext: string; description: string }>> {
+async function batchFetchMetadata(
+  titles: string[]
+): Promise<Record<string, { wikitext: string; description: string }>> {
   if (!titles.length) return {};
   const url =
     `https://en.wikipedia.org/w/api.php?` +
     `action=query&titles=${encodeURIComponent(titles.join('|'))}` +
     `&prop=revisions|description&rvprop=content&format=json&origin=*`;
-
   const data = await fetchWithRetry(url);
   if (!data) return {};
-
   const pages = data.query?.pages || {};
   const result: Record<string, { wikitext: string; description: string }> = {};
   for (const p of Object.values(pages) as any[]) {
@@ -145,24 +129,74 @@ async function batchFetchMetadata(titles: string[]): Promise<Record<string, { wi
   return result;
 }
 
+// ─── Inline confirm dialog (replaces window.confirm which is blocked in iframes) ──
+
+function ConfirmDialog({
+  message,
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <Button variant="ghost" size="sm"
+            onClick={onCancel}
+            className="text-slate-400 hover:text-slate-200 font-cinzel text-[10px] uppercase">
+            Cancel
+          </Button>
+          <Button size="sm"
+            onClick={onConfirm}
+            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">
+            Confirm
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
-  const [depthIdx, setDepthIdx]       = useState(1);
-  const [running, setRunning]         = useState(false);
-  const [stats, setStats]             = useState({ checked: 0, flagged: 0, done: false, phase: '' });
-  const [found, setFound]             = useState<any[]>([]);
-  const [expandedId, setExpandedId]   = useState<string | null>(null);
-  const [scanLog, setScanLog]         = useState<any[]>([]);
-  const [filterQuery, setFilterQuery] = useState('');
+  const [depthIdx, setDepthIdx]         = useState(1);
+  const [running, setRunning]           = useState(false);
+  const [stats, setStats]               = useState({ checked: 0, flagged: 0, done: false, phase: '' });
+  const [found, setFound]               = useState<any[]>([]);
+  const [expandedId, setExpandedId]     = useState<string | null>(null);
+  const [scanLog, setScanLog]           = useState<any[]>([]);
+  const [filterQuery, setFilterQuery]   = useState('');
   const [continueTokens, setContinueTokens] = useState<Record<number, string | null>>({});
 
-  const abort      = useRef(false);
-  const foundRef   = useRef<any[]>([]);
-  const statsRef   = useRef({ checked: 0, flagged: 0 });
-  const tokensRef  = useRef<Record<number, string | null>>({});
+  // ── FIX: React-state dialogs — replaces window.confirm (blocked in iframes) ──
+  const [dialog, setDialog] = useState<{
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  function showConfirm(message: string, onConfirm: () => void) {
+    setDialog({ message, onConfirm });
+  }
+  function dismissDialog() {
+    setDialog(null);
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const abort     = useRef(false);
+  const foundRef  = useRef<any[]>([]);
+  const statsRef  = useRef({ checked: 0, flagged: 0 });
+  const tokensRef = useRef<Record<number, string | null>>({});
 
   // ── Dynamic config ──────────────────────────────────────────────────────────
+
   const targetSign = useMemo(() => {
     const idx = ((targetYear - 1900) % 12 + 12) % 12;
     return ANIMALS[idx] || ANIMALS[0];
@@ -198,20 +232,21 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       .sort((a, b) => b.year - a.year);
   }, [targetYear, CF_CONFIG]);
 
-  // ── FIX 3: Load + persist checkpoint via localStorage ──────────────────────
+  // ── Checkpoint ─────────────────────────────────────────────────────────────
+
   useEffect(() => {
     const key = `scanner_posterity_v6_${targetYear}`;
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
         const state = JSON.parse(saved);
-        foundRef.current    = state.found  || [];
-        statsRef.current    = state.stats  || { checked: 0, flagged: 0 };
-        tokensRef.current   = state.tokens || {};
+        foundRef.current  = state.found  || [];
+        statsRef.current  = state.stats  || { checked: 0, flagged: 0 };
+        tokensRef.current = state.tokens || {};
         setFound(state.found || []);
         setStats(state.stats || { checked: 0, flagged: 0, done: true, phase: '' });
         setContinueTokens(state.tokens || {});
-      } catch { /* corrupt storage — start fresh */ }
+      } catch { /* corrupt — start fresh */ }
     } else {
       foundRef.current  = [];
       statsRef.current  = { checked: 0, flagged: 0 };
@@ -232,27 +267,44 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     }));
   }
 
+  // ── Actions ────────────────────────────────────────────────────────────────
+
   function clearData() {
-    if (!confirm(`Clear all discovered data for ${targetYear}?`)) return;
-    const key = `scanner_posterity_v6_${targetYear}`;
-    localStorage.removeItem(key);
-    foundRef.current  = [];
-    statsRef.current  = { checked: 0, flagged: 0 };
-    tokensRef.current = {};
-    setFound([]);
-    setStats({ checked: 0, flagged: 0, done: false, phase: '' });
-    setContinueTokens({});
-    setScanLog([]);
+    // ← was: if (!confirm(...)) return;  — blocked in iframes
+    showConfirm(
+      `Clear all discovered data for ${targetYear}? This cannot be undone.`,
+      () => {
+        dismissDialog();
+        const key = `scanner_posterity_v6_${targetYear}`;
+        localStorage.removeItem(key);
+        foundRef.current  = [];
+        statsRef.current  = { checked: 0, flagged: 0 };
+        tokensRef.current = {};
+        setFound([]);
+        setStats({ checked: 0, flagged: 0, done: false, phase: '' });
+        setContinueTokens({});
+        setScanLog([]);
+      }
+    );
   }
 
-  // ── Core scan loop ─────────────────────────────────────────────────────────
-  const startScan = async (isContinuing: boolean = false) => {
+  function handleScanButton() {
+    if (found.length > 0) {
+      // Already have data — continue from checkpoint, no confirmation needed
+      executeScan(true);
+    } else {
+      // Fresh start — no prior data so no need to confirm reset
+      executeScan(false);
+    }
+  }
+
+  // Separate the scan execution from the confirmation flow
+  const executeScan = async (isContinuing: boolean) => {
     abort.current = false;
     setRunning(true);
 
     if (!isContinuing) {
-      const confirmed = confirm('Reset progress and start from the beginning?');
-      if (!confirmed) { setRunning(false); return; }
+      // Reset everything for a clean run
       tokensRef.current = {};
       statsRef.current  = { checked: 0, flagged: 0 };
       foundRef.current  = [];
@@ -268,10 +320,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       if (abort.current) break;
 
       const currentToken = tokensRef.current[year];
-      // Skip years we've fully exhausted in a previous session
       if (isContinuing && currentToken === 'COMPLETED') continue;
 
-      // ── Update scan log ──
       setScanLog(prev => {
         const exists = prev.find(l => l.year === year);
         if (exists) return prev.map(l => l.year === year ? { ...l, status: 'loading' } : l);
@@ -280,24 +330,16 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
       setStats(s => ({ ...s, phase: `Fetching Category:${year}_births...` }));
 
-      // ── THE KEY FIX: paginating title fetch ──────────────────────────────
-      let titles: string[] = [];
+      let titles: string[]        = [];
       let finalToken: string | null = null;
       try {
-        const resumeFrom = isContinuing && currentToken !== 'COMPLETED'
-          ? currentToken
-          : null;
-
-        const result = await fetchAllMembersForYear(year, perYear, resumeFrom);
-        titles      = result.titles;
-        finalToken  = result.finalToken;
-
-        // Store where to resume next time.
-        // null  → Wikipedia exhausted; mark COMPLETED
-        // token → we hit the perYear cap; store token for next "Scan Next Batch"
+        const resumeFrom = isContinuing && currentToken !== 'COMPLETED' ? currentToken : null;
+        const result     = await fetchAllMembersForYear(year, perYear, resumeFrom);
+        titles           = result.titles;
+        finalToken       = result.finalToken;
         tokensRef.current[year] = finalToken ?? 'COMPLETED';
         setContinueTokens({ ...tokensRef.current });
-      } catch (e) {
+      } catch {
         setScanLog(p => p.map(l => l.year === year ? { ...l, status: 'error' } : l));
         continue;
       }
@@ -308,7 +350,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         continue;
       }
 
-      // ── Process titles in batches of 50 ──────────────────────────────────
       let yearChecked = 0;
       let yearFound   = 0;
       const batches: string[][] = [];
@@ -322,23 +363,21 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           phase: `Scanning ${year} Births... (${yearChecked}/${titles.length})`,
         }));
 
-        // Metadata fetch — also wrapped in retry via fetchWithRetry
         let metadataMap: Record<string, { wikitext: string; description: string }> = {};
         try {
           metadataMap = await batchFetchMetadata(batch);
         } catch {
-          // One bad batch won't kill the year — skip and continue
-          yearChecked += batch.length;
+          yearChecked            += batch.length;
           statsRef.current.checked += batch.length;
           continue;
         }
 
         for (const title of batch) {
           if (abort.current) break;
-          const meta          = metadataMap[title];
-          const wt            = meta?.wikitext    || '';
+          const meta           = metadataMap[title];
+          const wt             = meta?.wikitext    || '';
           const bioDescription = meta?.description || '';
-          const bd            = wt ? extractBirthDate(wt) : null;
+          const bd             = wt ? extractBirthDate(wt) : null;
 
           yearChecked++;
           statsRef.current.checked++;
@@ -350,19 +389,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               const totalScore = config.score + pyPoints;
               const tier       = getDangerTier(totalScore);
               const entry      = {
-                name: title,
-                bioDescription,
-                bd,
-                animal: config.animal,
-                type,
-                config,
-                py,
-                pyPoints,
-                totalScore,
-                tier,
+                name: title, bioDescription, bd,
+                animal: config.animal, type, config,
+                py, pyPoints, totalScore, tier,
                 url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
               };
-
               if (!foundRef.current.find(f => f.name === entry.name)) {
                 yearFound++;
                 statsRef.current.flagged++;
@@ -381,15 +412,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         }
 
         setScanLog(p => p.map(l =>
-          l.year === year
-            ? { ...l, checked: yearChecked, found: yearFound, status: 'scanning' }
-            : l
+          l.year === year ? { ...l, checked: yearChecked, found: yearFound, status: 'scanning' } : l
         ));
-
-        // FIX 3: Checkpoint after every batch
         persistState();
-
-        // FIX 4: Respectful pacing
         if (!abort.current) await new Promise(r => setTimeout(r, 650));
       }
 
@@ -405,7 +430,24 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     persistState();
   };
 
-  // ── Filtered / grouped results ─────────────────────────────────────────────
+  // ── When user wants to RESTART a scan that already has data ────────────────
+  function handleRestartScan() {
+    showConfirm(
+      'Reset current progress and start from the beginning? All stored results will be cleared.',
+      () => {
+        dismissDialog();
+        tokensRef.current = {};
+        statsRef.current  = { checked: 0, flagged: 0 };
+        foundRef.current  = [];
+        setFound([]);
+        setContinueTokens({});
+        executeScan(false);
+      }
+    );
+  }
+
+  // ── Derived state ──────────────────────────────────────────────────────────
+
   const filteredFound = useMemo(() =>
     found.filter(p =>
       `${p.name} ${p.bioDescription}`.toLowerCase().includes(filterQuery.toLowerCase())
@@ -421,193 +463,219 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   );
 
   // ── Render ─────────────────────────────────────────────────────────────────
+
   return (
-    <div className="space-y-6">
-      <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
-        {running && (
-          <motion.div
-            initial={{ top: '-10%' }}
-            animate={{ top: '110%' }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent z-10 opacity-50"
-          />
-        )}
+    <>
+      {/* Inline dialog — replaces window.confirm */}
+      {dialog && (
+        <ConfirmDialog
+          message={dialog.message}
+          onConfirm={dialog.onConfirm}
+          onCancel={dismissDialog}
+        />
+      )}
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-          <div className="space-y-1">
-            <h2 className="text-xl font-decorative text-primary flex items-center gap-3">
-              <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
-            </h2>
-            <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest">
-              TEMPORAL CONTEXT: {targetYear} {targetSign.n} YEAR ({targetSign.e})
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={clearData}
-              title="Clear Stored Data"
-              className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
-              WIKIPEDIA LIVE FEED
-            </Badge>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          {[
-            [stats.checked,                                   'Total Checked',    'text-primary'  ],
-            [found.length,                                    'Discovered',       'text-orange-400'],
-            [found.filter(f => f.totalScore >= 5).length,    'Critical/Severe',  'text-rose-500'  ],
-            [found.filter(f => f.totalScore <= 3).length,    'Elevated/Notable', 'text-blue-400'  ],
-          ].map(([val, label, cls]) => (
-            <div key={label as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-              <div className={`text-2xl font-black font-decorative tabular-nums ${cls}`}>{val}</div>
-              <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Running state */}
-        {running ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                {stats.phase}
-              </span>
-              <Button variant="ghost" size="sm"
-                onClick={() => { abort.current = true; }}
-                className="h-6 text-rose-400 text-[9px] uppercase">
-                Stop
-              </Button>
-            </div>
-            <Progress value={(statsRef.current.checked % 500) / 5} className="h-1 bg-white/5" />
-          </div>
-        ) : (
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex items-center gap-2 bg-black/20 p-1 rounded-full border border-white/10 w-full sm:w-auto">
-              {DEPTHS.map((d, i) => (
-                <button key={d.label} onClick={() => setDepthIdx(i)}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all font-cinzel ${
-                    depthIdx === i ? 'bg-primary text-primary-foreground' : 'text-slate-500'
-                  }`}>
-                  {d.label}
-                </button>
-              ))}
-            </div>
-            <Button
-              onClick={() => startScan(found.length > 0)}
-              className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8 h-auto py-3 whitespace-normal text-center leading-tight">
-              <Zap className="mr-2 h-4 w-4 shrink-0" />
-              {found.length > 0 ? 'Scan Next Batch (Perpetual Discovery)' : 'Start Discovery'}
-            </Button>
-          </div>
-        )}
-      </Card>
-
-      {/* Results */}
-      {found.length > 0 && (
-        <div className="space-y-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
-            <Input
-              placeholder="Filter by name, profession or nationality..."
-              value={filterQuery}
-              onChange={e => setFilterQuery(e.target.value)}
-              className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12"
+      <div className="space-y-6">
+        <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
+          {running && (
+            <motion.div
+              initial={{ top: '-10%' }}
+              animate={{ top: '110%' }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent z-10 opacity-50"
             />
+          )}
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+            <div className="space-y-1">
+              <h2 className="text-xl font-decorative text-primary flex items-center gap-3">
+                <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
+              </h2>
+              <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest">
+                TEMPORAL CONTEXT: {targetYear} {targetSign.n} YEAR ({targetSign.e})
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={clearData}
+                title="Clear Stored Data"
+                className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
+                WIKIPEDIA LIVE FEED
+              </Badge>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 mb-2 px-2">
-            <History className="h-4 w-4 text-primary/60" />
-            <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">
-              History Database Entry Total for {targetYear}:{' '}
-              <span className="font-bold text-primary">{found.length} Profiles</span>
-            </span>
-          </div>
-
-          {resultsByTier.map(({ tier, items }) => (
-            <div key={tier.label} className="space-y-3">
-              <div className="flex items-center gap-3 px-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel"
-                  style={{ color: tier.color }}>{tier.label}</span>
-                <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} Discoveries</span>
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            {[
+              [stats.checked,                                'Total Checked',    'text-primary'  ],
+              [found.length,                                 'Discovered',       'text-orange-400'],
+              [found.filter(f => f.totalScore >= 5).length,  'Critical/Severe',  'text-rose-500'  ],
+              [found.filter(f => f.totalScore <= 3).length,  'Elevated/Notable', 'text-blue-400'  ],
+            ].map(([val, label, cls]) => (
+              <div key={label as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                <div className={`text-2xl font-black font-decorative tabular-nums ${cls}`}>{val}</div>
+                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">{label}</div>
               </div>
+            ))}
+          </div>
 
-              <div className="space-y-2">
-                {items.map((person, idx) => (
-                  <Card key={`${person.name}-${idx}`}
-                    className="glass-card p-0 border-transparent overflow-hidden"
-                    style={{ borderLeft: `3px solid ${person.tier.color}` }}>
-                    <button
-                      className="w-full p-4 flex items-center justify-between text-left gap-4"
-                      onClick={() => setExpandedId(expandedId === person.name ? null : person.name)}>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
-                        <p className="text-[10px] text-primary/70 font-cinzel uppercase truncate">
-                          {person.bioDescription || 'Notable Individual'}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
-                          <span>Born {person.bd.year}</span>
-                          <span>•</span>
-                          <span className="font-bold text-primary">PY {person.py}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline"
-                          className="h-6 text-[8px] uppercase border-white/10 font-cinzel"
-                          style={{ color: person.config.color, backgroundColor: person.config.bg }}>
-                          {person.config.label}
-                        </Badge>
-                        <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border border-white/10"
-                          style={{ borderColor: person.tier.border }}>
-                          <span className="text-xs font-black font-decorative"
-                            style={{ color: person.tier.color }}>{person.totalScore}</span>
-                        </div>
-                      </div>
-                    </button>
-
-                    <AnimatePresence>
-                      {expandedId === person.name && (
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: 'auto' }}
-                          exit={{ height: 0 }}
-                          className="overflow-hidden bg-black/20 border-t border-white/5">
-                          <div className="p-4 space-y-4">
-                            <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
-                              <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
-                                Astrological Headwind:
-                              </span>
-                              {person.name} faces a {person.config.label} with the {targetYear}{' '}
-                              {targetSign.n} cycle. Coupled with a Personal Year {person.py}{' '}
-                              ({person.py === 4 ? 'Structure/Restriction' : 'Reflection/Endings'}),
-                              this creates a high-voltage energetic tension requiring profound discernment.
-                            </p>
-                            <a href={person.url} target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
-                              <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
-                            </a>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </Card>
+          {/* Controls */}
+          {running ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  {stats.phase}
+                </span>
+                <Button variant="ghost" size="sm"
+                  onClick={() => { abort.current = true; }}
+                  className="h-6 text-rose-400 text-[9px] uppercase">
+                  Stop
+                </Button>
+              </div>
+              <Progress value={(statsRef.current.checked % 500) / 5} className="h-1 bg-white/5" />
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex items-center gap-2 bg-black/20 p-1 rounded-full border border-white/10 w-full sm:w-auto">
+                {DEPTHS.map((d, i) => (
+                  <button key={d.label} onClick={() => setDepthIdx(i)}
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all font-cinzel ${
+                      depthIdx === i ? 'bg-primary text-primary-foreground' : 'text-slate-500'
+                    }`}>
+                    {d.label}
+                  </button>
                 ))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
 
-      {!running && found.length === 0 && (
-        <div className="py-20 text-center opacity-30 space-y-4">
-          <Globe className="h-16 w-16 mx-auto stroke-[1]" />
-          <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Discovery Engine Ready</p>
-        </div>
-      )}
-    </div>
+              <div className="flex gap-2 w-full sm:w-auto ml-auto">
+                {/* Main action button */}
+                <Button
+                  onClick={handleScanButton}
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8 h-auto py-3 whitespace-normal text-center leading-tight">
+                  <Zap className="mr-2 h-4 w-4 shrink-0" />
+                  {found.length > 0 ? 'Scan Next Batch' : 'Start Discovery'}
+                </Button>
+
+                {/* Restart button — only shown when there's existing data */}
+                {found.length > 0 && (
+                  <Button
+                    onClick={handleRestartScan}
+                    variant="outline"
+                    className="shrink-0 border-slate-600 text-slate-400 hover:text-slate-200 font-cinzel text-[10px] uppercase px-3 h-auto py-3">
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* Results */}
+        {found.length > 0 && (
+          <div className="space-y-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
+              <Input
+                placeholder="Filter by name, profession or nationality..."
+                value={filterQuery}
+                onChange={e => setFilterQuery(e.target.value)}
+                className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 mb-2 px-2">
+              <History className="h-4 w-4 text-primary/60" />
+              <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">
+                History Database Entry Total for {targetYear}:{' '}
+                <span className="font-bold text-primary">{found.length} Profiles</span>
+              </span>
+            </div>
+
+            {resultsByTier.map(({ tier, items }) => (
+              <div key={tier.label} className="space-y-3">
+                <div className="flex items-center gap-3 px-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel"
+                    style={{ color: tier.color }}>{tier.label}</span>
+                  <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} Discoveries</span>
+                </div>
+
+                <div className="space-y-2">
+                  {items.map((person, idx) => (
+                    <Card key={`${person.name}-${idx}`}
+                      className="glass-card p-0 border-transparent overflow-hidden"
+                      style={{ borderLeft: `3px solid ${person.tier.color}` }}>
+                      <button
+                        className="w-full p-4 flex items-center justify-between text-left gap-4"
+                        onClick={() => setExpandedId(expandedId === person.name ? null : person.name)}>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
+                          <p className="text-[10px] text-primary/70 font-cinzel uppercase truncate">
+                            {person.bioDescription || 'Notable Individual'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
+                            <span>Born {person.bd.year}</span>
+                            <span>•</span>
+                            <span className="font-bold text-primary">PY {person.py}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline"
+                            className="h-6 text-[8px] uppercase border-white/10 font-cinzel"
+                            style={{ color: person.config.color, backgroundColor: person.config.bg }}>
+                            {person.config.label}
+                          </Badge>
+                          <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border border-white/10"
+                            style={{ borderColor: person.tier.border }}>
+                            <span className="text-xs font-black font-decorative"
+                              style={{ color: person.tier.color }}>{person.totalScore}</span>
+                          </div>
+                        </div>
+                      </button>
+
+                      <AnimatePresence>
+                        {expandedId === person.name && (
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: 'auto' }}
+                            exit={{ height: 0 }}
+                            className="overflow-hidden bg-black/20 border-t border-white/5">
+                            <div className="p-4 space-y-4">
+                              <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
+                                <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
+                                  Astrological Headwind:
+                                </span>
+                                {person.name} faces a {person.config.label} with the {targetYear}{' '}
+                                {targetSign.n} cycle. Coupled with a Personal Year {person.py}{' '}
+                                ({person.py === 4 ? 'Structure/Restriction' : 'Reflection/Endings'}),
+                                this creates a high-voltage energetic tension requiring profound discernment.
+                              </p>
+                              <a href={person.url} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
+                                <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
+                              </a>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!running && found.length === 0 && (
+          <div className="py-20 text-center opacity-30 space-y-4">
+            <Globe className="h-16 w-16 mx-auto stroke-[1]" />
+            <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Discovery Engine Ready</p>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
