@@ -76,7 +76,7 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement, { arrowsOfStrength: Arrow
                     </h4>
                     <Accordion type="multiple" className="w-full" value={openItems} onValueChange={onToggle}>
                         {[...arrowsOfStrength, ...arrowsOfWeakness]
-                            .filter(a => a.category === cat)
+                            .filter(a => (a.category || (a.type === 'shadow' ? 'Deficiency' : 'Primary Plane')) === cat)
                             .map(renderArrowItem)}
                     </Accordion>
                 </div>

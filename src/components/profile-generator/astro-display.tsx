@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { BookOpen, Leaf, Users, Forward } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { AstroInsightOutput } from './types';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
@@ -137,12 +138,21 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
           onToggle={() => toggle(3)}
           content={
             <div className="space-y-4">
-              {Object.entries(compatibilities || {}).map(([s, text]) => (
-                <div key={s} className="p-3 bg-white/5 rounded-lg border border-white/10">
-                  <p className="font-cinzel text-[0.65rem] uppercase tracking-widest text-primary mb-2">With the {s} {ZOO[s]?.e || ''}</p>
-                  <AccordionContentWithPlayer text={String(text)} />
-                </div>
-              ))}
+              <p className="text-[13px] italic text-slate-400 mb-4 px-2">Analysis of spiritual and social resonance with the 12 signs of the Zodiac.</p>
+              <Accordion type="single" collapsible className="w-full space-y-2">
+                {Object.entries(compatibilities || {}).map(([s, text]) => (
+                  <AccordionItem key={s} value={s} className="border-none bg-white/5 rounded-lg overflow-hidden px-3">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <span className="font-cinzel text-[0.65rem] uppercase tracking-widest text-primary flex items-center gap-2">
+                        {ZOO[s]?.e || '🐾'} With the {s}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <AccordionContentWithPlayer text={String(text)} />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           }
         />
@@ -157,15 +167,29 @@ export function AstroDisplay({ insight }: { insight: AstroInsightOutput }) {
           onToggle={() => toggle(4)}
           content={
             <div className="space-y-4">
-              {Object.entries(futures || {})
-                .filter(([year]) => parseInt(year) >= new Date().getFullYear())
-                .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                .map(([year, data]: any) => (
-                  <div key={year} className="p-3 bg-white/5 rounded-lg border border-white/10">
-                    <p className="font-cinzel text-[0.65rem] uppercase tracking-widest text-primary mb-2">{year} - Year of the {data.year} {ZOO[data.year]?.e || ''}</p>
-                    <AccordionContentWithPlayer text={data.prediction} />
-                  </div>
-                ))}
+              <p className="text-[13px] italic text-slate-400 mb-4 px-2">A 12-year window into the upcoming cosmic frequencies and life patterns.</p>
+              <Accordion type="single" collapsible className="w-full space-y-2">
+                {Object.entries(futures || {})
+                  .filter(([year]) => parseInt(year) >= new Date().getFullYear())
+                  .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                  .map(([year, data]: any) => (
+                    <AccordionItem key={year} value={year} className="border-none bg-white/5 rounded-lg overflow-hidden px-3">
+                      <AccordionTrigger className="hover:no-underline py-3">
+                        <span className="font-cinzel text-[0.65rem] uppercase tracking-widest text-primary flex items-center gap-2">
+                          📅 {year} - Year of the {data.year} {ZOO[data.year]?.e || ''}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="p-2 mb-2 bg-primary/10 rounded-md inline-block">
+                          <span className="text-[10px] font-bold uppercase tracking-tighter text-primary">
+                            Element: {data.element}
+                          </span>
+                        </div>
+                        <AccordionContentWithPlayer text={data.prediction} />
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+              </Accordion>
             </div>
           }
         />
