@@ -7,12 +7,14 @@ import {
   RotateCcw, Globe, Loader2, Info,
   ChevronDown, ChevronUp, ExternalLink,
   Target, Calendar, AlertTriangle,
-  Play, Square, RefreshCw, Telescope
+  Play, Square, RefreshCw, Telescope,
+  FilterX, UserSearch
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { ANIMALS } from '@/lib/cosmic-fate/constants';
 
 // --- CONFIGURATION ---
@@ -87,15 +89,20 @@ async function fetchCategoryMembers(year: number, limit: number) {
   return (data.query?.categorymembers || []).map((m: any) => m.title);
 }
 
-async function batchFetchWikitext(titles: string[]) {
+async function batchFetchMetadata(titles: string[]) {
   if (!titles.length) return {};
-  const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.join('|'))}&prop=revisions&rvprop=content&format=json&origin=*`;
+  const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.join('|'))}&prop=revisions|description&rvprop=content&format=json&origin=*`;
   const res = await fetch(url);
   const data = await res.json();
   const pages = data.query?.pages || {};
-  const result: Record<string, string> = {};
+  const result: Record<string, { wikitext: string, description: string }> = {};
   for (const p of Object.values(pages) as any[]) {
-    if (p.title) result[p.title] = p?.revisions?.[0]?.['*'] || '';
+    if (p.title) {
+      result[p.title] = {
+        wikitext: p?.revisions?.[0]?.['*'] || '',
+        description: p?.description || ''
+      };
+    }
   }
   return result;
 }
@@ -108,6 +115,7 @@ export function CosmicRiskScanner() {
   const [found, setFound] = useState<any[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [scanLog, setScanLog] = useState<any[]>([]);
+  const [filterQuery, setFilterQuery] = useState("");
   const abort = useRef(false);
   const foundRef = useRef<any[]>([]);
 
@@ -165,21 +173,22 @@ export function CosmicRiskScanner() {
       let yearChecked = 0;
       let yearFound = 0;
       const batches = [];
-      // Increased batch size to 50 for larger scans
       for (let i = 0; i < titles.length; i += 50) batches.push(titles.slice(i, i + 50));
 
       for (const batch of batches) {
         if (abort.current) break;
         setStats(s => ({ ...s, phase: `Scanning ${year} births — Batch ${batches.indexOf(batch) + 1}/${batches.length}...` }));
         
-        let wikitextMap: Record<string, string> = {};
+        let metadataMap: Record<string, { wikitext: string, description: string }> = {};
         try {
-          wikitextMap = await batchFetchWikitext(batch);
+          metadataMap = await batchFetchMetadata(batch);
         } catch (e) { continue; }
 
         for (const title of batch) {
           if (abort.current) break;
-          const wt = wikitextMap[title] || '';
+          const meta = metadataMap[title];
+          const wt = meta?.wikitext || '';
+          const bioDescription = meta?.description || '';
           const bd = wt ? extractBirthDate(wt) : null;
           
           yearChecked++;
@@ -194,6 +203,7 @@ export function CosmicRiskScanner() {
               
               const entry = {
                 name: title,
+                bioDescription,
                 bd,
                 animal: animal.n,
                 emoji: animal.e,
@@ -235,9 +245,15 @@ export function CosmicRiskScanner() {
     setStats(s => ({ ...s, phase: "Terminated by User" }));
   };
 
+  // Advanced Filtering
+  const filteredFound = found.filter(person => {
+    const searchString = `${person.name} ${person.bioDescription}`.toLowerCase();
+    return searchString.includes(filterQuery.toLowerCase());
+  });
+
   const resultsByTier = DANGER_TIERS.map(tier => ({
     tier,
-    items: found.filter(f => f.tier.label === tier.label)
+    items: filteredFound.filter(f => f.tier.label === tier.label)
   })).filter(g => g.items.length > 0);
 
   return (
@@ -263,7 +279,7 @@ export function CosmicRiskScanner() {
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
-              WIKIPEDIA FEED
+              WIKIPEDIA METADATA FEED
             </Badge>
           </div>
         </div>
@@ -381,7 +397,7 @@ export function CosmicRiskScanner() {
               <Progress value={yearsToScanProgress(scanLog)} className="h-1 bg-white/5" />
             </div>
 
-            <div className="max-h-32 overflow-y-auto space-y-1 pr-2 scrollbar-thin border-y border-white/5 py-2">
+            <div className="max-h-32 overflow-y-auto space-y-1 pr-2 scrollbar-hide border-y border-white/5 py-2">
               {scanLog.map((log, idx) => (
                 <div key={idx} className="flex items-center justify-between p-2 rounded bg-black/20 text-[10px] font-medium">
                   <div className="flex items-center gap-3">
@@ -430,100 +446,130 @@ export function CosmicRiskScanner() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
+            {/* SEARCH & SORT SECTION */}
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50 group-focus-within:text-primary transition-colors" />
+              <Input 
+                placeholder="Filter results by name, profession or nationality..." 
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+                className="pl-10 bg-black/40 border-primary/20 focus:border-primary/50 font-body placeholder:text-muted-foreground/50 h-12 text-lg"
+              />
+              {filterQuery && (
+                <button 
+                  onClick={() => setFilterQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  <FilterX className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
             <div className="flex items-center gap-4">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-500/30 to-transparent" />
-              <h3 className="font-cinzel text-[0.7rem] text-orange-400 uppercase tracking-[0.3em] text-center">Ranked Discoveries — Composite Risk</h3>
+              <h3 className="font-cinzel text-[0.7rem] text-orange-400 uppercase tracking-[0.3em] text-center">
+                {filterQuery ? `Results for "${filterQuery}"` : 'Ranked Discoveries — Composite Risk'}
+              </h3>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-500/30 to-transparent" />
             </div>
 
-            {resultsByTier.map(({ tier, items }) => (
-              <div key={tier.label} className="space-y-3">
-                <div className="flex items-center gap-3 px-2">
-                  <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900 border border-white/10 text-xs font-black font-decorative" style={{ color: tier.color, borderColor: tier.border }}>
-                    {tier.min}
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>{tier.label}</span>
-                  <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} {items.length === 1 ? 'Individual' : 'Individuals'}</span>
-                </div>
-
-                <div className="space-y-2">
-                  {items.map((person, idx) => {
-                    const globalIdx = found.findIndex(f => f.name === person.name);
-                    return (
-                      <Card 
-                        key={`${person.name}-${idx}`} 
-                        className={`glass-card p-0 border-transparent overflow-hidden transition-all duration-300 hover:border-white/20`}
-                        style={{ borderLeft: `3px solid ${person.tier.color}`, backgroundColor: expandedId === globalIdx ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)' }}
-                      >
-                        <button 
-                          className="w-full p-4 flex items-center justify-between text-left gap-4"
-                          onClick={() => setExpandedId(expandedId === globalIdx ? null : globalIdx)}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] text-slate-500 font-cinzel">
-                              <span className="flex items-center gap-1">{person.emoji} {person.animal}</span>
-                              <span>•</span>
-                              <span>{person.bd.day} {MO[person.bd.month]} {person.bd.year}</span>
-                              <span>•</span>
-                              <span className="font-bold text-primary">PY {person.py}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel" style={{ color: person.cf.color, backgroundColor: person.cf.bg }}>
-                              {person.cf.type}
-                            </Badge>
-                            <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center border border-white/10 bg-black/40" style={{ borderColor: person.tier.border }}>
-                              <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>{person.totalScore}</span>
-                              <span className="text-[6px] uppercase opacity-50 font-cinzel">/ 6</span>
-                            </div>
-                            {expandedId === globalIdx ? <ChevronUp className="h-4 w-4 text-slate-600" /> : <ChevronDown className="h-4 w-4 text-slate-600" />}
-                          </div>
-                        </button>
-
-                        <AnimatePresence>
-                          {expandedId === globalIdx && (
-                            <motion.div 
-                              initial={{ height: 0 }}
-                              animate={{ height: 'auto' }}
-                              exit={{ height: 0 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="p-4 pt-0 border-t border-white/5 space-y-4 bg-black/20">
-                                <div className="grid grid-cols-2 gap-3 pt-4">
-                                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
-                                    <div className="text-[8px] uppercase text-slate-500 mb-1 font-cinzel">Zodiac Conflict</div>
-                                    <div className="text-xs font-bold font-cinzel" style={{ color: person.cf.color }}>{person.cf.label}</div>
-                                    <div className="text-[9px] text-slate-400 mt-1 font-cinzel">Score: {person.cf.score}/4</div>
-                                  </div>
-                                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
-                                    <div className="text-[8px] uppercase text-slate-500 mb-1 font-cinzel">Personal Year 2026</div>
-                                    <div className="text-xs font-bold text-primary font-cinzel">Vibration {person.py}</div>
-                                    <div className="text-[9px] text-slate-400 mt-1 font-cinzel">Weight: +{person.pyPoints} pts</div>
-                                  </div>
-                                </div>
-                                <div className="p-3 rounded-lg bg-primary/5 border border-primary/10 italic text-[11px] text-slate-300 leading-relaxed font-body">
-                                  <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">Analysis:</span>
-                                  {person.name} ({person.animal}) enters 2026 under a {person.cf.label} with the Horse Year. Combined with a Personal Year {person.py}, this creates a high-voltage {person.tier.label.toLowerCase()} tension where structural discipline or mystical detachment will be forced by external circumstances.
-                                </div>
-                                <a 
-                                  href={person.url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase tracking-widest font-bold font-cinzel"
-                                >
-                                  <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
-                                </a>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </Card>
-                    );
-                  })}
-                </div>
+            {resultsByTier.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground font-body italic">
+                No individuals matching your filter were found in the current discovery set.
               </div>
-            ))}
+            ) : (
+              resultsByTier.map(({ tier, items }) => (
+                <div key={tier.label} className="space-y-3">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900 border border-white/10 text-xs font-black font-decorative" style={{ color: tier.color, borderColor: tier.border }}>
+                      {tier.min}
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>{tier.label}</span>
+                    <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} {items.length === 1 ? 'Individual' : 'Individuals'}</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {items.map((person, idx) => {
+                      const globalIdx = found.findIndex(f => f.name === person.name);
+                      return (
+                        <Card 
+                          key={`${person.name}-${idx}`} 
+                          className={`glass-card p-0 border-transparent overflow-hidden transition-all duration-300 hover:border-white/20`}
+                          style={{ borderLeft: `3px solid ${person.tier.color}`, backgroundColor: expandedId === globalIdx ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)' }}
+                        >
+                          <button 
+                            className="w-full p-4 flex items-center justify-between text-left gap-4"
+                            onClick={() => setExpandedId(expandedId === globalIdx ? null : globalIdx)}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
+                              <p className="text-[10px] text-primary/70 font-cinzel uppercase tracking-wide truncate mb-1">
+                                {person.bioDescription || 'Notable Figure'}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-cinzel">
+                                <span className="flex items-center gap-1">{person.emoji} {person.animal}</span>
+                                <span>•</span>
+                                <span>{person.bd.day} {MO[person.bd.month]} {person.bd.year}</span>
+                                <span>•</span>
+                                <span className="font-bold text-primary">PY {person.py}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel" style={{ color: person.cf.color, backgroundColor: person.cf.bg }}>
+                                {person.cf.type}
+                              </Badge>
+                              <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center border border-white/10 bg-black/40" style={{ borderColor: person.tier.border }}>
+                                <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>{person.totalScore}</span>
+                                <span className="text-[6px] uppercase opacity-50 font-cinzel">/ 6</span>
+                              </div>
+                              {expandedId === globalIdx ? <ChevronUp className="h-4 w-4 text-slate-600" /> : <ChevronDown className="h-4 w-4 text-slate-600" />}
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {expandedId === globalIdx && (
+                              <motion.div 
+                                initial={{ height: 0 }}
+                                animate={{ height: 'auto' }}
+                                exit={{ height: 0 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="p-4 pt-0 border-t border-white/5 space-y-4 bg-black/20">
+                                  <div className="grid grid-cols-2 gap-3 pt-4">
+                                    <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
+                                      <div className="text-[8px] uppercase text-slate-500 mb-1 font-cinzel">Zodiac Conflict</div>
+                                      <div className="text-xs font-bold font-cinzel" style={{ color: person.cf.color }}>{person.cf.label}</div>
+                                      <div className="text-[9px] text-slate-400 mt-1 font-cinzel">Score: {person.cf.score}/4</div>
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
+                                      <div className="text-[8px] uppercase text-slate-500 mb-1 font-cinzel">Personal Year 2026</div>
+                                      <div className="text-xs font-bold text-primary font-cinzel">Vibration {person.py}</div>
+                                      <div className="text-[9px] text-slate-400 mt-1 font-cinzel">Weight: +{person.pyPoints} pts</div>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/10 italic text-[11px] text-slate-300 leading-relaxed font-body">
+                                    <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">Analysis:</span>
+                                    {person.name} ({person.bioDescription || person.animal}) enters 2026 under a {person.cf.label} with the Horse Year. Combined with a Personal Year {person.py}, this creates a high-voltage {person.tier.label.toLowerCase()} tension where structural discipline or mystical detachment will be forced by external circumstances.
+                                  </div>
+                                  <a 
+                                    href={person.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase tracking-widest font-bold font-cinzel"
+                                  >
+                                    <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
+                                  </a>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
           </motion.div>
         )}
       </AnimatePresence>
