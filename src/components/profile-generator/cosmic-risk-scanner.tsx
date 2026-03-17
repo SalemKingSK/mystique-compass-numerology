@@ -8,13 +8,12 @@ import {
   RotateCcw, Globe, Loader2, Info,
   ChevronDown, ChevronUp, ExternalLink,
   Target, Calendar, AlertTriangle,
-  Play, Square, RefreshCw
+  Play, Square, RefreshCw, Telescope
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ANIMALS } from '@/lib/cosmic-fate/constants';
 
 // --- CONFIGURATION ---
@@ -22,12 +21,14 @@ const UY_2026 = 1;
 const MO = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 // Conflict Types matching the app's animal indices
-// 0: Rat, 6: Horse, 1: Ox, 3: Rabbit
+// 4: Rat, 10: Dog, 5: Ox, 7: Rabbit
+// NOTE: Based on the prompt's CF matrix:
+// 4: Rat, 10: Horse (Self-Punishment), 5: Ox (Harm), 7: Rabbit (Po)
 const CF_CONFIG: Record<number, any> = {
-  0: { type: "Chong", label: "Direct Clash", score: 4, color: "#ff4444", bg: "rgba(255,68,68,0.13)", border: "rgba(255,68,68,0.5)", glyph: "☠", rel: "Rat ↔ Horse" },
-  6: { type: "Xing", label: "Self-Punishment", score: 3, color: "#e07828", bg: "rgba(224,120,40,0.12)", border: "rgba(224,120,40,0.5)", glyph: "⚔", rel: "Horse ↔ Horse" },
-  1: { type: "Hai", label: "Harm", score: 2, color: "#d4aa20", bg: "rgba(212,170,32,0.11)", border: "rgba(212,170,32,0.45)", glyph: "⚠", rel: "Ox ↔ Horse" },
-  3: { type: "Po", label: "Breaking", score: 1, color: "#9b8ec4", bg: "rgba(155,142,196,0.11)", border: "rgba(155,142,196,0.4)", glyph: "◎", rel: "Rabbit ↔ Horse" },
+  4: { type: "Chong", label: "Direct Clash", score: 4, color: "#ff4444", bg: "rgba(255,68,68,0.13)", border: "rgba(255,68,68,0.5)", glyph: "☠", rel: "Rat ↔ Horse" },
+  10: { type: "Xing", label: "Self-Punishment", score: 3, color: "#e07828", bg: "rgba(224,120,40,0.12)", border: "rgba(224,120,40,0.5)", glyph: "⚔", rel: "Horse ↔ Horse" },
+  5: { type: "Hai", label: "Harm", score: 2, color: "#d4aa20", bg: "rgba(212,170,32,0.11)", border: "rgba(212,170,32,0.45)", glyph: "⚠", rel: "Ox ↔ Horse" },
+  7: { type: "Po", label: "Breaking", score: 1, color: "#9b8ec4", bg: "rgba(155,142,196,0.11)", border: "rgba(155,142,196,0.4)", glyph: "◎", rel: "Rabbit ↔ Horse" },
 };
 
 const DANGER_TIERS = [
@@ -39,16 +40,23 @@ const DANGER_TIERS = [
 ];
 
 const SCAN_YEARS = [
-  { year: 1960, zodiacKey: 0 }, { year: 1972, zodiacKey: 0 }, { year: 1984, zodiacKey: 0 }, { year: 1996, zodiacKey: 0 },
-  { year: 1966, zodiacKey: 6 }, { year: 1978, zodiacKey: 6 }, { year: 1990, zodiacKey: 6 },
-  { year: 1961, zodiacKey: 1 }, { year: 1973, zodiacKey: 1 }, { year: 1985, zodiacKey: 1 }, { year: 1997, zodiacKey: 1 },
-  { year: 1963, zodiacKey: 3 }, { year: 1975, zodiacKey: 3 }, { year: 1987, zodiacKey: 3 }, { year: 1999, zodiacKey: 3 },
+  { year: 1960, zodiacKey: 4 }, { year: 1972, zodiacKey: 4 }, { year: 1984, zodiacKey: 4 }, { year: 1996, zodiacKey: 4 },
+  { year: 1966, zodiacKey: 10 }, { year: 1978, zodiacKey: 10 }, { year: 1990, zodiacKey: 10 },
+  { year: 1961, zodiacKey: 5 }, { year: 1973, zodiacKey: 5 }, { year: 1985, zodiacKey: 5 }, { year: 1997, zodiacKey: 5 },
+  { year: 1963, zodiacKey: 7 }, { year: 1975, zodiacKey: 7 }, { year: 1987, zodiacKey: 7 }, { year: 1999, zodiacKey: 7 },
 ];
 
 const DEPTHS = [
   { label: "Quick", sub: "~10/yr", perYear: 10 },
   { label: "Standard", sub: "~25/yr", perYear: 25 },
   { label: "Deep", sub: "~50/yr", perYear: 50 },
+];
+
+const GROUPS = [
+  { key: 4, label: "Chong — Rat years", years: [1960, 1972, 1984, 1996] },
+  { key: 10, label: "Xing — Horse years", years: [1966, 1978, 1990] },
+  { key: 5, label: "Hai — Ox years", years: [1961, 1973, 1985, 1997] },
+  { key: 7, label: "Po — Rabbit years", years: [1963, 1975, 1987, 1999] },
 ];
 
 // --- LOGIC HELPERS ---
@@ -118,6 +126,16 @@ export function CosmicRiskScanner() {
     });
   };
 
+  const toggleGroup = (zodiacKey: number) => {
+    const groupYears = SCAN_YEARS.filter(y => y.zodiacKey === zodiacKey).map(y => y.year);
+    const allOn = groupYears.every(y => activeYears.has(y));
+    setActiveYears(prev => {
+      const next = new Set(prev);
+      groupYears.forEach(y => allOn ? next.delete(y) : next.add(y));
+      return next;
+    });
+  };
+
   const startScan = async () => {
     abort.current = false;
     setRunning(true);
@@ -137,7 +155,7 @@ export function CosmicRiskScanner() {
       const cf = CF_CONFIG[zodiacKey];
       const animal = ANIMALS[zodiacKey];
       
-      setScanLog(p => [...p, { year, status: "loading", found: 0, checked: 0, animal: animal.n, cf }]);
+      setScanLog(p => [...p, { year, status: "loading", found: 0, checked: 0, animal: animal.n, cf, zodiacKey }]);
       setStats(s => ({ ...s, currentYear: year, phase: `Connecting to Wikipedia Category:${year}_births...` }));
 
       let titles: string[] = [];
@@ -244,22 +262,22 @@ export function CosmicRiskScanner() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div className="space-y-1">
             <h2 className="text-xl font-decorative text-primary flex items-center gap-3">
-              <Target className="h-6 w-6" /> Cosmic Risk Scanner
+              <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
             </h2>
             <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest">
-              2026 Horse Year · Global Discovery Engine
+              Auto-Discovery Engine · 2026 Horse Year
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1">
-              Live Wikipedia Feed
+            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
+              WIKIPEDIA FEED
             </Badge>
           </div>
         </div>
 
         <div className="p-4 bg-white/5 border border-white/10 rounded-lg mb-6">
           <p className="text-sm leading-relaxed text-slate-300 font-body">
-            This engine identifies global figures facing the most volatile energy in 2026. It automatically batch-scans 
+            This engine identified global figures facing volatile energy in 2026. It automatically batch-scans 
             thousands of public profiles from <strong className="text-primary">conflicting zodiac years</strong>, 
             calculates their Personal Year for 2026, and flags those at the intersection of a zodiac clash and a 
             critical numeric vibration (PY 4 or 7).
@@ -273,32 +291,41 @@ export function CosmicRiskScanner() {
               {Object.values(CF_CONFIG).map(cf => (
                 <div key={cf.type} className="p-3 rounded-lg border flex flex-col items-center text-center gap-1" style={{ backgroundColor: cf.bg, borderColor: cf.border, color: cf.color }}>
                   <span className="text-xl">{cf.glyph}</span>
-                  <div className="text-[10px] font-black uppercase">{cf.type}</div>
+                  <div className="text-[10px] font-black uppercase font-cinzel">{cf.type} — {cf.label}</div>
                   <div className="text-[9px] opacity-70 tracking-tighter">{cf.rel}</div>
                 </div>
               ))}
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Zodiac Conflict Target Years</span>
-                <Button variant="ghost" size="sm" className="h-6 text-[9px] uppercase" onClick={() => setActiveYears(new Set(SCAN_YEARS.map(y => y.year)))}>
-                  Reset Selection
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {SCAN_YEARS.map(sy => (
-                  <Button
-                    key={sy.year}
-                    variant={activeYears.has(sy.year) ? "primary" : "outline"}
-                    size="sm"
-                    onClick={() => toggleYear(sy.year)}
-                    className={`h-8 px-3 text-xs ${activeYears.has(sy.year) ? 'bg-primary/20 text-primary border-primary/40' : 'opacity-50'}`}
-                  >
-                    {sy.year}
-                  </Button>
-                ))}
-              </div>
+              {GROUPS.map(g => {
+                const cf = CF_CONFIG[g.key];
+                return (
+                  <div key={g.key} className="p-3 rounded-xl border border-white/5 bg-white/5 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70 flex items-center gap-2 font-cinzel">
+                        {cf.glyph} {g.label}
+                      </span>
+                      <Button variant="ghost" size="sm" className="h-6 text-[9px] uppercase" onClick={() => toggleGroup(g.key)}>
+                        {g.years.every(y => activeYears.has(y)) ? "Deselect Group" : "Select Group"}
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {g.years.map(y => (
+                        <Button
+                          key={y}
+                          variant={activeYears.has(y) ? "primary" : "outline"}
+                          size="sm"
+                          onClick={() => toggleYear(y)}
+                          className={`h-8 px-3 text-xs ${activeYears.has(y) ? 'bg-primary/20 text-primary border-primary/40' : 'opacity-50'}`}
+                        >
+                          {y}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-white/5">
@@ -307,7 +334,7 @@ export function CosmicRiskScanner() {
                   <button
                     key={d.label}
                     onClick={() => setDepthIdx(i)}
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all ${
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all font-cinzel ${
                       depthIdx === i ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
@@ -320,7 +347,7 @@ export function CosmicRiskScanner() {
                 disabled={activeYears.size === 0}
                 className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-black uppercase tracking-[0.1em] px-8"
               >
-                <Zap className="mr-2 h-4 w-4" /> Initialize Scan
+                <Zap className="mr-2 h-4 w-4" /> Auto-Discover
               </Button>
             </div>
           </div>
@@ -331,20 +358,20 @@ export function CosmicRiskScanner() {
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-primary">{stats.checked}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground">Profiles Evaluated</div>
+                <div className="text-2xl font-black text-primary font-decorative">{stats.checked}</div>
+                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Profiles Checked</div>
               </div>
               <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-orange-400">{stats.flagged}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground">Risks Flagged</div>
+                <div className="text-2xl font-black text-orange-400 font-decorative">{stats.flagged}</div>
+                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Risks Flagged</div>
               </div>
               <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-rose-500">{found.filter(f => f.totalScore >= 5).length}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground">Critical/Severe</div>
+                <div className="text-2xl font-black text-rose-500 font-decorative">{found.filter(f => f.totalScore >= 5).length}</div>
+                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Critical/Severe</div>
               </div>
               <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl font-black text-blue-400">{found.filter(f => f.totalScore <= 3).length}</div>
-                <div className="text-[8px] uppercase tracking-widest text-muted-foreground">Elevated/Notable</div>
+                <div className="text-2xl font-black text-blue-400 font-decorative">{found.filter(f => f.totalScore <= 3).length}</div>
+                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Elevated/Notable</div>
               </div>
             </div>
 
@@ -375,12 +402,12 @@ export function CosmicRiskScanner() {
                     }`} />
                     <span className="text-slate-200">{log.year}</span>
                     <span className="text-slate-500 uppercase tracking-tighter">{log.animal}</span>
-                    <span className="opacity-60" style={{ color: log.cf.color }}>{log.cf.type}</span>
+                    <span className="opacity-60 font-cinzel" style={{ color: log.cf.color }}>{log.cf.type}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-slate-500 italic">{log.checked} checked</span>
                     <span className={log.found > 0 ? "text-orange-400 font-bold" : "text-emerald-500"}>
-                      {log.found > 0 ? `⚠️ ${log.found} flagged` : '✓ Clear'}
+                      {log.found > 0 ? `⚠️ ${log.found} flagged` : '✓ clear'}
                     </span>
                   </div>
                 </div>
@@ -397,9 +424,9 @@ export function CosmicRiskScanner() {
                   setScanLog([]);
                   foundRef.current = [];
                 }}
-                className="w-full text-primary/70 border-primary/20 hover:bg-primary/5 h-8 text-[10px] uppercase"
+                className="w-full text-primary/70 border-primary/20 hover:bg-primary/5 h-8 text-[10px] uppercase font-cinzel"
               >
-                <RotateCcw className="mr-2 h-3 w-3" /> New Scan / Reset Engine
+                <RotateCcw className="mr-2 h-3 w-3" /> Reset Engine
               </Button>
             )}
           </div>
@@ -416,92 +443,95 @@ export function CosmicRiskScanner() {
           >
             <div className="flex items-center gap-4">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-500/30 to-transparent" />
-              <h3 className="font-cinzel text-[0.7rem] text-orange-400 uppercase tracking-[0.3em]">Scanned Individuals — Ranked by Composite Risk</h3>
+              <h3 className="font-cinzel text-[0.7rem] text-orange-400 uppercase tracking-[0.3em] text-center">Ranked Discoveries — Composite Risk</h3>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-500/30 to-transparent" />
             </div>
 
             {resultsByTier.map(({ tier, items }) => (
               <div key={tier.label} className="space-y-3">
                 <div className="flex items-center gap-3 px-2">
-                  <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900 border border-white/10 text-xs font-black" style={{ color: tier.color, borderColor: tier.border }}>
+                  <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900 border border-white/10 text-xs font-black font-decorative" style={{ color: tier.color, borderColor: tier.border }}>
                     {tier.min}
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: tier.color }}>{tier.label}</span>
-                  <span className="text-[9px] text-slate-500">· {items.length} {items.length === 1 ? 'Individual' : 'Individuals'} Found</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>{tier.label}</span>
+                  <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} {items.length === 1 ? 'Individual' : 'Individuals'}</span>
                 </div>
 
                 <div className="space-y-2">
-                  {items.map((person, idx) => (
-                    <Card 
-                      key={`${person.name}-${idx}`} 
-                      className={`glass-card p-0 border-transparent overflow-hidden transition-all duration-300 hover:border-white/20`}
-                      style={{ borderLeft: `3px solid ${person.tier.color}`, backgroundColor: expandedId === idx ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)' }}
-                    >
-                      <button 
-                        className="w-full p-4 flex items-center justify-between text-left gap-4"
-                        onClick={() => setExpandedId(expandedId === idx ? null : idx)}
+                  {items.map((person, idx) => {
+                    const globalIdx = found.findIndex(f => f.name === person.name);
+                    return (
+                      <Card 
+                        key={`${person.name}-${idx}`} 
+                        className={`glass-card p-0 border-transparent overflow-hidden transition-all duration-300 hover:border-white/20`}
+                        style={{ borderLeft: `3px solid ${person.tier.color}`, backgroundColor: expandedId === globalIdx ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)' }}
                       >
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-slate-100 truncate">{person.name}</h4>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] text-slate-500">
-                            <span className="flex items-center gap-1">{person.emoji} {person.animal}</span>
-                            <span>•</span>
-                            <span>{person.bd.day} {MO[person.bd.month]} {person.bd.year}</span>
-                            <span>•</span>
-                            <span className="font-bold text-primary">PY {person.py}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10" style={{ color: person.cf.color, backgroundColor: person.cf.bg }}>
-                            {person.cf.type}
-                          </Badge>
-                          <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center border border-white/10 bg-black/40" style={{ borderColor: person.tier.border }}>
-                            <span className="text-xs font-black" style={{ color: person.tier.color }}>{person.totalScore}</span>
-                            <span className="text-[6px] uppercase opacity-50">/ 6</span>
-                          </div>
-                          {expandedId === idx ? <ChevronUp className="h-4 w-4 text-slate-600" /> : <ChevronDown className="h-4 w-4 text-slate-600" />}
-                        </div>
-                      </button>
-
-                      <AnimatePresence>
-                        {expandedId === idx && (
-                          <motion.div 
-                            initial={{ height: 0 }}
-                            animate={{ height: 'auto' }}
-                            exit={{ height: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="p-4 pt-0 border-t border-white/5 space-y-4 bg-black/20">
-                              <div className="grid grid-cols-2 gap-3 pt-4">
-                                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                                  <div className="text-[8px] uppercase text-slate-500 mb-1">Zodiac Conflict</div>
-                                  <div className="text-xs font-bold" style={{ color: person.cf.color }}>{person.cf.label}</div>
-                                  <div className="text-[9px] text-slate-400 mt-1">Score: {person.cf.score}/4</div>
-                                </div>
-                                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                                  <div className="text-[8px] uppercase text-slate-500 mb-1">Personal Year 2026</div>
-                                  <div className="text-xs font-bold text-primary">Vibration {person.py}</div>
-                                  <div className="text-[9px] text-slate-400 mt-1">Weight: +{person.pyPoints} pts</div>
-                                </div>
-                              </div>
-                              <div className="p-3 rounded-lg bg-primary/5 border border-primary/10 italic text-[11px] text-slate-300 leading-relaxed font-body">
-                                <span className="text-primary font-bold not-italic mr-1 uppercase">Analysis:</span>
-                                {person.name} ({person.animal}) enters 2026 under a {person.cf.label} with the Horse Year. Combined with a Personal Year {person.py}, this creates a high-voltage {person.tier.label.toLowerCase()} tension where structural discipline or mystical detachment will be forced by external circumstances.
-                              </div>
-                              <a 
-                                href={person.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase tracking-widest font-bold"
-                              >
-                                <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
-                              </a>
+                        <button 
+                          className="w-full p-4 flex items-center justify-between text-left gap-4"
+                          onClick={() => setExpandedId(expandedId === globalIdx ? null : globalIdx)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] text-slate-500 font-cinzel">
+                              <span className="flex items-center gap-1">{person.emoji} {person.animal}</span>
+                              <span>•</span>
+                              <span>{person.bd.day} {MO[person.bd.month]} {person.bd.year}</span>
+                              <span>•</span>
+                              <span className="font-bold text-primary">PY {person.py}</span>
                             </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </Card>
-                  ))}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel" style={{ color: person.cf.color, backgroundColor: person.cf.bg }}>
+                              {person.cf.type}
+                            </Badge>
+                            <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center border border-white/10 bg-black/40" style={{ borderColor: person.tier.border }}>
+                              <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>{person.totalScore}</span>
+                              <span className="text-[6px] uppercase opacity-50 font-cinzel">/ 6</span>
+                            </div>
+                            {expandedId === globalIdx ? <ChevronUp className="h-4 w-4 text-slate-600" /> : <ChevronDown className="h-4 w-4 text-slate-600" />}
+                          </div>
+                        </button>
+
+                        <AnimatePresence>
+                          {expandedId === globalIdx && (
+                            <motion.div 
+                              initial={{ height: 0 }}
+                              animate={{ height: 'auto' }}
+                              exit={{ height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-4 pt-0 border-t border-white/5 space-y-4 bg-black/20">
+                                <div className="grid grid-cols-2 gap-3 pt-4">
+                                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
+                                    <div className="text-[8px] uppercase text-slate-500 mb-1 font-cinzel">Zodiac Conflict</div>
+                                    <div className="text-xs font-bold font-cinzel" style={{ color: person.cf.color }}>{person.cf.label}</div>
+                                    <div className="text-[9px] text-slate-400 mt-1 font-cinzel">Score: {person.cf.score}/4</div>
+                                  </div>
+                                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
+                                    <div className="text-[8px] uppercase text-slate-500 mb-1 font-cinzel">Personal Year 2026</div>
+                                    <div className="text-xs font-bold text-primary font-cinzel">Vibration {person.py}</div>
+                                    <div className="text-[9px] text-slate-400 mt-1 font-cinzel">Weight: +{person.pyPoints} pts</div>
+                                  </div>
+                                </div>
+                                <div className="p-3 rounded-lg bg-primary/5 border border-primary/10 italic text-[11px] text-slate-300 leading-relaxed font-body">
+                                  <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">Analysis:</span>
+                                  {person.name} ({person.animal}) enters 2026 under a {person.cf.label} with the Horse Year. Combined with a Personal Year {person.py}, this creates a high-voltage {person.tier.label.toLowerCase()} tension where structural discipline or mystical detachment will be forced by external circumstances.
+                                </div>
+                                <a 
+                                  href={person.url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase tracking-widest font-bold font-cinzel"
+                                >
+                                  <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
+                                </a>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -514,7 +544,7 @@ export function CosmicRiskScanner() {
           < Globe className="h-16 w-16 mx-auto stroke-[1]" />
           <div className="space-y-1">
             <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Discovery Engine Idle</p>
-            <p className="font-body text-sm italic">Initialize the engine to begin active scanning of historical records.</p>
+            <p className="font-body text-sm italic">Initialize scan to discover 2026 risk profiles.</p>
           </div>
         </div>
       )}
