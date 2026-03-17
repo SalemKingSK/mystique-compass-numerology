@@ -1,10 +1,9 @@
-// src/components/profile-generator/numerology-display.tsx
 'use client';
 
 import * as React from 'react';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, ArrowData, PersonalYearData } from './types';
-import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star, Activity, ChevronRight } from "lucide-react";
+import { Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass, Skull, BookUser, Star, Activity, ChevronRight, CalendarDays, Zap, Info } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,7 +12,6 @@ import { ZodiacSection } from './zodiac-section';
 import LoshuArrowDetailPanel from '@/components/LoshuArrowDetailPanel';
 import { FateChambers } from './fate-chambers';
 import { CoreVibrations } from './core-vibrations';
-
 
 const InfoCard = ({ title, value, icon, onClick }: { title: string, value: string | number, icon: React.ReactNode, onClick?: () => void }) => (
     <div
@@ -139,7 +137,6 @@ const KuaDisplay = React.forwardRef<HTMLDivElement, { kuaAttributes: any, open: 
 );
 KuaDisplay.displayName = 'KuaDisplay';
 
-
 export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
     const {
         birthDay,
@@ -169,16 +166,22 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
     const [personalYearAccordionValue, setPersonalYearAccordionValue] = React.useState<string>("");
     const [activeCoreLayer, setActiveCoreLayer] = React.useState<string | null>(null);
+    const [openPYLayer, setOpenPYLayer] = React.useState<number | null>(1);
 
     const coreVibrationsRef = React.useRef<HTMLDivElement>(null);
     const arrowsRef = React.useRef<HTMLDivElement>(null);
     const kuaRef = React.useRef<HTMLDivElement>(null);
+    const pyDetailRef = React.useRef<HTMLDivElement>(null);
 
     const handleYearSelect = (data: PersonalYearData | null) => {
         if (data?.year !== selectedPersonalYear?.year) {
             setSelectedPersonalYear(data);
             if (data) {
                 setPersonalYearAccordionValue("personal-year-detail");
+                setOpenPYLayer(1);
+                setTimeout(() => {
+                    pyDetailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 150);
             } else {
                 setPersonalYearAccordionValue("");
             }
@@ -214,9 +217,10 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         });
     }
 
+    const togglePYLayer = (num: number) => setOpenPYLayer(openPYLayer === num ? null : num);
+
     const kuaId = 'kua-section';
     const birthDateString = `${birthDay}-${birthMonth}-${birthYear}`;
-
 
   return (
     <div className="space-y-4 pb-20">
@@ -286,31 +290,110 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       <AnimatePresence>
         {selectedPersonalYear && (
           <motion.div
+            ref={pyDetailRef}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.4 }}
             className="mt-6"
           >
-            <div className="glass-card px-4 border-l-[3px] border-l-[#c8a84b]/40">
-              <Accordion 
-                type="single" 
-                collapsible 
-                value={personalYearAccordionValue} 
-                onValueChange={setPersonalYearAccordionValue}
-              >
-                <AccordionItem value="personal-year-detail">
-                  <AccordionTrigger>
-                    <span className="font-cinzel font-semibold text-[0.8rem] text-primary flex items-center gap-2 uppercase tracking-widest">
-                      <Star className="h-5 w-5" /> Personal Year {selectedPersonalYear.pyn} - {selectedPersonalYear.year}
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="font-body text-base leading-relaxed">
-                    <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+            <div className="glass-card p-4 space-y-4">
+                <div className="flex items-center gap-4 mb-2">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                    <h3 className="font-cinzel font-semibold text-[0.75rem] text-primary flex items-center gap-2 uppercase tracking-[0.3em]">
+                        <Star className="h-4 w-4" /> Personal Year Oracle
+                    </h3>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                </div>
+
+                <div className="flex flex-col">
+                    <div className="py-accordion">
+                        <button className="py-acc-header" onClick={() => togglePYLayer(1)}>
+                            <div className="py-acc-left">
+                                <span className="py-layer-badge" style={{ background: "#9b8ec422", color: "#9b8ec4", borderColor: "#9b8ec455" }}>Layer 1</span>
+                                <span className="py-acc-title">Annual Resonance ({selectedPersonalYear.year})</span>
+                            </div>
+                            <span className="py-acc-arrow" style={{ transform: openPYLayer === 1 ? "rotate(180deg)" : "rotate(0)" }}>▾</span>
+                        </button>
+                        {openPYLayer === 1 && (
+                            <div className="py-acc-body">
+                                <div className="py-meaning-card" style={{ borderLeftColor: "#9b8ec4" }}>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <CalendarDays className="h-4 w-4 text-[#9b8ec4]" />
+                                        <span className="text-[11px] font-bold uppercase tracking-widest text-[#9b8ec4]">Personal Year {selectedPersonalYear.pyn} Vibration</span>
+                                    </div>
+                                    <p className="font-body text-base text-slate-200 italic mb-2">Cycle Year {selectedPersonalYear.pyn}: A threshold of significant transition.</p>
+                                    <AccordionContentWithPlayer text={`In the year ${selectedPersonalYear.year}, you are navigating the frequency of Personal Year ${selectedPersonalYear.pyn}. This is a period dedicated to ${selectedPersonalYear.meaning.split('.')[0]}.`} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="py-accordion">
+                        <button className="py-acc-header" onClick={() => togglePYLayer(2)}>
+                            <div className="py-acc-left">
+                                <span className="py-layer-badge" style={{ background: "#3a8ee022", color: "#3a8ee0", borderColor: "#3a8ee055" }}>Layer 2</span>
+                                <span className="py-acc-title">Celestial Momentum</span>
+                            </div>
+                            <span className="py-acc-arrow" style={{ transform: openPYLayer === 2 ? "rotate(180deg)" : "rotate(0)" }}>▾</span>
+                        </button>
+                        {openPYLayer === 2 && (
+                            <div className="py-acc-body">
+                                <div className="py-meaning-card" style={{ borderLeftColor: "#3a8ee0" }}>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Zap className="h-4 w-4 text-[#3a8ee0]" />
+                                        <span className="text-[11px] font-bold uppercase tracking-widest text-[#3a8ee0]">Energy Distribution</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 mb-4">
+                                        <div className="p-3 bg-white/5 rounded-lg border border-white/10 text-center">
+                                            <p className="text-[9px] uppercase tracking-widest text-slate-400 mb-1">Power Quotient</p>
+                                            <p className="text-2xl font-decorative text-yellow-300">{selectedPersonalYear.power}/10</p>
+                                        </div>
+                                        <div className="p-3 bg-white/5 rounded-lg border border-white/10 text-center">
+                                            <p className="text-[9px] uppercase tracking-widest text-slate-400 mb-1">Cycle State</p>
+                                            <p className="text-xs font-cinzel text-primary uppercase">{selectedPersonalYear.pyn <= 4 ? 'Ascending' : selectedPersonalYear.pyn <= 7 ? 'Consolidating' : 'Harvesting'}</p>
+                                        </div>
+                                    </div>
+                                    <AccordionContentWithPlayer text={`This year carries a power level of ${selectedPersonalYear.power} out of 10. In the current 9-year cycle, this represents a phase of ${selectedPersonalYear.pyn <= 4 ? 'initial growth and foundational work' : selectedPersonalYear.pyn <= 7 ? 'inner refinement and introspection' : 'peak manifestation and eventual release'}.`} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="py-accordion">
+                        <button className="py-acc-header" onClick={() => togglePYLayer(3)}>
+                            <div className="py-acc-left">
+                                <span className="py-layer-badge" style={{ background: "#e0a83a22", color: "#e0a83a", borderColor: "#e0a83a55" }}>Layer 3</span>
+                                <span className="py-acc-title">The Curriculum</span>
+                            </div>
+                            <span className="py-acc-arrow" style={{ transform: openPYLayer === 3 ? "rotate(180deg)" : "rotate(0)" }}>▾</span>
+                        </button>
+                        {openPYLayer === 3 && (
+                            <div className="py-acc-body">
+                                <div className="py-meaning-card" style={{ borderLeftColor: "#e0a83a" }}>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Info className="h-4 w-4 text-[#e0a83a]" />
+                                        <span className="text-[11px] font-bold uppercase tracking-widest text-[#e0a83a]">Spiritual Guidance</span>
+                                    </div>
+                                    <AccordionContentWithPlayer text={selectedPersonalYear.meaning} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
+            <style jsx>{`
+                .py-accordion { border-top: 1px solid #2a2340; }
+                .py-accordion:first-of-type { border-top: none; }
+                .py-acc-header { width: 100%; background: transparent; border: none; padding: 14px 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 10px; }
+                .py-acc-left { display: flex; align-items: center; gap: 10px; }
+                .py-acc-title { font-size: 13.5px; font-weight: 600; letter-spacing: 0.03em; color: #c4b8e8; text-align: left; font-family: 'Cinzel', serif; }
+                .py-acc-arrow { font-size: 18px; color: #7a6fa0; transition: transform 0.2s ease; line-height: 1; }
+                .py-acc-body { padding: 4px 0 18px; animation: pyFadeIn 0.2s ease; }
+                @keyframes pyFadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+                .py-layer-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 20px; border: 1px solid; white-space: nowrap; font-family: 'Cinzel', serif; }
+                .py-meaning-card { background: rgba(255,255,255,0.02); border-left: 3px solid; border-radius: 0 10px 10px 0; padding: 16px; }
+            `}</style>
           </motion.div>
         )}
       </AnimatePresence>
