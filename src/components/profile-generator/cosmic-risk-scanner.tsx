@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Zap, RotateCcw, Loader2, 
   ExternalLink, Telescope, Trash2, History,
-  Globe
+  Globe, UserPlus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,8 +20,6 @@ function reduce(n: number) {
   while (s > 9) s = String(s).split("").reduce((acc, d) => acc + +d, 0);
   return s || 9;
 }
-
-const MO = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const DANGER_TIERS = [
   { min: 6, label: "CRITICAL", color: "#ff2020", bg: "rgba(255,32,32,0.16)", border: "rgba(255,32,32,0.55)" },
@@ -130,7 +128,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   // LOAD Persistent State
   useEffect(() => {
-    const key = `scanner_posterity_v4_${targetYear}`;
+    const key = `scanner_posterity_v5_${targetYear}`;
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
@@ -157,7 +155,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   }, [targetYear]);
 
   const persistState = () => {
-    const key = `scanner_posterity_v4_${targetYear}`;
+    const key = `scanner_posterity_v5_${targetYear}`;
     localStorage.setItem(key, JSON.stringify({
       found: foundRef.current,
       stats: statsRef.current,
@@ -167,7 +165,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const clearData = () => {
     if (!confirm(`Clear all discovered data for the year ${targetYear}?`)) return;
-    const key = `scanner_posterity_v4_${targetYear}`;
+    const key = `scanner_posterity_v5_${targetYear}`;
     localStorage.removeItem(key);
     setFound([]);
     foundRef.current = [];
@@ -183,7 +181,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setRunning(true);
     
     if (!isContinuing) {
-      if (confirm("Reset current progress and start from the beginning of alphabetical lists? Stored results will be cleared.")) {
+      if (confirm("Reset current progress and start from the beginning? Stored results will be cleared.")) {
         tokensRef.current = {};
         statsRef.current = { checked: 0, flagged: 0 };
         setFound([]);
@@ -217,7 +215,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       let titles: string[] = [];
       let nextToken: string | null = null;
       try {
-        const result = await fetchCategoryMembers(year, perYear, (currentToken === "COMPLETED" ? undefined : currentToken) || undefined);
+        const result = await fetchCategoryMembers(year, perYear, (isContinuing && currentToken !== "COMPLETED" ? currentToken : undefined) || undefined);
         titles = result.titles;
         nextToken = result.cmcontinue;
         tokensRef.current[year] = nextToken || "COMPLETED";
@@ -334,7 +332,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
             </h2>
             <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest">
-              DISCOVERY CONTEXT: {targetYear} {targetSign.n} YEAR ({targetSign.e})
+              TEMPORAL CONTEXT: {targetYear} {targetSign.n} YEAR ({targetSign.e})
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -349,19 +347,19 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-            <div className="text-2xl font-black text-primary font-decorative">{stats.checked}</div>
+            <div className="text-2xl font-black text-primary font-decorative tabular-nums">{stats.checked}</div>
             <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Total Checked</div>
           </div>
           <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-            <div className="text-2xl font-black text-orange-400 font-decorative">{found.length}</div>
-            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Flagged Risks</div>
+            <div className="text-2xl font-black text-orange-400 font-decorative tabular-nums">{found.length}</div>
+            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Discovered Profiles</div>
           </div>
           <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-            <div className="text-2xl font-black text-rose-500 font-decorative">{found.filter(f => f.totalScore >= 5).length}</div>
+            <div className="text-2xl font-black text-rose-500 font-decorative tabular-nums">{found.filter(f => f.totalScore >= 5).length}</div>
             <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Critical/Severe</div>
           </div>
           <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-            <div className="text-2xl font-black text-blue-400 font-decorative">{found.filter(f => f.totalScore <= 3).length}</div>
+            <div className="text-2xl font-black text-blue-400 font-decorative tabular-nums">{found.filter(f => f.totalScore <= 3).length}</div>
             <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">Elevated/Notable</div>
           </div>
         </div>
@@ -394,10 +392,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ))}
             </div>
             <Button 
-              onClick={() => startScan(true)} 
-              className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8"
+              onClick={() => startScan(found.length > 0)} 
+              className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8 h-auto py-3 whitespace-normal text-center leading-tight"
             >
-              <Zap className="mr-2 h-4 w-4" /> {found.length > 0 ? 'Scan Next Batch (Perpetual Discovery)' : 'Start Discovery'}
+              <Zap className="mr-2 h-4 w-4 shrink-0" /> {found.length > 0 ? 'Scan Next Batch (Perpetual Discovery)' : 'Start Discovery'}
             </Button>
           </div>
         )}
@@ -417,7 +415,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
           <div className="flex items-center gap-2 mb-2">
             <History className="h-4 w-4 text-primary/60" />
-            <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">Total Discovered for {targetYear}: {found.length}</span>
+            <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">
+              Database Entry Total for {targetYear}: <span className="font-bold text-primary">{found.length} Profiles</span>
+            </span>
           </div>
 
           {resultsByTier.map(({ tier, items }) => (

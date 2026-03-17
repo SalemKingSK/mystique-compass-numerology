@@ -50,9 +50,9 @@ export const calculateKua = (year: number, month: number, day: number, gender: s
 
   // 2. Get the Year Root (Sum of last two digits reduced to a single digit)
   const lastTwoDigits = adjustedYear % 100;
-  let yearRoot = String(lastTwoDigits).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+  let yearRoot = String(lastTwoDigits).split('').reduce((a, d) => a + parseInt(d, 10), 0);
   while (yearRoot > 9) {
-    yearRoot = String(yearRoot).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+    yearRoot = String(yearRoot).split('').reduce((a, d) => a + parseInt(d, 10), 0);
   }
 
   let kua = 0;
@@ -73,7 +73,7 @@ export const calculateKua = (year: number, month: number, day: number, gender: s
     
     // Reduce to single digit
     while (kua > 9) {
-      kua = String(kua).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+      kua = String(kua).split('').reduce((a, d) => a + parseInt(d, 10), 0);
     }
     
     // The Rule of 5: Females replace 5 with 8
