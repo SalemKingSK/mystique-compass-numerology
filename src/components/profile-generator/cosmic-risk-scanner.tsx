@@ -8,7 +8,7 @@ import {
   ChevronDown, ChevronUp, ExternalLink,
   Target, Calendar, AlertTriangle,
   Play, Square, RefreshCw, Telescope,
-  FilterX, UserSearch
+  FilterX, UserSearch, FastForward
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -82,11 +82,15 @@ function extractBirthDate(wikitext: string) {
   return null;
 }
 
-async function fetchCategoryMembers(year: number, limit: number) {
-  const url = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${year}_births&cmlimit=${limit}&cmnamespace=0&format=json&origin=*`;
+async function fetchCategoryMembers(year: number, limit: number, cmcontinue?: string) {
+  const continueParam = cmcontinue ? `&cmcontinue=${encodeURIComponent(cmcontinue)}` : '';
+  const url = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${year}_births&cmlimit=${limit}&cmnamespace=0&format=json&origin=*${continueParam}`;
   const res = await fetch(url);
   const data = await res.json();
-  return (data.query?.categorymembers || []).map((m: any) => m.title);
+  return {
+    titles: (data.query?.categorymembers || []).map((m: any) => m.title),
+    cmcontinue: data.continue?.cmcontinue || null
+  };
 }
 
 async function batchFetchMetadata(titles: string[]) {
@@ -116,6 +120,7 @@ export function CosmicRiskScanner() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [scanLog, setScanLog] = useState<any[]>([]);
   const [filterQuery, setFilterQuery] = useState("");
+  const [continueTokens, setContinueTokens] = useState<Record<number, string | null>>({});
   const abort = useRef(false);
   const foundRef = useRef<any[]>([]);
 
@@ -138,31 +143,47 @@ export function CosmicRiskScanner() {
     });
   };
 
-  const startScan = async () => {
+  const startScan = async (isContinuing: boolean = false) => {
     abort.current = false;
     setRunning(true);
-    setFound([]);
-    foundRef.current = [];
-    setExpandedId(null);
-    setScanLog([]);
-    setStats({ checked: 0, flagged: 0, currentYear: null, done: false, phase: "Initializing Engine..." });
+    
+    if (!isContinuing) {
+      setFound([]);
+      foundRef.current = [];
+      setExpandedId(null);
+      setScanLog([]);
+      setContinueTokens({});
+      setStats({ checked: 0, flagged: 0, currentYear: null, done: false, phase: "Initializing Engine..." });
+    } else {
+      setStats(s => ({ ...s, done: false, phase: "Resuming Scan from last batch..." }));
+    }
 
     const perYear = DEPTHS[depthIdx].perYear;
     const yearsToScan = SCAN_YEARS.filter(y => activeYears.has(y.year));
-    let totalChecked = 0;
-    let totalFlagged = 0;
+    let totalChecked = isContinuing ? stats.checked : 0;
+    let totalFlagged = isContinuing ? stats.flagged : 0;
 
     for (const { year, zodiacKey } of yearsToScan) {
       if (abort.current) break;
       const cf = CF_CONFIG[zodiacKey];
       const animal = ANIMALS[zodiacKey];
+      const currentToken = continueTokens[year] || undefined;
       
-      setScanLog(p => [...p, { year, status: "loading", found: 0, checked: 0, animal: animal.n, cf, zodiacKey }]);
+      setScanLog(p => {
+        const existing = p.find(l => l.year === year);
+        if (existing) return p.map(l => l.year === year ? { ...l, status: "loading" } : l);
+        return [...p, { year, status: "loading", found: 0, checked: 0, animal: animal.n, cf, zodiacKey }];
+      });
+
       setStats(s => ({ ...s, currentYear: year, phase: `Connecting to Wikipedia Category:${year}_births...` }));
 
       let titles: string[] = [];
+      let nextToken: string | null = null;
       try {
-        titles = await fetchCategoryMembers(year, perYear);
+        const result = await fetchCategoryMembers(year, perYear, currentToken);
+        titles = result.titles;
+        nextToken = result.cmcontinue;
+        setContinueTokens(prev => ({ ...prev, [year]: nextToken }));
       } catch (e) {
         setScanLog(p => p.map(l => l.year === year ? { ...l, status: "error" } : l));
         continue;
@@ -229,14 +250,14 @@ export function CosmicRiskScanner() {
             phase: `Analyzing ${year} Births... (${yearChecked}/${titles.length})`
           }));
         }
-        setScanLog(p => p.map(l => l.year === year ? { ...l, checked: yearChecked, found: yearFound, status: "scanning" } : l));
+        setScanLog(p => p.map(l => l.year === year ? { ...l, checked: l.checked + yearChecked, found: l.found + yearFound, status: "scanning" } : l));
         if (!abort.current) await new Promise(r => setTimeout(r, 100));
       }
-      setScanLog(p => p.map(l => l.year === year ? { ...l, status: "done", checked: yearChecked, found: yearFound } : l));
+      setScanLog(p => p.map(l => l.year === year ? { ...l, status: "done" } : l));
     }
 
     setRunning(false);
-    setStats(s => ({ ...s, currentYear: null, done: true, phase: "Scan Complete" }));
+    setStats(s => ({ ...s, currentYear: null, done: true, phase: "Batch Complete" }));
   };
 
   const stopScan = () => {
@@ -245,7 +266,6 @@ export function CosmicRiskScanner() {
     setStats(s => ({ ...s, phase: "Terminated by User" }));
   };
 
-  // Advanced Filtering
   const filteredFound = found.filter(person => {
     const searchString = `${person.name} ${person.bioDescription}`.toLowerCase();
     return searchString.includes(filterQuery.toLowerCase());
@@ -287,9 +307,8 @@ export function CosmicRiskScanner() {
         <div className="p-4 bg-white/5 border border-white/10 rounded-lg mb-6">
           <p className="text-sm leading-relaxed text-slate-300 font-body">
             This engine identifies global figures facing volatile energy in 2026. It automatically batch-scans 
-            thousands of public profiles from <strong className="text-primary">conflicting zodiac years</strong>, 
-            calculates their Personal Year for 2026, and flags those at the intersection of a zodiac clash and a 
-            critical numeric vibration (PY 4 or 7).
+            thousands of public profiles from <strong className="text-primary">conflicting zodiac years</strong>. 
+            After each scan of 7,500 profiles, you can continue to the next batch, searching to perpetuity.
           </p>
         </div>
 
@@ -351,11 +370,11 @@ export function CosmicRiskScanner() {
                 ))}
               </div>
               <Button 
-                onClick={startScan} 
+                onClick={() => startScan(false)} 
                 disabled={activeYears.size === 0}
                 className="w-full sm:w-auto ml-auto bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-black uppercase tracking-[0.1em] px-8"
               >
-                <Zap className="mr-2 h-4 w-4" /> Auto-Discover
+                <Zap className="mr-2 h-4 w-4" /> Start Discovery
               </Button>
             </div>
           </div>
@@ -397,43 +416,31 @@ export function CosmicRiskScanner() {
               <Progress value={yearsToScanProgress(scanLog)} className="h-1 bg-white/5" />
             </div>
 
-            <div className="max-h-32 overflow-y-auto space-y-1 pr-2 scrollbar-hide border-y border-white/5 py-2">
-              {scanLog.map((log, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 rounded bg-black/20 text-[10px] font-medium">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-1.5 h-1.5 rounded-full ${
-                      log.status === 'done' ? 'bg-emerald-500' : 
-                      log.status === 'scanning' ? 'bg-orange-500 animate-pulse' : 
-                      'bg-slate-700'
-                    }`} />
-                    <span className="text-slate-200">{log.year}</span>
-                    <span className="text-slate-500 uppercase tracking-tighter">{log.animal}</span>
-                    <span className="opacity-60 font-cinzel" style={{ color: log.cf.color }}>{log.cf.type}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-slate-500 italic">{log.checked} checked</span>
-                    <span className={log.found > 0 ? "text-orange-400 font-bold" : "text-emerald-500"}>
-                      {log.found > 0 ? `⚠️ ${log.found} flagged` : '✓ clear'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             {stats.done && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => {
-                  setStats({ checked: 0, flagged: 0, currentYear: null, done: false, phase: "" });
-                  setFound([]);
-                  setScanLog([]);
-                  foundRef.current = [];
-                }}
-                className="w-full text-primary/70 border-primary/20 hover:bg-primary/5 h-8 text-[10px] uppercase font-cinzel"
-              >
-                <RotateCcw className="mr-2 h-3 w-3" /> Reset Engine
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => startScan(true)}
+                  className="flex-1 text-orange-400 border-orange-500/30 hover:bg-orange-500/5 h-10 text-[10px] uppercase font-cinzel font-bold"
+                >
+                  <FastForward className="mr-2 h-4 w-4" /> Scan Next Batch (7,500)
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    setStats({ checked: 0, flagged: 0, currentYear: null, done: false, phase: "" });
+                    setFound([]);
+                    setScanLog([]);
+                    setContinueTokens({});
+                    foundRef.current = [];
+                  }}
+                  className="w-24 text-primary/70 border-primary/20 hover:bg-primary/5 h-10 text-[10px] uppercase font-cinzel"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              </div>
             )}
           </div>
         )}
@@ -446,7 +453,6 @@ export function CosmicRiskScanner() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* SEARCH & SORT SECTION */}
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50 group-focus-within:text-primary transition-colors" />
               <Input 
