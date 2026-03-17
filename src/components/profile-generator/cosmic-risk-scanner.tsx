@@ -96,11 +96,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const foundRef = useRef<any[]>([]);
 
   // Calculate dynamic context based on targetYear
-  const targetSign = useMemo(() => ANIMALS[((targetYear - 1900) % 12 + 12) % 12], [targetYear]);
+  const targetSign = useMemo(() => {
+    const idx = ((targetYear - 1900) % 12 + 12) % 12;
+    return ANIMALS[idx] || ANIMALS[0];
+  }, [targetYear]);
+
   const targetUY = useMemo(() => reduce(targetYear), [targetYear]);
   
   const CF_CONFIG: Record<string, any> = useMemo(() => {
-    const rels = RELATIONS[targetSign.n];
+    const rels = RELATIONS[targetSign.n] || RELATIONS.Rat;
     return {
       Chong: { label: "Direct Clash", score: 4, color: "#ff4444", bg: "rgba(255,68,68,0.13)", border: "rgba(255,68,68,0.5)", glyph: "☠", animal: rels.clash },
       Xing: { label: "Self-Punishment", score: 3, color: "#e07828", bg: "rgba(224,120,40,0.12)", border: "rgba(224,120,40,0.5)", glyph: "⚔", animal: ['Horse', 'Dragon', 'Rooster', 'Pig'].includes(targetSign.n) ? targetSign.n : null },
