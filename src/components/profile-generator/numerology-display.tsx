@@ -166,9 +166,11 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     const [selectedPersonalYear, setSelectedPersonalYear] = React.useState<PersonalYearData | null>(null);
     const [personalYearAccordionValue, setPersonalYearAccordionValue] = React.useState<string>("");
     const [activeCoreLayer, setActiveCoreLayer] = React.useState<string | null>(null);
+    const [activeFateLayer, setActiveFateLayer] = React.useState<number | null>(null);
     const [openPYLayer, setOpenPYLayer] = React.useState<number | null>(1);
 
     const coreVibrationsRef = React.useRef<HTMLDivElement>(null);
+    const fateChambersRef = React.useRef<HTMLDivElement>(null);
     const arrowsRef = React.useRef<HTMLDivElement>(null);
     const kuaRef = React.useRef<HTMLDivElement>(null);
     const pyDetailRef = React.useRef<HTMLDivElement>(null);
@@ -192,6 +194,13 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         setActiveCoreLayer(layerId);
         setTimeout(() => {
             coreVibrationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+    }
+
+    const handleFateNavigation = (layerNum: number) => {
+        setActiveFateLayer(layerNum);
+        setTimeout(() => {
+            fateChambersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 150);
     }
 
@@ -228,7 +237,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <InfoCard title="Psyche Number" value={psycheNum} icon={<BrainCircuit className="h-6 w-6" />} onClick={() => handleCoreNavigation('psyche')} />
         <InfoCard title="Destiny Number" value={destinyNum} icon={<Sparkles className="h-6 w-6" />} onClick={() => handleCoreNavigation('destiny')} />
         <InfoCard title="Kua Number" value={kuaNum} icon={<Compass className="h-6 w-6" />} onClick={() => handleToggle(kuaId)} />
-        {compoundNum && <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} />}
+        {compoundNum && <InfoCard title="Compound Number" value={compoundNum} icon={<Skull className="h-6 w-6" />} onClick={() => handleFateNavigation(1)} />}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -411,14 +420,18 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         />
       </div>
 
-      <FateChambers 
-        compoundNum={compoundNum}
-        compoundMeaning={compoundMeaning}
-        reducedCompoundNum={reducedCompoundNum}
-        reducedCompoundMeaning={reducedCompoundMeaning}
-        karmicFateNum={karmicFateNum}
-        karmicFateMeaning={karmicFateMeaning}
-      />
+      <div ref={fateChambersRef}>
+        <FateChambers 
+          compoundNum={compoundNum}
+          compoundMeaning={compoundMeaning}
+          reducedCompoundNum={reducedCompoundNum}
+          reducedCompoundMeaning={reducedCompoundMeaning}
+          karmicFateNum={karmicFateNum}
+          karmicFateMeaning={karmicFateMeaning}
+          activeLayer={activeFateLayer}
+          onLayerToggle={setActiveFateLayer}
+        />
+      </div>
 
       <ArrowsDisplay 
         ref={arrowsRef} 

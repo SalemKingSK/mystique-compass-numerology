@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Activity, Wand2, ShieldAlert, Lock } from "lucide-react";
 import { AccordionContentWithPlayer } from "./accordion-content-with-player";
 
@@ -11,6 +11,8 @@ interface FateChambersProps {
   reducedCompoundMeaning: string | null;
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
+  activeLayer: number | null;
+  onLayerToggle: (layer: number | null) => void;
 }
 
 export function FateChambers({
@@ -20,12 +22,9 @@ export function FateChambers({
   reducedCompoundMeaning,
   karmicFateNum,
   karmicFateMeaning,
+  activeLayer,
+  onLayerToggle
 }: FateChambersProps) {
-  const [openLayer, setOpenLayer] = useState<1 | 2 | 3 | null>(null);
-
-  function toggle(layer: 1 | 2 | 3) {
-    setOpenLayer((p) => (p === layer ? null : layer));
-  }
 
   const renderLayer = (
     layerNum: 1 | 2 | 3,
@@ -36,13 +35,14 @@ export function FateChambers({
     badgeColor: string
   ) => {
     const isLocked = !meaning;
+    const isOpen = activeLayer === layerNum;
     
     return (
-      <div className={`fate-accordion ${isLocked ? 'fate-locked' : ''}`}>
+      <div className={`fate-accordion ${isLocked ? 'fate-locked' : ''}`} id={`fate-layer-${layerNum}`}>
         <button
           className="fate-acc-header"
-          onClick={() => !isLocked && toggle(layerNum)}
-          aria-expanded={openLayer === layerNum}
+          onClick={() => !isLocked && onLayerToggle(isOpen ? null : layerNum)}
+          aria-expanded={isOpen}
           disabled={isLocked}
         >
           <div className="fate-acc-left">
@@ -61,14 +61,14 @@ export function FateChambers({
           ) : (
             <span 
               className="fate-acc-arrow" 
-              style={{ transform: openLayer === layerNum ? "rotate(180deg)" : "rotate(0)" }}
+              style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0)" }}
             >
               ▾
             </span>
           )}
         </button>
 
-        {openLayer === layerNum && !isLocked && (
+        {isOpen && !isLocked && (
           <div className="fate-acc-body">
              <div className="fate-meaning-card" style={{ borderLeftColor: badgeColor }}>
                 <div className="flex items-center gap-2 mb-3">
