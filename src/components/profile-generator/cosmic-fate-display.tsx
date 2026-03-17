@@ -1,6 +1,8 @@
+
 /**
  * @fileOverview Overhauled Cosmic Fate Display mirroring the "Personal Year Oracle" structure.
  * Integrated with functional year selection, multi-traditional sub-tabs, and auto-scrolling TTS.
+ * Updated to include the new Cosmic Risk Scanner discovery engine.
  */
 
 'use client';
@@ -18,10 +20,11 @@ import {
   Sparkles, Star, Info, CalendarDays, 
   Zap, BookOpen, ShieldAlert, Users, 
   MapIcon, Compass, BrainCircuit, Activity,
-  ChevronRight
+  ChevronRight, Target, Telescope
 } from 'lucide-react';
 import { SpeechPlayer } from './speech-player';
 import { ScrollableTextDisplay } from './scrollable-text-display';
+import { CosmicRiskScanner } from './cosmic-risk-scanner';
 
 // Helper to reduce numbers
 const reduce = (n: number): number => {
@@ -403,20 +406,21 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
       </Card>
 
       {/* Main Tabs */}
-      <div className="dash-nav">
+      <div className="dash-nav overflow-x-auto scrollbar-hide flex flex-nowrap md:grid md:grid-cols-6 gap-1">
         {[
-          { id: 'oracle', name: '✦ Oracle' },
-          { id: 'dive', name: '☽ Dive' },
-          { id: 'map', name: '📅 Map' },
-          { id: 'pinnacles', name: '◈ Pinnacles' },
-          { id: 'library', name: '📜 Library' },
+          { id: 'oracle', name: '✦ Oracle', icon: <Star className="h-3 w-3" /> },
+          { id: 'dive', name: '☽ Dive', icon: <Compass className="h-3 w-3" /> },
+          { id: 'map', name: '📅 Map', icon: <CalendarDays className="h-3 w-3" /> },
+          { id: 'pinnacles', name: '◈ Pinnacle', icon: <Activity className="h-3 w-3" /> },
+          { id: 'library', name: '📜 Codex', icon: <BookOpen className="h-3 w-3" /> },
+          { id: 'scanner', name: '🔭 Scan', icon: <Telescope className="h-3 w-3" /> },
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`dash-tab ${activeTab === tab.id ? 'active' : ''}`}
+            className={`dash-tab flex items-center justify-center gap-2 min-w-[100px] md:min-w-0 ${activeTab === tab.id ? 'active' : ''}`}
           >
-            {tab.name}
+            {tab.icon} {tab.name}
           </button>
         ))}
       </div>
@@ -426,6 +430,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
         {activeTab === 'dive' && renderDive()}
         {activeTab === 'map' && renderMap()}
         {activeTab === 'library' && renderLibrary()}
+        {activeTab === 'scanner' && <CosmicRiskScanner />}
         {activeTab === 'pinnacles' && (
           <div className="space-y-6 fu">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
