@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Zap, RotateCcw, Loader2, 
-  ExternalLink, Telescope, Trash2, History
+  ExternalLink, Telescope, Trash2, History,
+  Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
