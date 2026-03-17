@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -20,10 +19,6 @@ import { ANIMALS } from '@/lib/cosmic-fate/constants';
 const UY_2026 = 1;
 const MO = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-// Conflict Types matching the app's animal indices
-// 4: Rat, 10: Dog, 5: Ox, 7: Rabbit
-// NOTE: Based on the prompt's CF matrix:
-// 4: Rat, 10: Horse (Self-Punishment), 5: Ox (Harm), 7: Rabbit (Po)
 const CF_CONFIG: Record<number, any> = {
   4: { type: "Chong", label: "Direct Clash", score: 4, color: "#ff4444", bg: "rgba(255,68,68,0.13)", border: "rgba(255,68,68,0.5)", glyph: "☠", rel: "Rat ↔ Horse" },
   10: { type: "Xing", label: "Self-Punishment", score: 3, color: "#e07828", bg: "rgba(224,120,40,0.12)", border: "rgba(224,120,40,0.5)", glyph: "⚔", rel: "Horse ↔ Horse" },
@@ -47,9 +42,9 @@ const SCAN_YEARS = [
 ];
 
 const DEPTHS = [
-  { label: "Quick", sub: "~10/yr", perYear: 10 },
-  { label: "Standard", sub: "~25/yr", perYear: 25 },
-  { label: "Deep", sub: "~50/yr", perYear: 50 },
+  { label: "Standard", sub: "~100/yr", perYear: 100 },
+  { label: "Deep", sub: "~300/yr", perYear: 300 },
+  { label: "Global Discovery", sub: "~500/yr", perYear: 500 },
 ];
 
 const GROUPS = [
@@ -59,7 +54,6 @@ const GROUPS = [
   { key: 7, label: "Po — Rabbit years", years: [1963, 1975, 1987, 1999] },
 ];
 
-// --- LOGIC HELPERS ---
 function reduce(n: number) {
   let s = Math.abs(n);
   while (s > 9) s = String(s).split("").reduce((acc, d) => acc + +d, 0);
@@ -171,7 +165,8 @@ export function CosmicRiskScanner() {
       let yearChecked = 0;
       let yearFound = 0;
       const batches = [];
-      for (let i = 0; i < titles.length; i += 20) batches.push(titles.slice(i, i + 20));
+      // Increased batch size to 50 for larger scans
+      for (let i = 0; i < titles.length; i += 50) batches.push(titles.slice(i, i + 50));
 
       for (const batch of batches) {
         if (abort.current) break;
@@ -225,7 +220,6 @@ export function CosmicRiskScanner() {
           }));
         }
         setScanLog(p => p.map(l => l.year === year ? { ...l, checked: yearChecked, found: yearFound, status: "scanning" } : l));
-        // Small throttle
         if (!abort.current) await new Promise(r => setTimeout(r, 100));
       }
       setScanLog(p => p.map(l => l.year === year ? { ...l, status: "done", checked: yearChecked, found: yearFound } : l));
@@ -249,7 +243,6 @@ export function CosmicRiskScanner() {
   return (
     <div className="space-y-6">
       <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
-        {/* Animated Scanline Effect */}
         {running && (
           <motion.div 
             initial={{ top: "-10%" }}
@@ -277,14 +270,13 @@ export function CosmicRiskScanner() {
 
         <div className="p-4 bg-white/5 border border-white/10 rounded-lg mb-6">
           <p className="text-sm leading-relaxed text-slate-300 font-body">
-            This engine identified global figures facing volatile energy in 2026. It automatically batch-scans 
+            This engine identifies global figures facing volatile energy in 2026. It automatically batch-scans 
             thousands of public profiles from <strong className="text-primary">conflicting zodiac years</strong>, 
             calculates their Personal Year for 2026, and flags those at the intersection of a zodiac clash and a 
             critical numeric vibration (PY 4 or 7).
           </p>
         </div>
 
-        {/* Configuration Panel */}
         {!running && !stats.done && (
           <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-500">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -353,7 +345,6 @@ export function CosmicRiskScanner() {
           </div>
         )}
 
-        {/* Active Scan UI */}
         {(running || stats.done) && (
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -390,7 +381,6 @@ export function CosmicRiskScanner() {
               <Progress value={yearsToScanProgress(scanLog)} className="h-1 bg-white/5" />
             </div>
 
-            {/* Scrollable Scan Log */}
             <div className="max-h-32 overflow-y-auto space-y-1 pr-2 scrollbar-thin border-y border-white/5 py-2">
               {scanLog.map((log, idx) => (
                 <div key={idx} className="flex items-center justify-between p-2 rounded bg-black/20 text-[10px] font-medium">
@@ -433,7 +423,6 @@ export function CosmicRiskScanner() {
         )}
       </Card>
 
-      {/* Results Display */}
       <AnimatePresence>
         {found.length > 0 && (
           <motion.div 
