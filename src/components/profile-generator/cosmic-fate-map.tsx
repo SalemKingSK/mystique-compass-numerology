@@ -104,6 +104,97 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const [readYearState, setReadYearState] = useState(new Date().getFullYear());
 
   useEffect(() => {
+    (window as any).switchDash = (btn: HTMLElement) => {
+      const panelId = btn.getAttribute('data-panel');
+      const nav = document.getElementById('dash-nav');
+      if (!nav) return;
+      
+      nav.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      
+      document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+      const targetPanel = document.getElementById(`panel-${panelId}`);
+      if (targetPanel) targetPanel.classList.add('active');
+    };
+
+    (window as any).closePop = () => {
+      document.getElementById('overlay')?.classList.remove('visible');
+    };
+
+    (window as any).openZodiacPop = (ya: string, bs: string, y: string, age: string, cat: string) => {
+      const pg = document.getElementById('pg');
+      const ph = document.getElementById('ph');
+      const ps = document.getElementById('ps');
+      const pb = document.getElementById('pb');
+      const overlay = document.getElementById('overlay');
+      if (!pg || !ph || !ps || !pb || !overlay) return;
+
+      const zooYa = ZOO[ya];
+      const zooBs = ZOO[bs];
+      
+      pg.innerText = zooYa.e;
+      ph.innerText = `${y}: ${ya} Year`;
+      ps.innerText = `${bs} × ${ya} — ${catLabel(cat)}`;
+      
+      const catKey = cat === 'destruction' ? 'destruction' : cat;
+      const catText = BOOK.categories[catKey] || "";
+      const signSpecificText = zooBs[`${cat}Desc`] || zooBs[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `Neutral year dynamics.`;
+      const yearQualities = `${zooYa.trait}. Health focus: ${zooYa.organ}. Direction: ${zooYa.dir}.`;
+
+      pb.innerHTML = `
+        <div class="space-y-6">
+          <div class="p-4 bg-primary/5 border-l-[3px] border-primary rounded-r-lg font-body italic text-sm text-slate-300">
+            ${y} (${ya} Year, Age ${age}) — Tai Sui: ${catLabel(cat)}
+          </div>
+          <div class="p-4 bg-white/5 border-l-[3px] border-primary/40 rounded-r-lg font-body text-sm leading-relaxed text-slate-300">
+            ${catText}
+          </div>
+          <div class="space-y-4">
+            <h4 class="font-cinzel text-xs uppercase tracking-widest opacity-60">Your ${bs.toUpperCase()} in ${ya.toUpperCase()} Year</h4>
+            <div class="font-body text-base leading-relaxed text-slate-200">${signSpecificText}</div>
+          </div>
+          <div class="space-y-2">
+            <h4 class="font-cinzel text-xs uppercase tracking-widest opacity-60">${ya.toUpperCase()} Year Qualities</h4>
+            <div class="font-body text-sm text-slate-400">${yearQualities}</div>
+          </div>
+        </div>
+      `;
+      overlay.classList.add('visible');
+    };
+
+    (window as any).ttsPlay = (btn: HTMLButtonElement, targetId: string) => {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      const text = target.innerText || target.textContent || "";
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        btn.classList.remove('playing');
+        btn.innerText = "🔊 Read Aloud";
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.onstart = () => {
+        btn.classList.add('playing');
+        btn.innerText = "⏹ Stop";
+      };
+      utterance.onend = () => {
+        btn.classList.remove('playing');
+        btn.innerText = "🔊 Read Aloud";
+      };
+      window.speechSynthesis.speak(utterance);
+    };
+
+    (window as any).swT = (id: string, btn: HTMLElement) => {
+      const parent = btn.parentElement;
+      if (!parent) return;
+      parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const content = parent.nextElementSibling;
+      if (!content) return;
+      content.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      content.querySelector(`#tp-${id}`)?.classList.add('active');
+    };
+
     (window as any).calculate = () => {
       const ryInput = document.getElementById('cf-readYear') as HTMLInputElement;
       if (!ryInput) return;
@@ -183,7 +274,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       const lpRelationText = (py === lp) ? "exceptional harmony" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
       const lpInteractionText = (py === lp) ? "match" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "creates notable friction with" : "and";
       
-      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) ${lpInteractionText} Personal Year ${py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${ry}.`;
+      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) ${lpInteractionText} Personal Year ${py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all cocnverging in ${ry}.`;
       
       const sc = document.getElementById('synthesis-container');
       if (sc) {
@@ -433,97 +524,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       if (ra) {
         ra.classList.remove('result-hidden');
       }
-    };
-
-    (window as any).switchDash = (btn: HTMLElement) => {
-      const panelId = btn.getAttribute('data-panel');
-      const nav = document.getElementById('dash-nav');
-      if (!nav) return;
-      
-      nav.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      
-      document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
-      const targetPanel = document.getElementById(`panel-${panelId}`);
-      if (targetPanel) targetPanel.classList.add('active');
-    };
-
-    (window as any).closePop = () => {
-      document.getElementById('overlay')?.classList.remove('visible');
-    };
-
-    (window as any).openZodiacPop = (ya: string, bs: string, y: string, age: string, cat: string) => {
-      const pg = document.getElementById('pg');
-      const ph = document.getElementById('ph');
-      const ps = document.getElementById('ps');
-      const pb = document.getElementById('pb');
-      const overlay = document.getElementById('overlay');
-      if (!pg || !ph || !ps || !pb || !overlay) return;
-
-      const zooYa = ZOO[ya];
-      const zooBs = ZOO[bs];
-      
-      pg.innerText = zooYa.e;
-      ph.innerText = `${y}: ${ya} Year`;
-      ps.innerText = `${bs} × ${ya} — ${catLabel(cat)}`;
-      
-      const catKey = cat === 'destruction' ? 'destruction' : cat;
-      const catText = BOOK.categories[catKey] || "";
-      const signSpecificText = zooBs[`${cat}Desc`] || zooBs[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `Neutral year dynamics.`;
-      const yearQualities = `${zooYa.trait}. Health focus: ${zooYa.organ}. Direction: ${zooYa.dir}.`;
-
-      pb.innerHTML = `
-        <div class="space-y-6">
-          <div class="p-4 bg-primary/5 border-l-[3px] border-primary rounded-r-lg font-body italic text-sm text-slate-300">
-            ${y} (${ya} Year, Age ${age}) — Tai Sui: ${catLabel(cat)}
-          </div>
-          <div class="p-4 bg-white/5 border-l-[3px] border-primary/40 rounded-r-lg font-body text-sm leading-relaxed text-slate-300">
-            ${catText}
-          </div>
-          <div class="space-y-4">
-            <h4 class="font-cinzel text-xs uppercase tracking-widest opacity-60">Your ${bs.toUpperCase()} in ${ya.toUpperCase()} Year</h4>
-            <div class="font-body text-base leading-relaxed text-slate-200">${signSpecificText}</div>
-          </div>
-          <div class="space-y-2">
-            <h4 class="font-cinzel text-xs uppercase tracking-widest opacity-60">${ya.toUpperCase()} Year Qualities</h4>
-            <div class="font-body text-sm text-slate-400">${yearQualities}</div>
-          </div>
-        </div>
-      `;
-      overlay.classList.add('visible');
-    };
-
-    (window as any).ttsPlay = (btn: HTMLButtonElement, targetId: string) => {
-      const target = document.getElementById(targetId);
-      if (!target) return;
-      const text = target.innerText || target.textContent || "";
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-        btn.classList.remove('playing');
-        btn.innerText = "🔊 Read Aloud";
-        return;
-      }
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.onstart = () => {
-        btn.classList.add('playing');
-        btn.innerText = "⏹ Stop";
-      };
-      utterance.onend = () => {
-        btn.classList.remove('playing');
-        btn.innerText = "🔊 Read Aloud";
-      };
-      window.speechSynthesis.speak(utterance);
-    };
-
-    (window as any).swT = (id: string, btn: HTMLElement) => {
-      const parent = btn.parentElement;
-      if (!parent) return;
-      parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const content = parent.nextElementSibling;
-      if (!content) return;
-      content.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      content.querySelector(`#tp-${id}`)?.classList.add('active');
     };
 
     if (!initialized.current) {

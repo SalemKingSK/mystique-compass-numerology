@@ -51,11 +51,35 @@ function extractBirthDate(wikitext: string) {
   return null;
 }
 
+// FIX 1: Fetch with Retry and Backoff
+async function fetchWithRetry(url: string, retries = 3, delay = 1200) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) {
+        if (r.status === 429) { // Rate limited
+          await new Promise(res => setTimeout(res, delay * 2));
+          continue;
+        }
+        throw new Error(`HTTP ${r.status}`);
+      }
+      return await r.json();
+    } catch (e: any) {
+      if (attempt === retries - 1) {
+        console.warn("Batch fetch failed after retries:", e.message);
+        return null; 
+      }
+      await new Promise(r => setTimeout(r, delay * Math.pow(2, attempt)));
+    }
+  }
+}
+
 async function fetchCategoryMembers(year: number, limit: number, cmcontinue?: string) {
   const continueParam = cmcontinue ? `&cmcontinue=${encodeURIComponent(cmcontinue)}` : '';
   const url = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${year}_births&cmlimit=${limit}&cmnamespace=0&format=json&origin=*${continueParam}`;
-  const res = await fetch(url);
-  const data = await res.json();
+  const data = await fetchWithRetry(url);
+  if (!data) return { titles: [], cmcontinue: null };
+  
   return {
     titles: (data.query?.categorymembers || []).map((m: any) => m.title),
     cmcontinue: data.continue?.cmcontinue || null
@@ -65,8 +89,9 @@ async function fetchCategoryMembers(year: number, limit: number, cmcontinue?: st
 async function batchFetchMetadata(titles: string[]) {
   if (!titles.length) return {};
   const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.join('|'))}&prop=revisions|description&rvprop=content&format=json&origin=*`;
-  const res = await fetch(url);
-  const data = await res.json();
+  const data = await fetchWithRetry(url);
+  if (!data) return {};
+
   const pages = data.query?.pages || {};
   const result: Record<string, { wikitext: string, description: string }> = {};
   for (const p of Object.values(pages) as any[]) {
@@ -128,7 +153,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   // LOAD Persistent State
   useEffect(() => {
-    const key = `scanner_posterity_v5_${targetYear}`;
+    const key = `scanner_posterity_v6_${targetYear}`;
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
@@ -154,8 +179,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setScanLog([]);
   }, [targetYear]);
 
+  // FIX 3: Persistent Checkpoint Save
   const persistState = () => {
-    const key = `scanner_posterity_v5_${targetYear}`;
+    const key = `scanner_posterity_v6_${targetYear}`;
     localStorage.setItem(key, JSON.stringify({
       found: foundRef.current,
       stats: statsRef.current,
@@ -165,7 +191,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const clearData = () => {
     if (!confirm(`Clear all discovered data for the year ${targetYear}?`)) return;
-    const key = `scanner_posterity_v5_${targetYear}`;
+    const key = `scanner_posterity_v6_${targetYear}`;
     localStorage.removeItem(key);
     setFound([]);
     foundRef.current = [];
@@ -215,6 +241,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       let titles: string[] = [];
       let nextToken: string | null = null;
       try {
+        // FIX 2: Continuation Token Handling
         const result = await fetchCategoryMembers(year, perYear, (isContinuing && currentToken !== "COMPLETED" ? currentToken : undefined) || undefined);
         titles = result.titles;
         nextToken = result.cmcontinue;
@@ -289,8 +316,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           }));
         }
         setScanLog(p => p.map(l => l.year === year ? { ...l, checked: l.checked + yearChecked, found: l.found + yearFound, status: "scanning" } : l));
+        
+        // FIX 3: Save Checkpoint after every batch
         persistState();
-        if (!abort.current) await new Promise(r => setTimeout(r, 50));
+        
+        // FIX 4: Respectful Pacing
+        if (!abort.current) await new Promise(r => setTimeout(r, 650));
       }
       setScanLog(p => p.map(l => l.year === year ? { ...l, status: tokensRef.current[year] === "COMPLETED" ? "done" : "ready" } : l));
     }
@@ -336,7 +367,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={clearData} className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={clearData} title="Clear Stored Data" className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
               <Trash2 className="h-4 w-4" />
             </Button>
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
@@ -413,10 +444,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
             />
           </div>
 
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 px-2">
             <History className="h-4 w-4 text-primary/60" />
             <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">
-              Database Entry Total for {targetYear}: <span className="font-bold text-primary">{found.length} Profiles</span>
+              History Database Entry Total for {targetYear}: <span className="font-bold text-primary">{found.length} Profiles</span>
             </span>
           </div>
 
