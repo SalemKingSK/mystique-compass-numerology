@@ -36,19 +36,51 @@ export const calculateDestiny = (day: number, month: number, year: number): numb
   return reduceToSingleDigit(sum);
 };
 
-export const calculateKua = (year: number, gender: string): number => {
-  const reducedYear = reduceToSingleDigit(year);
-  let initialKua: number;
+/**
+ * Core Algorithm for Kua Number Calculation
+ * Implements the Solar Trigger, Pre/Post 2000 formulas, and Rule of 5.
+ */
+export const calculateKua = (year: number, month: number, day: number, gender: string): number => {
+  // 1. Solar Trigger Adjustment
+  // Births before Feb 4th or 5th use the previous year
+  let adjustedYear = year;
+  if (month < 2 || (month === 2 && day < 4)) {
+    adjustedYear = year - 1;
+  }
+
+  // 2. Get the Year Root (Sum of last two digits reduced to a single digit)
+  const lastTwoDigits = adjustedYear % 100;
+  let yearRoot = String(lastTwoDigits).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+  while (yearRoot > 9) {
+    yearRoot = String(yearRoot).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+  }
+
+  let kua = 0;
+  const isPost2000 = adjustedYear >= 2000;
+
   if (gender.toLowerCase() === 'male') {
-    initialKua = 11 - reducedYear;
+    // Male Formulas
+    kua = isPost2000 ? (9 - yearRoot) : (10 - yearRoot);
+    
+    // Adjust for results <= 0
+    if (kua <= 0) kua += 9;
+    
+    // The Rule of 5: Males replace 5 with 2
+    if (kua === 5) kua = 2;
   } else {
-    initialKua = reducedYear + 4;
+    // Female Formulas
+    kua = isPost2000 ? (6 + yearRoot) : (5 + yearRoot);
+    
+    // Reduce to single digit
+    while (kua > 9) {
+      kua = String(kua).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+    }
+    
+    // The Rule of 5: Females replace 5 with 8
+    if (kua === 5) kua = 8;
   }
-  let finalKua = reduceToSingleDigit(initialKua);
-  if (finalKua === 5) {
-    finalKua = gender.toLowerCase() === 'male' ? 2 : 8;
-  }
-  return finalKua;
+
+  return kua;
 };
 
 // --- DATA INTERFACES ---
@@ -97,7 +129,9 @@ export const generateLoShuData = (input: AstroInsightInput): NumerologyData => {
   const { day, month, year, gender } = input;
   const psycheNum = calculatePsyche(day);
   const destinyNum = calculateDestiny(day, month, year);
-  const kuaNum = calculateKua(year, gender);
+  
+  const kuaNum = calculateKua(year, month, day, gender);
+  
   const birthDigitsForGrid = (String(day) + String(month) + String(year)).split('').map(d => parseInt(d, 10)).filter(d => d !== 0);
   const allDigitsForGrid = [...birthDigitsForGrid, psycheNum, destinyNum, kuaNum];
 

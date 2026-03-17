@@ -100,7 +100,7 @@ function NewAstroLayer({ layerNum, title, icon, content, badgeColor, isOpen, onT
         .newastro-acc-arrow { font-size: 18px; color: #7a6fa0; transition: transform 0.2s ease; line-height: 1; }
         .newastro-acc-body { padding: 4px 0 18px; animation: naFadeIn 0.2s ease; }
         @keyframes naFadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        .newastro-layer-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 2px(7px); border-radius: 20px; border: 1px solid; white-space: nowrap; font-family: 'Cinzel', serif; }
+        .newastro-layer-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 20px; border: 1px solid; white-space: nowrap; font-family: 'Cinzel', serif; }
         .newastro-meaning-card { background: rgba(255,255,255,0.02); border-left: 3px solid; border-radius: 0 10px 10px 0; padding: 16px; }
       `}</style>
     </div>
@@ -330,7 +330,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
         </div>
          <ResultsFooter />
       </motion.div>
-      <FloatingNavigation onReset={handleReset} onHistoryOpen={onHistoryOpen} />
+      <FloatingNavigation onReset={onReset} onHistoryOpen={onHistoryOpen} />
     </>
   );
 }
