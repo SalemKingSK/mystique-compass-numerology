@@ -1,3 +1,4 @@
+
 {
   "firestore": {
     "rules": "firestore.rules"
@@ -7,6 +8,11 @@
     "cleanUrls": true,
     "trailingSlash": false,
     "rewrites": [
+      {
+        "source": "/ingestVaultNow",
+        "function": "ingestVaultNow",
+        "region": "us-central1"
+      },
       {
         "source": "**",
         "destination": "/index.html"
@@ -18,7 +24,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://en.wikipedia.org https://www.wikipedia.org https://query.wikidata.org; img-src 'self' data: https:; frame-ancestors 'none';"
+            "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://en.wikipedia.org https://www.wikipedia.org https://query.wikidata.org https://us-central1-studio-knvm3.cloudfunctions.net; img-src 'self' data: https:; frame-ancestors 'none';"
           },
           {
             "key": "X-Content-Type-Options",

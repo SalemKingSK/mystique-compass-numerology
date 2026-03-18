@@ -1,9 +1,10 @@
+
 'use client';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2, ExternalLink, Telescope,
-  Trash2, History, Globe, Database, RefreshCw, AlertTriangle,
+  Trash2, History, Globe, Database, RefreshCw, AlertTriangle, CloudRain, CloudLightning,
 } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
 import { Badge }    from '@/components/ui/badge';
@@ -70,8 +71,6 @@ function getDangerTier(total: number) {
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // ─── Firestore config ──────────────────────────────────────────────────────────
-// These two collection names live in YOUR Firestore database.
-// You can rename them, but keep them consistent between ingestion and scanning.
 
 const META_COLL   = 'cosmic_vault_meta';    // one doc per birth year
 const PEOPLE_COLL = 'cosmic_vault_people';  // one doc per person (wikidataId)
@@ -88,7 +87,6 @@ async function saveYearMeta(meta: YearMeta) {
 }
 
 async function savePeopleBatch(people: PersonRecord[]) {
-  // Firestore max 500 operations per batch — split accordingly
   const BATCH_SIZE = 450;
   for (let i = 0; i < people.length; i += BATCH_SIZE) {
     const batch = writeBatch(db);
@@ -100,7 +98,6 @@ async function savePeopleBatch(people: PersonRecord[]) {
 }
 
 async function getPeopleForYears(years: number[]): Promise<PersonRecord[]> {
-  // Firestore 'in' supports up to 30 values — chunk if needed
   const results: PersonRecord[] = [];
   for (let i = 0; i < years.length; i += 30) {
     const chunk = years.slice(i, i + 30);
@@ -113,8 +110,6 @@ async function getPeopleForYears(years: number[]): Promise<PersonRecord[]> {
 }
 
 // ─── Wikidata SPARQL ───────────────────────────────────────────────────────────
-// Queries one birth-year + month at a time to stay well under Wikidata's
-// 60-second timeout and 10,000-row limit per request.
 
 async function fetchWikidataMonth(year: number, month: number): Promise<PersonRecord[]> {
   const sparql = `
@@ -163,7 +158,6 @@ LIMIT 3000`.trim();
     if (birthMonth < 1 || birthMonth > 12 || birthDay < 1 || birthDay > 31) continue;
 
     const rawName = b.personLabel?.value || '';
-    // Skip entries that are just the Wikidata Q-ID (no label resolved)
     if (/^Q\d+$/.test(rawName)) continue;
 
     people.push({
@@ -180,56 +174,25 @@ LIMIT 3000`.trim();
   return people;
 }
 
-// ─── Inline confirm dialog (window.confirm is blocked in iframes) ─────────────
-
-function ConfirmDialog({ message, onConfirm, onCancel }: {
-  message: string; onConfirm: () => void; onCancel: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
-        </div>
-        <div className="flex gap-3 justify-end">
-          <Button variant="ghost" size="sm" onClick={onCancel}
-            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
-          <Button size="sm" onClick={onConfirm}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main component ────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
-
-  // ── Tab state ────────────────────────────────────────────────────────────────
   const [tab, setTab] = useState<'vault' | 'scanner'>('vault');
-
-  // ── Vault state ──────────────────────────────────────────────────────────────
   const [yearMetas, setYearMetas]       = useState<Record<number, YearMeta>>({});
   const [ingesting, setIngesting]       = useState(false);
   const [ingestLog, setIngestLog]       = useState<string[]>([]);
   const [ingestDone, setIngestDone]     = useState(0);
   const [ingestTotal, setIngestTotal]   = useState(0);
   const [ingestPhase, setIngestPhase]   = useState('');
-
-  // ── Scanner state ────────────────────────────────────────────────────────────
   const [scanning, setScanning]         = useState(false);
   const [scanResults, setScanResults]   = useState<ScanResult[]>([]);
   const [scanStats, setScanStats]       = useState({ checked: 0, flagged: 0 });
   const [filterQuery, setFilterQuery]   = useState('');
   const [expandedId, setExpandedId]     = useState<string | null>(null);
+  const [cloudSyncing, setCloudSyncing] = useState(false);
 
-  // ── Shared ───────────────────────────────────────────────────────────────────
   const [dialog, setDialog] = useState<{ message: string; onConfirm: () => void } | null>(null);
   const abortRef = useRef(false);
-
-  // ── Dynamic conflict config (same logic as before) ───────────────────────────
 
   const targetSign = useMemo(() => {
     const idx = ((targetYear - 1900) % 12 + 12) % 12;
@@ -248,14 +211,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     };
   }, [targetSign]);
 
-  // All conflict birth-years from 1930 → 2010 for ALL four conflict types
   const CONFLICT_YEARS = useMemo(() => {
     const list: { year: number; type: string; config: any }[] = [];
     Object.entries(CF_CONFIG).forEach(([type, config]) => {
       if (!config.animal) return;
       const animalIdx = ANIMALS.findIndex((a: any) => a.n === config.animal);
       if (animalIdx < 0) return;
-      // Walk every occurrence of this animal from 1930 to 2010
       let y = 1900 + animalIdx;
       while (y < 1930) y += 12;
       while (y <= 2010) {
@@ -271,14 +232,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     [CONFLICT_YEARS]
   );
 
-  // Map from birthYear → its conflict info (for scanner lookup)
   const yearConflictMap = useMemo(() => {
     const m: Record<number, { type: string; config: any }> = {};
     CONFLICT_YEARS.forEach(c => { if (!m[c.year]) m[c.year] = c; });
     return m;
   }, [CONFLICT_YEARS]);
-
-  // ── Load vault metadata on mount ─────────────────────────────────────────────
 
   useEffect(() => { refreshMetas(); }, [targetYear]);
 
@@ -293,8 +251,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setYearMetas(metas);
   }
 
-  // ── Ingestion logic ───────────────────────────────────────────────────────────
-
   async function ingestOneYear(year: number) {
     const existing    = yearMetas[year];
     const monthsDone  = existing?.monthsDone || [];
@@ -307,15 +263,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setYearMetas(p => ({ ...p, [year]: { ...meta } }));
 
     let yearTotal = 0;
-
     for (const month of remaining) {
       if (abortRef.current) break;
-
       setIngestPhase(`${year} · ${MONTHS_SHORT[month - 1]} — fetching Wikidata...`);
-
       const people = await fetchWikidataMonth(year, month);
       if (people.length > 0) await savePeopleBatch(people);
-
       meta = {
         ...meta,
         monthsDone: [...meta.monthsDone, month],
@@ -324,16 +276,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         status: meta.monthsDone.length + 1 === 12 ? 'complete' : 'partial',
       };
       yearTotal += people.length;
-
       await saveYearMeta(meta);
       setYearMetas(p => ({ ...p, [year]: { ...meta } }));
       setIngestDone(d => d + 1);
       setIngestLog(l => [`✓ ${year} ${MONTHS_SHORT[month-1]}: ${people.length} stored`, ...l.slice(0, 39)]);
-
-      // Be polite to Wikidata — 1s between monthly requests
       if (!abortRef.current) await new Promise(r => setTimeout(r, 1000));
     }
-
     return yearTotal;
   }
 
@@ -342,8 +290,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setIngesting(true);
     setIngestLog([]);
     setScanResults([]);
-
-    // Count total month-fetches needed
     const total = yearsToIngest.reduce((sum, y) => {
       const done = yearMetas[y]?.monthsDone?.length || 0;
       return sum + (12 - done);
@@ -351,12 +297,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setIngestTotal(total);
     setIngestDone(0);
     setIngestPhase('Initialising...');
-
     for (const year of yearsToIngest) {
       if (abortRef.current) break;
       await ingestOneYear(year);
     }
-
     setIngesting(false);
     setIngestPhase(abortRef.current ? 'Stopped.' : 'Ingestion complete ✓');
     await refreshMetas();
@@ -376,7 +320,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       message: `Delete all stored people data from Firestore for ${targetYear} conflict years? This cannot be undone — you will need to re-run ingestion.`,
       onConfirm: async () => {
         setDialog(null);
-        // Delete meta docs
         await Promise.all(uniqueYears.map(y =>
           setDoc(doc(db, META_COLL, String(y)), { year: y, status: 'pending', count: 0, monthsDone: [], updatedAt: Date.now() })
         ));
@@ -388,20 +331,30 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     });
   }
 
-  // ── Scanner logic ─────────────────────────────────────────────────────────────
+  async function handleCloudSync() {
+    setCloudSyncing(true);
+    try {
+      const response = await fetch('/ingestVaultNow', { method: 'POST' });
+      const data = await response.json();
+      if (data.ok) {
+        refreshMetas();
+      }
+    } catch (e) {
+      console.error('Cloud Sync Error:', e);
+    } finally {
+      setCloudSyncing(false);
+    }
+  }
 
   async function runScan() {
     setScanning(true);
     setScanResults([]);
     setScanStats({ checked: 0, flagged: 0 });
-
     try {
       const readableYears = uniqueYears.filter(y => (yearMetas[y]?.count || 0) > 0);
       if (!readableYears.length) { setScanning(false); return; }
-
       const people = await getPeopleForYears(readableYears);
       const results: ScanResult[] = [];
-
       for (const p of people) {
         const conflict = yearConflictMap[p.birthYear];
         if (!conflict) continue;
@@ -411,18 +364,14 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         const totalScore = conflict.config.score + pyPoints;
         results.push({ ...p, animal: conflict.config.animal, conflictType: conflict.type, config: conflict.config, py, pyPoints, totalScore, tier: getDangerTier(totalScore) });
       }
-
       results.sort((a, b) => b.totalScore - a.totalScore);
       setScanResults(results);
       setScanStats({ checked: people.length, flagged: results.length });
     } catch (e) {
       console.error('Scan error:', e);
     }
-
     setScanning(false);
   }
-
-  // ── Derived display data ──────────────────────────────────────────────────────
 
   const filtered = useMemo(() =>
     scanResults.filter(p =>
@@ -447,15 +396,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <>
       {dialog && <ConfirmDialog message={dialog.message} onConfirm={dialog.onConfirm} onCancel={() => setDialog(null)} />}
 
       <div className="space-y-4">
-
-        {/* ── Header card ─────────────────────────────────────────────────────── */}
         <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
@@ -477,7 +422,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
             </div>
           </div>
 
-          {/* Tab switcher */}
           <div className="flex gap-1 bg-black/20 p-1 rounded-xl border border-white/10">
             {[
               { id: 'vault',   label: '🗄  Data Vault' },
@@ -493,11 +437,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </div>
         </Card>
 
-        {/* ── VAULT TAB ───────────────────────────────────────────────────────── */}
         {tab === 'vault' && (
           <Card className="glass-card p-6 border-primary/20 space-y-6">
-
-            {/* Vault summary counters */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 [vaultSummary.totalPeople.toLocaleString(), 'People Stored',  'text-primary'  ],
@@ -512,7 +453,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ))}
             </div>
 
-            {/* Ingest controls */}
             {ingesting ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
@@ -526,10 +466,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                   </button>
                 </div>
                 <Progress value={ingestPct} className="h-2 bg-white/5" />
-                <p className="text-[9px] text-center text-slate-500 font-cinzel">
-                  {ingestDone} / {ingestTotal} monthly batches · {ingestPct}%
-                </p>
-                {/* Live log */}
                 <div className="bg-black/30 rounded-xl border border-white/5 p-3 max-h-36 overflow-y-auto space-y-1">
                   {ingestLog.map((l, i) => (
                     <p key={i} className="text-[9px] font-cinzel text-slate-400">{l}</p>
@@ -537,99 +473,78 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 </div>
               </div>
             ) : (
-              <div className="flex gap-2">
-                <Button onClick={handleIngestAll}
-                  disabled={vaultSummary.pending === 0 && vaultSummary.partial === 0}
-                  className="flex-1 bg-gradient-to-r from-primary/80 to-primary text-primary-foreground font-black uppercase tracking-widest font-cinzel text-[10px] py-3 h-auto">
-                  <Database className="mr-2 h-4 w-4" />
-                  {vaultSummary.pending === 0 && vaultSummary.partial === 0
-                    ? 'Vault Complete ✓'
-                    : `Ingest ${vaultSummary.pending + vaultSummary.partial} Remaining Years`}
-                </Button>
-                <Button variant="outline" size="icon" onClick={refreshMetas}
-                  className="border-white/10 text-slate-400 h-auto px-3">
-                  <RefreshCw className="h-4 w-4" />
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                  <Button onClick={handleIngestAll}
+                    disabled={vaultSummary.pending === 0 && vaultSummary.partial === 0}
+                    className="flex-1 bg-gradient-to-r from-primary/80 to-primary text-primary-foreground font-black uppercase tracking-widest font-cinzel text-[10px] py-3 h-auto">
+                    <Database className="mr-2 h-4 w-4" />
+                    {vaultSummary.pending === 0 && vaultSummary.partial === 0
+                      ? 'Vault Complete ✓'
+                      : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={refreshMetas}
+                    className="border-white/10 text-slate-400 h-auto px-3">
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <Button 
+                  onClick={handleCloudSync}
+                  disabled={cloudSyncing}
+                  variant="outline"
+                  className="border-primary/30 text-primary h-auto py-3 px-4 font-black uppercase text-[10px] font-cinzel hover:bg-primary/10 w-full"
+                >
+                  {cloudSyncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Globe className="h-4 w-4 mr-2" />}
+                  Force Cloud Sync (Background Job)
                 </Button>
               </div>
             )}
 
-            {/* What this does — first time explanation */}
-            {vaultSummary.totalPeople === 0 && !ingesting && (
-              <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-wider font-cinzel text-primary/80">
-                  First-time setup — one-off process
-                </p>
-                <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                  Tap <strong className="text-slate-200">Ingest {uniqueYears.length} Years</strong> above.
-                  This queries Wikidata month-by-month for every conflicting birth year from 1930 to 2010,
-                  and saves all birth records permanently into your Firestore database.
-                  <br /><br />
-                  <strong className="text-slate-200">Estimated time:</strong> ~45–90 minutes for all years
-                  (1 second between each monthly batch to respect Wikidata).
-                  You can stop and resume at any time — progress is saved after every batch.
-                  <br /><br />
-                  <strong className="text-slate-200">After ingestion:</strong> The Scanner tab will analyse
-                  all {uniqueYears.length * 1000}+ people in under 5 seconds with no external API calls.
-                </p>
-              </div>
-            )}
-
-            {/* Year grid — status per birth year */}
-            <div>
-              <p className="text-[9px] uppercase tracking-widest text-slate-500 font-cinzel mb-3">
-                Birth year vault — {uniqueYears.length} years tracked
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-wider font-cinzel text-primary/80 flex items-center gap-2">
+                <CloudLightning className="h-3 w-3" /> Cloud Ingestion Active
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                {uniqueYears.map(year => {
-                  const meta   = yearMetas[year];
-                  const status = meta?.status || 'pending';
-                  const info   = yearConflictMap[year];
-                  const c      = info?.config;
-                  const pct    = meta ? Math.round((meta.monthsDone?.length || 0) / 12 * 100) : 0;
+              <p className="text-[11px] text-slate-400 font-body leading-relaxed">
+                A background worker automatically populates your Firestore vault every hour.
+                Use <strong className="text-slate-200">Local Ingest</strong> to scan manually from your browser,
+                or <strong className="text-slate-200">Cloud Sync</strong> to trigger the server-side worker.
+              </p>
+            </div>
 
-                  const style = {
-                    complete:  { b: 'rgba(76,175,125,0.5)',  bg: 'rgba(76,175,125,0.08)',  dot: '#4caf7d' },
-                    partial:   { b: 'rgba(224,148,40,0.5)',  bg: 'rgba(224,148,40,0.08)',  dot: '#e09428' },
-                    ingesting: { b: 'rgba(155,142,196,0.5)', bg: 'rgba(155,142,196,0.08)', dot: '#9b8ec4' },
-                    pending:   { b: 'rgba(255,255,255,0.07)',bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a' },
-                  }[status] || { b: 'rgba(255,255,255,0.07)',bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a' };
-
-                  return (
-                    <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }}
-                      className="rounded-xl p-2.5 text-center relative overflow-hidden">
-                      <div className="text-[12px] font-black text-slate-100 font-decorative">{year}</div>
-                      {c && (
-                        <div className="text-[7px] uppercase tracking-wide font-cinzel mt-0.5" style={{ color: c.color }}>
-                          {c.glyph} {info.type}
-                        </div>
-                      )}
-                      <div className="flex items-center justify-center gap-1 mt-1">
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: style.dot }} />
-                        <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
-                      </div>
-                      {meta?.count ? (
-                        <div className="text-[7px] text-slate-500 font-cinzel mt-0.5">
-                          {meta.count.toLocaleString()}
-                        </div>
-                      ) : null}
-                      {status === 'partial' && (
-                        <div className="absolute bottom-0 left-0 h-[2px] bg-orange-400/50"
-                          style={{ width: `${pct}%` }} />
-                      )}
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              {uniqueYears.map(year => {
+                const meta   = yearMetas[year];
+                const status = meta?.status || 'pending';
+                const info   = yearConflictMap[year];
+                const c      = info?.config;
+                const pct    = meta ? Math.round((meta.monthsDone?.length || 0) / 12 * 100) : 0;
+                const style = {
+                  complete:  { b: 'rgba(76,175,125,0.5)',  bg: 'rgba(76,175,125,0.08)',  dot: '#4caf7d' },
+                  partial:   { b: 'rgba(224,148,40,0.5)',  bg: 'rgba(224,148,40,0.08)',  dot: '#e09428' },
+                  ingesting: { b: 'rgba(155,142,196,0.5)', bg: 'rgba(155,142,196,0.08)', dot: '#9b8ec4' },
+                  pending:   { b: 'rgba(255,255,255,0.07)',bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a' },
+                }[status];
+                return (
+                  <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }}
+                    className="rounded-xl p-2.5 text-center relative overflow-hidden">
+                    <div className="text-[12px] font-black text-slate-100 font-decorative">{year}</div>
+                    {c && <div className="text-[7px] uppercase tracking-wide font-cinzel mt-0.5" style={{ color: c.color }}>{c.glyph} {info.type}</div>}
+                    <div className="flex items-center justify-center gap-1 mt-1">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: style.dot }} />
+                      <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
                     </div>
-                  );
-                })}
-              </div>
+                    {status === 'partial' && <div className="absolute bottom-0 left-0 h-[2px] bg-orange-400/50" style={{ width: `${pct}%` }} />}
+                  </div>
+                );
+              })}
             </div>
           </Card>
         )}
 
-        {/* ── SCANNER TAB ─────────────────────────────────────────────────────── */}
         {tab === 'scanner' && (
           <>
             <Card className="glass-card p-6 border-primary/20">
-
-              {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                 {[
                   [scanStats.checked.toLocaleString(),                     'Checked',         'text-primary'  ],
@@ -643,7 +558,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                   </div>
                 ))}
               </div>
-
               {scanning ? (
                 <div className="flex items-center gap-3 text-xs text-primary/80 font-cinzel py-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -652,9 +566,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ) : vaultSummary.totalPeople === 0 ? (
                 <div className="text-center py-6 space-y-2">
                   <Database className="h-10 w-10 mx-auto opacity-20" />
-                  <p className="text-[11px] text-slate-500 font-cinzel">
-                    Vault is empty. Go to 🗄 Data Vault and run ingestion first.
-                  </p>
+                  <p className="text-[11px] text-slate-500 font-cinzel">Vault is empty. Go to 🗄 Data Vault and run ingestion first.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -663,117 +575,53 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                     <Zap className="mr-2 h-4 w-4" />
                     Scan {vaultSummary.totalPeople.toLocaleString()} People Instantly
                   </Button>
-                  {scanStats.checked > 0 && (
-                    <p className="text-[9px] text-center text-slate-500 font-cinzel">
-                      Last scan: {scanStats.checked.toLocaleString()} records · {scanStats.flagged} flagged
-                    </p>
-                  )}
                 </div>
               )}
             </Card>
 
-            {/* ── Results ───────────────────────────────────────────────────────── */}
             {scanResults.length > 0 && (
               <div className="space-y-4">
-                {/* Filter bar */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
                   <Input placeholder="Filter by name, profession or nationality..."
                     value={filterQuery} onChange={e => setFilterQuery(e.target.value)}
                     className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12" />
                 </div>
-
-                {/* Count header */}
-                <div className="flex items-center gap-2 px-1">
-                  <History className="h-4 w-4 text-primary/60" />
-                  <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">
-                    {targetYear} Risk Database ·{' '}
-                    <span className="font-bold text-primary">{filtered.length} profiles</span>
-                  </span>
-                </div>
-
-                {/* Tier groups */}
                 {byTier.map(({ tier, items }) => (
                   <div key={tier.label} className="space-y-3">
                     <div className="flex items-center gap-3 px-1">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel"
-                        style={{ color: tier.color }}>{tier.label}</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>{tier.label}</span>
                       <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} people</span>
                     </div>
-
                     <div className="space-y-2">
                       {items.map((person, idx) => (
-                        <Card key={`${person.wikidataId}-${idx}`}
-                          className="glass-card p-0 border-transparent overflow-hidden"
-                          style={{ borderLeft: `3px solid ${person.tier.color}` }}>
-
-                          {/* Collapsed row */}
-                          <button
-                            className="w-full p-4 flex items-start justify-between text-left gap-4"
-                            onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
+                        <Card key={`${person.wikidataId}-${idx}`} className="glass-card p-0 border-transparent overflow-hidden" style={{ borderLeft: `3px solid ${person.tier.color}` }}>
+                          <button className="w-full p-4 flex items-start justify-between text-left gap-4" onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
                             <div className="flex-1" style={{ minWidth: 0 }}>
-                              <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">
-                                {person.name}
-                              </h4>
-                              {person.description && (
-                                <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5"
-                                  style={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>
-                                  {person.description}
-                                </p>
-                              )}
+                              <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
+                              {person.description && <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5" style={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>{person.description}</p>}
                               <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
-                                <span>
-                                  {person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}
-                                </span>
+                                <span>{person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}</span>
                                 <span>•</span>
                                 <span className="font-bold text-primary">PY {person.py}</span>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <Badge variant="outline"
-                                className="h-6 text-[8px] uppercase border-white/10 font-cinzel"
-                                style={{ color: person.config.color, backgroundColor: person.config.bg }}>
-                                {person.config.label}
-                              </Badge>
-                              <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border"
-                                style={{ borderColor: person.tier.border }}>
-                                <span className="text-xs font-black font-decorative"
-                                  style={{ color: person.tier.color }}>{person.totalScore}</span>
+                              <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel" style={{ color: person.config.color, backgroundColor: person.config.bg }}>{person.config.label}</Badge>
+                              <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border" style={{ borderColor: person.tier.border }}>
+                                <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>{person.totalScore}</span>
                               </div>
                             </div>
                           </button>
-
-                          {/* Expanded detail */}
                           <AnimatePresence>
                             {expandedId === person.wikidataId && (
-                              <motion.div
-                                initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
-                                className="overflow-hidden bg-black/20 border-t border-white/5">
+                              <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-black/20 border-t border-white/5">
                                 <div className="p-4 space-y-3">
-                                  {person.description && (
-                                    <div className="pb-3 border-b border-white/5">
-                                      <span className="text-[9px] font-black uppercase tracking-widest text-primary/50 font-cinzel block mb-1">Profile</span>
-                                      <p className="text-[11px] text-slate-200 font-cinzel uppercase leading-relaxed">
-                                        {person.description}
-                                      </p>
-                                    </div>
-                                  )}
                                   <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
-                                    <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
-                                      Astrological Headwind:
-                                    </span>
-                                    {person.name} ({person.animal}, born {person.birthDay}{' '}
-                                    {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}) faces a{' '}
-                                    <span style={{ color: person.config.color }}>{person.config.label}</span>{' '}
-                                    with the {targetYear} {targetSign.n} cycle. Combined with a Personal Year{' '}
-                                    {person.py} ({person.py === 4 ? 'Structure/Restriction' : 'Reflection/Endings'}),
-                                    this produces a composite danger score of{' '}
-                                    <span style={{ color: person.tier.color }}>{person.totalScore}/6 — {person.tier.label}</span>.
+                                    <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">Astrological Headwind:</span>
+                                    {person.name} ({person.animal}, born {person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}) faces a <span style={{ color: person.config.color }}>{person.config.label}</span> with the {targetYear} {targetSign.n} cycle. Combined with a Personal Year {person.py} ({person.py === 4 ? 'Structure/Restriction' : 'Reflection/Endings'}), this produces a composite danger score of <span style={{ color: person.tier.color }}>{person.totalScore}/6 — {person.tier.label}</span>.
                                   </p>
-                                  <a href={person.url} target="_blank" rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
-                                    <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
-                                  </a>
+                                  <a href={person.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel"><ExternalLink className="h-3 w-3" /> Verify via Wikipedia</a>
                                 </div>
                               </motion.div>
                             )}
@@ -785,14 +633,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 ))}
               </div>
             )}
-
-            {/* Empty idle state */}
             {!scanning && scanResults.length === 0 && vaultSummary.totalPeople > 0 && (
               <div className="py-16 text-center opacity-30 space-y-3">
                 <Globe className="h-14 w-14 mx-auto stroke-[1]" />
-                <p className="font-cinzel text-xs uppercase tracking-[0.2em]">
-                  Tap scan to analyse {vaultSummary.totalPeople.toLocaleString()} stored records
-                </p>
+                <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Tap scan to analyse {vaultSummary.totalPeople.toLocaleString()} stored records</p>
               </div>
             )}
           </>
