@@ -609,11 +609,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                       className="glass-card p-0 border-transparent overflow-hidden"
                       style={{ borderLeft: `3px solid ${person.tier.color}` }}>
                       <button
-                        className="w-full p-4 flex items-center justify-between text-left gap-4"
+                        className="w-full p-4 flex items-start justify-between text-left gap-4"
                         onClick={() => setExpandedId(expandedId === person.name ? null : person.name)}>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-slate-100 truncate font-body">{person.name}</h4>
-                          <p className="text-[10px] text-primary/70 font-cinzel uppercase truncate">
+                        <div className="flex-1" style={{ minWidth: 0 }}>
+                          <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
+                          <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5"
+                            style={{ wordBreak: 'break-word', whiteSpace: 'normal', overflow: 'visible' }}>
                             {person.bioDescription || 'Notable Individual'}
                           </p>
                           <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
@@ -644,6 +645,14 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                             exit={{ height: 0 }}
                             className="overflow-hidden bg-black/20 border-t border-white/5">
                             <div className="p-4 space-y-4">
+                              {person.bioDescription && (
+                                <div className="pb-3 border-b border-white/5">
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-primary/50 font-cinzel block mb-1">Profile</span>
+                                  <p className="text-[11px] text-slate-200 font-cinzel uppercase leading-relaxed">
+                                    {person.bioDescription}
+                                  </p>
+                                </div>
+                              )}
                               <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
                                 <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
                                   Astrological Headwind:
