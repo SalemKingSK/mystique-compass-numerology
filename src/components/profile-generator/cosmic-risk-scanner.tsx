@@ -18,9 +18,6 @@ import {
   query as fsQuery, where, writeBatch,
 } from 'firebase/firestore';
 
-// ─── Env-var driven URL ──────────────────────────────────────────────────────
-const INGEST_URL = process.env.NEXT_PUBLIC_INGEST_URL ?? '/ingestVaultNow';
-
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface PersonRecord {
   wikidataId: string;
@@ -158,29 +155,7 @@ LIMIT 3000`.trim();
   return people;
 }
 
-// ─── Inline confirm dialog (window.confirm is blocked in iframes) ─────────────
-function ConfirmDialog({ message, onConfirm, onCancel }: {
-  message: string; onConfirm: () => void; onCancel: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
-        </div>
-        <div className="flex gap-3 justify-end">
-          <Button variant="ghost" size="sm" onClick={onCancel}
-            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
-          <Button size="sm" onClick={onConfirm}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main component ────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────────
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const [tab, setTab]                   = useState<'vault' | 'scanner'>('vault');
   const [yearMetas, setYearMetas]       = useState<Record<number, YearMeta>>({});
@@ -338,22 +313,22 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setCloudSyncing(true);
     setCloudSyncError(null);
     try {
-      const response = await fetch(INGEST_URL, { method: 'POST' });
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`HTTP ${response.status} — ${text.slice(0, 200)}`);
+      // Call our own Next.js API route — same origin, no CORS issue
+      const r = await fetch('/api/cloud-sync', { method: 'POST' });
+      const d = await r.json() as {
+        ok: boolean;
+        error?: string;
+        monthsProcessed?: number;
+        totalPeople?: number;
+        vaultComplete?: boolean;
+      };
+
+      if (!r.ok || !d.ok) {
+        setCloudSyncError(d.error ?? 'Unknown error from worker');
+        return;
       }
-      const ct = response.headers.get('content-type') ?? '';
-      if (!ct.includes('application/json')) {
-        const text = await response.text();
-        throw new Error(`Expected JSON but got: ${text.slice(0, 200)}`);
-      }
-      const data = await response.json();
-      if (data.ok) {
-        await refreshMetas();
-      } else {
-        throw new Error(data.error ?? 'Cloud Sync returned ok:false');
-      }
+
+      await refreshMetas();
     } catch (e: any) {
       console.error('Cloud Sync Error:', e.message);
       setCloudSyncError(e.message);
