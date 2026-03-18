@@ -69,8 +69,8 @@ function getDangerTier(total: number) {
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // ─── Firestore config ─────────────────────────────────────────────────────────
-const META_COLL   = 'cosmic_vault_meta';    // one doc per birth year
-const PEOPLE_COLL = 'cosmic_vault_people';  // one doc per person (wikidataId)
+const META_COLL   = 'cosmic_vault_meta';
+const PEOPLE_COLL = 'cosmic_vault_people';
 
 // ─── Firestore helpers ────────────────────────────────────────────────────────
 async function getYearMeta(year: number): Promise<YearMeta | null> {

@@ -10,8 +10,6 @@ import { onRequest }  from 'firebase-functions/v2/https';
 import { logger }     from 'firebase-functions/v2';
 import * as admin     from 'firebase-admin';
 
-// ── Node 20 has fetch built in — no import needed ────────────────────────────
-
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
@@ -19,11 +17,7 @@ const META_COLL   = 'cosmic_vault_meta';
 const PEOPLE_COLL = 'cosmic_vault_people';
 const TARGET_YEAR = 2026;
 
-// ─── Conflict year calculation ────────────────────────────────────────────────
-
 function getConflictYears(): number[] {
-  // Horse year 2026 conflict animal zodiac keys:
-  // Chong = Rat (4), Xing = Horse (10), Hai = Ox (5), Po = Rabbit (7)
   const conflictKeys = [4, 10, 5, 7];
   const years: number[] = [];
   for (const key of conflictKeys) {
@@ -37,13 +31,9 @@ function getConflictYears(): number[] {
   return [...new Set(years)].sort((a, b) => a - b);
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function sleep(ms: number) {
   return new Promise(r => setTimeout(r, ms));
 }
-
-// ─── Wikidata fetch — uses Node 20 native fetch ───────────────────────────────
 
 async function fetchWikidataMonth(year: number, month: number): Promise<any[]> {
   const sparql = `
@@ -64,7 +54,6 @@ LIMIT 2000`.trim();
 
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
-      // AbortController handles timeout — native fetch doesn't have a timeout option
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 50000);
 
@@ -134,8 +123,6 @@ async function savePeople(people: any[]) {
     await batch.commit();
   }
 }
-
-// ─── Core ingestion loop ──────────────────────────────────────────────────────
 
 async function runIngestionLoop(): Promise<{
   done: boolean;
@@ -207,12 +194,10 @@ async function runIngestionLoop(): Promise<{
   return { done: allComplete || true, monthsProcessed, totalPeople };
 }
 
-// ─── Scheduled trigger ────────────────────────────────────────────────────────
-
 export const ingestVaultScheduled = onSchedule(
   {
     schedule: 'every 70 minutes',
-    timeoutSeconds: 3600,  // 60 minutes — Cloud Functions v2 max
+    timeoutSeconds: 3600,
     memory: '512MiB',
     region: 'us-central1',
   },
@@ -222,8 +207,6 @@ export const ingestVaultScheduled = onSchedule(
     logger.info(`Done: ${result.monthsProcessed} months, ${result.totalPeople} people. Complete: ${result.done}`);
   }
 );
-
-// ─── Manual HTTP trigger ──────────────────────────────────────────────────────
 
 export const ingestVaultNow = onRequest(
   {
