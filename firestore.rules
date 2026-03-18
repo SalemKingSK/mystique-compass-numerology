@@ -1,0 +1,85 @@
+/**
+ * FIRESTORE SECURITY RULES: COSMIC RISK SCANNER (PROTOTYPING MODE)
+ * 
+ * Core Philosophy:
+ * This ruleset implements a "Shared Global Vault" model designed for a specialized 
+ * research tool. Because the data (astrological records and ingestion metadata) 
+ * is global in nature and not owned by individual users, the security model 
+ * prioritizes authenticated access over individual ownership.
+ * 
+ * Data Structure:
+ * 1. /cosmic_vault_meta/{yearId}: Tracking documents for birth year ingestion status.
+ * 2. /cosmic_vault_people/{wikidataId}: Detailed records of individuals for risk scanning.
+ * 
+ * Key Security Decisions:
+ * - Prototyping Flexibility: Data types and full object shapes are not enforced to 
+ *   allow rapid development of the ingestion logic.
+ * - Authenticated Write: Since the schema does not include a specific 'ownerId' or 
+ *   'creatorId' for these global records, any authenticated user is permitted 
+ *   to perform ingestion and update metadata.
+ * - Relational Integrity: On creation, the rules enforce that internal identifiers 
+ *   (like wikidataId and year) match the Firestore document ID to ensure data 
+ *   consistency during queries.
+ * - Safe Destructive Ops: All updates and deletes require explicit verification 
+ *   that the document exists.
+ * 
+ * Denormalization for Authorization:
+ * - This application uses path-based consistency checks. For example, the year 
+ *   metadata must contain a 'year' field matching its path ID to prevent 
+ *   mismatched data entry.
+ */
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- GLOBAL HELPERS ---
+
+    /** @description Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Verifies a document exists before modification. */
+    function isExisting() {
+      return resource != null;
+    }
+
+    // --- COLLECTION RULES ---
+
+    match /cosmic_vault_meta/{yearId} {
+      /**
+       * @description Management of ingestion progress metadata for birth years.
+       * @path /cosmic_vault_meta/{yearId}
+       * @allow (get, list) if authenticated.
+       * @allow (create) if authenticated and internal 'year' field matches path.
+       * @deny (create, update) if not authenticated.
+       * @principle Ensures metadata stays consistent with the birth year it describes.
+       */
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && string(request.resource.data.year) == yearId;
+      allow update: if isSignedIn() && isExisting() && string(request.resource.data.year) == yearId;
+      allow delete: if isSignedIn() && isExisting();
+    }
+
+    match /cosmic_vault_people/{wikidataId} {
+      /**
+       * @description Global repository of person records retrieved from Wikidata.
+       * @path /cosmic_vault_people/{wikidataId}
+       * @allow (get, list) if authenticated.
+       * @allow (create) if authenticated and wikidataId in data matches document ID.
+       * @deny (update, delete) if document does not exist or user is unauthenticated.
+       * @principle Enforces relational integrity between the document ID and its contents.
+       */
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.wikidataId == wikidataId;
+      allow update: if isSignedIn() && isExisting() && request.resource.data.wikidataId == wikidataId;
+      allow delete: if isSignedIn() && isExisting();
+    }
+
+    // --- DEFAULT DENY ---
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
