@@ -1,21 +1,16 @@
-
 /**
  * functions/src/ingestVault.ts
  *
  * Cloud Functions v2 — runs up to 60 minutes per invocation.
- * Loops through ALL pending months in one continuous run.
- * Scheduled every 70 minutes as a safety net to catch any remainder.
- * Stops gracefully at 55 minutes if still running, resumes next trigger.
- *
- * DEPLOY:
- *   cd functions && npm install && cd .. && firebase deploy --only functions
+ * Uses Node 20 native fetch — no node-fetch package needed.
  */
 
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { onRequest }  from 'firebase-functions/v2/https';
 import { logger }     from 'firebase-functions/v2';
 import * as admin     from 'firebase-admin';
-import fetch          from 'node-fetch';
+
+// ── Node 20 has fetch built in — no import needed ────────────────────────────
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -39,15 +34,16 @@ function getConflictYears(): number[] {
       y += 12;
     }
   }
-  // Sort oldest first — richest data comes first, most valuable
   return [...new Set(years)].sort((a, b) => a - b);
 }
 
-// ─── Wikidata fetch ───────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function sleep(ms: number) {
   return new Promise(r => setTimeout(r, ms));
 }
+
+// ─── Wikidata fetch — uses Node 20 native fetch ───────────────────────────────
 
 async function fetchWikidataMonth(year: number, month: number): Promise<any[]> {
   const sparql = `
@@ -68,17 +64,23 @@ LIMIT 2000`.trim();
 
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
+      // AbortController handles timeout — native fetch doesn't have a timeout option
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 50000);
+
       const r = await fetch(url, {
         headers: {
           'Accept': 'application/sparql-results+json',
           'User-Agent': 'MystiqueCompass/1.0 (Firebase background ingest)',
         },
-        timeout: 50000,
-      } as any);
+        signal: controller.signal,
+      });
+
+      clearTimeout(timer);
 
       if (!r.ok) {
         if (r.status === 429) {
-          logger.warn(`Rate limited on ${year}/${month}, waiting ${10 * (attempt+1)}s`);
+          logger.warn(`Rate limited on ${year}/${month}, waiting ${10 * (attempt + 1)}s`);
           await sleep(10000 * (attempt + 1));
           continue;
         }
@@ -87,6 +89,7 @@ LIMIT 2000`.trim();
 
       const data = await r.json() as any;
       return data?.results?.bindings || [];
+
     } catch (e: any) {
       if (attempt === 3) {
         logger.warn(`${year}/${month} failed after 4 attempts: ${e.message}`);
@@ -133,14 +136,14 @@ async function savePeople(people: any[]) {
 }
 
 // ─── Core ingestion loop ──────────────────────────────────────────────────────
-// Runs continuously through ALL pending months until either:
-// A) Everything is done (vault complete), or
-// B) 55 minutes have elapsed (safety margin before 60min hard limit)
-// If B, the next scheduled trigger resumes from exactly where it stopped.
 
-async function runIngestionLoop(): Promise<{ done: boolean; monthsProcessed: number; totalPeople: number }> {
+async function runIngestionLoop(): Promise<{
+  done: boolean;
+  monthsProcessed: number;
+  totalPeople: number;
+}> {
   const startTime      = Date.now();
-  const MAX_RUNTIME_MS = 55 * 60 * 1000; // 55 minutes — 5 min safety buffer
+  const MAX_RUNTIME_MS = 55 * 60 * 1000;
   const years          = getConflictYears();
   const allMonths      = [1,2,3,4,5,6,7,8,9,10,11,12];
 
@@ -152,16 +155,15 @@ async function runIngestionLoop(): Promise<{ done: boolean; monthsProcessed: num
     const metaRef  = db.collection(META_COLL).doc(String(year));
     const metaSnap = await metaRef.get();
     const meta     = metaSnap.data() as any || {
-      year, status: 'pending', count: 0, monthsDone: [], updatedAt: 0
+      year, status: 'pending', count: 0, monthsDone: [], updatedAt: 0,
     };
 
     if (meta.status === 'complete') continue;
 
-    const monthsDone = meta.monthsDone || [];
+    const monthsDone = (meta.monthsDone || []) as number[];
     const remaining  = allMonths.filter(m => !monthsDone.includes(m));
 
     if (!remaining.length) {
-      // All months fetched but status not marked complete — fix it
       await metaRef.set({ ...meta, status: 'complete', updatedAt: Date.now() });
       continue;
     }
@@ -169,14 +171,13 @@ async function runIngestionLoop(): Promise<{ done: boolean; monthsProcessed: num
     allComplete = false;
 
     for (const month of remaining) {
-      // ── Time guard — stop gracefully before hitting 60min hard limit ──────
       const elapsed = Date.now() - startTime;
       if (elapsed >= MAX_RUNTIME_MS) {
-        logger.info(`55min elapsed — pausing at ${year}/${month}. Will resume next trigger.`);
+        logger.info(`55min guard — pausing at ${year}/${month}. Resuming next trigger.`);
         return { done: false, monthsProcessed, totalPeople };
       }
 
-      logger.info(`Fetching ${year}/${month} (elapsed: ${Math.round(elapsed/1000)}s)`);
+      logger.info(`Fetching ${year}/${month} (${Math.round(elapsed / 1000)}s elapsed)`);
 
       const bindings = await fetchWikidataMonth(year, month);
       const people   = parseBindings(bindings);
@@ -185,7 +186,6 @@ async function runIngestionLoop(): Promise<{ done: boolean; monthsProcessed: num
       const newMonthsDone = [...monthsDone, month];
       const isComplete    = newMonthsDone.length === 12;
 
-      // Update meta immediately after each month — checkpoint saved
       await metaRef.set({
         year,
         status:     isComplete ? 'complete' : 'partial',
@@ -195,25 +195,19 @@ async function runIngestionLoop(): Promise<{ done: boolean; monthsProcessed: num
       });
 
       monthsProcessed++;
-      totalPeople += people.length;
-
-      logger.info(`✓ ${year}/${month}: ${people.length} stored (total this run: ${totalPeople})`);
-
-      // 300ms between requests — polite but not slow
-      await sleep(300);
-
-      // Update local monthsDone for the inner loop
+      totalPeople    += people.length;
+      meta.count      = (meta.count || 0) + people.length;
       monthsDone.push(month);
-      if (meta.count !== undefined) meta.count += people.length;
+
+      logger.info(`✓ ${year}/${month}: ${people.length} stored`);
+      await sleep(300);
     }
   }
 
   return { done: allComplete || true, monthsProcessed, totalPeople };
 }
 
-// ─── Scheduled trigger — every 70 minutes ────────────────────────────────────
-// 70 min gap > 60 min max runtime, so there's no overlap between invocations.
-// If a run finishes in 20 min (vault complete), the next trigger is a no-op.
+// ─── Scheduled trigger ────────────────────────────────────────────────────────
 
 export const ingestVaultScheduled = onSchedule(
   {
@@ -223,15 +217,13 @@ export const ingestVaultScheduled = onSchedule(
     region: 'us-central1',
   },
   async () => {
-    logger.info('Starting scheduled vault ingestion...');
+    logger.info('Scheduled vault ingestion starting...');
     const result = await runIngestionLoop();
-    logger.info(`Ingestion run complete: ${result.monthsProcessed} months, ${result.totalPeople} people stored. Vault done: ${result.done}`);
+    logger.info(`Done: ${result.monthsProcessed} months, ${result.totalPeople} people. Complete: ${result.done}`);
   }
 );
 
-// ─── Manual HTTP trigger — kick off on demand from the app UI ─────────────────
-// Called by the "Force Sync" button in the Data Vault tab.
-// Same logic as the scheduled function — runs until done or 55min elapsed.
+// ─── Manual HTTP trigger ──────────────────────────────────────────────────────
 
 export const ingestVaultNow = onRequest(
   {
@@ -245,12 +237,10 @@ export const ingestVaultNow = onRequest(
       res.status(405).json({ error: 'POST only' });
       return;
     }
-
     logger.info('Manual vault ingest triggered');
     const result = await runIngestionLoop();
-
     res.json({
-      ok: true,
+      ok:              true,
       monthsProcessed: result.monthsProcessed,
       totalPeople:     result.totalPeople,
       vaultComplete:   result.done,

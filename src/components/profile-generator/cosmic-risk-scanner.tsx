@@ -2,15 +2,14 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, Zap, Loader2, ExternalLink, Telescope,
-  Trash2, History, Globe, Database, RefreshCw, AlertTriangle,
-  CloudRain, CloudLightning,
+  Search, Zap, Loader2,
+  ExternalLink, Telescope, Trash2, History, Globe, AlertTriangle
 } from 'lucide-react';
-import { Button }   from '@/components/ui/button';
-import { Badge }    from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Card }     from '@/components/ui/card';
-import { Input }    from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
 import { db } from '@/lib/firebase';
 import {
@@ -18,37 +17,7 @@ import {
   query as fsQuery, where, writeBatch,
 } from 'firebase/firestore';
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-
-interface PersonRecord {
-  wikidataId: string;
-  name: string;
-  birthDay: number;
-  birthMonth: number;
-  birthYear: number;
-  description: string;
-  url: string;
-}
-
-interface YearMeta {
-  year: number;
-  status: 'pending' | 'ingesting' | 'partial' | 'complete';
-  count: number;
-  monthsDone: number[];
-  updatedAt: number;
-}
-
-interface ScanResult extends PersonRecord {
-  animal: string;
-  conflictType: string;
-  config: any;
-  py: number;
-  pyPoints: number;
-  totalScore: number;
-  tier: any;
-}
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function reduce(n: number) {
   let s = Math.abs(n);
@@ -64,122 +33,117 @@ const DANGER_TIERS = [
   { min: 2, label: 'NOTABLE',   color: '#9b8ec4', bg: 'rgba(155,142,196,0.11)',border: 'rgba(155,142,196,0.4)'  },
 ];
 
+const DEPTHS = [
+  { label: 'Quick',    sub: '~50/yr',  perYear: 50  },
+  { label: 'Global',   sub: '~250/yr', perYear: 250 },
+  { label: 'Infinite', sub: '~500/yr', perYear: 500 },
+];
+
 function getDangerTier(total: number) {
   return DANGER_TIERS.find(x => total >= x.min) || DANGER_TIERS[4];
 }
 
-const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-// ─── Env-var driven URL ──────────────────────────────────────────────────────
-const INGEST_URL = process.env.NEXT_PUBLIC_INGEST_URL ?? '/ingestVaultNow';
-
-// ─── Firestore config ──────────────────────────────────────────────────────────
-const META_COLL   = 'cosmic_vault_meta';    // one doc per birth year
-const PEOPLE_COLL = 'cosmic_vault_people';  // one doc per person (wikidataId)
-
-// ─── Firestore helpers ─────────────────────────────────────────────────────────
-
-async function getYearMeta(year: number): Promise<YearMeta | null> {
-  const snap = await getDoc(doc(db, META_COLL, String(year)));
-  return snap.exists() ? (snap.data() as YearMeta) : null;
+function extractBirthDate(wikitext: string) {
+  const p1 = wikitext.match(/\{\{birth[\s_]date(?:[\s_]and[\s_]age)?\s*(?:\|[^|{}]*)*?\|\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})/i);
+  if (p1) return { year: +p1[1], month: +p1[2], day: +p1[3] };
+  const p2 = wikitext.match(/\|\s*birth[_ ]date\s*=\s*(\d{4})-(\d{1,2})-(\d{1,2})/i);
+  if (p2) return { year: +p2[1], month: +p2[2], day: +p2[3] };
+  const p3 = wikitext.match(/\{\{dob\s*\|\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})/i);
+  if (p3) return { year: +p3[1], month: +p3[2], day: +p3[3] };
+  const p4 = wikitext.match(/\{\{birth[\s_]date[^}]{0,100}\|\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})/i);
+  if (p4) return { year: +p4[1], month: +p4[2], day: +p4[3] };
+  return null;
 }
 
-async function saveYearMeta(meta: YearMeta) {
-  await setDoc(doc(db, META_COLL, String(meta.year)), meta);
-}
+// ─── Network helpers ───────────────────────────────────────────────────────────
 
-async function savePeopleBatch(people: PersonRecord[]) {
-  const BATCH_SIZE = 450;
-  for (let i = 0; i < people.length; i += BATCH_SIZE) {
-    const batch = writeBatch(db);
-    people.slice(i, i + BATCH_SIZE).forEach(p => {
-      batch.set(doc(db, PEOPLE_COLL, p.wikidataId), p, { merge: true });
-    });
-    await batch.commit();
-  }
-}
-
-async function getPeopleForYears(years: number[]): Promise<PersonRecord[]> {
-  const results: PersonRecord[] = [];
-  for (let i = 0; i < years.length; i += 30) {
-    const chunk = years.slice(i, i + 30);
-    const snap = await getDocs(
-      fsQuery(collection(db, PEOPLE_COLL), where('birthYear', 'in', chunk))
-    );
-    snap.forEach(d => results.push(d.data() as PersonRecord));
-  }
-  return results;
-}
-
-// ─── Wikidata SPARQL ───────────────────────────────────────────────────────────
-
-async function fetchWikidataMonth(year: number, month: number): Promise<PersonRecord[]> {
-  const sparql = `
-SELECT ?person ?personLabel ?dob ?description WHERE {
-  ?person wdt:P31 wd:Q5 ;
-          wdt:P569 ?dob .
-  FILTER(YEAR(?dob) = ${year} && MONTH(?dob) = ${month})
-  FILTER(DATATYPE(?dob) = xsd:dateTime)
-  OPTIONAL {
-    ?person schema:description ?description .
-    FILTER(LANG(?description) = "en")
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-}
-LIMIT 3000`.trim();
-
-  const url = `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`;
-
-  let data: any;
-  for (let attempt = 0; attempt < 3; attempt++) {
+async function fetchWithRetry(url: string, retries = 3, delay = 1200) {
+  for (let attempt = 0; attempt < retries; attempt++) {
     try {
-      const r = await fetch(url, { headers: { Accept: 'application/sparql-results+json' } });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      data = await r.json();
-      break;
+      const r = await fetch(url);
+      if (!r.ok) {
+        if (r.status === 429) {
+          await new Promise(res => setTimeout(res, delay * 3));
+          continue;
+        }
+        throw new Error(`HTTP ${r.status}`);
+      }
+      return await r.json();
     } catch (e: any) {
-      if (attempt === 2) { console.warn(`Wikidata ${year}/${month} failed:`, e.message); return []; }
-      await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+      if (attempt === retries - 1) {
+        console.warn('Fetch failed after retries:', e.message);
+        return null;
+      }
+      await new Promise(res => setTimeout(res, delay * Math.pow(2, attempt)));
     }
   }
-
-  const bindings: any[] = data?.results?.bindings || [];
-  const people: PersonRecord[] = [];
-
-  for (const b of bindings) {
-    const wikidataId = b.person?.value?.split('/').pop();
-    if (!wikidataId) continue;
-
-    const dobStr = b.dob?.value || '';
-    const match  = dobStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (!match) continue;
-
-    const birthYear  = parseInt(match[1]);
-    const birthMonth = parseInt(match[2]);
-    const birthDay   = parseInt(match[3]);
-    if (birthMonth < 1 || birthMonth > 12 || birthDay < 1 || birthDay > 31) continue;
-
-    const rawName = b.personLabel?.value || '';
-    if (/^Q\d+$/.test(rawName)) continue;
-
-    people.push({
-      wikidataId,
-      name: rawName,
-      birthDay,
-      birthMonth,
-      birthYear,
-      description: b.description?.value || '',
-      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(rawName.replace(/ /g, '_'))}`,
-    });
-  }
-
-  return people;
 }
 
-// ─── Inline confirm dialog ───────────────────────────────────────────────────
+async function fetchAllMembersForYear(
+  year: number,
+  limit: number,
+  resumeToken?: string | null
+): Promise<{ titles: string[]; finalToken: string | null }> {
+  const titles: string[] = [];
+  const PAGE_SIZE = 50;
+  let cmcontinue: string | null = resumeToken || null;
 
-function ConfirmDialog({ message, onConfirm, onCancel }: {
-  message: string; onConfirm: () => void; onCancel: () => void;
+  while (titles.length < limit) {
+    const need = Math.min(PAGE_SIZE, limit - titles.length);
+    const contParam = cmcontinue ? `&cmcontinue=${encodeURIComponent(cmcontinue)}` : '';
+    const url =
+      `https://en.wikipedia.org/w/api.php?` +
+      `action=query&list=categorymembers` +
+      `&cmtitle=Category:${year}_births` +
+      `&cmlimit=${need}&cmnamespace=0&format=json&origin=*` +
+      contParam;
+
+    const data = await fetchWithRetry(url);
+    if (!data) break;
+
+    const page = (data.query?.categorymembers || []).map((m: any) => m.title);
+    titles.push(...page);
+    cmcontinue = data.continue?.cmcontinue || null;
+    if (!cmcontinue) break;
+    await new Promise(r => setTimeout(r, 650));
+  }
+
+  return { titles, finalToken: cmcontinue };
+}
+
+async function batchFetchMetadata(
+  titles: string[]
+): Promise<Record<string, { wikitext: string; description: string }>> {
+  if (!titles.length) return {};
+  const url =
+    `https://en.wikipedia.org/w/api.php?` +
+    `action=query&titles=${encodeURIComponent(titles.join('|'))}` +
+    `&prop=revisions|description&rvprop=content&format=json&origin=*`;
+  const data = await fetchWithRetry(url);
+  if (!data) return {};
+  const pages = data.query?.pages || {};
+  const result: Record<string, { wikitext: string; description: string }> = {};
+  for (const p of Object.values(pages) as any[]) {
+    if (p.title) {
+      result[p.title] = {
+        wikitext: p?.revisions?.[0]?.['*'] || '',
+        description: p?.description || '',
+      };
+    }
+  }
+  return result;
+}
+
+// ─── Inline confirm dialog (replaces window.confirm which is blocked in iframes) ──
+
+function ConfirmDialog({
+  message,
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -189,43 +153,54 @@ function ConfirmDialog({ message, onConfirm, onCancel }: {
           <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
         </div>
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" size="sm" onClick={onCancel}
-            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
-          <Button size="sm" onClick={onConfirm}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
+          <Button variant="ghost" size="sm"
+            onClick={onCancel}
+            className="text-slate-400 hover:text-slate-200 font-cinzel text-[10px] uppercase">
+            Cancel
+          </Button>
+          <Button size="sm"
+            onClick={onConfirm}
+            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">
+            Confirm
+          </Button>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
-
-  // ── Tab state ────────────────────────────────────────────────────────────────
-  const [tab, setTab] = useState<'vault' | 'scanner'>('vault');
-
-  // ── Vault state ──────────────────────────────────────────────────────────────
-  const [yearMetas, setYearMetas]       = useState<Record<number, YearMeta>>({});
-  const [ingesting, setIngesting]       = useState(false);
-  const [ingestLog, setIngestLog]       = useState<string[]>([]);
-  const [ingestDone, setIngestDone]     = useState(0);
-  const [ingestTotal, setIngestTotal]   = useState(0);
-  const [ingestPhase, setIngestPhase]   = useState('');
-
-  // ── Scanner state ────────────────────────────────────────────────────────────
-  const [scanning, setScanning]         = useState(false);
-  const [scanResults, setScanResults]   = useState<ScanResult[]>([]);
-  const [scanStats, setScanStats]       = useState({ checked: 0, flagged: 0 });
-  const [filterQuery, setFilterQuery]   = useState('');
+  const [depthIdx, setDepthIdx]         = useState(1);
+  const [running, setRunning]           = useState(false);
+  const [stats, setStats]               = useState({ checked: 0, flagged: 0, done: false, phase: '' });
+  const [found, setFound]               = useState<any[]>([]);
   const [expandedId, setExpandedId]     = useState<string | null>(null);
+  const [scanLog, setScanLog]           = useState<any[]>([]);
+  const [filterQuery, setFilterQuery]   = useState('');
+  const [continueTokens, setContinueTokens] = useState<Record<number, string | null>>({});
 
-  // ── Shared ───────────────────────────────────────────────────────────────────
-  const [cloudSyncing, setCloudSyncing] = useState(false);
-  const [cloudSyncError, setCloudSyncError] = useState<string | null>(null);
-  const [dialog, setDialog] = useState<{ message: string; onConfirm: () => void } | null>(null);
-  const abortRef = useRef(false);
+  // ── FIX: React-state dialogs — replaces window.confirm (blocked in iframes) ──
+  const [dialog, setDialog] = useState<{
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  function showConfirm(message: string, onConfirm: () => void) {
+    setDialog({ message, onConfirm });
+  }
+  function dismissDialog() {
+    setDialog(null);
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const abort     = useRef(false);
+  const foundRef  = useRef<any[]>([]);
+  const statsRef  = useRef({ checked: 0, flagged: 0 });
+  const tokensRef = useRef<Record<number, string | null>>({});
+
+  // ── Dynamic config ──────────────────────────────────────────────────────────
 
   const targetSign = useMemo(() => {
     const idx = ((targetYear - 1900) % 12 + 12) % 12;
@@ -244,851 +219,477 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     };
   }, [targetSign]);
 
-  const CONFLICT_YEARS = useMemo(() => {
+  const SCAN_YEARS_DYNAMIC = useMemo(() => {
     const list: { year: number; type: string; config: any }[] = [];
     Object.entries(CF_CONFIG).forEach(([type, config]) => {
       if (!config.animal) return;
-      const animalIdx = ANIMALS.findIndex((a: any) => a.n === config.animal);
-      if (animalIdx < 0) return;
-      let y = 1900 + animalIdx;
-      while (y < 1930) y += 12;
-      while (y <= 2010) {
-        if (y < targetYear) list.push({ year: y, type, config });
-        y += 12;
-      }
+      const animalIdx = ANIMALS.findIndex(a => a.n === config.animal);
+      [2, 3, 4, 5, 6].forEach(cycle => {
+        list.push({
+          year: targetYear - (cycle * 12) + (animalIdx - (targetYear - 1900) % 12),
+          type,
+          config,
+        });
+      });
     });
-    return list.sort((a, b) => b.year - a.year);
+    return list
+      .filter(y => y.year > 1900 && y.year < targetYear)
+      .sort((a, b) => b.year - a.year);
   }, [targetYear, CF_CONFIG]);
 
-  const uniqueYears = useMemo(() =>
-    [...new Set(CONFLICT_YEARS.map(c => c.year))].sort((a, b) => b - a),
-    [CONFLICT_YEARS]
-  );
+  // ── Checkpoint ─────────────────────────────────────────────────────────────
 
-  const yearConflictMap = useMemo(() => {
-    const m: Record<number, { type: string; config: any }> = {};
-    CONFLICT_YEARS.forEach(c => { if (!m[c.year]) m[c.year] = c; });
-    return m;
-  }, [CONFLICT_YEARS]);
+  useEffect(() => {
+    const key = `scanner_posterity_v6_${targetYear}`;
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        foundRef.current  = state.found  || [];
+        statsRef.current  = state.stats  || { checked: 0, flagged: 0 };
+        tokensRef.current = state.tokens || {};
+        setFound(state.found || []);
+        setStats(state.stats || { checked: 0, flagged: 0, done: true, phase: '' });
+        setContinueTokens(state.tokens || {});
+      } catch { /* corrupt — start fresh */ }
+    } else {
+      foundRef.current  = [];
+      statsRef.current  = { checked: 0, flagged: 0 };
+      tokensRef.current = {};
+      setFound([]);
+      setStats({ checked: 0, flagged: 0, done: false, phase: '' });
+      setContinueTokens({});
+    }
+    setScanLog([]);
+  }, [targetYear]);
 
-  useEffect(() => { refreshMetas(); }, [targetYear]);
+  function persistState() {
+    const key = `scanner_posterity_v6_${targetYear}`;
+    localStorage.setItem(key, JSON.stringify({
+      found:  foundRef.current,
+      stats:  statsRef.current,
+      tokens: tokensRef.current,
+    }));
+  }
 
-  async function refreshMetas() {
-    const metas: Record<number, YearMeta> = {};
-    await Promise.all(
-      uniqueYears.map(async y => {
-        const m = await getYearMeta(y);
-        if (m) metas[y] = m;
-      })
+  // ── Actions ────────────────────────────────────────────────────────────────
+
+  function clearData() {
+    // ← was: if (!confirm(...)) return;  — blocked in iframes
+    showConfirm(
+      `Clear all discovered data for ${targetYear}? This cannot be undone.`,
+      () => {
+        dismissDialog();
+        const key = `scanner_posterity_v6_${targetYear}`;
+        localStorage.removeItem(key);
+        foundRef.current  = [];
+        statsRef.current  = { checked: 0, flagged: 0 };
+        tokensRef.current = {};
+        setFound([]);
+        setStats({ checked: 0, flagged: 0, done: false, phase: '' });
+        setContinueTokens({});
+        setScanLog([]);
+      }
     );
-    setYearMetas(metas);
   }
 
-  async function ingestOneYear(year: number) {
-    const existing    = yearMetas[year];
-    const monthsDone  = existing?.monthsDone || [];
-    const remaining   = [1,2,3,4,5,6,7,8,9,10,11,12].filter(m => !monthsDone.includes(m));
-    if (!remaining.length) return 0;
+  function handleScanButton() {
+    if (found.length > 0) {
+      // Already have data — continue from checkpoint, no confirmation needed
+      executeScan(true);
+    } else {
+      // Fresh start — no prior data so no need to confirm reset
+      executeScan(false);
+    }
+  }
 
-    let meta: YearMeta = existing || { year, status: 'ingesting', count: 0, monthsDone: [], updatedAt: Date.now() };
-    meta.status = 'ingesting';
-    await saveYearMeta(meta);
-    setYearMetas(p => ({ ...p, [year]: { ...meta } }));
+  // Separate the scan execution from the confirmation flow
+  const executeScan = async (isContinuing: boolean) => {
+    abort.current = false;
+    setRunning(true);
 
-    let yearTotal = 0;
-
-    for (const month of remaining) {
-      if (abortRef.current) break;
-
-      setIngestPhase(`${year} · ${MONTHS_SHORT[month - 1]} — fetching Wikidata...`);
-
-      const people = await fetchWikidataMonth(year, month);
-      if (people.length > 0) await savePeopleBatch(people);
-
-      meta = {
-        ...meta,
-        monthsDone: [...meta.monthsDone, month],
-        count: meta.count + people.length,
-        updatedAt: Date.now(),
-        status: meta.monthsDone.length + 1 === 12 ? 'complete' : 'partial',
-      };
-      yearTotal += people.length;
-
-      await saveYearMeta(meta);
-      setYearMetas(p => ({ ...p, [year]: { ...meta } }));
-      setIngestDone(d => d + 1);
-      setIngestLog(l => [`✓ ${year} ${MONTHS_SHORT[month-1]}: ${people.length} stored`, ...l.slice(0, 39)]);
-
-      if (!abortRef.current) await new Promise(r => setTimeout(r, 1000));
+    if (!isContinuing) {
+      // Reset everything for a clean run
+      tokensRef.current = {};
+      statsRef.current  = { checked: 0, flagged: 0 };
+      foundRef.current  = [];
+      setFound([]);
+      setContinueTokens({});
     }
 
-    return yearTotal;
-  }
+    setStats(s => ({ ...s, done: false, phase: 'Initialising Engine...' }));
 
-  async function startIngestion(yearsToIngest: number[]) {
-    abortRef.current = false;
-    setIngesting(true);
-    setIngestLog([]);
-    setScanResults([]);
+    const perYear = DEPTHS[depthIdx].perYear;
 
-    const total = yearsToIngest.reduce((sum, y) => {
-      const done = yearMetas[y]?.monthsDone?.length || 0;
-      return sum + (12 - done);
-    }, 0);
-    setIngestTotal(total);
-    setIngestDone(0);
-    setIngestPhase('Initialising...');
+    for (const { year, type, config } of SCAN_YEARS_DYNAMIC) {
+      if (abort.current) break;
 
-    for (const year of yearsToIngest) {
-      if (abortRef.current) break;
-      await ingestOneYear(year);
-    }
+      const currentToken = tokensRef.current[year];
+      if (isContinuing && currentToken === 'COMPLETED') continue;
 
-    setIngesting(false);
-    setIngestPhase(abortRef.current ? 'Stopped.' : 'Ingestion complete ✓');
-    await refreshMetas();
-  }
+      setScanLog(prev => {
+        const exists = prev.find(l => l.year === year);
+        if (exists) return prev.map(l => l.year === year ? { ...l, status: 'loading' } : l);
+        return [...prev, { year, status: 'loading', found: 0, checked: 0, animal: config.animal, type, config }];
+      });
 
-  function handleIngestAll() {
-    const pending = uniqueYears.filter(y => {
-      const s = yearMetas[y]?.status;
-      return !s || s === 'pending' || s === 'partial';
-    });
-    if (!pending.length) return;
-    startIngestion(pending);
-  }
+      setStats(s => ({ ...s, phase: `Fetching Category:${year}_births...` }));
 
-  async function clearVault() {
-    setDialog({
-      message: `Delete all stored people data from Firestore for ${targetYear} conflict years? This cannot be undone — you will need to re-run ingestion.`,
-      onConfirm: async () => {
-        setDialog(null);
-        await Promise.all(uniqueYears.map(y =>
-          setDoc(doc(db, META_COLL, String(y)), { year: y, status: 'pending', count: 0, monthsDone: [], updatedAt: Date.now() })
+      let titles: string[]        = [];
+      let finalToken: string | null = null;
+      try {
+        const resumeFrom = isContinuing && currentToken !== 'COMPLETED' ? currentToken : null;
+        const result     = await fetchAllMembersForYear(year, perYear, resumeFrom);
+        titles           = result.titles;
+        finalToken       = result.finalToken;
+        tokensRef.current[year] = finalToken ?? 'COMPLETED';
+        setContinueTokens({ ...tokensRef.current });
+      } catch {
+        setScanLog(p => p.map(l => l.year === year ? { ...l, status: 'error' } : l));
+        continue;
+      }
+
+      if (abort.current) break;
+      if (!titles.length) {
+        setScanLog(p => p.map(l => l.year === year ? { ...l, status: 'done' } : l));
+        continue;
+      }
+
+      let yearChecked = 0;
+      let yearFound   = 0;
+      const batches: string[][] = [];
+      for (let i = 0; i < titles.length; i += 50) batches.push(titles.slice(i, i + 50));
+
+      for (const batch of batches) {
+        if (abort.current) break;
+
+        setStats(s => ({
+          ...s,
+          phase: `Scanning ${year} Births... (${yearChecked}/${titles.length})`,
+        }));
+
+        let metadataMap: Record<string, { wikitext: string; description: string }> = {};
+        try {
+          metadataMap = await batchFetchMetadata(batch);
+        } catch {
+          yearChecked            += batch.length;
+          statsRef.current.checked += batch.length;
+          continue;
+        }
+
+        for (const title of batch) {
+          if (abort.current) break;
+          const meta           = metadataMap[title];
+          const wt             = meta?.wikitext    || '';
+          const bioDescription = meta?.description || '';
+          const bd             = wt ? extractBirthDate(wt) : null;
+
+          yearChecked++;
+          statsRef.current.checked++;
+
+          if (bd) {
+            const py = reduce(bd.day + bd.month + targetUY);
+            if (py === 4 || py === 7) {
+              const pyPoints   = py === 4 ? 2 : 1;
+              const totalScore = config.score + pyPoints;
+              const tier       = getDangerTier(totalScore);
+              const entry      = {
+                name: title, bioDescription, bd,
+                animal: config.animal, type, config,
+                py, pyPoints, totalScore, tier,
+                url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
+              };
+              if (!foundRef.current.find(f => f.name === entry.name)) {
+                yearFound++;
+                statsRef.current.flagged++;
+                foundRef.current = [...foundRef.current, entry].sort((a, b) => b.totalScore - a.totalScore);
+                setFound([...foundRef.current]);
+              }
+            }
+          }
+
+          setStats(s => ({
+            ...s,
+            checked: statsRef.current.checked,
+            flagged: statsRef.current.flagged,
+            phase:   `Scanning ${year} Births... (${yearChecked}/${titles.length})`,
+          }));
+        }
+
+        setScanLog(p => p.map(l =>
+          l.year === year ? { ...l, checked: yearChecked, found: yearFound, status: 'scanning' } : l
         ));
-        await refreshMetas();
-        setScanResults([]);
-        setScanStats({ checked: 0, flagged: 0 });
-        setIngestLog([]);
-      },
-    });
-  }
-
-  async function handleCloudSync() {
-    setCloudSyncing(true);
-    setCloudSyncError(null);
-    try {
-      const response = await fetch(INGEST_URL, { method: 'POST' });
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`HTTP ${response.status} — ${text.slice(0, 200)}`);
+        persistState();
+        if (!abort.current) await new Promise(r => setTimeout(r, 650));
       }
 
-      const ct = response.headers.get('content-type') ?? '';
-      if (!ct.includes('application/json')) {
-        const text = await response.text();
-        throw new Error(`Expected JSON but got: ${text.slice(0, 200)}`);
-      }
-
-      const data = await response.json();
-      if (data.ok) {
-        await refreshMetas();
-      } else {
-        throw new Error(data.error ?? 'Cloud Sync returned ok:false');
-      }
-    } catch (e: any) {
-      console.error('Cloud Sync Error:', e.message);
-      setCloudSyncError(e.message);
-    } finally {
-      setCloudSyncing(false);
-    }
-  }
-
-  async function runScan() {
-    setScanning(true);
-    setScanResults([]);
-    setScanStats({ checked: 0, flagged: 0 });
-
-    try {
-      const readableYears = uniqueYears.filter(y => (yearMetas[y]?.count || 0) > 0);
-      if (!readableYears.length) { setScanning(false); return; }
-
-      const people = await getPeopleForYears(readableYears);
-      const results: ScanResult[] = [];
-
-      for (const p of people) {
-        const conflict = yearConflictMap[p.birthYear];
-        if (!conflict) continue;
-        const py = reduce(p.birthDay + p.birthMonth + targetUY);
-        if (py !== 4 && py !== 7) continue;
-        const pyPoints   = py === 4 ? 2 : 1;
-        const totalScore = conflict.config.score + pyPoints;
-        results.push({ ...p, animal: conflict.config.animal, conflictType: conflict.type, config: conflict.config, py, pyPoints, totalScore, tier: getDangerTier(totalScore) });
-      }
-
-      results.sort((a, b) => b.totalScore - a.totalScore);
-      setScanResults(results);
-      setScanStats({ checked: people.length, flagged: results.length });
-    } catch (e) {
-      console.error('Scan error:', e);
+      setScanLog(p => p.map(l =>
+        l.year === year
+          ? { ...l, status: tokensRef.current[year] === 'COMPLETED' ? 'done' : 'ready' }
+          : l
+      ));
     }
 
-    setScanning(false);
+    setRunning(false);
+    setStats(s => ({ ...s, done: true, phase: 'Batch Complete' }));
+    persistState();
+  };
+
+  // ── When user wants to RESTART a scan that already has data ────────────────
+  function handleRestartScan() {
+    showConfirm(
+      'Reset current progress and start from the beginning? All stored results will be cleared.',
+      () => {
+        dismissDialog();
+        tokensRef.current = {};
+        statsRef.current  = { checked: 0, flagged: 0 };
+        foundRef.current  = [];
+        setFound([]);
+        setContinueTokens({});
+        executeScan(false);
+      }
+    );
   }
 
-  const filtered = useMemo(() =>
-    scanResults.filter(p =>
-      `${p.name} ${p.description}`.toLowerCase().includes(filterQuery.toLowerCase())
+  // ── Derived state ──────────────────────────────────────────────────────────
+
+  const filteredFound = useMemo(() =>
+    found.filter(p =>
+      `${p.name} ${p.bioDescription}`.toLowerCase().includes(filterQuery.toLowerCase())
     ),
-    [scanResults, filterQuery]
+    [found, filterQuery]
   );
 
-  const byTier = useMemo(() =>
-    DANGER_TIERS.map(tier => ({ tier, items: filtered.filter(f => f.tier.label === tier.label) }))
+  const resultsByTier = useMemo(() =>
+    DANGER_TIERS
+      .map(tier => ({ tier, items: filteredFound.filter(f => f.tier.label === tier.label) }))
       .filter(g => g.items.length > 0),
-    [filtered]
+    [filteredFound]
   );
 
-  const vaultSummary = useMemo(() => {
-    const complete    = uniqueYears.filter(y => yearMetas[y]?.status === 'complete').length;
-    const partial     = uniqueYears.filter(y => yearMetas[y]?.status === 'partial').length;
-    const pending     = uniqueYears.filter(y => !yearMetas[y] || yearMetas[y].status === 'pending').length;
-    const totalPeople = Object.values(yearMetas).reduce((s, m) => s + (m.count || 0), 0);
-    return { complete, partial, pending, totalPeople };
-  }, [yearMetas, uniqueYears]);
-
-  const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <>
-      {dialog && <ConfirmDialog message={dialog.message} onConfirm={dialog.onConfirm} onCancel={() => setDialog(null)} />}
+      {/* Inline dialog — replaces window.confirm */}
+      {dialog && (
+        <ConfirmDialog
+          message={dialog.message}
+          onConfirm={dialog.onConfirm}
+          onCancel={dismissDialog}
+        />
+      )}
 
-      <div className="space-y-4">
-
+      <div className="space-y-6">
         <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
-          <div className="flex items-start justify-between gap-4 mb-5">
-            <div>
+          {running && (
+            <motion.div
+              initial={{ top: '-10%' }}
+              animate={{ top: '110%' }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent z-10 opacity-50"
+            />
+          )}
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+            <div className="space-y-1">
               <h2 className="text-xl font-decorative text-primary flex items-center gap-3">
                 <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
               </h2>
-              <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest mt-1">
-                {targetYear} · {targetSign.n} Year · {uniqueYears.length} conflict years · 1930–2010
+              <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest">
+                TEMPORAL CONTEXT: {targetYear} {targetSign.n} YEAR ({targetSign.e})
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={clearVault} title="Clear vault data"
-                className="text-rose-400 hover:bg-rose-500/10 h-8 w-8">
+              <Button variant="ghost" size="icon" onClick={clearData}
+                title="Clear Stored Data"
+                className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 h-8 w-8">
                 <Trash2 className="h-4 w-4" />
               </Button>
-              <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 font-cinzel text-[10px]">
-                FIRESTORE VAULT
+              <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 py-1 font-cinzel text-[10px]">
+                WIKIPEDIA LIVE FEED
               </Badge>
             </div>
           </div>
 
-          <div className="flex gap-1 bg-black/20 p-1 rounded-xl border border-white/10">
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
             {[
-              { id: 'vault',   label: '🗄  Data Vault' },
-              { id: 'scanner', label: '🔭  Scanner'    },
-            ].map(t => (
-              <button key={t.id} onClick={() => setTab(t.id as any)}
-                className={`flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest font-cinzel transition-all ${
-                  tab === t.id ? 'bg-primary text-primary-foreground' : 'text-slate-500 hover:text-slate-300'
-                }`}>
-                {t.label}
-              </button>
+              [stats.checked,                                'Total Checked',    'text-primary'  ],
+              [found.length,                                 'Discovered',       'text-orange-400'],
+              [found.filter(f => f.totalScore >= 5).length,  'Critical/Severe',  'text-rose-500'  ],
+              [found.filter(f => f.totalScore <= 3).length,  'Elevated/Notable', 'text-blue-400'  ],
+            ].map(([val, label, cls]) => (
+              <div key={label as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                <div className={`text-2xl font-black font-decorative tabular-nums ${cls}`}>{val}</div>
+                <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">{label}</div>
+              </div>
             ))}
           </div>
+
+          {/* Controls */}
+          {running ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  {stats.phase}
+                </span>
+                <Button variant="ghost" size="sm"
+                  onClick={() => { abort.current = true; }}
+                  className="h-6 text-rose-400 text-[9px] uppercase">
+                  Stop
+                </Button>
+              </div>
+              <Progress value={(statsRef.current.checked % 500) / 5} className="h-1 bg-white/5" />
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex items-center gap-2 bg-black/20 p-1 rounded-full border border-white/10 w-full sm:w-auto">
+                {DEPTHS.map((d, i) => (
+                  <button key={d.label} onClick={() => setDepthIdx(i)}
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all font-cinzel ${
+                      depthIdx === i ? 'bg-primary text-primary-foreground' : 'text-slate-500'
+                    }`}>
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-2 w-full sm:w-auto ml-auto">
+                {/* Main action button */}
+                <Button
+                  onClick={handleScanButton}
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] px-8 h-auto py-3 whitespace-normal text-center leading-tight">
+                  <Zap className="mr-2 h-4 w-4 shrink-0" />
+                  {found.length > 0 ? 'Scan Next Batch' : 'Start Discovery'}
+                </Button>
+
+                {/* Restart button — only shown when there's existing data */}
+                {found.length > 0 && (
+                  <Button
+                    onClick={handleRestartScan}
+                    variant="outline"
+                    className="shrink-0 border-slate-600 text-slate-400 hover:text-slate-200 font-cinzel text-[10px] uppercase px-3 h-auto py-3">
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
 
-        {tab === 'vault' && (
-          <Card className="glass-card p-6 border-primary/20 space-y-6">
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                [vaultSummary.totalPeople.toLocaleString(), 'People Stored',  'text-primary'  ],
-                [uniqueYears.length,                        'Conflict Years', 'text-orange-400'],
-                [vaultSummary.complete,                     'Complete',       'text-emerald-400'],
-                [vaultSummary.pending + vaultSummary.partial, 'Remaining',    'text-slate-400' ],
-              ].map(([v, l, c]) => (
-                <div key={l as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                  <div className={`text-xl font-black font-decorative tabular-nums ${c}`}>{v}</div>
-                  <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel mt-0.5">{l}</div>
-                </div>
-              ))}
+        {/* Results */}
+        {found.length > 0 && (
+          <div className="space-y-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
+              <Input
+                placeholder="Filter by name, profession or nationality..."
+                value={filterQuery}
+                onChange={e => setFilterQuery(e.target.value)}
+                className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12"
+              />
             </div>
 
-            {ingesting ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    {ingestPhase}
-                  </span>
-                  <button onClick={() => { abortRef.current = true; }}
-                    className="text-rose-400 text-[9px] uppercase font-cinzel">
-                    Stop
-                  </button>
+            <div className="flex items-center gap-2 mb-2 px-2">
+              <History className="h-4 w-4 text-primary/60" />
+              <span className="text-xs font-cinzel text-primary/60 uppercase tracking-widest">
+                History Database Entry Total for {targetYear}:{' '}
+                <span className="font-bold text-primary">{found.length} Profiles</span>
+              </span>
+            </div>
+
+            {resultsByTier.map(({ tier, items }) => (
+              <div key={tier.label} className="space-y-3">
+                <div className="flex items-center gap-3 px-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel"
+                    style={{ color: tier.color }}>{tier.label}</span>
+                  <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} Discoveries</span>
                 </div>
-                <Progress value={ingestPct} className="h-2 bg-white/5" />
-                <div className="bg-black/30 rounded-xl border border-white/5 p-3 max-h-36 overflow-y-auto space-y-1">
-                  {ingestLog.map((l, i) => (
-                    <p key={i} className="text-[9px] font-cinzel text-slate-400">{l}</p>
+
+                <div className="space-y-2">
+                  {items.map((person, idx) => (
+                    <Card key={`${person.name}-${idx}`}
+                      className="glass-card p-0 border-transparent overflow-hidden"
+                      style={{ borderLeft: `3px solid ${person.tier.color}` }}>
+                      <button
+                        className="w-full p-4 flex items-start justify-between text-left gap-4"
+                        onClick={() => setExpandedId(expandedId === person.name ? null : person.name)}>
+                        <div className="flex-1" style={{ minWidth: 0 }}>
+                          <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
+                          <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5"
+                            style={{ wordBreak: 'break-word', whiteSpace: 'normal', overflow: 'visible' }}>
+                            {person.bioDescription || 'Notable Individual'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
+                            <span>Born {person.bd.year}</span>
+                            <span>•</span>
+                            <span className="font-bold text-primary">PY {person.py}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline"
+                            className="h-6 text-[8px] uppercase border-white/10 font-cinzel"
+                            style={{ color: person.config.color, backgroundColor: person.config.bg }}>
+                            {person.config.label}
+                          </Badge>
+                          <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border border-white/10"
+                            style={{ borderColor: person.tier.border }}>
+                            <span className="text-xs font-black font-decorative"
+                              style={{ color: person.tier.color }}>{person.totalScore}</span>
+                          </div>
+                        </div>
+                      </button>
+
+                      <AnimatePresence>
+                        {expandedId === person.name && (
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: 'auto' }}
+                            exit={{ height: 0 }}
+                            className="overflow-hidden bg-black/20 border-t border-white/5">
+                            <div className="p-4 space-y-4">
+                              {person.bioDescription && (
+                                <div className="pb-3 border-b border-white/5">
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-primary/50 font-cinzel block mb-1">Profile</span>
+                                  <p className="text-[11px] text-slate-200 font-cinzel uppercase leading-relaxed">
+                                    {person.bioDescription}
+                                  </p>
+                                </div>
+                              )}
+                              <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
+                                <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
+                                  Astrological Headwind:
+                                </span>
+                                {person.name} faces a {person.config.label} with the {targetYear}{' '}
+                                {targetSign.n} cycle. Coupled with a Personal Year {person.py}{' '}
+                                ({person.py === 4 ? 'Structure/Restriction' : 'Reflection/Endings'}),
+                                this creates a high-voltage energetic tension requiring profound discernment.
+                              </p>
+                              <a href={person.url} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
+                                <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
+                              </a>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Card>
                   ))}
                 </div>
               </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <div className="flex gap-2">
-                  <Button onClick={handleIngestAll}
-                    disabled={vaultSummary.pending === 0 && vaultSummary.partial === 0}
-                    className="flex-1 bg-gradient-to-r from-primary/80 to-primary text-primary-foreground font-black uppercase tracking-widest font-cinzel text-[10px] py-3 h-auto">
-                    <Database className="mr-2 h-4 w-4" />
-                    {vaultSummary.pending === 0 && vaultSummary.partial === 0
-                      ? 'Vault Complete ✓'
-                      : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={refreshMetas}
-                    className="border-white/10 text-slate-400 h-auto px-3">
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <Button 
-                  onClick={handleCloudSync}
-                  disabled={cloudSyncing}
-                  variant="outline"
-                  className="border-primary/30 text-primary h-auto py-3 px-4 font-black uppercase text-[10px] font-cinzel hover:bg-primary/10 w-full"
-                >
-                  {cloudSyncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Globe className="h-4 w-4 mr-2" />}
-                  Force Cloud Sync (Background Job)
-                </Button>
-
-                {cloudSyncError && (
-                  <div className="flex items-start gap-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl">
-                    <AlertTriangle className="h-3 w-3 text-rose-400 mt-0.5 shrink-0" />
-                    <p className="text-[9px] font-cinzel text-rose-400 leading-relaxed break-all">
-                      {cloudSyncError}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-wider font-cinzel text-primary/80 flex items-center gap-2">
-                <CloudLightning className="h-3 w-3" /> Cloud Ingestion Active
-              </p>
-              <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                A background worker automatically populates your Firestore vault every hour.
-                Use <strong className="text-slate-200">Local Ingest</strong> to scan manually from your browser,
-                or <strong className="text-slate-200">Cloud Sync</strong> to trigger the server-side worker.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              {uniqueYears.map(year => {
-                const meta   = yearMetas[year];
-                const status = meta?.status || 'pending';
-                const info   = yearConflictMap[year];
-                const c      = info?.config;
-                const pct    = meta ? Math.round((meta.monthsDone?.length || 0) / 12 * 100) : 0;
-                const style = {
-                  complete:  { b: 'rgba(76,175,125,0.5)',  bg: 'rgba(76,175,125,0.08)',  dot: '#4caf7d' },
-                  partial:   { b: 'rgba(224,148,40,0.5)',  bg: 'rgba(224,148,40,0.08)',  dot: '#e09428' },
-                  ingesting: { b: 'rgba(155,142,196,0.5)', bg: 'rgba(155,142,196,0.08)', dot: '#9b8ec4' },
-                  pending:   { b: 'rgba(255,255,255,0.07)',bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a' },
-                }[status];
-                return (
-                  <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }}
-                    className="rounded-xl p-2.5 text-center relative overflow-hidden">
-                    <div className="text-[12px] font-black text-slate-100 font-decorative">{year}</div>
-                    {c && <div className="text-[7px] uppercase tracking-wide font-cinzel mt-0.5" style={{ color: c.color }}>{c.glyph} {info.type}</div>}
-                    <div className="flex items-center justify-center gap-1 mt-1">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: style.dot }} />
-                      <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
-                    </div>
-                    {status === 'partial' && <div className="absolute bottom-0 left-0 h-[2px] bg-orange-400/50" style={{ width: `${pct}%` }} />}
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
+            ))}
+          </div>
         )}
 
-        {tab === 'scanner' && (
-          <>
-            <Card className="glass-card p-6 border-primary/20">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                {[
-                  [scanStats.checked.toLocaleString(),                     'Checked',         'text-primary'  ],
-                  [scanResults.length,                                      'Flagged',         'text-orange-400'],
-                  [scanResults.filter(r => r.totalScore >= 5).length,      'Critical/Severe', 'text-rose-500'  ],
-                  [scanResults.filter(r => r.totalScore <= 3).length,      'Elevated/Notable','text-blue-400'  ],
-                ].map(([v, l, c]) => (
-                  <div key={l as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                    <div className={`text-2xl font-black font-decorative tabular-nums ${c}`}>{v}</div>
-                    <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-cinzel">{l}</div>
-                  </div>
-                ))}
-              </div>
-              {scanning ? (
-                <div className="flex items-center gap-3 text-xs text-primary/80 font-cinzel py-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Reading from Firestore vault — no API calls needed...
-                </div>
-              ) : vaultSummary.totalPeople === 0 ? (
-                <div className="text-center py-6 space-y-2">
-                  <Database className="h-10 w-10 mx-auto opacity-20" />
-                  <p className="text-[11px] text-slate-500 font-cinzel">Vault is empty. Go to 🗄 Data Vault and run ingestion first.</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Button onClick={runScan}
-                    className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] py-3 h-auto font-cinzel">
-                    <Zap className="mr-2 h-4 w-4" />
-                    Scan {vaultSummary.totalPeople.toLocaleString()} People Instantly
-                  </Button>
-                </div>
-              )}
-            </Card>
-
-            {scanResults.length > 0 && (
-              <div className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
-                  <Input placeholder="Filter by name, profession or nationality..."
-                    value={filterQuery} onChange={e => setFilterQuery(e.target.value)}
-                    className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12" />
-                </div>
-                {byTier.map(({ tier, items }) => (
-                  <div key={tier.label} className="space-y-3">
-                    <div className="flex items-center gap-3 px-1">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>{tier.label}</span>
-                      <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} people</span>
-                    </div>
-                    <div className="space-y-2">
-                      {items.map((person, idx) => (
-                        <Card key={`${person.wikidataId}-${idx}`} className="glass-card p-0 border-transparent overflow-hidden" style={{ borderLeft: `3px solid ${person.tier.color}` }}>
-                          <button className="w-full p-4 flex items-start justify-between text-left gap-4" onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
-                            <div className="flex-1" style={{ minWidth: 0 }}>
-                              <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
-                              {person.description && <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5" style={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>{person.description}</p>}
-                              <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
-                                <span>{person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}</span>
-                                <span>•</span>
-                                <span className="font-bold text-primary">PY {person.py}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel" style={{ color: person.config.color, backgroundColor: person.config.bg }}>{person.config.label}</Badge>
-                              <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border" style={{ borderColor: person.tier.border }}>
-                                <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>{person.totalScore}</span>
-                              </div>
-                            </div>
-                          </button>
-                          <AnimatePresence>
-                            {expandedId === person.wikidataId && (
-                              <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-black/20 border-t border-white/5">
-                                <div className="p-4 space-y-3">
-                                  <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
-                                    <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">Astrological Headwind:</span>
-                                    {person.name} ({person.animal}, born {person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}) faces a <span style={{ color: person.config.color }}>{person.config.label}</span> with the {targetYear} {targetSign.n} cycle. Combined with a Personal Year {person.py} ({person.py === 4 ? 'Structure/Restriction' : 'Reflection/Endings'}), this produces a composite danger score of <span style={{ color: person.tier.color }}>{person.totalScore}/6 — {person.tier.label}</span>.
-                                  </p>
-                                  <a href={person.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel"><ExternalLink className="h-3 w-3" /> Verify via Wikipedia</a>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {!scanning && scanResults.length === 0 && vaultSummary.totalPeople > 0 && (
-              <div className="py-16 text-center opacity-30 space-y-3">
-                <Globe className="h-14 w-14 mx-auto stroke-[1]" />
-                <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Tap scan to analyse {vaultSummary.totalPeople.toLocaleString()} stored records</p>
-              </div>
-            )}
-          </>
+        {!running && found.length === 0 && (
+          <div className="py-20 text-center opacity-30 space-y-4">
+            <Globe className="h-16 w-16 mx-auto stroke-[1]" />
+            <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Discovery Engine Ready</p>
+          </div>
         )}
       </div>
     </>
   );
 }
-Next files: - {
-  "hosting": {
-    "public": ".next",
-    "cleanUrls": true,
-    "trailingSlash": false,
-    "rewrites": [
-      {
-        "source": "/ingestVaultNow",
-        "function": "ingestVaultNow",
-        "region": "us-central1"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
-    "headers": [
-      {
-        "source": "**",
-        "headers": [
-          {
-            "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://en.wikipedia.org https://www.wikipedia.org https://query.wikidata.org https://us-central1-studio-knvm3.cloudfunctions.net; img-src 'self' data: https:; frame-ancestors 'none';"
-          },
-          {
-            "key": "X-Content-Type-Options",
-            "value": "nosniff"
-          },
-          {
-            "key": "X-Frame-Options",
-            "value": "DENY"
-          }
-        ]
-      }
-    ]
-  }
-}
-Next file: - **`.env.local`** — place at Next.js project root:
-```
-NEXT_PUBLIC_INGEST_URL=https://us-central1-studio-knvm3.cloudfunctions.net/ingestVaultNow
-```
-
----
-
-**`.env.production`** — place at Next.js project root:
-```
-NEXT_PUBLIC_INGEST_URL=/ingestVaultNow
-```
-
----
-
-Remind: swap `studio-knvm3` for your actual Firebase project ID if it differs — check Firebase Console → Project Settings → Project ID. 
-Next file :- rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    match /cosmic_vault_people/{personId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    match /cosmic_vault_meta/{yearId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-} 
-Next file :- {
-  "name": "functions",
-  "scripts": {
-    "build": "tsc",
-    "serve": "npm run build && firebase emulators:start --only functions",
-    "shell": "npm run build && firebase functions:shell",
-    "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
-  },
-  "engines": {
-    "node": "20"
-  },
-  "main": "lib/index.js",
-  "dependencies": {
-    "firebase-admin": "^12.0.0",
-    "firebase-functions": "^5.0.0",
-    "node-fetch": "^2.6.7"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "private": true
-}
-Next file :- import { ingestVaultScheduled, ingestVaultNow } from './ingestVault';
-export { ingestVaultScheduled, ingestVaultNow };
-Next file :- {
-  "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitAny": true,
-    "removeComments": true,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "target": "es2020",
-    "outDir": "lib",
-    "lib": ["es2020"]
-  },
-  "include": ["src/**/*"]
-}
-Next file :- /**
- * functions/src/ingestVault.ts
- *
- * Cloud Functions v2 — runs up to 60 minutes per invocation.
- * Loops through ALL pending months in one continuous run.
- * Scheduled every 70 minutes as a safety net to catch any remainder.
- * Stops gracefully at 55 minutes if still running, resumes next trigger.
- *
- * DEPLOY:
- *   cd functions && npm install && cd .. && firebase deploy --only functions
- */
-
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { onRequest }  from 'firebase-functions/v2/https';
-import { logger }     from 'firebase-functions/v2';
-import * as admin     from 'firebase-admin';
-import fetch          from 'node-fetch';
-
-if (!admin.apps.length) admin.initializeApp();
-const db = admin.firestore();
-
-const META_COLL   = 'cosmic_vault_meta';
-const PEOPLE_COLL = 'cosmic_vault_people';
-const TARGET_YEAR = 2026;
-
-// ─── Conflict year calculation ────────────────────────────────────────────────
-
-function getConflictYears(): number[] {
-  // Horse year 2026 conflict animal zodiac keys:
-  // Chong = Rat (4), Xing = Horse (10), Hai = Ox (5), Po = Rabbit (7)
-  const conflictKeys = [4, 10, 5, 7];
-  const years: number[] = [];
-  for (const key of conflictKeys) {
-    let y = 1900 + key;
-    while (y < 1930) y += 12;
-    while (y <= 2003) {
-      if (y < TARGET_YEAR) years.push(y);
-      y += 12;
-    }
-  }
-  // Sort oldest first — richest data comes first, most valuable
-  return [...new Set(years)].sort((a, b) => a - b);
-}
-
-// ─── Wikidata fetch ───────────────────────────────────────────────────────────
-
-function sleep(ms: number) {
-  return new Promise(r => setTimeout(r, ms));
-}
-
-async function fetchWikidataMonth(year: number, month: number): Promise<any[]> {
-  const sparql = `
-SELECT ?person ?personLabel ?dob ?description WHERE {
-  ?person wdt:P31 wd:Q5 ;
-          wdt:P569 ?dob .
-  FILTER(YEAR(?dob) = ${year} && MONTH(?dob) = ${month})
-  FILTER(DATATYPE(?dob) = xsd:dateTime)
-  OPTIONAL {
-    ?person schema:description ?description .
-    FILTER(LANG(?description) = "en")
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-}
-LIMIT 2000`.trim();
-
-  const url = `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`;
-
-  for (let attempt = 0; attempt < 4; attempt++) {
-    try {
-      const r = await fetch(url, {
-        headers: {
-          'Accept': 'application/sparql-results+json',
-          'User-Agent': 'MystiqueCompass/1.0 (Firebase background ingest)',
-        },
-        timeout: 50000,
-      } as any);
-
-      if (!r.ok) {
-        if (r.status === 429) {
-          logger.warn(`Rate limited on ${year}/${month}, waiting ${10 * (attempt+1)}s`);
-          await sleep(10000 * (attempt + 1));
-          continue;
-        }
-        throw new Error(`HTTP ${r.status}`);
-      }
-
-      const data = await r.json() as any;
-      return data?.results?.bindings || [];
-    } catch (e: any) {
-      if (attempt === 3) {
-        logger.warn(`${year}/${month} failed after 4 attempts: ${e.message}`);
-        return [];
-      }
-      await sleep(4000 * (attempt + 1));
-    }
-  }
-  return [];
-}
-
-function parseBindings(bindings: any[]): any[] {
-  const people: any[] = [];
-  for (const b of bindings) {
-    const wikidataId = b.person?.value?.split('/').pop();
-    if (!wikidataId) continue;
-    const dobStr = b.dob?.value || '';
-    const match  = dobStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (!match) continue;
-    const birthYear  = parseInt(match[1]);
-    const birthMonth = parseInt(match[2]);
-    const birthDay   = parseInt(match[3]);
-    if (birthMonth < 1 || birthMonth > 12 || birthDay < 1 || birthDay > 31) continue;
-    const name = b.personLabel?.value || '';
-    if (/^Q\d+$/.test(name)) continue;
-    people.push({
-      wikidataId, name, birthDay, birthMonth, birthYear,
-      description: b.description?.value || '',
-      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`,
-    });
-  }
-  return people;
-}
-
-async function savePeople(people: any[]) {
-  const CHUNK = 450;
-  for (let i = 0; i < people.length; i += CHUNK) {
-    const batch = db.batch();
-    people.slice(i, i + CHUNK).forEach(p => {
-      batch.set(db.collection(PEOPLE_COLL).doc(p.wikidataId), p, { merge: true });
-    });
-    await batch.commit();
-  }
-}
-
-// ─── Core ingestion loop ──────────────────────────────────────────────────────
-// Runs continuously through ALL pending months until either:
-// A) Everything is done (vault complete), or
-// B) 55 minutes have elapsed (safety margin before 60min hard limit)
-// If B, the next scheduled trigger resumes from exactly where it stopped.
-
-async function runIngestionLoop(): Promise<{ done: boolean; monthsProcessed: number; totalPeople: number }> {
-  const startTime      = Date.now();
-  const MAX_RUNTIME_MS = 55 * 60 * 1000; // 55 minutes — 5 min safety buffer
-  const years          = getConflictYears();
-  const allMonths      = [1,2,3,4,5,6,7,8,9,10,11,12];
-
-  let monthsProcessed = 0;
-  let totalPeople     = 0;
-  let allComplete     = true;
-
-  for (const year of years) {
-    const metaRef  = db.collection(META_COLL).doc(String(year));
-    const metaSnap = await metaRef.get();
-    const meta     = metaSnap.data() as any || {
-      year, status: 'pending', count: 0, monthsDone: [], updatedAt: 0
-    };
-
-    if (meta.status === 'complete') continue;
-
-    const monthsDone = meta.monthsDone || [];
-    const remaining  = allMonths.filter(m => !monthsDone.includes(m));
-
-    if (!remaining.length) {
-      // All months fetched but status not marked complete — fix it
-      await metaRef.set({ ...meta, status: 'complete', updatedAt: Date.now() });
-      continue;
-    }
-
-    allComplete = false;
-
-    for (const month of remaining) {
-      // ── Time guard — stop gracefully before hitting 60min hard limit ──────
-      const elapsed = Date.now() - startTime;
-      if (elapsed >= MAX_RUNTIME_MS) {
-        logger.info(`55min elapsed — pausing at ${year}/${month}. Will resume next trigger.`);
-        return { done: false, monthsProcessed, totalPeople };
-      }
-
-      logger.info(`Fetching ${year}/${month} (elapsed: ${Math.round(elapsed/1000)}s)`);
-
-      const bindings = await fetchWikidataMonth(year, month);
-      const people   = parseBindings(bindings);
-      if (people.length > 0) await savePeople(people);
-
-      const newMonthsDone = [...monthsDone, month];
-      const isComplete    = newMonthsDone.length === 12;
-
-      // Update meta immediately after each month — checkpoint saved
-      await metaRef.set({
-        year,
-        status:     isComplete ? 'complete' : 'partial',
-        count:      (meta.count || 0) + people.length,
-        monthsDone: newMonthsDone,
-        updatedAt:  Date.now(),
-      });
-
-      monthsProcessed++;
-      totalPeople += people.length;
-
-      logger.info(`✓ ${year}/${month}: ${people.length} stored (total this run: ${totalPeople})`);
-
-      // 300ms between requests — polite but not slow
-      await sleep(300);
-
-      // Update local monthsDone for the inner loop
-      monthsDone.push(month);
-      if (meta.count !== undefined) meta.count += people.length;
-    }
-  }
-
-  return { done: allComplete || true, monthsProcessed, totalPeople };
-}
-
-// ─── Scheduled trigger — every 70 minutes ────────────────────────────────────
-// 70 min gap > 60 min max runtime, so there's no overlap between invocations.
-// If a run finishes in 20 min (vault complete), the next trigger is a no-op.
-
-export const ingestVaultScheduled = onSchedule(
-  {
-    schedule: 'every 70 minutes',
-    timeoutSeconds: 3600,  // 60 minutes — Cloud Functions v2 max
-    memory: '512MiB',
-    region: 'us-central1',
-  },
-  async () => {
-    logger.info('Starting scheduled vault ingestion...');
-    const result = await runIngestionLoop();
-    logger.info(`Ingestion run complete: ${result.monthsProcessed} months, ${result.totalPeople} people stored. Vault done: ${result.done}`);
-  }
-);
-
-// ─── Manual HTTP trigger — kick off on demand from the app UI ─────────────────
-// Called by the "Force Sync" button in the Data Vault tab.
-// Same logic as the scheduled function — runs until done or 55min elapsed.
-
-export const ingestVaultNow = onRequest(
-  {
-    timeoutSeconds: 3600,
-    memory: '512MiB',
-    region: 'us-central1',
-    cors: true,
-  },
-  async (req, res) => {
-    if (req.method !== 'POST') {
-      res.status(405).json({ error: 'POST only' });
-      return;
-    }
-
-    logger.info('Manual vault ingest triggered');
-    const result = await runIngestionLoop();
-
-    res.json({
-      ok: true,
-      monthsProcessed: result.monthsProcessed,
-      totalPeople:     result.totalPeople,
-      vaultComplete:   result.done,
-    });
-  }
-);
