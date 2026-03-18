@@ -1,10 +1,10 @@
-
 'use client';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2, ExternalLink, Telescope,
-  Trash2, History, Globe, Database, RefreshCw, AlertTriangle, CloudRain, CloudLightning,
+  Trash2, History, Globe, Database, RefreshCw, AlertTriangle,
+  CloudRain, CloudLightning,
 } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
 import { Badge }    from '@/components/ui/badge';
@@ -17,6 +17,12 @@ import {
   collection, doc, setDoc, getDoc, getDocs,
   query as fsQuery, where, writeBatch,
 } from 'firebase/firestore';
+
+// ─── Env-var driven URL ──────────────────────────────────────────────────────
+// .env.local  → direct Cloud Function URL (Studio preview has no rewrite engine)
+// .env.production → /ingestVaultNow  (Firebase Hosting rewrite handles it)
+const INGEST_URL =
+  process.env.NEXT_PUBLIC_INGEST_URL ?? '/ingestVaultNow';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -71,6 +77,8 @@ function getDangerTier(total: number) {
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // ─── Firestore config ──────────────────────────────────────────────────────────
+// These two collection names live in YOUR Firestore database.
+// You can rename them, but keep them consistent between ingestion and scanning.
 
 const META_COLL   = 'cosmic_vault_meta';    // one doc per birth year
 const PEOPLE_COLL = 'cosmic_vault_people';  // one doc per person (wikidataId)
@@ -87,6 +95,7 @@ async function saveYearMeta(meta: YearMeta) {
 }
 
 async function savePeopleBatch(people: PersonRecord[]) {
+  // Firestore max 500 operations per batch — split accordingly
   const BATCH_SIZE = 450;
   for (let i = 0; i < people.length; i += BATCH_SIZE) {
     const batch = writeBatch(db);
@@ -98,6 +107,7 @@ async function savePeopleBatch(people: PersonRecord[]) {
 }
 
 async function getPeopleForYears(years: number[]): Promise<PersonRecord[]> {
+  // Firestore 'in' supports up to 30 values — chunk if needed
   const results: PersonRecord[] = [];
   for (let i = 0; i < years.length; i += 30) {
     const chunk = years.slice(i, i + 30);
@@ -110,6 +120,8 @@ async function getPeopleForYears(years: number[]): Promise<PersonRecord[]> {
 }
 
 // ─── Wikidata SPARQL ───────────────────────────────────────────────────────────
+// Queries one birth-year + month at a time to stay well under Wikidata's
+// 60-second timeout and 10,000-row limit per request.
 
 async function fetchWikidataMonth(year: number, month: number): Promise<PersonRecord[]> {
   const sparql = `
@@ -158,6 +170,7 @@ LIMIT 3000`.trim();
     if (birthMonth < 1 || birthMonth > 12 || birthDay < 1 || birthDay > 31) continue;
 
     const rawName = b.personLabel?.value || '';
+    // Skip entries that are just the Wikidata Q-ID (no label resolved)
     if (/^Q\d+$/.test(rawName)) continue;
 
     people.push({
@@ -174,25 +187,58 @@ LIMIT 3000`.trim();
   return people;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Inline confirm dialog (window.confirm is blocked in iframes) ─────────────
+
+function ConfirmDialog({ message, onConfirm, onCancel }: {
+  message: string; onConfirm: () => void; onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <Button variant="ghost" size="sm" onClick={onCancel}
+            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
+          <Button size="sm" onClick={onConfirm}
+            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
 
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
+
+  // ── Tab state ────────────────────────────────────────────────────────────────
   const [tab, setTab] = useState<'vault' | 'scanner'>('vault');
+
+  // ── Vault state ──────────────────────────────────────────────────────────────
   const [yearMetas, setYearMetas]       = useState<Record<number, YearMeta>>({});
   const [ingesting, setIngesting]       = useState(false);
   const [ingestLog, setIngestLog]       = useState<string[]>([]);
   const [ingestDone, setIngestDone]     = useState(0);
   const [ingestTotal, setIngestTotal]   = useState(0);
   const [ingestPhase, setIngestPhase]   = useState('');
+
+  // ── Scanner state ────────────────────────────────────────────────────────────
   const [scanning, setScanning]         = useState(false);
   const [scanResults, setScanResults]   = useState<ScanResult[]>([]);
   const [scanStats, setScanStats]       = useState({ checked: 0, flagged: 0 });
   const [filterQuery, setFilterQuery]   = useState('');
   const [expandedId, setExpandedId]     = useState<string | null>(null);
-  const [cloudSyncing, setCloudSyncing] = useState(false);
 
+  // ── Shared ───────────────────────────────────────────────────────────────────
+  const [cloudSyncing, setCloudSyncing] = useState(false);
+  const [cloudSyncError, setCloudSyncError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<{ message: string; onConfirm: () => void } | null>(null);
   const abortRef = useRef(false);
+
+  // ── Dynamic conflict config (same logic as before) ───────────────────────────
 
   const targetSign = useMemo(() => {
     const idx = ((targetYear - 1900) % 12 + 12) % 12;
@@ -211,12 +257,14 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     };
   }, [targetSign]);
 
+  // All conflict birth-years from 1930 → 2010 for ALL four conflict types
   const CONFLICT_YEARS = useMemo(() => {
     const list: { year: number; type: string; config: any }[] = [];
     Object.entries(CF_CONFIG).forEach(([type, config]) => {
       if (!config.animal) return;
       const animalIdx = ANIMALS.findIndex((a: any) => a.n === config.animal);
       if (animalIdx < 0) return;
+      // Walk every occurrence of this animal from 1930 to 2010
       let y = 1900 + animalIdx;
       while (y < 1930) y += 12;
       while (y <= 2010) {
@@ -232,11 +280,14 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     [CONFLICT_YEARS]
   );
 
+  // Map from birthYear → its conflict info (for scanner lookup)
   const yearConflictMap = useMemo(() => {
     const m: Record<number, { type: string; config: any }> = {};
     CONFLICT_YEARS.forEach(c => { if (!m[c.year]) m[c.year] = c; });
     return m;
   }, [CONFLICT_YEARS]);
+
+  // ── Load vault metadata on mount ─────────────────────────────────────────────
 
   useEffect(() => { refreshMetas(); }, [targetYear]);
 
@@ -251,6 +302,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setYearMetas(metas);
   }
 
+  // ── Ingestion logic ───────────────────────────────────────────────────────────
+
   async function ingestOneYear(year: number) {
     const existing    = yearMetas[year];
     const monthsDone  = existing?.monthsDone || [];
@@ -263,11 +316,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setYearMetas(p => ({ ...p, [year]: { ...meta } }));
 
     let yearTotal = 0;
+
     for (const month of remaining) {
       if (abortRef.current) break;
+
       setIngestPhase(`${year} · ${MONTHS_SHORT[month - 1]} — fetching Wikidata...`);
+
       const people = await fetchWikidataMonth(year, month);
       if (people.length > 0) await savePeopleBatch(people);
+
       meta = {
         ...meta,
         monthsDone: [...meta.monthsDone, month],
@@ -276,12 +333,16 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         status: meta.monthsDone.length + 1 === 12 ? 'complete' : 'partial',
       };
       yearTotal += people.length;
+
       await saveYearMeta(meta);
       setYearMetas(p => ({ ...p, [year]: { ...meta } }));
       setIngestDone(d => d + 1);
       setIngestLog(l => [`✓ ${year} ${MONTHS_SHORT[month-1]}: ${people.length} stored`, ...l.slice(0, 39)]);
+
+      // Be polite to Wikidata — 1s between monthly requests
       if (!abortRef.current) await new Promise(r => setTimeout(r, 1000));
     }
+
     return yearTotal;
   }
 
@@ -290,6 +351,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setIngesting(true);
     setIngestLog([]);
     setScanResults([]);
+
+    // Count total month-fetches needed
     const total = yearsToIngest.reduce((sum, y) => {
       const done = yearMetas[y]?.monthsDone?.length || 0;
       return sum + (12 - done);
@@ -297,10 +360,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setIngestTotal(total);
     setIngestDone(0);
     setIngestPhase('Initialising...');
+
     for (const year of yearsToIngest) {
       if (abortRef.current) break;
       await ingestOneYear(year);
     }
+
     setIngesting(false);
     setIngestPhase(abortRef.current ? 'Stopped.' : 'Ingestion complete ✓');
     await refreshMetas();
@@ -320,6 +385,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       message: `Delete all stored people data from Firestore for ${targetYear} conflict years? This cannot be undone — you will need to re-run ingestion.`,
       onConfirm: async () => {
         setDialog(null);
+        // Delete meta docs
         await Promise.all(uniqueYears.map(y =>
           setDoc(doc(db, META_COLL, String(y)), { year: y, status: 'pending', count: 0, monthsDone: [], updatedAt: Date.now() })
         ));
@@ -331,30 +397,52 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     });
   }
 
+  // ─── FIXED handleCloudSync ───────────────────────────────────────────────────
   async function handleCloudSync() {
     setCloudSyncing(true);
+    setCloudSyncError(null);
     try {
-      const response = await fetch('/ingestVaultNow', { method: 'POST' });
+      const response = await fetch(INGEST_URL, { method: 'POST' });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`HTTP ${response.status} — ${text.slice(0, 200)}`);
+      }
+
+      const ct = response.headers.get('content-type') ?? '';
+      if (!ct.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Expected JSON but got: ${text.slice(0, 200)}`);
+      }
+
       const data = await response.json();
       if (data.ok) {
-        refreshMetas();
+        await refreshMetas();
+      } else {
+        throw new Error(data.error ?? 'Cloud Sync returned ok:false');
       }
-    } catch (e) {
-      console.error('Cloud Sync Error:', e);
+    } catch (e: any) {
+      console.error('Cloud Sync Error:', e.message);
+      setCloudSyncError(e.message);
     } finally {
       setCloudSyncing(false);
     }
   }
 
+  // ── Scanner logic ─────────────────────────────────────────────────────────────
+
   async function runScan() {
     setScanning(true);
     setScanResults([]);
     setScanStats({ checked: 0, flagged: 0 });
+
     try {
       const readableYears = uniqueYears.filter(y => (yearMetas[y]?.count || 0) > 0);
       if (!readableYears.length) { setScanning(false); return; }
+
       const people = await getPeopleForYears(readableYears);
       const results: ScanResult[] = [];
+
       for (const p of people) {
         const conflict = yearConflictMap[p.birthYear];
         if (!conflict) continue;
@@ -364,14 +452,18 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         const totalScore = conflict.config.score + pyPoints;
         results.push({ ...p, animal: conflict.config.animal, conflictType: conflict.type, config: conflict.config, py, pyPoints, totalScore, tier: getDangerTier(totalScore) });
       }
+
       results.sort((a, b) => b.totalScore - a.totalScore);
       setScanResults(results);
       setScanStats({ checked: people.length, flagged: results.length });
     } catch (e) {
       console.error('Scan error:', e);
     }
+
     setScanning(false);
   }
+
+  // ── Derived display data ──────────────────────────────────────────────────────
 
   const filtered = useMemo(() =>
     scanResults.filter(p =>
@@ -396,11 +488,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
+  // ─── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <>
       {dialog && <ConfirmDialog message={dialog.message} onConfirm={dialog.onConfirm} onCancel={() => setDialog(null)} />}
 
       <div className="space-y-4">
+
+        {/* ── Header card ─────────────────────────────────────────────────────── */}
         <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
@@ -412,7 +508,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={clearVault} title="Clear vault data"
+              <Button variant="ghost" size="icon" onClick={clearData} title="Clear vault data"
                 className="text-rose-400 hover:bg-rose-500/10 h-8 w-8">
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -422,6 +518,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
             </div>
           </div>
 
+          {/* Tab switcher */}
           <div className="flex gap-1 bg-black/20 p-1 rounded-xl border border-white/10">
             {[
               { id: 'vault',   label: '🗄  Data Vault' },
@@ -437,8 +534,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </div>
         </Card>
 
+        {/* ── VAULT TAB ───────────────────────────────────────────────────────── */}
         {tab === 'vault' && (
           <Card className="glass-card p-6 border-primary/20 space-y-6">
+
+            {/* Vault summary counters */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 [vaultSummary.totalPeople.toLocaleString(), 'People Stored',  'text-primary'  ],
@@ -453,6 +553,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ))}
             </div>
 
+            {/* Ingest controls */}
             {ingesting ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
@@ -498,6 +599,16 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                   {cloudSyncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Globe className="h-4 w-4 mr-2" />}
                   Force Cloud Sync (Background Job)
                 </Button>
+
+                {/* Error surface — shows when Cloud Sync fails instead of silent crash */}
+                {cloudSyncError && (
+                  <div className="flex items-start gap-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl">
+                    <AlertTriangle className="h-3 w-3 text-rose-400 mt-0.5 shrink-0" />
+                    <p className="text-[9px] font-cinzel text-rose-400 leading-relaxed break-all">
+                      {cloudSyncError}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
