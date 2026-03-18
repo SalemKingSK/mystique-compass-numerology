@@ -6,9 +6,6 @@ runConfig:
   concurrency: 80
 
 env:
-  # ─── Replace YOUR_PROJECT_ID with your actual Firebase project ID ─────────────
-  # Find it: Firebase Console → Project Settings → General → Project ID
-  # Confirm the exact URL by running:  firebase functions:list
   - variable: INGEST_VAULT_URL
     value: https://us-central1-studio-knvm3.cloudfunctions.net/ingestVaultNow
     availability:

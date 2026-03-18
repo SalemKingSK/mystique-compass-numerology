@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         error:
           'INGEST_VAULT_URL is not configured. ' +
           'Add it to apphosting.yaml (production) or .env (Studio preview). ' +
-          'Value: https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/ingestVaultNow',
+          'Value: https://us-central1-studio-knvm3.cloudfunctions.net/ingestVaultNow',
       },
       { status: 500 },
     );
