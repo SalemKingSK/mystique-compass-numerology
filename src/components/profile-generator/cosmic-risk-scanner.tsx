@@ -201,7 +201,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         ));
         await refreshMetas();
         setScanResults([]);
-        setScanStats({ checked: 0, found: 0, critical: 0, elevated: 0 });
+        setScanStats({ checked: 0, flagged: 0 });
         setIngestLog([]);
       },
     });
@@ -238,7 +238,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   async function runScan() {
     setScanning(true);
     setScanResults([]);
-    setScanStats({ checked: 0, found: 0 });
+    setScanStats({ checked: 0, flagged: 0 });
     try {
       const snap = await getDocs(collection(db, PEOPLE_COLL));
       const people: PersonRecord[] = [];
@@ -256,7 +256,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       }
       results.sort((a, b) => b.totalScore - a.totalScore);
       setScanResults(results);
-      setScanStats({ checked: people.length, found: results.length });
+      setScanStats({ checked: people.length, flagged: results.length });
     } catch (e) {
       console.error('Scan error:', e);
     }
@@ -414,7 +414,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                 {[
                   [scanStats.checked.toLocaleString(),                    'Checked',         'text-primary'    ],
-                  [scanStats.found.toLocaleString(),                      'Flagged',         'text-orange-400' ],
+                  [scanStats.flagged.toLocaleString(),                      'Flagged',         'text-orange-400' ],
                 ].map(([v, l, c]) => (
                   <div key={l as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
                     <div className={`text-2xl font-black font-decorative tabular-nums ${c}`}>{v}</div>
