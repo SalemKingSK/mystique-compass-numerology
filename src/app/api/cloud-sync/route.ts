@@ -1,11 +1,3 @@
-/**
- * app/api/cloud-sync/route.ts
- *
- * Server-side proxy → ingestVaultNow Cloud Function.
- * Browser calls /api/cloud-sync (same origin, no CORS).
- * Server calls the Cloud Function — no browser restrictions apply.
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -14,7 +6,7 @@ export async function POST(req: NextRequest) {
   //    For Firebase Studio preview → set in .env            (INGEST_VAULT_URL)
   let url = process.env.INGEST_VAULT_URL?.trim();
 
-  // ── 2. Fallback: use the firebase.json hosting rewrite ────────────────────────
+  // ── 2. Fallback: use the current origin if no URL is configured ─────────────
   if (!url) {
     const origin = req.headers.get('origin') ||
                    req.headers.get('x-forwarded-host') ||
@@ -27,19 +19,15 @@ export async function POST(req: NextRequest) {
 
   if (!url) {
     return NextResponse.json(
-      {
-        ok: false,
-        error:
-          'INGEST_VAULT_URL is not configured. ' +
-          'Add it to apphosting.yaml (production) or .env (Studio preview).',
-      },
-      { status: 500 },
+      { ok: false, error: 'INGEST_VAULT_URL is not configured.' },
+      { status: 500 }
     );
   }
 
   // ── 3. Call the Cloud Function ────────────────────────────────────────────────
   try {
     const controller = new AbortController();
+    // Timeout set to 55 minutes to match Cloud Function maximum run time
     const timer = setTimeout(() => controller.abort(), 55 * 60 * 1000);
 
     const r = await fetch(url, {
@@ -55,12 +43,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: `Cloud Function returned HTTP ${r.status}. ` +
-                 (r.status === 404
-                   ? 'Function not found — verify your Project ID in INGEST_VAULT_URL and confirm the function is deployed (firebase deploy --only functions).'
-                   : body.slice(0, 300)),
+          error: `Cloud Function returned HTTP ${r.status}. ${
+            r.status === 404
+              ? 'Function not found — confirm it is deployed.'
+              : body.slice(0, 300)
+          }`,
         },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -70,7 +59,7 @@ export async function POST(req: NextRequest) {
   } catch (e: unknown) {
     const isAbort = e instanceof Error && e.name === 'AbortError';
     const msg = isAbort
-      ? 'Request timed out — the function is still running in the background.'
+      ? 'Request timed out — function is still running in the background.'
       : (e instanceof Error ? e.message : String(e));
 
     return NextResponse.json({ ok: false, error: msg }, { status: 502 });
