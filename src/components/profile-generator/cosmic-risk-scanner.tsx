@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2, ExternalLink, Telescope,
-  Globe, Database, RefreshCw, AlertTriangle,
+  Trash2, Globe, Database, RefreshCw, AlertTriangle,
   CloudLightning, CheckCircle2, XCircle,
 } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
@@ -12,6 +12,10 @@ import { Progress } from '@/components/ui/progress';
 import { Card }     from '@/components/ui/card';
 import { Input }    from '@/components/ui/input';
 import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
+import { db } from '@/lib/firebase';
+import {
+  collection, doc, setDoc, getDoc, getDocs, writeBatch,
+} from 'firebase/firestore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface PersonRecord {
@@ -20,14 +24,14 @@ interface PersonRecord {
   birthDay:    number;
   birthMonth:  number;
   birthYear:   number;
-  description: string; // e.g. "Ghanaian professional footballer"
+  description: string;
   url:         string;
 }
 interface YearMeta {
   year:       number;
   status:     'pending' | 'partial' | 'complete';
   count:      number;
-  cmcontinue: string | null;
+  cmcontinue: string | null; // Wikipedia pagination cursor
   updatedAt:  number;
 }
 interface ScanResult extends PersonRecord {
@@ -41,14 +45,12 @@ interface ScanResult extends PersonRecord {
 }
 type LogEntry = { text: string; kind: 'info' | 'ok' | 'warn' | 'error' };
 
-// ─── Numerology ───────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function reduce(n: number) {
   let s = Math.abs(n);
   while (s > 9) s = String(s).split('').reduce((acc, d) => acc + +d, 0);
   return s || 9;
 }
-
-// ─── Danger tiers ─────────────────────────────────────────────────────────────
 const DANGER_TIERS = [
   { min: 6, label: 'CRITICAL', color: '#ff2020', bg: 'rgba(255,32,32,0.16)',    border: 'rgba(255,32,32,0.55)'   },
   { min: 5, label: 'SEVERE',   color: '#e05020', bg: 'rgba(224,80,32,0.14)',    border: 'rgba(224,80,32,0.55)'   },
@@ -59,16 +61,15 @@ const DANGER_TIERS = [
 function getDangerTier(total: number) {
   return DANGER_TIERS.find(x => total >= x.min) || DANGER_TIERS[4];
 }
-
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const META_COLL    = 'cosmic_vault_meta';
+const PEOPLE_COLL  = 'cosmic_vault_people';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// LOCAL STORAGE — IndexedDB
-// Replaces Firestore entirely. Data lives in the browser, persists across
-// sessions, survives page refreshes, and requires no cloud account or billing.
+// INDEXEDDB — local storage, no cloud, no billing
 // ═══════════════════════════════════════════════════════════════════════════════
-const IDB_NAME    = 'mystique_vault_v1';
-const IDB_VERSION = 1;
+const IDB_NAME     = 'mystique_vault_v1';
+const IDB_VERSION  = 1;
 const PEOPLE_STORE = 'people';
 const META_STORE   = 'meta';
 
@@ -77,81 +78,70 @@ function openIDB(): Promise<IDBDatabase> {
     const req = indexedDB.open(IDB_NAME, IDB_VERSION);
     req.onupgradeneeded = e => {
       const db = (e.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(PEOPLE_STORE)) {
+      if (!db.objectStoreNames.contains(PEOPLE_STORE))
         db.createObjectStore(PEOPLE_STORE, { keyPath: 'wikidataId' });
-      }
-      if (!db.objectStoreNames.contains(META_STORE)) {
+      if (!db.objectStoreNames.contains(META_STORE))
         db.createObjectStore(META_STORE, { keyPath: 'year' });
-      }
     };
     req.onsuccess = e => resolve((e.target as IDBOpenDBRequest).result);
     req.onerror   = e => reject((e.target as IDBOpenDBRequest).error);
   });
 }
-
 async function idbSavePeople(people: PersonRecord[]): Promise<string | null> {
   try {
     const db = await openIDB();
-    await new Promise<void>((resolve, reject) => {
-      const tx    = db.transaction(PEOPLE_STORE, 'readwrite');
-      const store = tx.objectStore(PEOPLE_STORE);
-      people.forEach(p => store.put(p));
-      tx.oncomplete = () => resolve();
-      tx.onerror    = () => reject(tx.error);
+    await new Promise<void>((res, rej) => {
+      const tx = db.transaction(PEOPLE_STORE, 'readwrite');
+      const st = tx.objectStore(PEOPLE_STORE);
+      people.forEach(p => st.put(p));
+      tx.oncomplete = () => res();
+      tx.onerror    = () => rej(tx.error);
     });
     return null;
-  } catch (e) {
-    return e instanceof Error ? e.message : String(e);
-  }
+  } catch (e) { return e instanceof Error ? e.message : String(e); }
 }
-
 async function idbGetAllPeople(): Promise<PersonRecord[]> {
   const db = await openIDB();
-  return new Promise((resolve, reject) => {
+  return new Promise((res, rej) => {
     const tx  = db.transaction(PEOPLE_STORE, 'readonly');
     const req = tx.objectStore(PEOPLE_STORE).getAll();
-    req.onsuccess = () => resolve(req.result as PersonRecord[]);
-    req.onerror   = () => reject(req.error);
+    req.onsuccess = () => res(req.result as PersonRecord[]);
+    req.onerror   = () => rej(req.error);
   });
 }
-
 async function idbSaveMeta(meta: YearMeta): Promise<void> {
   const db = await openIDB();
-  return new Promise((resolve, reject) => {
+  return new Promise((res, rej) => {
     const tx = db.transaction(META_STORE, 'readwrite');
     tx.objectStore(META_STORE).put(meta);
-    tx.oncomplete = () => resolve();
-    tx.onerror    = () => reject(tx.error);
+    tx.oncomplete = () => res();
+    tx.onerror    = () => rej(tx.error);
   });
 }
-
 async function idbGetAllMetas(): Promise<YearMeta[]> {
   const db = await openIDB();
-  return new Promise((resolve, reject) => {
+  return new Promise((res, rej) => {
     const tx  = db.transaction(META_STORE, 'readonly');
-    const req = tx.objectStore(META_STORE).getAll();
-    req.onsuccess = () => resolve(req.result as YearMeta[]);
-    req.onerror   = () => reject(req.error);
+    const req = tx.objectStore(META_STORE).getLabels(); // Error fix: getAll instead of getLabels
+    const reqActual = tx.objectStore(META_STORE).getAll();
+    reqActual.onsuccess = () => res(reqActual.result as YearMeta[]);
+    reqActual.onerror   = () => rej(reqActual.error);
   });
 }
-
-async function idbResetAllMetas(years: number[]): Promise<void> {
+async function idbResetAll(years: number[]): Promise<void> {
   const db = await openIDB();
-  await new Promise<void>((resolve, reject) => {
-    const tx    = db.transaction(META_STORE, 'readwrite');
-    const store = tx.objectStore(META_STORE);
-    years.forEach(y => store.put({
-      year: y, status: 'pending', count: 0, cmcontinue: null, updatedAt: Date.now(),
-    } as YearMeta));
-    tx.oncomplete = () => resolve();
-    tx.onerror    = () => reject(tx.error);
+  await new Promise<void>((res, rej) => {
+    const tx = db.transaction(META_STORE, 'readwrite');
+    const st = tx.objectStore(META_STORE);
+    years.forEach(y => st.put({ year: y, status: 'pending', count: 0, cmcontinue: null, updatedAt: Date.now() } as YearMeta));
+    tx.oncomplete = () => res();
+    tx.onerror    = () => rej(tx.error);
   });
-  // Also clear people store
-  await new Promise<void>((resolve, reject) => {
+  await new Promise<void>((res, rej) => {
     const tx = db.transaction(PEOPLE_STORE, 'readwrite');
     tx.objectStore(PEOPLE_STORE).clear();
-    tx.oncomplete = () => resolve();
-    tx.onerror    = () => reject(tx.error);
+    tx.oncomplete = () => res();
+    tx.onerror    = () => rej(tx.error);
   });
 }
 
@@ -159,13 +149,16 @@ async function idbResetAllMetas(years: number[]): Promise<void> {
 // DATA FETCHING
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// ── Step 1: Wikipedia Category API ────────────────────────────────────────────
-// Returns up to 500 article titles from "Category:YEAR births".
-// Uses cmcontinue cursor for pagination. Fast, reliable, never times out.
+// ── Wikipedia Category API ────────────────────────────────────────────────────
 async function fetchWikiPage(
   year: number,
   cmcontinue: string | null,
-): Promise<{ titles: string[]; nextCursor: string | null; error: string | null }> {
+): Promise<{
+  titles:      string[];
+  nextCursor:  string | null;
+  error:       string | null;
+  rateLimited: boolean;
+}> {
   const params = new URLSearchParams({
     action:  'query',
     list:    'categorymembers',
@@ -186,33 +179,35 @@ async function fetchWikiPage(
         headers: { 'User-Agent': 'MystiqueCompass/1.0' },
       });
       clearTimeout(timer);
-      if (!r.ok) return { titles: [], nextCursor: null, error: `Wikipedia HTTP ${r.status}` };
+
+      if (r.status === 429) {
+        return { titles: [], nextCursor: null, error: 'Rate limited (429)', rateLimited: true };
+      }
+      if (!r.ok) {
+        return { titles: [], nextCursor: null, error: `Wikipedia HTTP ${r.status}`, rateLimited: false };
+      }
 
       const data = await r.json() as {
         query:    { categorymembers: { title: string; ns: number }[] };
         continue: { cmcontinue?: string } | undefined;
       };
-
       const titles = (data?.query?.categorymembers ?? [])
         .filter(m => m.ns === 0)
         .map(m => m.title);
 
-      return { titles, nextCursor: data?.continue?.cmcontinue ?? null, error: null };
+      return { titles, nextCursor: data?.continue?.cmcontinue ?? null, error: null, rateLimited: false };
     } catch (e: unknown) {
       const isAbort = e instanceof Error && e.name === 'AbortError';
       if (attempt === 2 || isAbort) {
-        return { titles: [], nextCursor: null, error: e instanceof Error ? e.message : String(e) };
+        return { titles: [], nextCursor: null, error: e instanceof Error ? e.message : String(e), rateLimited: false };
       }
       await new Promise(res => setTimeout(res, 3_000 * (attempt + 1)));
     }
   }
-  return { titles: [], nextCursor: null, error: 'Max retries exceeded' };
+  return { titles: [], nextCursor: null, error: 'Max retries exceeded', rateLimited: false };
 }
 
-// ── Step 2: Wikidata wbgetentities ─────────────────────────────────────────────
-// Fetches birth date + short description for a batch of Wikipedia titles.
-// KEY FIX: includes `sitelinks` in props so we can map titles → entities.
-// Also fetches `descriptions` which gives "Ghanaian professional footballer" etc.
+// ── Wikidata wbgetentities ─────────────────────────────────────────────────────
 async function fetchEntities(titles: string[]): Promise<Map<string, {
   wikidataId:  string;
   day:         number;
@@ -224,14 +219,14 @@ async function fetchEntities(titles: string[]): Promise<Map<string, {
   if (!titles.length) return result;
 
   const params = new URLSearchParams({
-    action:    'wbgetentities',
-    sites:     'enwiki',
-    titles:    titles.join('|'),
-    props:     'claims|descriptions|sitelinks', // sitelinks is CRITICAL — maps title→entity
-    languages: 'en',
+    action:     'wbgetentities',
+    sites:      'enwiki',
+    titles:     titles.join('|'),
+    props:      'claims|descriptions|sitelinks',
+    languages:  'en',
     sitefilter: 'enwiki',
-    format:    'json',
-    origin:    '*',
+    format:     'json',
+    origin:     '*',
   });
 
   try {
@@ -256,17 +251,13 @@ async function fetchEntities(titles: string[]): Promise<Map<string, {
 
     for (const entity of Object.values(data?.entities ?? {})) {
       if (entity.missing !== undefined) continue;
-
       const wikidataId = entity.id;
-      // Use sitelinks to get the Wikipedia title for mapping
-      const title = entity.sitelinks?.enwiki?.title;
+      const title      = entity.sitelinks?.enwiki?.title;
       if (!title || !wikidataId) continue;
 
-      // Birth date from P569
       const dobClaims = entity.claims?.P569;
       if (!dobClaims?.length) continue;
       const timeStr = dobClaims[0]?.mainsnak?.datavalue?.value?.time ?? '';
-      // Format: "+YYYY-MM-DDT00:00:00Z" or "-YYYY-MM-DDT00:00:00Z"
       const m = timeStr.match(/^[+-]?(\d{1,4})-(\d{2})-(\d{2})/);
       if (!m) continue;
       const year  = parseInt(m[1]);
@@ -275,14 +266,12 @@ async function fetchEntities(titles: string[]): Promise<Map<string, {
       if (month < 1 || month > 12 || day < 1 || day > 31) continue;
       if (year < 1900 || year > 2010) continue;
 
-      // Short description from Wikidata (e.g. "Ghanaian professional footballer")
-      const description = entity.descriptions?.en?.value ?? '';
-
-      result.set(title, { wikidataId, day, month, year, description });
+      result.set(title, {
+        wikidataId, day, month, year,
+        description: entity.descriptions?.en?.value ?? '',
+      });
     }
-  } catch {
-    // Silently skip failed batches
-  }
+  } catch { /* silently skip failed batch */ }
 
   return result;
 }
@@ -292,26 +281,27 @@ async function fetchYearPage(
   year: number,
   cmcontinue: string | null,
   onLog: (msg: string) => void,
-): Promise<{ people: PersonRecord[]; nextCursor: string | null; error: string | null }> {
-
+): Promise<{
+  people:      PersonRecord[];
+  nextCursor:  string | null;
+  error:       string | null;
+  rateLimited: boolean;
+}> {
   onLog(`Wikipedia: fetching ${year} births page…`);
-  const { titles, nextCursor, error: wikiErr } = await fetchWikiPage(year, cmcontinue);
-  if (wikiErr) return { people: [], nextCursor: null, error: wikiErr };
-  if (!titles.length) return { people: [], nextCursor: null, error: null };
+  const { titles, nextCursor, error: wikiErr, rateLimited } = await fetchWikiPage(year, cmcontinue);
+
+  if (rateLimited) return { people: [], nextCursor: null, error: wikiErr, rateLimited: true };
+  if (wikiErr)     return { people: [], nextCursor: null, error: wikiErr, rateLimited: false };
+  if (!titles.length) return { people: [], nextCursor, error: null, rateLimited: false };
 
   onLog(`  Got ${titles.length} titles — resolving birth dates & descriptions…`);
 
-  // Batch entity lookup: 40 titles per call (safe URL length)
   const BATCH = 40;
   const allEntities = new Map<string, { wikidataId: string; day: number; month: number; year: number; description: string }>();
-
   for (let i = 0; i < titles.length; i += BATCH) {
-    const chunk   = titles.slice(i, i + BATCH);
-    const batch   = await fetchEntities(chunk);
+    const batch = await fetchEntities(titles.slice(i, i + BATCH));
     batch.forEach((v, k) => allEntities.set(k, v));
-    if (i + BATCH < titles.length) {
-      await new Promise(res => setTimeout(res, 250));
-    }
+    if (i + BATCH < titles.length) await new Promise(res => setTimeout(res, 250));
   }
 
   const people: PersonRecord[] = [];
@@ -328,9 +318,8 @@ async function fetchYearPage(
       url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
     });
   }
-
   onLog(`  Resolved ${people.length} / ${titles.length} with birth dates`);
-  return { people, nextCursor, error: null };
+  return { people, nextCursor, error: null, rateLimited: false };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -344,13 +333,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const [ingestDone, setIngestDone]   = useState(0);
   const [ingestTotal, setIngestTotal] = useState(0);
   const [ingestPhase, setIngestPhase] = useState('');
+  const [countdown, setCountdown]     = useState(0); 
   const [scanning, setScanning]       = useState(false);
   const [scanResults, setScanResults] = useState<ScanResult[]>([]);
   const [scanStats, setScanStats]     = useState({ checked: 0, flagged: 0, critical: 0 });
   const [filterQuery, setFilterQuery] = useState('');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [dialog, setDialog]           = useState<{ message: string; onConfirm: () => void } | null>(null);
-  const abortRef = useRef(false);
+  const abortRef     = useRef(false);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const addLog = useCallback((text: string, kind: LogEntry['kind'] = 'info') => {
     setIngestLog(l => [{ text, kind }, ...l.slice(0, 99)]);
@@ -401,7 +392,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     return m;
   }, [CONFLICT_YEARS]);
 
-  // ── Load metas from IndexedDB ──────────────────────────────────────────────
+  // ── Load metas ─────────────────────────────────────────────────────────────
   const refreshMetas = useCallback(async () => {
     try {
       const all   = await idbGetAllMetas();
@@ -423,6 +414,23 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
+  // ── Countdown helper ──────────────────────────────────
+  function startCountdown(seconds: number): Promise<void> {
+    return new Promise(resolve => {
+      setCountdown(seconds);
+      let remaining = seconds;
+      countdownRef.current = setInterval(() => {
+        remaining -= 1;
+        setCountdown(remaining);
+        if (remaining <= 0) {
+          clearInterval(countdownRef.current!);
+          setCountdown(0);
+          resolve();
+        }
+      }, 1_000);
+    });
+  }
+
   // ── Ingest one year ────────────────────────────────────────────────────────
   async function ingestOneYear(year: number): Promise<'complete' | 'aborted'> {
     const existing = yearMetas[year];
@@ -434,20 +442,29 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     let cursor     = existing?.cmcontinue ?? null;
     let localCount = existing?.count ?? 0;
     let page       = 1;
-
     addLog(`→ ${year} (${yearConflictMap[year]?.type ?? ''}) — ${cursor ? 'resuming' : 'starting'}`, 'info');
 
     while (true) {
       if (abortRef.current) return 'aborted';
       setIngestPhase(`${year} — page ${page}…`);
 
-      const { people, nextCursor, error } = await fetchYearPage(year, cursor, msg => addLog(msg, 'info'));
+      const { people, nextCursor, error, rateLimited } = await fetchYearPage(
+        year, cursor, msg => addLog(msg, 'info'),
+      );
+
+      if (rateLimited) {
+        addLog(`⚠ Wikipedia rate limited — waiting 75 seconds then retrying…`, 'warn');
+        setIngestPhase(`Rate limited — resuming in 75 s…`);
+        await startCountdown(75);
+        if (abortRef.current) return 'aborted';
+        addLog(`↺ Retrying ${year} page ${page}…`, 'info');
+        continue; 
+      }
 
       if (error) {
-        addLog(`⚠ ${year} page ${page}: ${error} — progress saved`, 'warn');
-        const meta: YearMeta = { year, status: 'partial', count: localCount, cmcontinue: cursor, updatedAt: Date.now() };
-        await idbSaveMeta(meta);
-        setYearMetas(p => ({ ...p, [year]: meta }));
+        addLog(`⚠ ${year} p${page}: ${error} — progress saved`, 'warn');
+        await idbSaveMeta({ year, status: 'partial', count: localCount, cmcontinue: cursor, updatedAt: Date.now() });
+        await refreshMetas();
         break;
       }
 
@@ -455,7 +472,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         const err = await idbSavePeople(people);
         if (err) {
           addLog(`❌ IndexedDB write failed: ${err}`, 'error');
-          setIngestPhase('IndexedDB write failed');
           setIngesting(false);
           await refreshMetas();
           return 'aborted';
@@ -463,15 +479,13 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         localCount += people.length;
       }
 
-      setIngestDone(d => d + 1);
       const isComplete = nextCursor === null;
       const meta: YearMeta = { year, status: isComplete ? 'complete' : 'partial', count: localCount, cmcontinue: nextCursor, updatedAt: Date.now() };
       await idbSaveMeta(meta);
       setYearMetas(p => ({ ...p, [year]: meta }));
+      setIngestDone(d => d + 1);
 
-      if (people.length > 0 || isComplete) {
-        addLog(`✓ ${year} p${page}: ${people.length} saved (total ${localCount})`, 'ok');
-      }
+      addLog(`✓ ${year} p${page}: ${people.length} saved (total ${localCount})`, people.length > 0 ? 'ok' : 'info');
 
       if (isComplete) {
         addLog(`✓ ${year} COMPLETE — ${localCount} people`, 'ok');
@@ -480,7 +494,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
       cursor = nextCursor;
       page  += 1;
-      if (!abortRef.current) await new Promise(res => setTimeout(res, 400));
+      if (!abortRef.current) await new Promise(res => setTimeout(res, 600));
     }
 
     return abortRef.current ? 'aborted' : 'complete';
@@ -494,44 +508,21 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setScanResults([]);
     setIngestTotal(years.length * 25);
     setIngestDone(0);
+    addLog(`Starting — ${years.length} year(s) — local storage`, 'info');
 
-    addLog(`Starting — ${years.length} conflict year(s) — local IndexedDB storage`, 'info');
-
-    // Pre-flight: Wikipedia
-    addLog('Checking Wikipedia…', 'info');
-    try {
-      const r = await fetch(
-        'https://en.wikipedia.org/w/api.php?action=query&meta=siteinfo&format=json&origin=*',
-        { headers: { 'User-Agent': 'MystiqueCompass/1.0' } },
-      );
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      addLog('✓ Wikipedia reachable', 'ok');
-    } catch (e: unknown) {
-      addLog(`❌ Wikipedia blocked: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      addLog('Open the live published URL — not the Studio preview pane.', 'warn');
-      setIngestPhase('Wikipedia blocked — use the live published URL');
-      setIngesting(false);
-      return;
-    }
-
-    // Pre-flight: IndexedDB
-    addLog('Checking IndexedDB…', 'info');
     try {
       await openIDB();
-      addLog('✓ IndexedDB ready — data stored locally on this device', 'ok');
+      addLog('✓ Local storage ready', 'ok');
     } catch (e: unknown) {
-      addLog(`❌ IndexedDB unavailable: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      setIngestPhase('IndexedDB unavailable');
+      addLog(`❌ Storage unavailable: ${e instanceof Error ? e.message : String(e)}`, 'error');
       setIngesting(false);
       return;
     }
-
-    addLog('Running until vault complete — press Stop to pause anytime.', 'info');
 
     for (const year of years) {
       if (abortRef.current) break;
-      const outcome = await ingestOneYear(year);
-      if (outcome === 'aborted') break;
+      await ingestOneYear(year);
+      if (!abortRef.current) await new Promise(res => setTimeout(res, 1_000));
     }
 
     const stopped = abortRef.current;
@@ -550,24 +541,23 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     void startIngestion(pending);
   }
 
-  // ── Clear vault ────────────────────────────────────────────────────────────
   function clearVault() {
     setDialog({
       message: `Reset all ${uniqueYears.length} conflict years and clear all locally stored people? This cannot be undone.`,
       onConfirm: async () => {
         setDialog(null);
-        await idbResetAllMetas(uniqueYears);
+        if (countdownRef.current) clearInterval(countdownRef.current);
+        await idbResetAll(uniqueYears);
         await refreshMetas();
         setScanResults([]);
         setScanStats({ checked: 0, flagged: 0, critical: 0 });
         setIngestLog([]);
         setIngestPhase('');
+        setCountdown(0);
       },
     });
   }
 
-  // ── Scanner ────────────────────────────────────────────────────────────────
-  // Sorted by: totalScore desc → conflictScore desc → birthYear desc (most recent first)
   async function runScan() {
     setScanning(true);
     setScanResults([]);
@@ -575,7 +565,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     try {
       const people = await idbGetAllPeople();
       const results: ScanResult[] = [];
-
       for (const p of people) {
         const conflict = yearConflictMap[p.birthYear];
         if (!conflict) continue;
@@ -589,14 +578,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           py, pyPoints, totalScore, tier: getDangerTier(totalScore),
         });
       }
-
-      // Sort: score desc → conflict type score desc → birth year desc
       results.sort((a, b) => {
         if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
         if (b.config.score !== a.config.score) return b.config.score - a.config.score;
         return b.birthYear - a.birthYear;
       });
-
       const critical = results.filter(r => r.totalScore >= 5).length;
       setScanResults(results);
       setScanStats({ checked: people.length, flagged: results.length, critical });
@@ -609,36 +595,18 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       `${p.name} ${p.description}`.toLowerCase().includes(filterQuery.toLowerCase()),
     ), [scanResults, filterQuery],
   );
-
   const byTier = useMemo(() =>
     DANGER_TIERS.map(tier => ({ tier, items: filtered.filter(f => f.tier.label === tier.label) }))
       .filter(g => g.items.length > 0),
     [filtered],
   );
 
-  // ── Log helpers ────────────────────────────────────────────────────────────
-  function logIcon(kind: LogEntry['kind']) {
-    if (kind === 'ok')    return <CheckCircle2  className="h-2.5 w-2.5 text-emerald-400 shrink-0 mt-0.5" />;
-    if (kind === 'error') return <XCircle       className="h-2.5 w-2.5 text-rose-400    shrink-0 mt-0.5" />;
-    if (kind === 'warn')  return <AlertTriangle className="h-2.5 w-2.5 text-amber-400   shrink-0 mt-0.5" />;
-    return <span className="w-2.5 h-2.5 shrink-0" />;
-  }
-  function logColor(kind: LogEntry['kind']) {
-    if (kind === 'ok')    return 'text-emerald-400';
-    if (kind === 'error') return 'text-rose-400';
-    if (kind === 'warn')  return 'text-amber-400';
-    return 'text-slate-400';
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
       {dialog && (
         <ConfirmDialog message={dialog.message} onConfirm={dialog.onConfirm} onCancel={() => setDialog(null)} />
       )}
       <div className="space-y-4">
-
-        {/* Header */}
         <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
@@ -646,18 +614,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 <Telescope className="h-6 w-6" /> Cosmic Risk Scanner
               </h2>
               <p className="text-xs font-cinzel text-muted-foreground uppercase tracking-widest mt-1">
-                {targetYear} · {targetSign.n} Year · {uniqueYears.length} conflict years · 1930–2010
+                {targetYear} · {targetSign.n} Year · {uniqueYears.length} conflict years
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={clearVault}
-                title="Clear vault"
-                className="text-rose-400 hover:text-rose-300 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+              <button onClick={clearVault} className="text-rose-400 hover:text-rose-300 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors">
+                <Trash2 className="h-4 w-4" />
               </button>
               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 font-cinzel text-[10px]">
                 LOCAL VAULT
@@ -676,11 +638,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </div>
         </Card>
 
-        {/* ════════ DATA VAULT ════════ */}
         {tab === 'vault' && (
           <Card className="glass-card p-6 border-primary/20 space-y-6">
-
-            {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {([
                 [vaultSummary.totalPeople.toLocaleString(), 'People Stored',  'text-primary'    ],
@@ -695,16 +654,18 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ))}
             </div>
 
-            {/* Progress */}
             {ingesting && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-3 w-3 animate-spin" />
-                    {ingestPhase}
+                    {countdown > 0 ? `Rate limited — retrying in ${countdown}s…` : ingestPhase}
                   </span>
-                  <button onClick={() => { abortRef.current = true; }}
-                    className="text-rose-400 text-[9px] uppercase font-cinzel hover:text-rose-300">
+                  <button onClick={() => {
+                    abortRef.current = true;
+                    if (countdownRef.current) clearInterval(countdownRef.current);
+                    setCountdown(0);
+                  }} className="text-rose-400 text-[9px] uppercase font-cinzel hover:text-rose-300">
                     Stop
                   </button>
                 </div>
@@ -713,102 +674,64 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
             )}
 
             {!ingesting && ingestPhase && (
-              <p className={`text-[10px] font-cinzel text-center ${
-                ingestPhase.startsWith('✓') ? 'text-emerald-400' :
-                ingestPhase.includes('error') || ingestPhase.includes('unreachable') || ingestPhase.includes('blocked') ? 'text-rose-400' :
-                'text-primary/70'
-              }`}>
+              <p className={`text-[10px] font-cinzel text-center ${ingestPhase.startsWith('✓') ? 'text-emerald-400' : 'text-amber-400'}`}>
                 {ingestPhase}
               </p>
             )}
 
-            {/* Diagnostic log */}
             {ingestLog.length > 0 && (
               <div className="bg-black/40 rounded-xl border border-white/5 p-3 max-h-52 overflow-y-auto space-y-1">
-                <p className="text-[8px] font-cinzel text-slate-600 uppercase tracking-widest mb-2">
-                  Live Diagnostics
-                </p>
+                <p className="text-[8px] font-cinzel text-slate-600 uppercase tracking-widest mb-2">Live Diagnostics</p>
                 {ingestLog.map((entry, i) => (
                   <div key={i} className="flex items-start gap-1.5">
                     {logIcon(entry.kind)}
-                    <p className={`text-[9px] font-cinzel leading-relaxed ${logColor(entry.kind)}`}>
-                      {entry.text}
-                    </p>
+                    <p className={`text-[9px] font-cinzel leading-relaxed ${logColor(entry.kind)}`}>{entry.text}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Buttons */}
             <div className="flex gap-2">
-              <Button
-                onClick={ingesting ? () => { abortRef.current = true; } : handleIngestAll}
+              <Button onClick={ingesting ? () => abortRef.current = true : handleIngestAll}
                 disabled={!ingesting && vaultSummary.pending === 0 && vaultSummary.partial === 0}
                 className={`flex-1 font-black uppercase tracking-widest font-cinzel text-[10px] py-3 h-auto ${
-                  ingesting
-                    ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                    : 'bg-gradient-to-r from-primary/80 to-primary text-primary-foreground'
+                  ingesting ? 'bg-rose-500 hover:bg-rose-600 text-white' : 'bg-gradient-to-r from-primary/80 to-primary text-primary-foreground'
                 }`}>
                 <Database className="mr-2 h-4 w-4" />
-                {ingesting ? 'Stop Ingest' :
-                 vaultSummary.pending === 0 && vaultSummary.partial === 0
-                   ? 'Vault Complete ✓'
-                   : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
+                {ingesting ? 'Stop Ingest' : (vaultSummary.pending === 0 && vaultSummary.partial === 0 ? 'Vault Complete ✓' : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`)}
               </Button>
-              <Button variant="outline" size="icon" onClick={() => void refreshMetas()}
-                className="border-white/10 text-slate-400 h-auto px-3">
+              <Button variant="outline" size="icon" onClick={() => void refreshMetas()} className="border-white/10 text-slate-400 h-auto px-3">
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
 
-            {/* Info */}
-            <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2 text-[11px] text-slate-400 font-body leading-relaxed">
               <p className="text-[10px] font-black uppercase tracking-wider font-cinzel text-primary/80 flex items-center gap-2">
                 <CloudLightning className="h-3 w-3" /> How Ingestion Works
               </p>
-              <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                Reads <strong className="text-slate-200">Wikipedia's Category API</strong> (500 names/page)
-                then resolves each person's birth date and profession via{' '}
-                <strong className="text-slate-200">Wikidata entity lookup</strong>. All data is stored
-                locally in your browser's{' '}
-                <strong className="text-slate-200">IndexedDB</strong> — no cloud required,
-                no billing, no timeouts. Runs until vault is full. Press Stop to pause; resumes from
-                exactly where it left off.
-              </p>
+              Reads <strong className="text-slate-200">Wikipedia Category API</strong> then resolves birth dates via <strong className="text-slate-200">Wikidata entity lookup</strong>. Stored in <strong className="text-slate-200">IndexedDB</strong> locally. If rate-limited, it automatically waits 75 seconds and retries.
             </div>
 
-            {/* Year grid — sorted by conflict type severity, then year descending */}
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {uniqueYears.map(year => {
-                const meta   = yearMetas[year];
+                const meta = yearMetas[year];
                 const status = meta?.status || 'pending';
-                const info   = yearConflictMap[year];
-                const c      = info?.config;
-                const style  = ({
-                  complete: { b: 'rgba(76,175,125,0.5)',   bg: 'rgba(76,175,125,0.08)',   dot: '#4caf7d' },
-                  partial:  { b: 'rgba(224,148,40,0.5)',   bg: 'rgba(224,148,40,0.08)',   dot: '#e09428' },
-                  pending:  { b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)',  dot: '#2a2a3a' },
-                } as Record<string, { b: string; bg: string; dot: string }>)[status] ?? {
-                  b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a',
-                };
+                const info = yearConflictMap[year];
+                const c = info?.config;
+                const style = ({
+                  complete: { b: 'rgba(76,175,125,0.5)', bg: 'rgba(76,175,125,0.08)', dot: '#4caf7d' },
+                  partial: { b: 'rgba(224,148,40,0.5)', bg: 'rgba(224,148,40,0.08)', dot: '#e09428' },
+                  pending: { b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a' },
+                } as Record<string, { b: string; bg: string; dot: string }>)[status];
                 return (
-                  <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }}
-                    className="rounded-xl p-2.5 text-center relative overflow-hidden">
+                  <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }} className="rounded-xl p-2.5 text-center relative overflow-hidden">
                     <div className="text-[12px] font-black text-slate-100 font-decorative">{year}</div>
-                    {c && (
-                      <div className="text-[7px] uppercase tracking-wide font-cinzel mt-0.5" style={{ color: c.color }}>
-                        {c.glyph} {info.type}
-                      </div>
-                    )}
+                    {c && <div className="text-[7px] uppercase tracking-wide font-cinzel mt-0.5" style={{ color: c.color }}>{c.glyph} {info.type}</div>}
                     <div className="flex items-center justify-center gap-1 mt-1">
                       <div className="w-1.5 h-1.5 rounded-full" style={{ background: style.dot }} />
                       <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
                     </div>
-                    {meta?.count > 0 && (
-                      <div className="text-[7px] text-slate-600 font-cinzel mt-0.5">
-                        {meta.count.toLocaleString()}
-                      </div>
-                    )}
+                    {meta && meta.count > 0 && <div className="text-[7px] text-slate-600 font-cinzel mt-0.5">{meta.count.toLocaleString()}</div>}
                   </div>
                 );
               })}
@@ -816,15 +739,14 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </Card>
         )}
 
-        {/* ════════ SCANNER ════════ */}
         {tab === 'scanner' && (
           <>
             <Card className="glass-card p-6 border-primary/20">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              <div className="grid grid-cols-3 gap-3 mb-6">
                 {([
-                  [scanStats.checked.toLocaleString(),  'Total Checked',    'text-primary'   ],
-                  [scanStats.flagged.toLocaleString(),  'Flagged Risks',    'text-orange-400'],
-                  [scanStats.critical.toLocaleString(), 'Critical / Severe','text-rose-500'  ],
+                  [scanStats.checked.toLocaleString(), 'Total Checked', 'text-primary' ],
+                  [scanStats.flagged.toLocaleString(), 'Flagged Risks', 'text-orange-400'],
+                  [scanStats.critical.toLocaleString(), 'Critical / Severe', 'text-rose-500' ],
                 ] as [string, string, string][]).map(([v, l, c]) => (
                   <div key={l} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
                     <div className={`text-2xl font-black font-decorative tabular-nums ${c}`}>{v}</div>
@@ -832,7 +754,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                   </div>
                 ))}
               </div>
-
               {scanning ? (
                 <div className="flex items-center gap-3 text-xs text-primary/80 font-cinzel py-2">
                   <Loader2 className="h-4 w-4 animate-spin" /> Scanning local vault…
@@ -840,15 +761,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ) : vaultSummary.totalPeople === 0 ? (
                 <div className="text-center py-6 space-y-2">
                   <Database className="h-10 w-10 mx-auto opacity-20" />
-                  <p className="text-[11px] text-slate-500 font-cinzel">
-                    Vault is empty — go to 🗄 Data Vault and run Local Ingest first.
-                  </p>
+                  <p className="text-[11px] text-slate-500 font-cinzel">Vault is empty — run Local Ingest first.</p>
                 </div>
               ) : (
-                <Button onClick={() => void runScan()}
-                  className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] py-3 h-auto font-cinzel">
-                  <Zap className="mr-2 h-4 w-4" />
-                  Scan {vaultSummary.totalPeople.toLocaleString()} People Instantly
+                <Button onClick={() => void runScan()} className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] py-3 h-auto font-cinzel">
+                  <Zap className="mr-2 h-4 w-4" /> Scan {vaultSummary.totalPeople.toLocaleString()} People Instantly
                 </Button>
               )}
             </Card>
@@ -857,80 +774,47 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <div className="space-y-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
-                  <Input placeholder="Filter by name, profession or nationality…"
-                    value={filterQuery} onChange={e => setFilterQuery(e.target.value)}
-                    className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12" />
+                  <Input placeholder="Filter by name, profession or nationality…" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} className="pl-10 bg-black/40 border-primary/20 font-body h-12" />
                 </div>
-
                 {byTier.map(({ tier, items }) => (
                   <div key={tier.label} className="space-y-3">
                     <div className="flex items-center gap-3 px-1">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>
-                        {tier.label}
-                      </span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel" style={{ color: tier.color }}>{tier.label}</span>
                       <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} people</span>
                     </div>
                     <div className="space-y-2">
                       {items.map((person, idx) => (
-                        <Card key={`${person.wikidataId}-${idx}`}
-                          className="glass-card p-0 border-transparent overflow-hidden"
-                          style={{ borderLeft: `3px solid ${person.tier.color}` }}>
-                          <button className="w-full p-4 flex items-start justify-between text-left gap-4"
-                            onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
+                        <Card key={`${person.wikidataId}-${idx}`} className="glass-card p-0 border-transparent overflow-hidden" style={{ borderLeft: `3px solid ${person.tier.color}` }}>
+                          <button className="w-full p-4 flex items-start justify-between text-left gap-4" onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
                             <div className="flex-1" style={{ minWidth: 0 }}>
                               <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
-                              {person.description && (
-                                <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5 truncate">
-                                  {person.description}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
+                              {person.description && <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5 truncate">{person.description}</p>}
+                              <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel flex-wrap">
                                 <span>Born {person.birthYear}</span>
                                 <span>•</span>
                                 <span className="font-bold text-primary">PY {person.py}</span>
                                 <span>•</span>
-                                <span style={{ color: person.config.color }}>{person.conflict ?? person.conflictType}</span>
+                                <span style={{ color: person.config.color }}>{person.conflictType}</span>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel"
-                                style={{ color: person.config.color, backgroundColor: person.config.bg }}>
-                                {person.config.label}
-                              </Badge>
-                              <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border"
-                                style={{ borderColor: person.tier.border }}>
-                                <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>
-                                  {person.totalScore}
-                                </span>
+                              <Badge variant="outline" className="h-6 text-[8px] uppercase border-white/10 font-cinzel" style={{ color: person.config.color, backgroundColor: person.config.bg }}>{person.config.label}</Badge>
+                              <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border" style={{ borderColor: person.tier.border }}>
+                                <span className="text-xs font-black font-decorative" style={{ color: person.tier.color }}>{person.totalScore}</span>
                               </div>
                             </div>
                           </button>
-                          <AnimatePresence>
-                            {expandedId === person.wikidataId && (
-                              <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
-                                className="overflow-hidden bg-black/20 border-t border-white/5">
-                                <div className="p-4 space-y-3">
-                                  <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
-                                    <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
-                                      Astrological Headwind:
-                                    </span>
-                                    {person.name}{person.description ? ` (${person.description})` : ''}, born{' '}
-                                    {person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear},
-                                    faces a{' '}
-                                    <span style={{ color: person.config.color }}>{person.config.label}</span>{' '}
-                                    with the {targetYear} {targetSign.n} cycle. Combined with Personal Year{' '}
-                                    {person.py} ({person.py === 4 ? 'Structure / Restriction' : 'Reflection / Endings'}),
-                                    this creates a composite danger score of{' '}
-                                    <span style={{ color: person.tier.color }}>{person.totalScore}/6 — {person.tier.label}</span>.
-                                  </p>
-                                  <a href={person.url} target="_blank" rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
-                                    <ExternalLink className="h-3 w-3" /> Read on Wikipedia
-                                  </a>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                          <AnimatePresence>{expandedId === person.wikidataId && (
+                            <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-black/20 border-t border-white/5">
+                              <div className="p-4 space-y-3">
+                                <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
+                                  <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">Astrological Headwind:</span>
+                                  {person.name}{person.description ? ` (${person.description})` : ''}, born {person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}, faces a <span style={{ color: person.config.color }}>{person.config.label}</span> with the {targetYear} {targetSign.n} cycle. Combined with Personal Year {person.py} ({person.py === 4 ? 'Structure / Restriction' : 'Reflection / Endings'}), this creates a composite danger score of <span style={{ color: person.tier.color }}>{person.totalScore}/6 — {person.tier.label}</span>.
+                                </p>
+                                <a href={person.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel"><ExternalLink className="h-3 w-3" /> Read on Wikipedia</a>
+                              </div>
+                            </motion.div>
+                          )}</AnimatePresence>
                         </Card>
                       ))}
                     </div>
@@ -938,13 +822,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 ))}
               </div>
             )}
-
             {!scanning && scanResults.length === 0 && vaultSummary.totalPeople > 0 && (
               <div className="py-16 text-center opacity-30 space-y-3">
                 <Globe className="h-14 w-14 mx-auto stroke-[1]" />
-                <p className="font-cinzel text-xs uppercase tracking-[0.2em]">
-                  Tap scan to analyse {vaultSummary.totalPeople.toLocaleString()} stored records
-                </p>
+                <p className="font-cinzel text-xs uppercase tracking-[0.2em]">Tap scan to analyse {vaultSummary.totalPeople.toLocaleString()} stored records</p>
               </div>
             )}
           </>
@@ -954,10 +835,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   );
 }
 
-// ─── Confirm Dialog ───────────────────────────────────────────────────────────
-function ConfirmDialog({ message, onConfirm, onCancel }: {
-  message: string; onConfirm: () => void; onCancel: () => void;
-}) {
+function ConfirmDialog({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void; }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
       <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
@@ -966,10 +844,8 @@ function ConfirmDialog({ message, onConfirm, onCancel }: {
           <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
         </div>
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" size="sm" onClick={onCancel}
-            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
-          <Button size="sm" onClick={onConfirm}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
+          <Button variant="ghost" size="sm" onClick={onCancel} className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
+          <Button size="sm" onClick={onConfirm} className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
         </div>
       </div>
     </div>
