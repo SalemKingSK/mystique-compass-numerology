@@ -16,8 +16,6 @@ import { db } from '@/lib/firebase';
 import {
   collection, doc, setDoc, getDoc, getDocs,
   query as fsQuery, where, writeBatch,
-  orderBy, limit, startAfter,
-  type QueryDocumentSnapshot, type DocumentData,
 } from 'firebase/firestore';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -70,28 +68,6 @@ const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct
 // ─── Firestore config ─────────────────────────────────────────────────────────
 const META_COLL   = 'cosmic_vault_meta';
 const PEOPLE_COLL = 'cosmic_vault_people';
-
-// ─── Inline confirm dialog (window.confirm is blocked in iframes) ─────────────
-function ConfirmDialog({ message, onConfirm, onCancel }: {
-  message: string; onConfirm: () => void; onCancel: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
-        </div>
-        <div className="flex gap-3 justify-end">
-          <Button variant="ghost" size="sm" onClick={onCancel}
-            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
-          <Button size="sm" onClick={onConfirm}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
@@ -225,7 +201,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         ));
         await refreshMetas();
         setScanResults([]);
-        setScanStats({ checked: 0, flagged: 0 });
+        setScanStats({ checked: 0, found: 0, critical: 0, elevated: 0 });
         setIngestLog([]);
       },
     });
@@ -262,7 +238,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   async function runScan() {
     setScanning(true);
     setScanResults([]);
-    setScanStats({ checked: 0, flagged: 0 });
+    setScanStats({ checked: 0, found: 0 });
     try {
       const snap = await getDocs(collection(db, PEOPLE_COLL));
       const people: PersonRecord[] = [];
@@ -280,7 +256,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       }
       results.sort((a, b) => b.totalScore - a.totalScore);
       setScanResults(results);
-      setScanStats({ checked: people.length, flagged: results.length });
+      setScanStats({ checked: people.length, found: results.length });
     } catch (e) {
       console.error('Scan error:', e);
     }
@@ -438,9 +414,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                 {[
                   [scanStats.checked.toLocaleString(),                    'Checked',         'text-primary'    ],
-                  [scanResults.length,                                     'Flagged',         'text-orange-400' ],
-                  [scanResults.filter(r => r.totalScore >= 5).length,     'Critical/Severe', 'text-rose-500'   ],
-                  [scanResults.filter(r => r.totalScore <= 3).length,     'Elevated/Notable','text-blue-400'   ],
+                  [scanStats.found.toLocaleString(),                      'Flagged',         'text-orange-400' ],
                 ].map(([v, l, c]) => (
                   <div key={l as string} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
                     <div className={`text-2xl font-black font-decorative tabular-nums ${c}`}>{v}</div>
@@ -553,9 +527,39 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 ))}
               </div>
             )}
+
+            {!scanning && scanResults.length === 0 && vaultSummary.totalPeople > 0 && (
+              <div className="py-16 text-center opacity-30 space-y-3">
+                <Globe className="h-14 w-14 mx-auto stroke-[1]" />
+                <p className="font-cinzel text-xs uppercase tracking-[0.2em]">
+                  Tap scan to analyse {vaultSummary.totalPeople.toLocaleString()} stored records
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>
     </>
+  );
+}
+
+function ConfirmDialog({ message, onConfirm, onCancel }: {
+  message: string; onConfirm: () => void; onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="mx-4 max-w-sm w-full bg-[#0d0a1a] border border-primary/30 rounded-2xl p-6 space-y-5 shadow-2xl">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-slate-200 font-body leading-relaxed">{message}</p>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <Button variant="ghost" size="sm" onClick={onCancel}
+            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
+          <Button size="sm" onClick={onConfirm}
+            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
+        </div>
+      </div>
+    </div>
   );
 }
