@@ -29,9 +29,9 @@ interface PersonRecord {
 }
 interface YearMeta {
   year:       number;
-  status:     'pending' | 'ingesting' | 'partial' | 'complete';
+  status:     'pending' | 'partial' | 'complete';
   count:      number;
-  monthsDone: number[];
+  cmcontinue: string | null; // Wikipedia pagination cursor
   updatedAt:  number;
 }
 interface ScanResult extends PersonRecord {
@@ -65,136 +65,198 @@ const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct
 const META_COLL    = 'cosmic_vault_meta';
 const PEOPLE_COLL  = 'cosmic_vault_people';
 
-// ─── SPARQL config ────────────────────────────────────────────────────────────
-// PAGE_SIZE 200 — small enough that each request completes in well under 60s.
-// No OPTIONAL description block — that join was the main cause of timeouts.
-// Descriptions are stored as empty string and can be enriched later if needed.
-const PAGE_SIZE       = 200;
-const REQUEST_TIMEOUT = 60_000; // 60 seconds per page
-
-// ─── Wikidata SPARQL — single page fetch ──────────────────────────────────────
-async function fetchPage(
+// ─── STEP 1: Wikipedia Category API ──────────────────────────────────────────
+// Fetches a page of article titles from "Category:YEAR births".
+// Returns up to 500 titles per call plus a cmcontinue cursor for the next page.
+// This API is extremely reliable — never times out.
+async function fetchWikipediaPage(
   year: number,
-  month: number,
-  offset: number,
-): Promise<{ rows: Record<string, { value: string }>[]; error: string | null }> {
+  cmcontinue: string | null,
+): Promise<{
+  titles: string[];
+  nextCursor: string | null;
+  error: string | null;
+}> {
+  const params = new URLSearchParams({
+    action:      'query',
+    list:        'categorymembers',
+    cmtitle:     `Category:${year}_births`,
+    cmtype:      'page',
+    cmlimit:     '500',
+    format:      'json',
+    origin:      '*',
+    ...(cmcontinue ? { cmcontinue } : {}),
+  });
 
-  // Minimal query — name + DOB only. No OPTIONAL blocks. Fast.
-  const sparql = `
-SELECT ?person ?personLabel ?dob WHERE {
-  ?person wdt:P31 wd:Q5 ;
-          wdt:P569 ?dob .
-  FILTER(YEAR(?dob) = ${year} && MONTH(?dob) = ${month})
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-}
-ORDER BY ?person
-LIMIT ${PAGE_SIZE}
-OFFSET ${offset}`.trim();
-
-  const url = `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`;
+  const url = `https://en.wikipedia.org/w/api.php?${params}`;
 
   for (let attempt = 0; attempt < 3; attempt++) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30_000);
       const r = await fetch(url, {
         signal: controller.signal,
-        headers: {
-          Accept:       'application/sparql-results+json',
-          'User-Agent': 'MystiqueCompass/1.0 (browser ingest)',
-        },
+        headers: { 'User-Agent': 'MystiqueCompass/1.0 (browser ingest)' },
       });
       clearTimeout(timer);
 
-      if (r.status === 429) {
-        // Rate limited — back off and retry
-        await new Promise(res => setTimeout(res, 20_000 * (attempt + 1)));
-        continue;
-      }
-      if (!r.ok) return { rows: [], error: `HTTP ${r.status}` };
+      if (!r.ok) return { titles: [], nextCursor: null, error: `Wikipedia HTTP ${r.status}` };
 
       const data = await r.json() as {
-        results: { bindings: Record<string, { value: string }>[] };
+        query:    { categorymembers: { title: string; ns: number }[] };
+        continue: { cmcontinue: string } | undefined;
       };
-      return { rows: data?.results?.bindings ?? [], error: null };
 
-    } catch (e: unknown) {
-      clearTimeout(timer);
-      const isAbort = e instanceof Error && e.name === 'AbortError';
-      if (isAbort && attempt < 2) {
-        // Timeout — wait then retry with smaller effective load
-        await new Promise(res => setTimeout(res, 5_000));
-        continue;
-      }
+      const titles = (data?.query?.categorymembers ?? [])
+        .filter(m => m.ns === 0) // main namespace only
+        .map(m => m.title);
+
       return {
-        rows: [],
-        error: isAbort
-          ? `Timed out after ${REQUEST_TIMEOUT / 1000}s (offset ${offset})`
-          : (e instanceof Error ? e.message : String(e)),
+        titles,
+        nextCursor: data?.continue?.cmcontinue ?? null,
+        error: null,
       };
+    } catch (e: unknown) {
+      const isAbort = e instanceof Error && e.name === 'AbortError';
+      if (attempt === 2 || isAbort) {
+        return {
+          titles: [],
+          nextCursor: null,
+          error: isAbort ? 'Wikipedia request timed out' : (e instanceof Error ? e.message : String(e)),
+        };
+      }
+      await new Promise(res => setTimeout(res, 3_000 * (attempt + 1)));
     }
   }
-  return { rows: [], error: 'Max retries exceeded' };
+  return { titles: [], nextCursor: null, error: 'Max retries exceeded' };
 }
 
-// ─── Parse SPARQL bindings → PersonRecord[] ───────────────────────────────────
-function parseRows(rows: Record<string, { value: string }>[]): PersonRecord[] {
-  const out: PersonRecord[] = [];
-  for (const b of rows) {
-    const wikidataId = b.person?.value?.split('/').pop();
-    if (!wikidataId) continue;
+// ─── STEP 2: Wikidata wbgetentities — batch birth date lookup ─────────────────
+// Given a list of Wikipedia titles, fetches their Wikidata birth dates in one
+// call. This uses the entity lookup API (NOT SPARQL) — fast and reliable.
+// Max ~40 titles per call to stay within URL length limits.
+async function fetchBirthDates(
+  titles: string[],
+): Promise<Map<string, { wikidataId: string; day: number; month: number; year: number }>> {
+  const result = new Map<string, { wikidataId: string; day: number; month: number; year: number }>();
+  if (!titles.length) return result;
 
-    const raw = b.dob?.value ?? '';
-    // Accept xsd:date ("YYYY-MM-DD") and xsd:dateTime ("YYYY-MM-DDT…")
-    const m = raw.match(/^(-?\d{1,4})-(\d{2})-(\d{2})/);
-    if (!m) continue;
+  const params = new URLSearchParams({
+    action:    'wbgetentities',
+    sites:     'enwiki',
+    titles:    titles.join('|'),
+    props:     'claims|labels',
+    languages: 'en',
+    format:    'json',
+    origin:    '*',
+  });
 
-    const birthYear  = parseInt(m[1]);
-    const birthMonth = parseInt(m[2]);
-    const birthDay   = parseInt(m[3]);
-    if (birthMonth < 1 || birthMonth > 12 || birthDay < 1 || birthDay > 31) continue;
-    if (birthYear < 1900 || birthYear > 2010) continue;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 30_000);
+    const r = await fetch(`https://www.wikidata.org/w/api.php?${params}`, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'MystiqueCompass/1.0 (browser ingest)' },
+    });
+    clearTimeout(timer);
 
-    const name = b.personLabel?.value ?? '';
-    if (/^Q\d+$/.test(name) || !name.trim()) continue;
+    if (!r.ok) return result;
 
-    out.push({
-      wikidataId, name, birthYear, birthMonth, birthDay,
-      description: '', // fetched without description to keep queries fast
-      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`,
+    const data = await r.json() as {
+      entities: Record<string, {
+        id:     string;
+        labels: Record<string, { value: string }>;
+        claims: Record<string, { mainsnak: { datavalue: { value: { time: string } } } }[]>;
+        sitelinks: Record<string, { title: string }>;
+        missing?: string;
+      }>;
+    };
+
+    for (const [, entity] of Object.entries(data?.entities ?? {})) {
+      if (entity.missing !== undefined) continue;
+
+      const wikidataId = entity.id;
+      const title      = entity.sitelinks?.enwiki?.title;
+      if (!title || !wikidataId) continue;
+
+      const dobClaims = entity.claims?.P569;
+      if (!dobClaims?.length) continue;
+
+      const timeStr = dobClaims[0]?.mainsnak?.datavalue?.value?.time ?? '';
+      // Wikidata time format: "+YYYY-MM-DDT00:00:00Z"
+      const m = timeStr.match(/^[+-]?(\d{1,4})-(\d{2})-(\d{2})/);
+      if (!m) continue;
+
+      const year  = parseInt(m[1]);
+      const month = parseInt(m[2]);
+      const day   = parseInt(m[3]);
+
+      if (month < 1 || month > 12 || day < 1 || day > 31) continue;
+      if (year < 1900 || year > 2010) continue;
+
+      result.set(title, { wikidataId, day, month, year });
+    }
+  } catch {
+    // Silently skip failed batch — the title just won't have a birth date
+  }
+
+  return result;
+}
+
+// ─── Main fetch function: Wikipedia titles → PersonRecords ────────────────────
+// Fetches one "page" worth of Wikipedia category members (500 titles),
+// then batch-looks up their birth dates from Wikidata in chunks of 40.
+async function fetchYearPage(
+  year: number,
+  cmcontinue: string | null,
+  onProgress: (msg: string) => void,
+): Promise<{
+  people:     PersonRecord[];
+  nextCursor: string | null;
+  error:      string | null;
+}> {
+  // Step 1: Get titles from Wikipedia
+  onProgress(`Wikipedia: fetching ${year} births page…`);
+  const { titles, nextCursor, error: wikiError } = await fetchWikipediaPage(year, cmcontinue);
+
+  if (wikiError) return { people: [], nextCursor: null, error: wikiError };
+  if (!titles.length) return { people: [], nextCursor, error: null };
+
+  onProgress(`  Got ${titles.length} titles — fetching birth dates…`);
+
+  // Step 2: Batch fetch birth dates from Wikidata (40 titles per call)
+  const BATCH = 40;
+  const allDates = new Map<string, { wikidataId: string; day: number; month: number; year: number }>();
+
+  for (let i = 0; i < titles.length; i += BATCH) {
+    const chunk = titles.slice(i, i + BATCH);
+    const dates = await fetchBirthDates(chunk);
+    dates.forEach((v, k) => allDates.set(k, v));
+    // Small pause between batches
+    if (i + BATCH < titles.length) {
+      await new Promise(res => setTimeout(res, 300));
+    }
+  }
+
+  // Step 3: Build PersonRecord[] for titles that have a birth date
+  const people: PersonRecord[] = [];
+  for (const title of titles) {
+    const bd = allDates.get(title);
+    if (!bd) continue; // no birth date found — skip
+
+    people.push({
+      wikidataId:  bd.wikidataId,
+      name:        title,
+      birthYear:   bd.year,
+      birthMonth:  bd.month,
+      birthDay:    bd.day,
+      description: '',
+      url:         `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
     });
   }
-  return out;
-}
 
-// ─── Fetch ALL people for a year/month via pagination ─────────────────────────
-async function fetchMonth(
-  year: number,
-  month: number,
-  onPage: (pg: number, count: number) => void,
-): Promise<{ people: PersonRecord[]; error: string | null }> {
-  const all: PersonRecord[] = [];
-  let offset = 0;
-  let pg     = 1;
-
-  while (true) {
-    const { rows, error } = await fetchPage(year, month, offset);
-    if (error) return { people: all, error: `Page ${pg}: ${error}` };
-
-    const parsed = parseRows(rows);
-    all.push(...parsed);
-    onPage(pg, parsed.length);
-
-    // Fewer rows than PAGE_SIZE means we've reached the end
-    if (rows.length < PAGE_SIZE) break;
-
-    offset += PAGE_SIZE;
-    pg     += 1;
-    // Polite pause between pages
-    await new Promise(res => setTimeout(res, 600));
-  }
-
-  return { people: all, error: null };
+  onProgress(`  Resolved ${people.length} / ${titles.length} with birth dates`);
+  return { people, nextCursor, error: null };
 }
 
 // ─── Firestore batch write ────────────────────────────────────────────────────
@@ -231,7 +293,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const abortRef = useRef(false);
 
   const addLog = useCallback((text: string, kind: LogEntry['kind'] = 'info') => {
-    setIngestLog(l => [{ text, kind }, ...l.slice(0, 79)]);
+    setIngestLog(l => [{ text, kind }, ...l.slice(0, 99)]);
   }, []);
 
   // ── Zodiac config ──────────────────────────────────────────────────────────
@@ -304,43 +366,49 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
-  // ── Ingest one year ────────────────────────────────────────────────────────
+  // ── Ingest one year — pages through all of "Category:YEAR births" ──────────
   async function ingestOneYear(year: number): Promise<'complete' | 'aborted'> {
     const metaRef  = doc(db, META_COLL, String(year));
     const snap     = await getDoc(metaRef);
     const existing = snap.exists() ? (snap.data() as YearMeta) : null;
 
-    const monthsDone = [...(existing?.monthsDone ?? [])];
-    const remaining  = [1,2,3,4,5,6,7,8,9,10,11,12].filter(m => !monthsDone.includes(m));
-
-    if (!remaining.length) {
+    if (existing?.status === 'complete') {
       addLog(`${year}: already complete — skipping`, 'ok');
       return 'complete';
     }
 
+    // Resume from saved cursor if we were interrupted mid-year
+    let cursor: string | null = existing?.cmcontinue ?? null;
     let localCount = existing?.count ?? 0;
+    let pageNum    = 1;
 
-    for (const month of remaining) {
+    addLog(`→ ${year} — starting from ${cursor ? 'saved cursor' : 'beginning'}`, 'info');
+
+    while (true) {
       if (abortRef.current) return 'aborted';
 
-      setIngestPhase(`${year} / ${MONTHS_SHORT[month - 1]} — fetching…`);
-      addLog(`→ ${year} / ${MONTHS_SHORT[month - 1]}`, 'info');
+      setIngestPhase(`${year} — page ${pageNum}…`);
 
-      // ── Paginated fetch ──────────────────────────────────────────────────
-      const { people, error } = await fetchMonth(year, month, (pg, cnt) => {
-        addLog(`  page ${pg}: ${cnt} people`, 'info');
-      });
+      const { people, nextCursor, error } = await fetchYearPage(
+        year,
+        cursor,
+        msg => addLog(`  ${msg}`, 'info'),
+      );
 
       if (error) {
-        // Log the error but DON'T mark the month done — retry next session
-        addLog(`⚠ ${error} — will retry this month next time`, 'warn');
-        await new Promise(res => setTimeout(res, 2_000));
-        continue;
+        addLog(`⚠ ${year} page ${pageNum}: ${error} — saving progress`, 'warn');
+        // Save progress so we can resume
+        await setDoc(metaRef, {
+          year,
+          status:     'partial',
+          count:      localCount,
+          cmcontinue: cursor,
+          updatedAt:  Date.now(),
+        } as YearMeta);
+        break;
       }
 
-      addLog(`  Total: ${people.length} from Wikidata`, people.length > 0 ? 'ok' : 'warn');
-
-      // ── Save to Firestore ────────────────────────────────────────────────
+      // Write to Firestore
       if (people.length > 0) {
         const writeErr = await saveBatch(people);
         if (writeErr) {
@@ -350,16 +418,19 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           await refreshMetas();
           return 'aborted';
         }
+        localCount += people.length;
+        addLog(`✓ ${year} page ${pageNum}: ${people.length} saved (total ${localCount})`, 'ok');
       }
 
-      // ── Update meta ──────────────────────────────────────────────────────
-      monthsDone.push(month);
-      localCount += people.length;
+      setIngestDone(d => d + 1);
+
+      // Update meta with new cursor and count
+      const isComplete = nextCursor === null;
       const meta: YearMeta = {
         year,
-        status:     monthsDone.length === 12 ? 'complete' : 'partial',
+        status:     isComplete ? 'complete' : 'partial',
         count:      localCount,
-        monthsDone: [...monthsDone],
+        cmcontinue: nextCursor,
         updatedAt:  Date.now(),
       };
       try {
@@ -370,60 +441,64 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         return 'aborted';
       }
 
-      addLog(`✓ ${year} ${MONTHS_SHORT[month - 1]}: ${people.length} saved`, 'ok');
-      setIngestDone(d => d + 1);
-      // Brief pause between months to be polite
-      if (!abortRef.current) await new Promise(res => setTimeout(res, 400));
+      if (isComplete) {
+        addLog(`✓ ${year} complete — ${localCount} people total`, 'ok');
+        break;
+      }
+
+      cursor  = nextCursor;
+      pageNum += 1;
+      // Brief pause between pages
+      if (!abortRef.current) await new Promise(res => setTimeout(res, 500));
     }
-    return 'complete';
+
+    return abortRef.current ? 'aborted' : 'complete';
   }
 
-  // ── Start full ingestion — runs until vault complete or Stop pressed ────────
+  // ── Start ingestion — runs until vault full or Stop pressed ────────────────
   async function startIngestion(yearsToIngest: number[]) {
     abortRef.current = false;
     setIngesting(true);
     setIngestLog([]);
     setScanResults([]);
 
-    const total = yearsToIngest.reduce(
-      (s, y) => s + (12 - (yearMetas[y]?.monthsDone?.length ?? 0)), 0,
-    );
-    setIngestTotal(total);
+    // Total pages is unknown upfront — use year count as progress proxy
+    setIngestTotal(yearsToIngest.length * 30); // rough estimate: ~30 pages per year
     setIngestDone(0);
-    addLog(`Starting — ${yearsToIngest.length} year(s), ${total} month-batches`, 'info');
 
-    // ── Pre-flight: Firestore ──────────────────────────────────────────────
+    addLog(`Starting — ${yearsToIngest.length} conflict year(s) to ingest`, 'info');
+    addLog('Source: Wikipedia Category API + Wikidata birth date lookup', 'info');
+
+    // ── Pre-flight checks ──────────────────────────────────────────────────
     addLog('Checking Firestore…', 'info');
     try {
       await getDoc(doc(db, META_COLL, '_ping_'));
       addLog('✓ Firestore reachable', 'ok');
     } catch (e: unknown) {
       addLog(`❌ Firestore unreachable: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      addLog('Enable billing: console.cloud.google.com → project studio-knvm3 → Billing', 'error');
       setIngestPhase('Firestore unreachable — enable billing');
       setIngesting(false);
       return;
     }
 
-    // ── Pre-flight: Wikidata ───────────────────────────────────────────────
-    addLog('Checking Wikidata…', 'info');
+    addLog('Checking Wikipedia…', 'info');
     try {
       const r = await fetch(
-        'https://query.wikidata.org/sparql?format=json&query=SELECT%20%2A%20WHERE%20%7B%20wd%3AQ42%20wdt%3AP31%20%3Ft%20%7D%20LIMIT%201',
-        { headers: { Accept: 'application/sparql-results+json' } },
+        'https://en.wikipedia.org/w/api.php?action=query&meta=siteinfo&format=json&origin=*',
+        { headers: { 'User-Agent': 'MystiqueCompass/1.0' } },
       );
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      addLog('✓ Wikidata reachable', 'ok');
+      addLog('✓ Wikipedia reachable', 'ok');
     } catch (e: unknown) {
-      addLog(`❌ Wikidata blocked: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      addLog('Use the live published URL — Studio preview blocks external fetches.', 'warn');
-      setIngestPhase('Wikidata blocked — use the live published URL');
+      addLog(`❌ Wikipedia blocked: ${e instanceof Error ? e.message : String(e)}`, 'error');
+      addLog('Use the live published URL — not the Studio preview.', 'warn');
+      setIngestPhase('Wikipedia blocked — use the live published URL');
       setIngesting(false);
       return;
     }
 
-    // ── Run until complete or manually stopped — NO time limit ────────────
-    addLog('Running until vault complete — press Stop to pause anytime.', 'info');
+    // ── Run until complete or stopped ─────────────────────────────────────
+    addLog('Running continuously — press Stop to pause anytime.', 'info');
 
     for (const year of yearsToIngest) {
       if (abortRef.current) break;
@@ -433,7 +508,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
     const stopped = abortRef.current;
     setIngestPhase(stopped ? 'Stopped — press again to resume.' : '✓ Vault complete!');
-    addLog(stopped ? '⏹ Manually stopped' : '✓ All years complete!', stopped ? 'warn' : 'ok');
+    addLog(stopped ? '⏹ Stopped' : '✓ All years complete!', stopped ? 'warn' : 'ok');
     setIngesting(false);
     await refreshMetas();
   }
@@ -450,13 +525,13 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   // ── Clear vault ────────────────────────────────────────────────────────────
   function clearVault() {
     setDialog({
-      message: `Reset all ${uniqueYears.length} conflict years back to pending? All stored people data will be cleared. This cannot be undone.`,
+      message: `Reset all ${uniqueYears.length} conflict years? All stored people will be cleared. This cannot be undone.`,
       onConfirm: async () => {
         setDialog(null);
         await Promise.all(uniqueYears.map(y =>
           setDoc(doc(db, META_COLL, String(y)), {
-            year: y, status: 'pending', count: 0, monthsDone: [], updatedAt: Date.now(),
-          }),
+            year: y, status: 'pending', count: 0, cmcontinue: null, updatedAt: Date.now(),
+          } as YearMeta),
         ));
         await refreshMetas();
         setScanResults([]);
@@ -509,7 +584,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     [filtered],
   );
 
-  // ── Log display ────────────────────────────────────────────────────────────
+  // ── Log helpers ────────────────────────────────────────────────────────────
   function logIcon(kind: LogEntry['kind']) {
     if (kind === 'ok')    return <CheckCircle2  className="h-2.5 w-2.5 text-emerald-400 shrink-0 mt-0.5" />;
     if (kind === 'error') return <XCircle       className="h-2.5 w-2.5 text-rose-400    shrink-0 mt-0.5" />;
@@ -531,7 +606,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       )}
       <div className="space-y-4">
 
-        {/* ── Header ───────────────────────────────────────────────────────── */}
+        {/* Header */}
         <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
@@ -564,7 +639,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </div>
         </Card>
 
-        {/* ════════ DATA VAULT ════════ */}
+        {/* ════════ DATA VAULT TAB ════════ */}
         {tab === 'vault' && (
           <Card className="glass-card p-6 border-primary/20 space-y-6">
 
@@ -604,7 +679,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <p className={`text-[10px] font-cinzel text-center ${
                 ingestPhase.startsWith('✓') ? 'text-emerald-400' :
                 ingestPhase.includes('error') || ingestPhase.includes('unreachable') || ingestPhase.includes('blocked') ? 'text-rose-400' :
-                'text-amber-400'
+                'text-primary/70'
               }`}>
                 {ingestPhase}
               </p>
@@ -655,11 +730,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 <CloudLightning className="h-3 w-3" /> How Ingestion Works
               </p>
               <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                Fetches from Wikidata in small pages of{' '}
-                <strong className="text-slate-200">{PAGE_SIZE} records</strong> — fast, no timeouts.
-                Runs continuously until the vault is full or you press Stop.
-                Keep the screen on and plugged in overnight for best results.
-                If any months show errors, press Local Ingest again to retry them.
+                Reads directly from <strong className="text-slate-200">Wikipedia's Category API</strong>{' '}
+                (e.g. "Category:1984 births") — 500 names per page, never times out. Birth dates are
+                resolved via <strong className="text-slate-200">Wikidata entity lookup</strong> in
+                batches of 40. Runs continuously until the vault is full. Press Stop anytime — it
+                resumes exactly where it left off.
               </p>
             </div>
 
@@ -670,13 +745,13 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 const status = meta?.status || 'pending';
                 const info   = yearConflictMap[year];
                 const c      = info?.config;
-                const pct    = meta ? Math.round(((meta.monthsDone?.length ?? 0) / 12) * 100) : 0;
                 const style  = ({
-                  complete:  { b: 'rgba(76,175,125,0.5)',   bg: 'rgba(76,175,125,0.08)',   dot: '#4caf7d' },
-                  partial:   { b: 'rgba(224,148,40,0.5)',   bg: 'rgba(224,148,40,0.08)',   dot: '#e09428' },
-                  ingesting: { b: 'rgba(155,142,196,0.5)',  bg: 'rgba(155,142,196,0.08)',  dot: '#9b8ec4' },
-                  pending:   { b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)',  dot: '#2a2a3a' },
-                } as Record<string, { b: string; bg: string; dot: string }>)[status];
+                  complete: { b: 'rgba(76,175,125,0.5)',   bg: 'rgba(76,175,125,0.08)',   dot: '#4caf7d' },
+                  partial:  { b: 'rgba(224,148,40,0.5)',   bg: 'rgba(224,148,40,0.08)',   dot: '#e09428' },
+                  pending:  { b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)',  dot: '#2a2a3a' },
+                } as Record<string, { b: string; bg: string; dot: string }>)[status] ?? {
+                  b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)', dot: '#2a2a3a',
+                };
                 return (
                   <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }}
                     className="rounded-xl p-2.5 text-center relative overflow-hidden">
@@ -694,9 +769,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                       <div className="text-[7px] text-slate-500 font-cinzel mt-0.5">
                         {meta.count.toLocaleString()}
                       </div>
-                    )}
-                    {status === 'partial' && (
-                      <div className="absolute bottom-0 left-0 h-[2px] bg-orange-400/50" style={{ width: `${pct}%` }} />
                     )}
                   </div>
                 );
@@ -765,6 +837,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                             onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
                             <div className="flex-1" style={{ minWidth: 0 }}>
                               <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
+                              {person.description && (
+                                <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5"
+                                  style={{ wordBreak: 'break-word' }}>
+                                  {person.description}
+                                </p>
+                              )}
                               <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
                                 <span>{person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}</span>
                                 <span>•</span>
@@ -803,7 +881,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                                   </p>
                                   <a href={person.url} target="_blank" rel="noopener noreferrer"
                                     className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
-                                    <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
+                                    <ExternalLink className="h-3 w-3" /> Read on Wikipedia
                                   </a>
                                 </div>
                               </motion.div>
