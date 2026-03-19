@@ -12,12 +12,9 @@ export async function POST(req: NextRequest) {
   // ── 1. Resolve the Cloud Function URL ────────────────────────────────────────
   //    For Firebase App Hosting  → set in apphosting.yaml  (INGEST_VAULT_URL)
   //    For Firebase Studio preview → set in .env            (INGEST_VAULT_URL)
-  //    Format: https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/ingestVaultNow
   let url = process.env.INGEST_VAULT_URL?.trim();
 
   // ── 2. Fallback: use the firebase.json hosting rewrite ────────────────────────
-  //    firebase.json rewrites /ingestVaultNow → function ingestVaultNow
-  //    So calling the hosting origin + /ingestVaultNow works as a fallback.
   if (!url) {
     const origin = req.headers.get('origin') ||
                    req.headers.get('x-forwarded-host') ||
@@ -34,8 +31,7 @@ export async function POST(req: NextRequest) {
         ok: false,
         error:
           'INGEST_VAULT_URL is not configured. ' +
-          'Add it to apphosting.yaml (production) or .env (Studio preview). ' +
-          'Value: https://us-central1-studio-knvm3.cloudfunctions.net/ingestVaultNow',
+          'Add it to apphosting.yaml (production) or .env (Studio preview).',
       },
       { status: 500 },
     );
