@@ -77,7 +77,6 @@ SELECT ?person ?personLabel ?dob ?description WHERE {
   ?person wdt:P31 wd:Q5 ;
           wdt:P569 ?dob .
   FILTER(YEAR(?dob) = ${year} && MONTH(?dob) = ${month})
-  FILTER(DATATYPE(?dob) = xsd:dateTime)
   OPTIONAL {
     ?person schema:description ?description .
     FILTER(LANG(?description) = "en")
@@ -259,7 +258,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
   // ── Core ingest loop ───────────────────────────────────────────────────────
-  async function ingestOneYear(year: number): Promise<'complete' | 'aborted'> {
+  async function ingestOneYear(
+    year: number,
+    deadline: number,
+  ): Promise<'complete' | 'paused' | 'aborted'> {
     const metaRef  = doc(db, META_COLL, String(year));
     const snap     = await getDoc(metaRef);
     const existing = snap.exists() ? (snap.data() as YearMeta) : null;
@@ -276,6 +278,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
     for (const month of remaining) {
       if (abortRef.current) return 'aborted';
+      if (Date.now() >= deadline) return 'paused';
 
       setIngestPhase(`${year} / ${MONTHS_SHORT[month - 1]} — contacting Wikidata…`);
       addLog(`→ Fetching ${year} / ${MONTHS_SHORT[month - 1]}…`, 'info');
@@ -344,7 +347,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
     addLog(`Starting ingest for ${yearsToIngest.length} year(s), ${total} month-batches total`, 'info');
 
-    // Connectivity checks
     addLog('Checking Firestore connectivity…', 'info');
     try {
       await getDoc(doc(db, META_COLL, '_ping_'));
@@ -366,22 +368,21 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       addLog('✓ Wikidata reachable', 'ok');
     } catch (e: unknown) {
       addLog(`❌ Wikidata unreachable: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      setIngestPhase('Wikidata blocked — check connection');
+      setIngestPhase('Wikidata blocked — use the live published URL');
       setIngesting(false);
       return;
     }
 
-    let outcome: 'complete' | 'aborted' = 'complete';
+    const deadline = Infinity;
+    let outcome: 'complete' | 'paused' | 'aborted' = 'complete';
+
     for (const year of yearsToIngest) {
       if (abortRef.current) {
         outcome = 'aborted';
         break;
       }
-      const yearOutcome = await ingestOneYear(year);
-      if (yearOutcome === 'aborted') {
-        outcome = 'aborted';
-        break;
-      }
+      outcome = await ingestOneYear(year, deadline);
+      if (outcome !== 'complete') break;
     }
 
     setIngestPhase(
@@ -406,7 +407,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     void startIngestion(pending);
   }
 
-  // ── Clear vault ────────────────────────────────────────────────────────────
   function clearVault() {
     setDialog({
       message: `Delete all stored people data from Firestore for ${targetYear} conflict years? This cannot be undone.`,
@@ -426,7 +426,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     });
   }
 
-  // ── Scanner ────────────────────────────────────────────────────────────────
   async function runScan() {
     setScanning(true);
     setScanResults([]);
