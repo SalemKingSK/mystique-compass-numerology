@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2, ExternalLink, Telescope,
   Trash2, Globe, Database, RefreshCw, AlertTriangle,
-  CloudLightning,
+  CloudLightning, CheckCircle2, XCircle,
 } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
 import { Badge }    from '@/components/ui/badge';
@@ -27,7 +27,6 @@ interface PersonRecord {
   description: string;
   url:         string;
 }
-
 interface YearMeta {
   year:       number;
   status:     'pending' | 'ingesting' | 'partial' | 'complete';
@@ -35,7 +34,6 @@ interface YearMeta {
   monthsDone: number[];
   updatedAt:  number;
 }
-
 interface ScanResult extends PersonRecord {
   animal:       string;
   conflictType: string;
@@ -45,6 +43,7 @@ interface ScanResult extends PersonRecord {
   totalScore:   number;
   tier:         any;
 }
+type LogEntry = { text: string; kind: 'info' | 'ok' | 'warn' | 'error' };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function reduce(n: number) {
@@ -65,16 +64,18 @@ function getDangerTier(total: number) {
 }
 
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const META_COLL    = 'cosmic_vault_meta';
+const PEOPLE_COLL  = 'cosmic_vault_people';
 
-// ─── Firestore collections ────────────────────────────────────────────────────
-const META_COLL   = 'cosmic_vault_meta';
-const PEOPLE_COLL = 'cosmic_vault_people';
-
-// ─── Wikidata SPARQL fetch (browser-side — Wikidata supports CORS) ────────────
-async function fetchWikidataMonth(year: number, month: number): Promise<PersonRecord[]> {
+// ─── Wikidata SPARQL ──────────────────────────────────────────────────────────
+async function fetchWikidataMonth(
+  year: number,
+  month: number,
+): Promise<{ people: PersonRecord[]; error: string | null }> {
   const sparql = `
 SELECT ?person ?personLabel ?dob ?description WHERE {
-  ?person wdt:P31 wd:Q5 ; wdt:P569 ?dob .
+  ?person wdt:P31 wd:Q5 ;
+          wdt:P569 ?dob .
   FILTER(YEAR(?dob) = ${year} && MONTH(?dob) = ${month})
   FILTER(DATATYPE(?dob) = xsd:dateTime)
   OPTIONAL {
@@ -84,21 +85,37 @@ SELECT ?person ?personLabel ?dob ?description WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
 } LIMIT 2000`.trim();
 
-  for (let attempt = 0; attempt < 3; attempt++) {
+  const endpoint =
+    `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`;
+
+  for (let attempt = 0; attempt < 4; attempt++) {
     try {
-      const r = await fetch(
-        `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`,
-        { headers: { Accept: 'application/sparql-results+json' } },
-      );
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 45_000);
+
+      const r = await fetch(endpoint, {
+        signal: controller.signal,
+        headers: {
+          Accept:       'application/sparql-results+json',
+          'User-Agent': 'MystiqueCompass/1.0 (browser ingest)',
+        },
+      });
+      clearTimeout(timer);
+
       if (r.status === 429) {
-        await new Promise(res => setTimeout(res, 10000));
+        const wait = 12_000 * (attempt + 1);
+        await new Promise(res => setTimeout(res, wait));
         continue;
       }
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      if (!r.ok) {
+        return { people: [], error: `Wikidata HTTP ${r.status}` };
+      }
 
-      const data = await r.json() as any;
+      const data = await r.json() as {
+        results: { bindings: Record<string, { value: string }>[] };
+      };
+
       const people: PersonRecord[] = [];
-
       for (const b of (data?.results?.bindings ?? [])) {
         const wikidataId = b.person?.value?.split('/').pop();
         if (!wikidataId) continue;
@@ -116,43 +133,60 @@ SELECT ?person ?personLabel ?dob ?description WHERE {
           url: `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`,
         });
       }
-      return people;
-    } catch {
-      await new Promise(res => setTimeout(res, 3000 * (attempt + 1)));
+      return { people, error: null };
+
+    } catch (e: unknown) {
+      const isAbort = e instanceof Error && e.name === 'AbortError';
+      if (attempt === 3 || isAbort) {
+        return {
+          people: [],
+          error:  isAbort ? `Timeout on ${year}/${month}` : (e instanceof Error ? e.message : String(e)),
+        };
+      }
+      await new Promise(res => setTimeout(res, 4_000 * (attempt + 1)));
     }
   }
-  return [];
+  return { people: [], error: 'Max retries exceeded' };
 }
 
 // ─── Firestore batch write ────────────────────────────────────────────────────
-async function savePeopleBatch(people: PersonRecord[]) {
-  for (let i = 0; i < people.length; i += 450) {
-    const batch = writeBatch(db);
-    people.slice(i, i + 450).forEach(p =>
-      batch.set(doc(db, PEOPLE_COLL, p.wikidataId), p, { merge: true }),
-    );
-    await batch.commit();
+async function savePeopleBatch(people: PersonRecord[]): Promise<string | null> {
+  try {
+    for (let i = 0; i < people.length; i += 450) {
+      const batch = writeBatch(db);
+      people.slice(i, i + 450).forEach(p =>
+        batch.set(doc(db, PEOPLE_COLL, p.wikidataId), p, { merge: true }),
+      );
+      await batch.commit();
+    }
+    return null;
+  } catch (e: unknown) {
+    return e instanceof Error ? e.message : String(e);
   }
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
-  const [tab, setTab]                       = useState<'vault' | 'scanner'>('vault');
-  const [yearMetas, setYearMetas]           = useState<Record<number, YearMeta>>({});
-  const [ingesting, setIngesting]           = useState(false);
-  const [ingestLog, setIngestLog]           = useState<string[]>([]);
-  const [ingestDone, setIngestDone]         = useState(0);
-  const [ingestTotal, setIngestTotal]       = useState(0);
-  const [ingestPhase, setIngestPhase]       = useState('');
-  const [scanning, setScanning]             = useState(false);
-  const [scanResults, setScanResults]       = useState<ScanResult[]>([]);
-  const [scanStats, setScanStats]           = useState({ checked: 0, flagged: 0 });
-  const [filterQuery, setFilterQuery]       = useState('');
-  const [expandedId, setExpandedId]         = useState<string | null>(null);
-  const [dialog, setDialog]                 = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [tab, setTab]                 = useState<'vault' | 'scanner'>('vault');
+  const [yearMetas, setYearMetas]     = useState<Record<number, YearMeta>>({});
+  const [ingesting, setIngesting]     = useState(false);
+  const [ingestLog, setIngestLog]     = useState<LogEntry[]>([]);
+  const [ingestDone, setIngestDone]   = useState(0);
+  const [ingestTotal, setIngestTotal] = useState(0);
+  const [ingestPhase, setIngestPhase] = useState('');
+  const [scanning, setScanning]       = useState(false);
+  const [scanResults, setScanResults] = useState<ScanResult[]>([]);
+  const [scanStats, setScanStats]     = useState({ checked: 0, flagged: 0 });
+  const [filterQuery, setFilterQuery] = useState('');
+  const [expandedId, setExpandedId]   = useState<string | null>(null);
+  const [dialog, setDialog]           = useState<{ message: string; onConfirm: () => void } | null>(null);
   const abortRef = useRef(false);
 
-  // ── Derived zodiac info ────────────────────────────────────────────────────
+  const addLog = useCallback((text: string, kind: LogEntry['kind'] = 'info') => {
+    setIngestLog(l => [{ text, kind }, ...l.slice(0, 49)]);
+  }, []);
+
+  // ── Zodiac config ──────────────────────────────────────────────────────────
   const targetSign = useMemo(() => {
     const idx = ((targetYear - 1900) % 12 + 12) % 12;
     return ANIMALS[idx] || ANIMALS[0];
@@ -163,9 +197,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const CF_CONFIG = useMemo(() => {
     const rels = RELATIONS[targetSign.n] || RELATIONS.Rat;
     return {
-      Chong: { label: 'Direct Clash',    score: 4, color: '#ff4444', bg: 'rgba(255,68,68,0.13)',    border: 'rgba(255,68,68,0.5)',    glyph: '☠', animal: rels.clash },
+      Chong: { label: 'Direct Clash',    score: 4, color: '#ff4444', bg: 'rgba(255,68,68,0.13)',    border: 'rgba(255,68,68,0.5)',    glyph: '☠', animal: rels.clash   },
       Xing:  { label: 'Self-Punishment', score: 3, color: '#e07828', bg: 'rgba(224,120,40,0.12)',   border: 'rgba(224,120,40,0.5)',   glyph: '⚔', animal: ['Horse','Dragon','Rooster','Pig'].includes(targetSign.n) ? targetSign.n : null },
-      Hai:   { label: 'Harm',            score: 2, color: '#d4aa20', bg: 'rgba(212,170,32,0.11)',   border: 'rgba(212,170,32,0.45)',  glyph: '⚠', animal: rels.harm },
+      Hai:   { label: 'Harm',            score: 2, color: '#d4aa20', bg: 'rgba(212,170,32,0.11)',   border: 'rgba(212,170,32,0.45)',  glyph: '⚠', animal: rels.harm    },
       Po:    { label: 'Breaking',        score: 1, color: '#9b8ec4', bg: 'rgba(155,142,196,0.11)', border: 'rgba(155,142,196,0.4)',  glyph: '◎', animal: rels.destroy },
     };
   }, [targetSign]);
@@ -197,15 +231,19 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     return m;
   }, [CONFLICT_YEARS]);
 
-  // ── Vault stats ────────────────────────────────────────────────────────────
+  // ── Vault meta ─────────────────────────────────────────────────────────────
   const refreshMetas = useCallback(async () => {
-    const snap = await getDocs(collection(db, META_COLL));
-    const metas: Record<number, YearMeta> = {};
-    snap.forEach(d => {
-      const data = d.data() as YearMeta;
-      metas[data.year] = data;
-    });
-    setYearMetas(metas);
+    try {
+      const snap = await getDocs(collection(db, META_COLL));
+      const metas: Record<number, YearMeta> = {};
+      snap.forEach(d => {
+        const data = d.data() as YearMeta;
+        metas[data.year] = data;
+      });
+      setYearMetas(metas);
+    } catch (e: unknown) {
+      console.error('refreshMetas failed:', e);
+    }
   }, []);
 
   useEffect(() => { void refreshMetas(); }, [targetYear, refreshMetas]);
@@ -220,28 +258,50 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
-  // ── Local ingest — Infinity browser session, only stopped by user ─
-  async function ingestOneYear(
-    year: number,
-    onPhase: (msg: string) => void,
-  ): Promise<'complete' | 'aborted'> {
-    const metaRef    = doc(db, META_COLL, String(year));
-    const snap       = await getDoc(metaRef);
-    const existing   = snap.exists() ? (snap.data() as YearMeta) : null;
+  // ── Core ingest loop ───────────────────────────────────────────────────────
+  async function ingestOneYear(year: number): Promise<'complete' | 'aborted'> {
+    const metaRef  = doc(db, META_COLL, String(year));
+    const snap     = await getDoc(metaRef);
+    const existing = snap.exists() ? (snap.data() as YearMeta) : null;
+
     const monthsDone = [...(existing?.monthsDone ?? [])];
     const remaining  = [1,2,3,4,5,6,7,8,9,10,11,12].filter(m => !monthsDone.includes(m));
 
-    if (!remaining.length) return 'complete';
+    if (!remaining.length) {
+      addLog(`${year}: already complete — skipping`, 'ok');
+      return 'complete';
+    }
 
     let localCount = existing?.count ?? 0;
 
     for (const month of remaining) {
       if (abortRef.current) return 'aborted';
 
-      onPhase(`${year} / ${MONTHS_SHORT[month - 1]} — fetching Wikidata…`);
+      setIngestPhase(`${year} / ${MONTHS_SHORT[month - 1]} — contacting Wikidata…`);
+      addLog(`→ Fetching ${year} / ${MONTHS_SHORT[month - 1]}…`, 'info');
 
-      const people = await fetchWikidataMonth(year, month);
-      if (people.length > 0) await savePeopleBatch(people);
+      const { people, error: fetchError } = await fetchWikidataMonth(year, month);
+
+      if (fetchError) {
+        addLog(`⚠ Wikidata error ${year}/${month}: ${fetchError}`, 'warn');
+        await new Promise(res => setTimeout(res, 3_000));
+        continue;
+      }
+
+      addLog(`  Wikidata returned ${people.length} people`, people.length > 0 ? 'info' : 'warn');
+
+      if (people.length > 0) {
+        addLog(`  Writing ${people.length} records to Firestore…`, 'info');
+        const writeError = await savePeopleBatch(people);
+        if (writeError) {
+          addLog(`❌ Firestore write failed: ${writeError}`, 'error');
+          setIngestPhase(`Firestore error — check billing & rules`);
+          setIngesting(false);
+          await refreshMetas();
+          return 'aborted';
+        }
+        addLog(`✓ ${year} ${MONTHS_SHORT[month - 1]}: ${people.length} saved`, 'ok');
+      }
 
       monthsDone.push(month);
       localCount += people.length;
@@ -254,13 +314,17 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         monthsDone: [...monthsDone],
         updatedAt:  Date.now(),
       };
-      await setDoc(metaRef, meta);
-      setYearMetas(p => ({ ...p, [year]: meta }));
-      setIngestLog(l => [`✓ ${year} ${MONTHS_SHORT[month - 1]}: ${people.length} stored`, ...l.slice(0, 39)]);
-      setIngestDone(d => d + 1);
 
-      // Respect Wikidata rate limit
-      if (!abortRef.current) await new Promise(res => setTimeout(res, 700));
+      try {
+        await setDoc(metaRef, meta);
+        setYearMetas(p => ({ ...p, [year]: meta }));
+      } catch (e: unknown) {
+        addLog(`❌ Meta write failed: ${e instanceof Error ? e.message : String(e)}`, 'error');
+        return 'aborted';
+      }
+
+      setIngestDone(d => d + 1);
+      if (!abortRef.current) await new Promise(res => setTimeout(res, 800));
     }
     return 'complete';
   }
@@ -277,23 +341,58 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     );
     setIngestTotal(total);
     setIngestDone(0);
-    setIngestPhase('Starting…');
+
+    addLog(`Starting ingest for ${yearsToIngest.length} year(s), ${total} month-batches total`, 'info');
+
+    // Connectivity checks
+    addLog('Checking Firestore connectivity…', 'info');
+    try {
+      await getDoc(doc(db, META_COLL, '_ping_'));
+      addLog('✓ Firestore reachable', 'ok');
+    } catch (e: unknown) {
+      addLog(`❌ Firestore unreachable: ${e instanceof Error ? e.message : String(e)}`, 'error');
+      setIngestPhase('Firestore unreachable — check billing & rules');
+      setIngesting(false);
+      return;
+    }
+
+    addLog('Checking Wikidata connectivity…', 'info');
+    try {
+      const testR = await fetch(
+        'https://query.wikidata.org/sparql?format=json&query=SELECT%20%2A%20WHERE%20%7B%20wd%3AQ42%20wdt%3AP31%20%3Ftype%20%7D%20LIMIT%201',
+        { headers: { Accept: 'application/sparql-results+json' } },
+      );
+      if (!testR.ok) throw new Error(`HTTP ${testR.status}`);
+      addLog('✓ Wikidata reachable', 'ok');
+    } catch (e: unknown) {
+      addLog(`❌ Wikidata unreachable: ${e instanceof Error ? e.message : String(e)}`, 'error');
+      setIngestPhase('Wikidata blocked — check connection');
+      setIngesting(false);
+      return;
+    }
 
     let outcome: 'complete' | 'aborted' = 'complete';
-
     for (const year of yearsToIngest) {
       if (abortRef.current) {
         outcome = 'aborted';
         break;
       }
-      outcome = await ingestOneYear(year, msg => setIngestPhase(msg));
-      if (outcome !== 'complete') break;
+      const yearOutcome = await ingestOneYear(year);
+      if (yearOutcome === 'aborted') {
+        outcome = 'aborted';
+        break;
+      }
     }
 
     setIngestPhase(
-      outcome === 'aborted' ? 'Stopped — press again to resume from here.' :
+      outcome === 'aborted' ? 'Stopped — press again to resume.' :
                               '✓ All ingestion complete!',
     );
+    addLog(
+      outcome === 'complete' ? '✓ Session complete' : '⏹ Manually stopped',
+      outcome === 'complete' ? 'ok' : 'warn',
+    );
+
     setIngesting(false);
     await refreshMetas();
   }
@@ -322,6 +421,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         setScanResults([]);
         setScanStats({ checked: 0, flagged: 0 });
         setIngestLog([]);
+        setIngestPhase('');
       },
     });
   }
@@ -332,7 +432,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setScanResults([]);
     setScanStats({ checked: 0, flagged: 0 });
     try {
-      const snap   = await getDocs(collection(db, PEOPLE_COLL));
+      const snap = await getDocs(collection(db, PEOPLE_COLL));
       const people: PersonRecord[] = [];
       snap.forEach(d => people.push(d.data() as PersonRecord));
 
@@ -346,9 +446,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         const totalScore = conflict.config.score + pyPoints;
         results.push({
           ...p,
-          animal: conflict.config.animal,
+          animal:       conflict.config.animal,
           conflictType: conflict.type,
-          config: conflict.config,
+          config:       conflict.config,
           py, pyPoints, totalScore,
           tier: getDangerTier(totalScore),
         });
@@ -376,7 +476,19 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     [filtered],
   );
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  function logIcon(kind: LogEntry['kind']) {
+    if (kind === 'ok')    return <CheckCircle2 className="h-2.5 w-2.5 text-emerald-400 shrink-0 mt-0.5" />;
+    if (kind === 'error') return <XCircle      className="h-2.5 w-2.5 text-rose-400    shrink-0 mt-0.5" />;
+    if (kind === 'warn')  return <AlertTriangle className="h-2.5 w-2.5 text-amber-400  shrink-0 mt-0.5" />;
+    return <span className="w-2.5 shrink-0" />;
+  }
+  function logColor(kind: LogEntry['kind']) {
+    if (kind === 'ok')    return 'text-emerald-400';
+    if (kind === 'error') return 'text-rose-400';
+    if (kind === 'warn')  return 'text-amber-400';
+    return 'text-slate-400';
+  }
+
   return (
     <>
       {dialog && (
@@ -388,8 +500,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       )}
 
       <div className="space-y-4">
-
-        {/* ── Header card ──────────────────────────────────────────────────── */}
         <Card className="glass-card p-6 border-primary/20 relative overflow-hidden">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
@@ -401,11 +511,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost" size="icon" onClick={clearVault}
-                title="Clear vault data"
-                className="text-rose-400 hover:bg-rose-500/10 h-8 w-8"
-              >
+              <Button variant="ghost" size="icon" onClick={clearVault} title="Clear vault data"
+                className="text-rose-400 hover:bg-rose-500/10 h-8 w-8">
                 <Trash2 className="h-4 w-4" />
               </Button>
               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 font-cinzel text-[10px]">
@@ -414,34 +521,23 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
             </div>
           </div>
 
-          {/* Tab toggle */}
           <div className="flex gap-1 bg-black/20 p-1 rounded-xl border border-white/10">
             {[
               { id: 'vault',   label: '🗄 Data Vault' },
               { id: 'scanner', label: '🔭 Scanner'    },
             ].map(t => (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id as 'vault' | 'scanner')}
+              <button key={t.id} onClick={() => setTab(t.id as 'vault' | 'scanner')}
                 className={`flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest font-cinzel transition-all ${
-                  tab === t.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-slate-500 hover:text-slate-300'
-                }`}
-              >
+                  tab === t.id ? 'bg-primary text-primary-foreground' : 'text-slate-500 hover:text-slate-300'
+                }`}>
                 {t.label}
               </button>
             ))}
           </div>
         </Card>
 
-        {/* ════════════════════════════════════════════════════════════════════
-            DATA VAULT TAB
-        ════════════════════════════════════════════════════════════════════ */}
         {tab === 'vault' && (
           <Card className="glass-card p-6 border-primary/20 space-y-6">
-
-            {/* Stats grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {([
                 [vaultSummary.totalPeople.toLocaleString(), 'People Stored',  'text-primary'    ],
@@ -456,7 +552,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ))}
             </div>
 
-            {/* Ingest progress */}
             {ingesting && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-primary/80 font-cinzel">
@@ -464,63 +559,76 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                     <Loader2 className="h-3 w-3 animate-spin" />
                     {ingestPhase}
                   </span>
-                  <button
-                    onClick={() => { abortRef.current = true; }}
-                    className="text-rose-400 text-[9px] uppercase font-cinzel"
-                  >
+                  <button onClick={() => { abortRef.current = true; }}
+                    className="text-rose-400 text-[9px] uppercase font-cinzel hover:text-rose-300">
                     Stop
                   </button>
                 </div>
                 <Progress value={ingestPct} className="h-2 bg-white/5" />
-                <div className="bg-black/30 rounded-xl border border-white/5 p-3 max-h-36 overflow-y-auto space-y-1">
-                  {ingestLog.map((l, i) => (
-                    <p key={i} className="text-[9px] font-cinzel text-slate-400">{l}</p>
-                  ))}
-                </div>
               </div>
             )}
 
-            {/* Phase message when not ingesting */}
             {!ingesting && ingestPhase && (
-              <p className="text-[10px] font-cinzel text-primary/70 text-center">{ingestPhase}</p>
+              <p className={`text-[10px] font-cinzel text-center ${
+                ingestPhase.startsWith('✓') ? 'text-emerald-400' :
+                ingestPhase.includes('error') || ingestPhase.includes('unreachable') ? 'text-rose-400' :
+                'text-primary/70'
+              }`}>
+                {ingestPhase}
+              </p>
             )}
 
-            {/* Action buttons */}
-            {!ingesting && (
-              <div className="flex flex-col gap-3">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleIngestAll}
-                    disabled={vaultSummary.pending === 0 && vaultSummary.partial === 0}
-                    className="flex-1 bg-gradient-to-r from-primary/80 to-primary text-primary-foreground font-black uppercase tracking-widest font-cinzel text-[10px] py-3 h-auto"
-                  >
-                    <Database className="mr-2 h-4 w-4" />
-                    {vaultSummary.pending === 0 && vaultSummary.partial === 0
-                      ? 'Vault Complete ✓'
-                      : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
-                  </Button>
-                  <Button
-                    variant="outline" size="icon" onClick={refreshMetas}
-                    className="border-white/10 text-slate-400 h-auto px-3"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                </div>
+            {ingestLog.length > 0 && (
+              <div className="bg-black/40 rounded-xl border border-white/5 p-3 max-h-48 overflow-y-auto space-y-1">
+                <p className="text-[8px] font-cinzel text-slate-600 uppercase tracking-widest mb-2">
+                  Ingest Diagnostics
+                </p>
+                {ingestLog.map((entry, i) => (
+                  <div key={i} className="flex items-start gap-1.5">
+                    {logIcon(entry.kind)}
+                    <p className={`text-[9px] font-cinzel leading-relaxed ${logColor(entry.kind)}`}>
+                      {entry.text}
+                    </p>
+                  </div>
+                ))}
               </div>
             )}
 
-            {/* Cloud Ingestion info */}
+            <div className="flex gap-2">
+              <Button
+                onClick={ingesting ? () => { abortRef.current = true; } : handleIngestAll}
+                disabled={!ingesting && vaultSummary.pending === 0 && vaultSummary.partial === 0}
+                className={`flex-1 font-black uppercase tracking-widest font-cinzel text-[10px] py-3 h-auto ${
+                  ingesting
+                    ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                    : 'bg-gradient-to-r from-primary/80 to-primary text-primary-foreground'
+                }`}
+              >
+                <Database className="mr-2 h-4 w-4" />
+                {ingesting
+                  ? 'Stop Ingest'
+                  : vaultSummary.pending === 0 && vaultSummary.partial === 0
+                    ? 'Vault Complete ✓'
+                    : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => void refreshMetas()}
+                className="border-white/10 text-slate-400 h-auto px-3">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+
             <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
               <p className="text-[10px] font-black uppercase tracking-wider font-cinzel text-primary/80 flex items-center gap-2">
                 <CloudLightning className="h-3 w-3" /> How Ingestion Works
               </p>
               <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                Press <strong className="text-slate-200">Local Ingest</strong> to fetch from Wikidata directly
-                in your browser. The process will run continuously until the vault shows <strong className="text-slate-200">Complete ✓</strong>.
+                Fetches directly from Wikidata in your browser — no server needed.
+                The process runs continuously until the stop button is pressed or all years show{' '}
+                <strong className="text-emerald-400">complete</strong>. The diagnostic log above will show
+                exactly what's happening at each step.
               </p>
             </div>
 
-            {/* Per-year status grid */}
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {uniqueYears.map(year => {
                 const meta   = yearMetas[year];
@@ -529,18 +637,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 const c      = info?.config;
                 const pct    = meta ? Math.round(((meta.monthsDone?.length ?? 0) / 12) * 100) : 0;
                 const style  = ({
-                  complete:  { b: 'rgba(76,175,125,0.5)',   bg: 'rgba(76,175,125,0.08)',   dot: '#4caf7d' },
-                  partial:   { b: 'rgba(224,148,40,0.5)',   bg: 'rgba(224,148,40,0.08)',   dot: '#e09428' },
+                  complete:  { b: 'rgba(34,197,94,0.5)',   bg: 'rgba(34,197,94,0.08)',   dot: '#4caf7d' },
+                  partial:   { b: 'rgba(245,158,11,0.5)',   bg: 'rgba(245,158,11,0.08)',   dot: '#e09428' },
                   ingesting: { b: 'rgba(155,142,196,0.5)',  bg: 'rgba(155,142,196,0.08)',  dot: '#9b8ec4' },
                   pending:   { b: 'rgba(255,255,255,0.07)', bg: 'rgba(255,255,255,0.01)',  dot: '#2a2a3a' },
                 } as Record<string, { b: string; bg: string; dot: string }>)[status];
 
                 return (
-                  <div
-                    key={year}
-                    style={{ border: `1px solid ${style.b}`, background: style.bg }}
-                    className="rounded-xl p-2.5 text-center relative overflow-hidden"
-                  >
+                  <div key={year} style={{ border: `1px solid ${style.b}`, background: style.bg }}
+                    className="rounded-xl p-2.5 text-center relative overflow-hidden">
                     <div className="text-[12px] font-black text-slate-100 font-decorative">{year}</div>
                     {c && (
                       <div className="text-[7px] uppercase tracking-wide font-cinzel mt-0.5" style={{ color: c.color }}>
@@ -552,10 +657,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                       <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
                     </div>
                     {status === 'partial' && (
-                      <div
-                        className="absolute bottom-0 left-0 h-[2px] bg-orange-400/50"
-                        style={{ width: `${pct}%` }}
-                      />
+                      <div className="absolute bottom-0 left-0 h-[2px] bg-orange-400/50"
+                        style={{ width: `${pct}%` }} />
                     )}
                   </div>
                 );
@@ -564,9 +667,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </Card>
         )}
 
-        {/* ════════════════════════════════════════════════════════════════════
-            SCANNER TAB
-        ════════════════════════════════════════════════════════════════════ */}
         {tab === 'scanner' && (
           <>
             <Card className="glass-card p-6 border-primary/20">
@@ -585,27 +685,24 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               {scanning ? (
                 <div className="flex items-center gap-3 text-xs text-primary/80 font-cinzel py-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Reading from Firestore vault — no API calls needed…
+                  Reading from Firestore vault…
                 </div>
               ) : vaultSummary.totalPeople === 0 ? (
                 <div className="text-center py-6 space-y-2">
                   <Database className="h-10 w-10 mx-auto opacity-20" />
                   <p className="text-[11px] text-slate-500 font-cinzel">
-                    Vault is empty. Go to 🗄 Data Vault and run Local Ingest first.
+                    Vault is empty — go to 🗄 Data Vault and run Local Ingest first.
                   </p>
                 </div>
               ) : (
-                <Button
-                  onClick={() => void runScan()}
-                  className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] py-3 h-auto font-cinzel"
-                >
+                <Button onClick={() => void runScan()}
+                  className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] py-3 h-auto font-cinzel">
                   <Zap className="mr-2 h-4 w-4" />
                   Scan {vaultSummary.totalPeople.toLocaleString()} People Instantly
                 </Button>
               )}
             </Card>
 
-            {/* Results */}
             {scanResults.length > 0 && (
               <div className="space-y-4">
                 <div className="relative">
@@ -621,26 +718,20 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 {byTier.map(({ tier, items }) => (
                   <div key={tier.label} className="space-y-3">
                     <div className="flex items-center gap-3 px-1">
-                      <span
-                        className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel"
-                        style={{ color: tier.color }}
-                      >
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-cinzel"
+                        style={{ color: tier.color }}>
                         {tier.label}
                       </span>
                       <span className="text-[9px] text-slate-500 font-cinzel">· {items.length} people</span>
                     </div>
-
                     <div className="space-y-2">
                       {items.map((person, idx) => (
-                        <Card
-                          key={`${person.wikidataId}-${idx}`}
+                        <Card key={`${person.wikidataId}-${idx}`}
                           className="glass-card p-0 border-transparent overflow-hidden"
-                          style={{ borderLeft: `3px solid ${person.tier.color}` }}
-                        >
+                          style={{ borderLeft: `3px solid ${person.tier.color}` }}>
                           <button
                             className="w-full p-4 flex items-start justify-between text-left gap-4"
-                            onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}
-                          >
+                            onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
                             <div className="flex-1" style={{ minWidth: 0 }}>
                               <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">
                                 {person.name}
@@ -658,35 +749,25 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <Badge
-                                variant="outline"
+                              <Badge variant="outline"
                                 className="h-6 text-[8px] uppercase border-white/10 font-cinzel"
-                                style={{ color: person.config.color, backgroundColor: person.config.bg }}
-                              >
+                                style={{ color: person.config.color, backgroundColor: person.config.bg }}>
                                 {person.config.label}
                               </Badge>
-                              <div
-                                className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border"
-                                style={{ borderColor: person.tier.border }}
-                              >
-                                <span
-                                  className="text-xs font-black font-decorative"
-                                  style={{ color: person.tier.color }}
-                                >
+                              <div className="w-8 h-8 rounded bg-black/40 flex flex-col items-center justify-center border"
+                                style={{ borderColor: person.tier.border }}>
+                                <span className="text-xs font-black font-decorative"
+                                  style={{ color: person.tier.color }}>
                                   {person.totalScore}
                                 </span>
                               </div>
                             </div>
                           </button>
-
                           <AnimatePresence>
                             {expandedId === person.wikidataId && (
                               <motion.div
-                                initial={{ height: 0 }}
-                                animate={{ height: 'auto' }}
-                                exit={{ height: 0 }}
-                                className="overflow-hidden bg-black/20 border-t border-white/5"
-                              >
+                                initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
+                                className="overflow-hidden bg-black/20 border-t border-white/5">
                                 <div className="p-4 space-y-3">
                                   <p className="text-[11px] text-slate-300 leading-relaxed font-body italic">
                                     <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
@@ -695,19 +776,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                                     {person.name} ({person.animal}, born {person.birthDay}{' '}
                                     {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}) faces a{' '}
                                     <span style={{ color: person.config.color }}>{person.config.label}</span>{' '}
-                                    with the {targetYear} {targetSign.n} cycle. Combined with a Personal Year{' '}
+                                    with the {targetYear} {targetSign.n} cycle. Combined with Personal Year{' '}
                                     {person.py} ({person.py === 4 ? 'Structure / Restriction' : 'Reflection / Endings'}),
                                     this produces a composite danger score of{' '}
                                     <span style={{ color: person.tier.color }}>
                                       {person.totalScore}/6 — {person.tier.label}
                                     </span>.
                                   </p>
-                                  <a
-                                    href={person.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel"
-                                  >
+                                  <a href={person.url} target="_blank" rel="noopener noreferrer"
+                                    className="flex items-center gap-2 text-[9px] text-primary/70 hover:text-primary transition-colors uppercase font-bold font-cinzel">
                                     <ExternalLink className="h-3 w-3" /> Verify via Wikipedia
                                   </a>
                                 </div>
@@ -722,7 +799,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               </div>
             )}
 
-            {/* Empty state */}
             {!scanning && scanResults.length === 0 && vaultSummary.totalPeople > 0 && (
               <div className="py-16 text-center opacity-30 space-y-3">
                 <Globe className="h-14 w-14 mx-auto stroke-[1]" />
@@ -739,9 +815,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 }
 
 // ─── Confirm Dialog ───────────────────────────────────────────────────────────
-function ConfirmDialog({
-  message, onConfirm, onCancel,
-}: {
+function ConfirmDialog({ message, onConfirm, onCancel }: {
   message: string; onConfirm: () => void; onCancel: () => void;
 }) {
   return (
@@ -753,13 +827,9 @@ function ConfirmDialog({
         </div>
         <div className="flex gap-3 justify-end">
           <Button variant="ghost" size="sm" onClick={onCancel}
-            className="text-slate-400 font-cinzel text-[10px] uppercase">
-            Cancel
-          </Button>
+            className="text-slate-400 font-cinzel text-[10px] uppercase">Cancel</Button>
           <Button size="sm" onClick={onConfirm}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">
-            Confirm
-          </Button>
+            className="bg-rose-500 hover:bg-rose-600 text-white font-cinzel text-[10px] uppercase">Confirm</Button>
         </div>
       </div>
     </div>
