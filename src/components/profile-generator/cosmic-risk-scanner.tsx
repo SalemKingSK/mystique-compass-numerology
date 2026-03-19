@@ -3,8 +3,9 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2, ExternalLink, Telescope,
-  Trash2, Globe, Database, RefreshCw, AlertTriangle,
+  Globe, Database, RefreshCw, AlertTriangle,
   CloudLightning, CheckCircle2, XCircle,
+  Trash2
 } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
 import { Badge }    from '@/components/ui/badge';
@@ -31,7 +32,7 @@ interface YearMeta {
   year:       number;
   status:     'pending' | 'partial' | 'complete';
   count:      number;
-  cmcontinue: string | null; // Wikipedia pagination cursor
+  cmcontinue: string | null;
   updatedAt:  number;
 }
 interface ScanResult extends PersonRecord {
@@ -62,8 +63,6 @@ function getDangerTier(total: number) {
   return DANGER_TIERS.find(x => total >= x.min) || DANGER_TIERS[4];
 }
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const META_COLL    = 'cosmic_vault_meta';
-const PEOPLE_COLL  = 'cosmic_vault_people';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // INDEXEDDB — local storage, no cloud, no billing
@@ -121,11 +120,11 @@ async function idbSaveMeta(meta: YearMeta): Promise<void> {
 async function idbGetAllMetas(): Promise<YearMeta[]> {
   const db = await openIDB();
   return new Promise((res, rej) => {
-    const tx  = db.transaction(META_STORE, 'readonly');
-    const req = tx.objectStore(META_STORE).getLabels(); // Error fix: getAll instead of getLabels
-    const reqActual = tx.objectStore(META_STORE).getAll();
-    reqActual.onsuccess = () => res(reqActual.result as YearMeta[]);
-    reqActual.onerror   = () => rej(reqActual.error);
+    const tx = db.transaction(META_STORE, 'readonly');
+    const store = tx.objectStore(META_STORE);
+    const req = store.getAll();
+    req.onsuccess = () => res(req.result as YearMeta[]);
+    req.onerror = () => rej(req.error);
   });
 }
 async function idbResetAll(years: number[]): Promise<void> {
@@ -150,7 +149,7 @@ async function idbResetAll(years: number[]): Promise<void> {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // ── Wikipedia Category API ────────────────────────────────────────────────────
-async function fetchWikiPage(
+async function fetchWikipediaPage(
   year: number,
   cmcontinue: string | null,
 ): Promise<{
@@ -322,9 +321,7 @@ async function fetchYearPage(
   return { people, nextCursor, error: null, rateLimited: false };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Component ────────────────────────────────────────────────────────────────
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const [tab, setTab]                 = useState<'vault' | 'scanner'>('vault');
   const [yearMetas, setYearMetas]     = useState<Record<number, YearMeta>>({});
@@ -369,9 +366,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     const list: { year: number; type: string; config: any }[] = [];
     Object.entries(CF_CONFIG).forEach(([type, config]) => {
       if (!config.animal) return;
-      const idx = ANIMALS.findIndex((a: any) => a.n === config.animal);
-      if (idx < 0) return;
-      let y = 1900 + idx;
+      const animalIdx = ANIMALS.findIndex((a: any) => a.n === config.animal);
+      if (animalIdx < 0) return;
+      let y = 1900 + animalIdx;
       while (y < 1930) y += 12;
       while (y <= 2010) {
         if (y < targetYear) list.push({ year: y, type, config });
@@ -525,6 +522,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       if (!abortRef.current) await new Promise(res => setTimeout(res, 1_000));
     }
 
+    const freshMetas = await idbGetAllMetas();
+    const allComplete = years.every(y => freshMetas.find(m => m.year === y)?.status === 'complete');
+
     const stopped = abortRef.current;
     setIngestPhase(stopped ? 'Stopped — press again to resume.' : '✓ Vault complete!');
     addLog(stopped ? '⏹ Stopped' : '✓ All years complete!', stopped ? 'warn' : 'ok');
@@ -600,6 +600,20 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       .filter(g => g.items.length > 0),
     [filtered],
   );
+
+  // ── Log helpers ────────────────────────────────────────────────────────────
+  function logIcon(kind: LogEntry['kind']) {
+    if (kind === 'ok')    return <CheckCircle2  className="h-2.5 w-2.5 text-emerald-400 shrink-0 mt-0.5" />;
+    if (kind === 'error') return <XCircle       className="h-2.5 w-2.5 text-rose-400    shrink-0 mt-0.5" />;
+    if (kind === 'warn')  return <AlertTriangle className="h-2.5 w-2.5 text-amber-400   shrink-0 mt-0.5" />;
+    return <span className="w-2.5 h-2.5 shrink-0" />;
+  }
+  function logColor(kind: LogEntry['kind']) {
+    if (kind === 'ok')    return 'text-emerald-400';
+    if (kind === 'error') return 'text-rose-400';
+    if (kind === 'warn')  return 'text-amber-400';
+    return 'text-slate-400';
+  }
 
   return (
     <>
@@ -761,7 +775,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               ) : vaultSummary.totalPeople === 0 ? (
                 <div className="text-center py-6 space-y-2">
                   <Database className="h-10 w-10 mx-auto opacity-20" />
-                  <p className="text-[11px] text-slate-500 font-cinzel">Vault is empty — run Local Ingest first.</p>
+                  <p className="text-[11px] text-slate-500 font-cinzel">
+                    Vault is empty — go to 🗄 Data Vault and run Local Ingest first.
+                  </p>
                 </div>
               ) : (
                 <Button onClick={() => void runScan()} className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black uppercase tracking-[0.1em] py-3 h-auto font-cinzel">
