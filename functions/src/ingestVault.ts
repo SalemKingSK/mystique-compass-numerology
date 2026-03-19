@@ -197,7 +197,7 @@ async function runIngestionLoop(): Promise<{
 export const ingestVaultScheduled = onSchedule(
   {
     schedule: 'every 70 minutes',
-    timeoutSeconds: 3600,
+    timeoutSeconds: 1800,
     memory: '512MiB',
     region: 'us-central1',
   },

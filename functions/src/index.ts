@@ -52,7 +52,7 @@ ${APP_KNOWLEDGE_BASE}
 /**
  * Firebase Callable Function to consult the Gemini AI Oracle.
  */
-export const consultoracle = onCall({ allowAnonymous: true }, async (request) => {
+export const consultoracle = onCall(async (request) => {
   const { userReport, userQuestion, chatHistory } = request.data as OracleInput;
   const apiKey = geminiApiKey.value();
 
@@ -106,3 +106,5 @@ ${userQuestion}`;
     throw new Error('Failed to get a response from the Oracle.');
   }
 });
+
+export * from './ingestVault';
