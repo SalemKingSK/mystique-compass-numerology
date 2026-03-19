@@ -220,12 +220,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
-  // ── Local ingest — 9-minute browser session, resumes from where it stopped ─
+  // ── Local ingest — Infinity browser session, only stopped by user ─
   async function ingestOneYear(
     year: number,
-    deadline: number,
     onPhase: (msg: string) => void,
-  ): Promise<'complete' | 'paused' | 'aborted'> {
+  ): Promise<'complete' | 'aborted'> {
     const metaRef    = doc(db, META_COLL, String(year));
     const snap       = await getDoc(metaRef);
     const existing   = snap.exists() ? (snap.data() as YearMeta) : null;
@@ -238,7 +237,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
     for (const month of remaining) {
       if (abortRef.current) return 'aborted';
-      if (Date.now() >= deadline) return 'paused';
 
       onPhase(`${year} / ${MONTHS_SHORT[month - 1]} — fetching Wikidata…`);
 
@@ -281,22 +279,19 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     setIngestDone(0);
     setIngestPhase('Starting…');
 
-    // 9-minute hard limit — safe for any browser tab / mobile
-    const deadline = Date.now() + 9 * 60 * 1000;
-    let outcome: 'complete' | 'paused' | 'aborted' = 'complete';
+    let outcome: 'complete' | 'aborted' = 'complete';
 
     for (const year of yearsToIngest) {
-      if (abortRef.current || Date.now() >= deadline) {
-        outcome = abortRef.current ? 'aborted' : 'paused';
+      if (abortRef.current) {
+        outcome = 'aborted';
         break;
       }
-      outcome = await ingestOneYear(year, deadline, msg => setIngestPhase(msg));
+      outcome = await ingestOneYear(year, msg => setIngestPhase(msg));
       if (outcome !== 'complete') break;
     }
 
     setIngestPhase(
       outcome === 'aborted' ? 'Stopped — press again to resume from here.' :
-      outcome === 'paused'  ? '9-min limit reached — press again to continue.' :
                               '✓ All ingestion complete!',
     );
     setIngesting(false);
@@ -502,7 +497,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                     <Database className="mr-2 h-4 w-4" />
                     {vaultSummary.pending === 0 && vaultSummary.partial === 0
                       ? 'Vault Complete ✓'
-                      : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left · 9 min runs)`}
+                      : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
                   </Button>
                   <Button
                     variant="outline" size="icon" onClick={refreshMetas}
@@ -521,8 +516,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               </p>
               <p className="text-[11px] text-slate-400 font-body leading-relaxed">
                 Press <strong className="text-slate-200">Local Ingest</strong> to fetch from Wikidata directly
-                in your browser. Each press runs for up to 9 minutes and automatically resumes from where
-                it left off. Press again until the vault shows <strong className="text-slate-200">Complete ✓</strong>.
+                in your browser. The process will run continuously until the vault shows <strong className="text-slate-200">Complete ✓</strong>.
               </p>
             </div>
 
