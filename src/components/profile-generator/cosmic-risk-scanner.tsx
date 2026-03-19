@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Zap, Loader2, ExternalLink, Telescope,
-  Trash2, Globe, Database, RefreshCw, AlertTriangle,
+  Globe, Database, RefreshCw, AlertTriangle,
   CloudLightning, CheckCircle2, XCircle,
 } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
@@ -12,10 +12,6 @@ import { Progress } from '@/components/ui/progress';
 import { Card }     from '@/components/ui/card';
 import { Input }    from '@/components/ui/input';
 import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
-import { db } from '@/lib/firebase';
-import {
-  collection, doc, setDoc, getDoc, getDocs, writeBatch,
-} from 'firebase/firestore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface PersonRecord {
@@ -24,14 +20,14 @@ interface PersonRecord {
   birthDay:    number;
   birthMonth:  number;
   birthYear:   number;
-  description: string;
+  description: string; // e.g. "Ghanaian professional footballer"
   url:         string;
 }
 interface YearMeta {
   year:       number;
   status:     'pending' | 'partial' | 'complete';
   count:      number;
-  cmcontinue: string | null; // Wikipedia pagination cursor
+  cmcontinue: string | null;
   updatedAt:  number;
 }
 interface ScanResult extends PersonRecord {
@@ -45,12 +41,14 @@ interface ScanResult extends PersonRecord {
 }
 type LogEntry = { text: string; kind: 'info' | 'ok' | 'warn' | 'error' };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Numerology ───────────────────────────────────────────────────────────────
 function reduce(n: number) {
   let s = Math.abs(n);
   while (s > 9) s = String(s).split('').reduce((acc, d) => acc + +d, 0);
   return s || 9;
 }
+
+// ─── Danger tiers ─────────────────────────────────────────────────────────────
 const DANGER_TIERS = [
   { min: 6, label: 'CRITICAL', color: '#ff2020', bg: 'rgba(255,32,32,0.16)',    border: 'rgba(255,32,32,0.55)'   },
   { min: 5, label: 'SEVERE',   color: '#e05020', bg: 'rgba(224,80,32,0.14)',    border: 'rgba(224,80,32,0.55)'   },
@@ -61,69 +59,149 @@ const DANGER_TIERS = [
 function getDangerTier(total: number) {
   return DANGER_TIERS.find(x => total >= x.min) || DANGER_TIERS[4];
 }
-const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const META_COLL    = 'cosmic_vault_meta';
-const PEOPLE_COLL  = 'cosmic_vault_people';
 
-// ─── STEP 1: Wikipedia Category API ──────────────────────────────────────────
-// Fetches a page of article titles from "Category:YEAR births".
-// Returns up to 500 titles per call plus a cmcontinue cursor for the next page.
-// This API is extremely reliable — never times out.
-async function fetchWikipediaPage(
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOCAL STORAGE — IndexedDB
+// Replaces Firestore entirely. Data lives in the browser, persists across
+// sessions, survives page refreshes, and requires no cloud account or billing.
+// ═══════════════════════════════════════════════════════════════════════════════
+const IDB_NAME    = 'mystique_vault_v1';
+const IDB_VERSION = 1;
+const PEOPLE_STORE = 'people';
+const META_STORE   = 'meta';
+
+function openIDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = (e.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(PEOPLE_STORE)) {
+        db.createObjectStore(PEOPLE_STORE, { keyPath: 'wikidataId' });
+      }
+      if (!db.objectStoreNames.contains(META_STORE)) {
+        db.createObjectStore(META_STORE, { keyPath: 'year' });
+      }
+    };
+    req.onsuccess = e => resolve((e.target as IDBOpenDBRequest).result);
+    req.onerror   = e => reject((e.target as IDBOpenDBRequest).error);
+  });
+}
+
+async function idbSavePeople(people: PersonRecord[]): Promise<string | null> {
+  try {
+    const db = await openIDB();
+    await new Promise<void>((resolve, reject) => {
+      const tx    = db.transaction(PEOPLE_STORE, 'readwrite');
+      const store = tx.objectStore(PEOPLE_STORE);
+      people.forEach(p => store.put(p));
+      tx.oncomplete = () => resolve();
+      tx.onerror    = () => reject(tx.error);
+    });
+    return null;
+  } catch (e) {
+    return e instanceof Error ? e.message : String(e);
+  }
+}
+
+async function idbGetAllPeople(): Promise<PersonRecord[]> {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(PEOPLE_STORE, 'readonly');
+    const req = tx.objectStore(PEOPLE_STORE).getAll();
+    req.onsuccess = () => resolve(req.result as PersonRecord[]);
+    req.onerror   = () => reject(req.error);
+  });
+}
+
+async function idbSaveMeta(meta: YearMeta): Promise<void> {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(META_STORE, 'readwrite');
+    tx.objectStore(META_STORE).put(meta);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => reject(tx.error);
+  });
+}
+
+async function idbGetAllMetas(): Promise<YearMeta[]> {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(META_STORE, 'readonly');
+    const req = tx.objectStore(META_STORE).getAll();
+    req.onsuccess = () => resolve(req.result as YearMeta[]);
+    req.onerror   = () => reject(req.error);
+  });
+}
+
+async function idbResetAllMetas(years: number[]): Promise<void> {
+  const db = await openIDB();
+  await new Promise<void>((resolve, reject) => {
+    const tx    = db.transaction(META_STORE, 'readwrite');
+    const store = tx.objectStore(META_STORE);
+    years.forEach(y => store.put({
+      year: y, status: 'pending', count: 0, cmcontinue: null, updatedAt: Date.now(),
+    } as YearMeta));
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => reject(tx.error);
+  });
+  // Also clear people store
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(PEOPLE_STORE, 'readwrite');
+    tx.objectStore(PEOPLE_STORE).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => reject(tx.error);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA FETCHING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Step 1: Wikipedia Category API ────────────────────────────────────────────
+// Returns up to 500 article titles from "Category:YEAR births".
+// Uses cmcontinue cursor for pagination. Fast, reliable, never times out.
+async function fetchWikiPage(
   year: number,
   cmcontinue: string | null,
-): Promise<{
-  titles: string[];
-  nextCursor: string | null;
-  error: string | null;
-}> {
+): Promise<{ titles: string[]; nextCursor: string | null; error: string | null }> {
   const params = new URLSearchParams({
-    action:      'query',
-    list:        'categorymembers',
-    cmtitle:     `Category:${year}_births`,
-    cmtype:      'page',
-    cmlimit:     '500',
-    format:      'json',
-    origin:      '*',
+    action:  'query',
+    list:    'categorymembers',
+    cmtitle: `Category:${year}_births`,
+    cmtype:  'page',
+    cmlimit: '500',
+    format:  'json',
+    origin:  '*',
     ...(cmcontinue ? { cmcontinue } : {}),
   });
 
-  const url = `https://en.wikipedia.org/w/api.php?${params}`;
-
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 30_000);
-      const r = await fetch(url, {
-        signal: controller.signal,
-        headers: { 'User-Agent': 'MystiqueCompass/1.0 (browser ingest)' },
+      const ctrl  = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 30_000);
+      const r = await fetch(`https://en.wikipedia.org/w/api.php?${params}`, {
+        signal:  ctrl.signal,
+        headers: { 'User-Agent': 'MystiqueCompass/1.0' },
       });
       clearTimeout(timer);
-
       if (!r.ok) return { titles: [], nextCursor: null, error: `Wikipedia HTTP ${r.status}` };
 
       const data = await r.json() as {
         query:    { categorymembers: { title: string; ns: number }[] };
-        continue: { cmcontinue: string } | undefined;
+        continue: { cmcontinue?: string } | undefined;
       };
 
       const titles = (data?.query?.categorymembers ?? [])
-        .filter(m => m.ns === 0) // main namespace only
+        .filter(m => m.ns === 0)
         .map(m => m.title);
 
-      return {
-        titles,
-        nextCursor: data?.continue?.cmcontinue ?? null,
-        error: null,
-      };
+      return { titles, nextCursor: data?.continue?.cmcontinue ?? null, error: null };
     } catch (e: unknown) {
       const isAbort = e instanceof Error && e.name === 'AbortError';
       if (attempt === 2 || isAbort) {
-        return {
-          titles: [],
-          nextCursor: null,
-          error: isAbort ? 'Wikipedia request timed out' : (e instanceof Error ? e.message : String(e)),
-        };
+        return { titles: [], nextCursor: null, error: e instanceof Error ? e.message : String(e) };
       }
       await new Promise(res => setTimeout(res, 3_000 * (attempt + 1)));
     }
@@ -131,151 +209,133 @@ async function fetchWikipediaPage(
   return { titles: [], nextCursor: null, error: 'Max retries exceeded' };
 }
 
-// ─── STEP 2: Wikidata wbgetentities — batch birth date lookup ─────────────────
-// Given a list of Wikipedia titles, fetches their Wikidata birth dates in one
-// call. This uses the entity lookup API (NOT SPARQL) — fast and reliable.
-// Max ~40 titles per call to stay within URL length limits.
-async function fetchBirthDates(
-  titles: string[],
-): Promise<Map<string, { wikidataId: string; day: number; month: number; year: number }>> {
-  const result = new Map<string, { wikidataId: string; day: number; month: number; year: number }>();
+// ── Step 2: Wikidata wbgetentities ─────────────────────────────────────────────
+// Fetches birth date + short description for a batch of Wikipedia titles.
+// KEY FIX: includes `sitelinks` in props so we can map titles → entities.
+// Also fetches `descriptions` which gives "Ghanaian professional footballer" etc.
+async function fetchEntities(titles: string[]): Promise<Map<string, {
+  wikidataId:  string;
+  day:         number;
+  month:       number;
+  year:        number;
+  description: string;
+}>> {
+  const result = new Map<string, { wikidataId: string; day: number; month: number; year: number; description: string }>();
   if (!titles.length) return result;
 
   const params = new URLSearchParams({
     action:    'wbgetentities',
     sites:     'enwiki',
     titles:    titles.join('|'),
-    props:     'claims|labels',
+    props:     'claims|descriptions|sitelinks', // sitelinks is CRITICAL — maps title→entity
     languages: 'en',
+    sitefilter: 'enwiki',
     format:    'json',
     origin:    '*',
   });
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 30_000);
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 30_000);
     const r = await fetch(`https://www.wikidata.org/w/api.php?${params}`, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'MystiqueCompass/1.0 (browser ingest)' },
+      signal:  ctrl.signal,
+      headers: { 'User-Agent': 'MystiqueCompass/1.0' },
     });
     clearTimeout(timer);
-
     if (!r.ok) return result;
 
     const data = await r.json() as {
       entities: Record<string, {
-        id:     string;
-        labels: Record<string, { value: string }>;
-        claims: Record<string, { mainsnak: { datavalue: { value: { time: string } } } }[]>;
-        sitelinks: Record<string, { title: string }>;
-        missing?: string;
+        id:           string;
+        missing?:     string;
+        descriptions: Record<string, { value: string }>;
+        claims:       Record<string, { mainsnak: { datavalue?: { value: { time?: string } } } }[]>;
+        sitelinks:    Record<string, { title: string }>;
       }>;
     };
 
-    for (const [, entity] of Object.entries(data?.entities ?? {})) {
+    for (const entity of Object.values(data?.entities ?? {})) {
       if (entity.missing !== undefined) continue;
 
       const wikidataId = entity.id;
-      const title      = entity.sitelinks?.enwiki?.title;
+      // Use sitelinks to get the Wikipedia title for mapping
+      const title = entity.sitelinks?.enwiki?.title;
       if (!title || !wikidataId) continue;
 
+      // Birth date from P569
       const dobClaims = entity.claims?.P569;
       if (!dobClaims?.length) continue;
-
       const timeStr = dobClaims[0]?.mainsnak?.datavalue?.value?.time ?? '';
-      // Wikidata time format: "+YYYY-MM-DDT00:00:00Z"
+      // Format: "+YYYY-MM-DDT00:00:00Z" or "-YYYY-MM-DDT00:00:00Z"
       const m = timeStr.match(/^[+-]?(\d{1,4})-(\d{2})-(\d{2})/);
       if (!m) continue;
-
       const year  = parseInt(m[1]);
       const month = parseInt(m[2]);
       const day   = parseInt(m[3]);
-
       if (month < 1 || month > 12 || day < 1 || day > 31) continue;
       if (year < 1900 || year > 2010) continue;
 
-      result.set(title, { wikidataId, day, month, year });
+      // Short description from Wikidata (e.g. "Ghanaian professional footballer")
+      const description = entity.descriptions?.en?.value ?? '';
+
+      result.set(title, { wikidataId, day, month, year, description });
     }
   } catch {
-    // Silently skip failed batch — the title just won't have a birth date
+    // Silently skip failed batches
   }
 
   return result;
 }
 
-// ─── Main fetch function: Wikipedia titles → PersonRecords ────────────────────
-// Fetches one "page" worth of Wikipedia category members (500 titles),
-// then batch-looks up their birth dates from Wikidata in chunks of 40.
+// ── Combined: one Wikipedia page → PersonRecord[] ─────────────────────────────
 async function fetchYearPage(
   year: number,
   cmcontinue: string | null,
-  onProgress: (msg: string) => void,
-): Promise<{
-  people:     PersonRecord[];
-  nextCursor: string | null;
-  error:      string | null;
-}> {
-  // Step 1: Get titles from Wikipedia
-  onProgress(`Wikipedia: fetching ${year} births page…`);
-  const { titles, nextCursor, error: wikiError } = await fetchWikipediaPage(year, cmcontinue);
+  onLog: (msg: string) => void,
+): Promise<{ people: PersonRecord[]; nextCursor: string | null; error: string | null }> {
 
-  if (wikiError) return { people: [], nextCursor: null, error: wikiError };
-  if (!titles.length) return { people: [], nextCursor, error: null };
+  onLog(`Wikipedia: fetching ${year} births page…`);
+  const { titles, nextCursor, error: wikiErr } = await fetchWikiPage(year, cmcontinue);
+  if (wikiErr) return { people: [], nextCursor: null, error: wikiErr };
+  if (!titles.length) return { people: [], nextCursor: null, error: null };
 
-  onProgress(`  Got ${titles.length} titles — fetching birth dates…`);
+  onLog(`  Got ${titles.length} titles — resolving birth dates & descriptions…`);
 
-  // Step 2: Batch fetch birth dates from Wikidata (40 titles per call)
+  // Batch entity lookup: 40 titles per call (safe URL length)
   const BATCH = 40;
-  const allDates = new Map<string, { wikidataId: string; day: number; month: number; year: number }>();
+  const allEntities = new Map<string, { wikidataId: string; day: number; month: number; year: number; description: string }>();
 
   for (let i = 0; i < titles.length; i += BATCH) {
-    const chunk = titles.slice(i, i + BATCH);
-    const dates = await fetchBirthDates(chunk);
-    dates.forEach((v, k) => allDates.set(k, v));
-    // Small pause between batches
+    const chunk   = titles.slice(i, i + BATCH);
+    const batch   = await fetchEntities(chunk);
+    batch.forEach((v, k) => allEntities.set(k, v));
     if (i + BATCH < titles.length) {
-      await new Promise(res => setTimeout(res, 300));
+      await new Promise(res => setTimeout(res, 250));
     }
   }
 
-  // Step 3: Build PersonRecord[] for titles that have a birth date
   const people: PersonRecord[] = [];
   for (const title of titles) {
-    const bd = allDates.get(title);
-    if (!bd) continue; // no birth date found — skip
-
+    const e = allEntities.get(title);
+    if (!e) continue;
     people.push({
-      wikidataId:  bd.wikidataId,
+      wikidataId:  e.wikidataId,
       name:        title,
-      birthYear:   bd.year,
-      birthMonth:  bd.month,
-      birthDay:    bd.day,
-      description: '',
-      url:         `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
+      birthYear:   e.year,
+      birthMonth:  e.month,
+      birthDay:    e.day,
+      description: e.description,
+      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
     });
   }
 
-  onProgress(`  Resolved ${people.length} / ${titles.length} with birth dates`);
+  onLog(`  Resolved ${people.length} / ${titles.length} with birth dates`);
   return { people, nextCursor, error: null };
 }
 
-// ─── Firestore batch write ────────────────────────────────────────────────────
-async function saveBatch(people: PersonRecord[]): Promise<string | null> {
-  try {
-    for (let i = 0; i < people.length; i += 450) {
-      const batch = writeBatch(db);
-      people.slice(i, i + 450).forEach(p =>
-        batch.set(doc(db, PEOPLE_COLL, p.wikidataId), p, { merge: true }),
-      );
-      await batch.commit();
-    }
-    return null;
-  } catch (e: unknown) {
-    return e instanceof Error ? e.message : String(e);
-  }
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
 export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const [tab, setTab]                 = useState<'vault' | 'scanner'>('vault');
   const [yearMetas, setYearMetas]     = useState<Record<number, YearMeta>>({});
@@ -286,7 +346,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const [ingestPhase, setIngestPhase] = useState('');
   const [scanning, setScanning]       = useState(false);
   const [scanResults, setScanResults] = useState<ScanResult[]>([]);
-  const [scanStats, setScanStats]     = useState({ checked: 0, flagged: 0 });
+  const [scanStats, setScanStats]     = useState({ checked: 0, flagged: 0, critical: 0 });
   const [filterQuery, setFilterQuery] = useState('');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [dialog, setDialog]           = useState<{ message: string; onConfirm: () => void } | null>(null);
@@ -318,9 +378,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     const list: { year: number; type: string; config: any }[] = [];
     Object.entries(CF_CONFIG).forEach(([type, config]) => {
       if (!config.animal) return;
-      const animalIdx = ANIMALS.findIndex((a: any) => a.n === config.animal);
-      if (animalIdx < 0) return;
-      let y = 1900 + animalIdx;
+      const idx = ANIMALS.findIndex((a: any) => a.n === config.animal);
+      if (idx < 0) return;
+      let y = 1900 + idx;
       while (y < 1930) y += 12;
       while (y <= 2010) {
         if (y < targetYear) list.push({ year: y, type, config });
@@ -341,15 +401,12 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     return m;
   }, [CONFLICT_YEARS]);
 
-  // ── Vault meta ─────────────────────────────────────────────────────────────
+  // ── Load metas from IndexedDB ──────────────────────────────────────────────
   const refreshMetas = useCallback(async () => {
     try {
-      const snap = await getDocs(collection(db, META_COLL));
+      const all   = await idbGetAllMetas();
       const metas: Record<number, YearMeta> = {};
-      snap.forEach(d => {
-        const data = d.data() as YearMeta;
-        metas[data.year] = data;
-      });
+      all.forEach(m => { metas[m.year] = m; });
       setYearMetas(metas);
     } catch (e) { console.error('refreshMetas:', e); }
   }, []);
@@ -366,121 +423,81 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
-  // ── Ingest one year — pages through all of "Category:YEAR births" ──────────
+  // ── Ingest one year ────────────────────────────────────────────────────────
   async function ingestOneYear(year: number): Promise<'complete' | 'aborted'> {
-    const metaRef  = doc(db, META_COLL, String(year));
-    const snap     = await getDoc(metaRef);
-    const existing = snap.exists() ? (snap.data() as YearMeta) : null;
-
+    const existing = yearMetas[year];
     if (existing?.status === 'complete') {
-      addLog(`${year}: already complete — skipping`, 'ok');
+      addLog(`${year}: complete — skipping`, 'ok');
       return 'complete';
     }
 
-    // Resume from saved cursor if we were interrupted mid-year
-    let cursor: string | null = existing?.cmcontinue ?? null;
+    let cursor     = existing?.cmcontinue ?? null;
     let localCount = existing?.count ?? 0;
-    let pageNum    = 1;
+    let page       = 1;
 
-    addLog(`→ ${year} — starting from ${cursor ? 'saved cursor' : 'beginning'}`, 'info');
+    addLog(`→ ${year} (${yearConflictMap[year]?.type ?? ''}) — ${cursor ? 'resuming' : 'starting'}`, 'info');
 
     while (true) {
       if (abortRef.current) return 'aborted';
+      setIngestPhase(`${year} — page ${page}…`);
 
-      setIngestPhase(`${year} — page ${pageNum}…`);
-
-      const { people, nextCursor, error } = await fetchYearPage(
-        year,
-        cursor,
-        msg => addLog(`  ${msg}`, 'info'),
-      );
+      const { people, nextCursor, error } = await fetchYearPage(year, cursor, msg => addLog(msg, 'info'));
 
       if (error) {
-        addLog(`⚠ ${year} page ${pageNum}: ${error} — saving progress`, 'warn');
-        // Save progress so we can resume
-        await setDoc(metaRef, {
-          year,
-          status:     'partial',
-          count:      localCount,
-          cmcontinue: cursor,
-          updatedAt:  Date.now(),
-        } as YearMeta);
+        addLog(`⚠ ${year} page ${page}: ${error} — progress saved`, 'warn');
+        const meta: YearMeta = { year, status: 'partial', count: localCount, cmcontinue: cursor, updatedAt: Date.now() };
+        await idbSaveMeta(meta);
+        setYearMetas(p => ({ ...p, [year]: meta }));
         break;
       }
 
-      // Write to Firestore
       if (people.length > 0) {
-        const writeErr = await saveBatch(people);
-        if (writeErr) {
-          addLog(`❌ Firestore write failed: ${writeErr}`, 'error');
-          setIngestPhase('Firestore error — check billing & rules');
+        const err = await idbSavePeople(people);
+        if (err) {
+          addLog(`❌ IndexedDB write failed: ${err}`, 'error');
+          setIngestPhase('IndexedDB write failed');
           setIngesting(false);
           await refreshMetas();
           return 'aborted';
         }
         localCount += people.length;
-        addLog(`✓ ${year} page ${pageNum}: ${people.length} saved (total ${localCount})`, 'ok');
       }
 
       setIngestDone(d => d + 1);
-
-      // Update meta with new cursor and count
       const isComplete = nextCursor === null;
-      const meta: YearMeta = {
-        year,
-        status:     isComplete ? 'complete' : 'partial',
-        count:      localCount,
-        cmcontinue: nextCursor,
-        updatedAt:  Date.now(),
-      };
-      try {
-        await setDoc(metaRef, meta);
-        setYearMetas(p => ({ ...p, [year]: meta }));
-      } catch (e: unknown) {
-        addLog(`❌ Meta write failed: ${e instanceof Error ? e.message : String(e)}`, 'error');
-        return 'aborted';
+      const meta: YearMeta = { year, status: isComplete ? 'complete' : 'partial', count: localCount, cmcontinue: nextCursor, updatedAt: Date.now() };
+      await idbSaveMeta(meta);
+      setYearMetas(p => ({ ...p, [year]: meta }));
+
+      if (people.length > 0 || isComplete) {
+        addLog(`✓ ${year} p${page}: ${people.length} saved (total ${localCount})`, 'ok');
       }
 
       if (isComplete) {
-        addLog(`✓ ${year} complete — ${localCount} people total`, 'ok');
+        addLog(`✓ ${year} COMPLETE — ${localCount} people`, 'ok');
         break;
       }
 
-      cursor  = nextCursor;
-      pageNum += 1;
-      // Brief pause between pages
-      if (!abortRef.current) await new Promise(res => setTimeout(res, 500));
+      cursor = nextCursor;
+      page  += 1;
+      if (!abortRef.current) await new Promise(res => setTimeout(res, 400));
     }
 
     return abortRef.current ? 'aborted' : 'complete';
   }
 
-  // ── Start ingestion — runs until vault full or Stop pressed ────────────────
-  async function startIngestion(yearsToIngest: number[]) {
+  // ── Start ingestion ────────────────────────────────────────────────────────
+  async function startIngestion(years: number[]) {
     abortRef.current = false;
     setIngesting(true);
     setIngestLog([]);
     setScanResults([]);
-
-    // Total pages is unknown upfront — use year count as progress proxy
-    setIngestTotal(yearsToIngest.length * 30); // rough estimate: ~30 pages per year
+    setIngestTotal(years.length * 25);
     setIngestDone(0);
 
-    addLog(`Starting — ${yearsToIngest.length} conflict year(s) to ingest`, 'info');
-    addLog('Source: Wikipedia Category API + Wikidata birth date lookup', 'info');
+    addLog(`Starting — ${years.length} conflict year(s) — local IndexedDB storage`, 'info');
 
-    // ── Pre-flight checks ──────────────────────────────────────────────────
-    addLog('Checking Firestore…', 'info');
-    try {
-      await getDoc(doc(db, META_COLL, '_ping_'));
-      addLog('✓ Firestore reachable', 'ok');
-    } catch (e: unknown) {
-      addLog(`❌ Firestore unreachable: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      setIngestPhase('Firestore unreachable — enable billing');
-      setIngesting(false);
-      return;
-    }
-
+    // Pre-flight: Wikipedia
     addLog('Checking Wikipedia…', 'info');
     try {
       const r = await fetch(
@@ -491,16 +508,27 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       addLog('✓ Wikipedia reachable', 'ok');
     } catch (e: unknown) {
       addLog(`❌ Wikipedia blocked: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      addLog('Use the live published URL — not the Studio preview.', 'warn');
+      addLog('Open the live published URL — not the Studio preview pane.', 'warn');
       setIngestPhase('Wikipedia blocked — use the live published URL');
       setIngesting(false);
       return;
     }
 
-    // ── Run until complete or stopped ─────────────────────────────────────
-    addLog('Running continuously — press Stop to pause anytime.', 'info');
+    // Pre-flight: IndexedDB
+    addLog('Checking IndexedDB…', 'info');
+    try {
+      await openIDB();
+      addLog('✓ IndexedDB ready — data stored locally on this device', 'ok');
+    } catch (e: unknown) {
+      addLog(`❌ IndexedDB unavailable: ${e instanceof Error ? e.message : String(e)}`, 'error');
+      setIngestPhase('IndexedDB unavailable');
+      setIngesting(false);
+      return;
+    }
 
-    for (const year of yearsToIngest) {
+    addLog('Running until vault complete — press Stop to pause anytime.', 'info');
+
+    for (const year of years) {
       if (abortRef.current) break;
       const outcome = await ingestOneYear(year);
       if (outcome === 'aborted') break;
@@ -525,17 +553,13 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   // ── Clear vault ────────────────────────────────────────────────────────────
   function clearVault() {
     setDialog({
-      message: `Reset all ${uniqueYears.length} conflict years? All stored people will be cleared. This cannot be undone.`,
+      message: `Reset all ${uniqueYears.length} conflict years and clear all locally stored people? This cannot be undone.`,
       onConfirm: async () => {
         setDialog(null);
-        await Promise.all(uniqueYears.map(y =>
-          setDoc(doc(db, META_COLL, String(y)), {
-            year: y, status: 'pending', count: 0, cmcontinue: null, updatedAt: Date.now(),
-          } as YearMeta),
-        ));
+        await idbResetAllMetas(uniqueYears);
         await refreshMetas();
         setScanResults([]);
-        setScanStats({ checked: 0, flagged: 0 });
+        setScanStats({ checked: 0, flagged: 0, critical: 0 });
         setIngestLog([]);
         setIngestPhase('');
       },
@@ -543,16 +567,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   }
 
   // ── Scanner ────────────────────────────────────────────────────────────────
+  // Sorted by: totalScore desc → conflictScore desc → birthYear desc (most recent first)
   async function runScan() {
     setScanning(true);
     setScanResults([]);
-    setScanStats({ checked: 0, flagged: 0 });
+    setScanStats({ checked: 0, flagged: 0, critical: 0 });
     try {
-      const snap = await getDocs(collection(db, PEOPLE_COLL));
-      const people: PersonRecord[] = [];
-      snap.forEach(d => people.push(d.data() as PersonRecord));
-
+      const people = await idbGetAllPeople();
       const results: ScanResult[] = [];
+
       for (const p of people) {
         const conflict = yearConflictMap[p.birthYear];
         if (!conflict) continue;
@@ -566,9 +589,17 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           py, pyPoints, totalScore, tier: getDangerTier(totalScore),
         });
       }
-      results.sort((a, b) => b.totalScore - a.totalScore);
+
+      // Sort: score desc → conflict type score desc → birth year desc
+      results.sort((a, b) => {
+        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+        if (b.config.score !== a.config.score) return b.config.score - a.config.score;
+        return b.birthYear - a.birthYear;
+      });
+
+      const critical = results.filter(r => r.totalScore >= 5).length;
       setScanResults(results);
-      setScanStats({ checked: people.length, flagged: results.length });
+      setScanStats({ checked: people.length, flagged: results.length, critical });
     } catch (e) { console.error('Scan error:', e); }
     setScanning(false);
   }
@@ -578,6 +609,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       `${p.name} ${p.description}`.toLowerCase().includes(filterQuery.toLowerCase()),
     ), [scanResults, filterQuery],
   );
+
   const byTier = useMemo(() =>
     DANGER_TIERS.map(tier => ({ tier, items: filtered.filter(f => f.tier.label === tier.label) }))
       .filter(g => g.items.length > 0),
@@ -618,12 +650,17 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={clearVault} title="Clear vault data"
-                className="text-rose-400 hover:bg-rose-500/10 h-8 w-8">
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <button
+                onClick={clearVault}
+                title="Clear vault"
+                className="text-rose-400 hover:text-rose-300 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 font-cinzel text-[10px]">
-                FIRESTORE VAULT
+                LOCAL VAULT
               </Badge>
             </div>
           </div>
@@ -639,7 +676,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
           </div>
         </Card>
 
-        {/* ════════ DATA VAULT TAB ════════ */}
+        {/* ════════ DATA VAULT ════════ */}
         {tab === 'vault' && (
           <Card className="glass-card p-6 border-primary/20 space-y-6">
 
@@ -730,15 +767,17 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 <CloudLightning className="h-3 w-3" /> How Ingestion Works
               </p>
               <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                Reads directly from <strong className="text-slate-200">Wikipedia's Category API</strong>{' '}
-                (e.g. "Category:1984 births") — 500 names per page, never times out. Birth dates are
-                resolved via <strong className="text-slate-200">Wikidata entity lookup</strong> in
-                batches of 40. Runs continuously until the vault is full. Press Stop anytime — it
-                resumes exactly where it left off.
+                Reads <strong className="text-slate-200">Wikipedia's Category API</strong> (500 names/page)
+                then resolves each person's birth date and profession via{' '}
+                <strong className="text-slate-200">Wikidata entity lookup</strong>. All data is stored
+                locally in your browser's{' '}
+                <strong className="text-slate-200">IndexedDB</strong> — no cloud required,
+                no billing, no timeouts. Runs until vault is full. Press Stop to pause; resumes from
+                exactly where it left off.
               </p>
             </div>
 
-            {/* Year grid */}
+            {/* Year grid — sorted by conflict type severity, then year descending */}
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {uniqueYears.map(year => {
                 const meta   = yearMetas[year];
@@ -765,8 +804,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                       <div className="w-1.5 h-1.5 rounded-full" style={{ background: style.dot }} />
                       <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
                     </div>
-                    {meta && meta.count > 0 && (
-                      <div className="text-[7px] text-slate-500 font-cinzel mt-0.5">
+                    {meta?.count > 0 && (
+                      <div className="text-[7px] text-slate-600 font-cinzel mt-0.5">
                         {meta.count.toLocaleString()}
                       </div>
                     )}
@@ -781,10 +820,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         {tab === 'scanner' && (
           <>
             <Card className="glass-card p-6 border-primary/20">
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                 {([
-                  [scanStats.checked.toLocaleString(), 'Checked', 'text-primary'   ],
-                  [scanStats.flagged.toLocaleString(), 'Flagged', 'text-orange-400'],
+                  [scanStats.checked.toLocaleString(),  'Total Checked',    'text-primary'   ],
+                  [scanStats.flagged.toLocaleString(),  'Flagged Risks',    'text-orange-400'],
+                  [scanStats.critical.toLocaleString(), 'Critical / Severe','text-rose-500'  ],
                 ] as [string, string, string][]).map(([v, l, c]) => (
                   <div key={l} className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
                     <div className={`text-2xl font-black font-decorative tabular-nums ${c}`}>{v}</div>
@@ -792,9 +832,10 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                   </div>
                 ))}
               </div>
+
               {scanning ? (
                 <div className="flex items-center gap-3 text-xs text-primary/80 font-cinzel py-2">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Reading from Firestore vault…
+                  <Loader2 className="h-4 w-4 animate-spin" /> Scanning local vault…
                 </div>
               ) : vaultSummary.totalPeople === 0 ? (
                 <div className="text-center py-6 space-y-2">
@@ -820,6 +861,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                     value={filterQuery} onChange={e => setFilterQuery(e.target.value)}
                     className="pl-10 bg-black/40 border-primary/20 font-body placeholder:text-muted-foreground/50 h-12" />
                 </div>
+
                 {byTier.map(({ tier, items }) => (
                   <div key={tier.label} className="space-y-3">
                     <div className="flex items-center gap-3 px-1">
@@ -838,15 +880,16 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                             <div className="flex-1" style={{ minWidth: 0 }}>
                               <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
                               {person.description && (
-                                <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5"
-                                  style={{ wordBreak: 'break-word' }}>
+                                <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5 truncate">
                                   {person.description}
                                 </p>
                               )}
                               <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
-                                <span>{person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}</span>
+                                <span>Born {person.birthYear}</span>
                                 <span>•</span>
                                 <span className="font-bold text-primary">PY {person.py}</span>
+                                <span>•</span>
+                                <span style={{ color: person.config.color }}>{person.conflict ?? person.conflictType}</span>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
@@ -871,12 +914,13 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                                     <span className="text-primary font-bold not-italic mr-1 uppercase font-cinzel">
                                       Astrological Headwind:
                                     </span>
-                                    {person.name} ({person.animal}, born {person.birthDay}{' '}
-                                    {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}) faces a{' '}
+                                    {person.name}{person.description ? ` (${person.description})` : ''}, born{' '}
+                                    {person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear},
+                                    faces a{' '}
                                     <span style={{ color: person.config.color }}>{person.config.label}</span>{' '}
                                     with the {targetYear} {targetSign.n} cycle. Combined with Personal Year{' '}
                                     {person.py} ({person.py === 4 ? 'Structure / Restriction' : 'Reflection / Endings'}),
-                                    this produces a composite danger score of{' '}
+                                    this creates a composite danger score of{' '}
                                     <span style={{ color: person.tier.color }}>{person.totalScore}/6 — {person.tier.label}</span>.
                                   </p>
                                   <a href={person.url} target="_blank" rel="noopener noreferrer"
