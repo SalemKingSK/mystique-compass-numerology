@@ -64,42 +64,40 @@ function getDangerTier(total: number) {
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const META_COLL    = 'cosmic_vault_meta';
 const PEOPLE_COLL  = 'cosmic_vault_people';
-const PAGE_SIZE    = 400; // safe page size — each request stays fast and never times out
 
-// ─── Wikidata SPARQL — paginated fetch ────────────────────────────────────────
-// Fetches in pages of PAGE_SIZE using LIMIT+OFFSET so no single request
-// ever tries to pull thousands of records at once (which causes timeouts).
-// Removed the DATATYPE filter — it was rejecting valid xsd:date records.
-async function fetchWikidataPage(
+// ─── SPARQL config ────────────────────────────────────────────────────────────
+// PAGE_SIZE 200 — small enough that each request completes in well under 60s.
+// No OPTIONAL description block — that join was the main cause of timeouts.
+// Descriptions are stored as empty string and can be enriched later if needed.
+const PAGE_SIZE       = 200;
+const REQUEST_TIMEOUT = 60_000; // 60 seconds per page
+
+// ─── Wikidata SPARQL — single page fetch ──────────────────────────────────────
+async function fetchPage(
   year: number,
   month: number,
   offset: number,
-): Promise<{ bindings: Record<string, { value: string }>[]; error: string | null }> {
+): Promise<{ rows: Record<string, { value: string }>[]; error: string | null }> {
+
+  // Minimal query — name + DOB only. No OPTIONAL blocks. Fast.
   const sparql = `
-SELECT ?person ?personLabel ?dob ?description WHERE {
+SELECT ?person ?personLabel ?dob WHERE {
   ?person wdt:P31 wd:Q5 ;
           wdt:P569 ?dob .
   FILTER(YEAR(?dob) = ${year} && MONTH(?dob) = ${month})
-  OPTIONAL {
-    ?person schema:description ?description .
-    FILTER(LANG(?description) = "en")
-  }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
 }
 ORDER BY ?person
 LIMIT ${PAGE_SIZE}
 OFFSET ${offset}`.trim();
 
-  const endpoint =
-    `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`;
+  const url = `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`;
 
   for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     try {
-      const controller = new AbortController();
-      // 30s per page — each page is small so this is plenty
-      const timer = setTimeout(() => controller.abort(), 30_000);
-
-      const r = await fetch(endpoint, {
+      const r = await fetch(url, {
         signal: controller.signal,
         headers: {
           Accept:       'application/sparql-results+json',
@@ -109,93 +107,98 @@ OFFSET ${offset}`.trim();
       clearTimeout(timer);
 
       if (r.status === 429) {
-        await new Promise(res => setTimeout(res, 15_000 * (attempt + 1)));
+        // Rate limited — back off and retry
+        await new Promise(res => setTimeout(res, 20_000 * (attempt + 1)));
         continue;
       }
-      if (!r.ok) return { bindings: [], error: `HTTP ${r.status}` };
+      if (!r.ok) return { rows: [], error: `HTTP ${r.status}` };
 
       const data = await r.json() as {
         results: { bindings: Record<string, { value: string }>[] };
       };
-      return { bindings: data?.results?.bindings ?? [], error: null };
+      return { rows: data?.results?.bindings ?? [], error: null };
 
     } catch (e: unknown) {
+      clearTimeout(timer);
       const isAbort = e instanceof Error && e.name === 'AbortError';
-      if (attempt === 2 || isAbort) {
-        return {
-          bindings: [],
-          error: isAbort ? `Page timeout (offset ${offset})` : (e instanceof Error ? e.message : String(e)),
-        };
+      if (isAbort && attempt < 2) {
+        // Timeout — wait then retry with smaller effective load
+        await new Promise(res => setTimeout(res, 5_000));
+        continue;
       }
-      await new Promise(res => setTimeout(res, 3_000 * (attempt + 1)));
+      return {
+        rows: [],
+        error: isAbort
+          ? `Timed out after ${REQUEST_TIMEOUT / 1000}s (offset ${offset})`
+          : (e instanceof Error ? e.message : String(e)),
+      };
     }
   }
-  return { bindings: [], error: 'Max retries exceeded' };
+  return { rows: [], error: 'Max retries exceeded' };
 }
 
-function parseBindings(bindings: Record<string, { value: string }>[]): PersonRecord[] {
-  const people: PersonRecord[] = [];
-  for (const b of bindings) {
+// ─── Parse SPARQL bindings → PersonRecord[] ───────────────────────────────────
+function parseRows(rows: Record<string, { value: string }>[]): PersonRecord[] {
+  const out: PersonRecord[] = [];
+  for (const b of rows) {
     const wikidataId = b.person?.value?.split('/').pop();
     if (!wikidataId) continue;
-    // Accept both xsd:date ("YYYY-MM-DD") and xsd:dateTime ("YYYY-MM-DDT...")
+
     const raw = b.dob?.value ?? '';
-    const m   = raw.match(/^(-?\d{1,4})-(\d{2})-(\d{2})/);
+    // Accept xsd:date ("YYYY-MM-DD") and xsd:dateTime ("YYYY-MM-DDT…")
+    const m = raw.match(/^(-?\d{1,4})-(\d{2})-(\d{2})/);
     if (!m) continue;
+
     const birthYear  = parseInt(m[1]);
     const birthMonth = parseInt(m[2]);
     const birthDay   = parseInt(m[3]);
     if (birthMonth < 1 || birthMonth > 12 || birthDay < 1 || birthDay > 31) continue;
     if (birthYear < 1900 || birthYear > 2010) continue;
+
     const name = b.personLabel?.value ?? '';
     if (/^Q\d+$/.test(name) || !name.trim()) continue;
-    people.push({
+
+    out.push({
       wikidataId, name, birthYear, birthMonth, birthDay,
-      description: b.description?.value ?? '',
+      description: '', // fetched without description to keep queries fast
       url: `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`,
     });
   }
-  return people;
+  return out;
 }
 
-// Fetches ALL people for a year/month by paginating until Wikidata returns
-// fewer than PAGE_SIZE results (meaning we've hit the end).
-async function fetchWikidataMonth(
+// ─── Fetch ALL people for a year/month via pagination ─────────────────────────
+async function fetchMonth(
   year: number,
   month: number,
-  onPage: (pageNum: number, count: number) => void,
+  onPage: (pg: number, count: number) => void,
 ): Promise<{ people: PersonRecord[]; error: string | null }> {
-  const allPeople: PersonRecord[] = [];
+  const all: PersonRecord[] = [];
   let offset = 0;
-  let pageNum = 1;
+  let pg     = 1;
 
   while (true) {
-    const { bindings, error } = await fetchWikidataPage(year, month, offset);
+    const { rows, error } = await fetchPage(year, month, offset);
+    if (error) return { people: all, error: `Page ${pg}: ${error}` };
 
-    if (error) {
-      // On page error, return what we have so far + the error
-      return { people: allPeople, error: `Page ${pageNum} failed: ${error}` };
-    }
+    const parsed = parseRows(rows);
+    all.push(...parsed);
+    onPage(pg, parsed.length);
 
-    const pagePeople = parseBindings(bindings);
-    allPeople.push(...pagePeople);
-    onPage(pageNum, pagePeople.length);
+    // Fewer rows than PAGE_SIZE means we've reached the end
+    if (rows.length < PAGE_SIZE) break;
 
-    // If we got fewer results than PAGE_SIZE, we've reached the end
-    if (bindings.length < PAGE_SIZE) break;
-
-    offset  += PAGE_SIZE;
-    pageNum += 1;
-
-    // Small pause between pages to be polite to Wikidata
-    await new Promise(res => setTimeout(res, 500));
+    offset += PAGE_SIZE;
+    pg     += 1;
+    // Polite pause between pages
+    await new Promise(res => setTimeout(res, 600));
   }
 
-  return { people: allPeople, error: null };
+  return { people: all, error: null };
 }
 
 // ─── Firestore batch write ────────────────────────────────────────────────────
-async function savePeopleBatch(people: PersonRecord[]): Promise<string | null> {
+async function saveBatch(people: PersonRecord[]): Promise<string | null> {
   try {
     for (let i = 0; i < people.length; i += 450) {
       const batch = writeBatch(db);
@@ -228,7 +231,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   const abortRef = useRef(false);
 
   const addLog = useCallback((text: string, kind: LogEntry['kind'] = 'info') => {
-    setIngestLog(l => [{ text, kind }, ...l.slice(0, 59)]);
+    setIngestLog(l => [{ text, kind }, ...l.slice(0, 79)]);
   }, []);
 
   // ── Zodiac config ──────────────────────────────────────────────────────────
@@ -301,11 +304,8 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
   const ingestPct = ingestTotal > 0 ? Math.round((ingestDone / ingestTotal) * 100) : 0;
 
-  // ── Core ingest ────────────────────────────────────────────────────────────
-  async function ingestOneYear(
-    year: number,
-    deadline: number,
-  ): Promise<'complete' | 'paused' | 'aborted'> {
+  // ── Ingest one year ────────────────────────────────────────────────────────
+  async function ingestOneYear(year: number): Promise<'complete' | 'aborted'> {
     const metaRef  = doc(db, META_COLL, String(year));
     const snap     = await getDoc(metaRef);
     const existing = snap.exists() ? (snap.data() as YearMeta) : null;
@@ -322,45 +322,37 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
 
     for (const month of remaining) {
       if (abortRef.current) return 'aborted';
-      if (Date.now() >= deadline) return 'paused';
 
       setIngestPhase(`${year} / ${MONTHS_SHORT[month - 1]} — fetching…`);
       addLog(`→ ${year} / ${MONTHS_SHORT[month - 1]}`, 'info');
 
-      // ── Paginated Wikidata fetch ───────────────────────────────────────────
-      const { people, error: fetchError } = await fetchWikidataMonth(
-        year,
-        month,
-        (pageNum, count) => {
-          addLog(`  page ${pageNum}: ${count} people`, 'info');
-        },
-      );
+      // ── Paginated fetch ──────────────────────────────────────────────────
+      const { people, error } = await fetchMonth(year, month, (pg, cnt) => {
+        addLog(`  page ${pg}: ${cnt} people`, 'info');
+      });
 
-      if (fetchError) {
-        addLog(`⚠ ${fetchError} — skipping month, will retry next session`, 'warn');
+      if (error) {
+        // Log the error but DON'T mark the month done — retry next session
+        addLog(`⚠ ${error} — will retry this month next time`, 'warn');
         await new Promise(res => setTimeout(res, 2_000));
         continue;
       }
 
-      addLog(`  Total: ${people.length} people from Wikidata`, people.length > 0 ? 'ok' : 'warn');
+      addLog(`  Total: ${people.length} from Wikidata`, people.length > 0 ? 'ok' : 'warn');
 
-      // ── Write to Firestore ─────────────────────────────────────────────────
+      // ── Save to Firestore ────────────────────────────────────────────────
       if (people.length > 0) {
-        addLog(`  Saving to Firestore…`, 'info');
-        const writeError = await savePeopleBatch(people);
-        if (writeError) {
-          addLog(`❌ Firestore write failed: ${writeError}`, 'error');
+        const writeErr = await saveBatch(people);
+        if (writeErr) {
+          addLog(`❌ Firestore write failed: ${writeErr}`, 'error');
           setIngestPhase('Firestore error — check billing & rules');
           setIngesting(false);
           await refreshMetas();
           return 'aborted';
         }
-        addLog(`✓ ${year} ${MONTHS_SHORT[month - 1]}: ${people.length} saved`, 'ok');
-      } else {
-        addLog(`  ${year} ${MONTHS_SHORT[month - 1]}: 0 found (sparse year)`, 'warn');
       }
 
-      // ── Update meta ────────────────────────────────────────────────────────
+      // ── Update meta ──────────────────────────────────────────────────────
       monthsDone.push(month);
       localCount += people.length;
       const meta: YearMeta = {
@@ -378,13 +370,15 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         return 'aborted';
       }
 
+      addLog(`✓ ${year} ${MONTHS_SHORT[month - 1]}: ${people.length} saved`, 'ok');
       setIngestDone(d => d + 1);
-      // Brief pause between months
-      if (!abortRef.current) await new Promise(res => setTimeout(res, 300));
+      // Brief pause between months to be polite
+      if (!abortRef.current) await new Promise(res => setTimeout(res, 400));
     }
     return 'complete';
   }
 
+  // ── Start full ingestion — runs until vault complete or Stop pressed ────────
   async function startIngestion(yearsToIngest: number[]) {
     abortRef.current = false;
     setIngesting(true);
@@ -405,7 +399,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       addLog('✓ Firestore reachable', 'ok');
     } catch (e: unknown) {
       addLog(`❌ Firestore unreachable: ${e instanceof Error ? e.message : String(e)}`, 'error');
-      addLog('Enable billing at console.cloud.google.com → project studio-knvm3 → Billing', 'error');
+      addLog('Enable billing: console.cloud.google.com → project studio-knvm3 → Billing', 'error');
       setIngestPhase('Firestore unreachable — enable billing');
       setIngesting(false);
       return;
@@ -414,11 +408,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
     // ── Pre-flight: Wikidata ───────────────────────────────────────────────
     addLog('Checking Wikidata…', 'info');
     try {
-      const testR = await fetch(
+      const r = await fetch(
         'https://query.wikidata.org/sparql?format=json&query=SELECT%20%2A%20WHERE%20%7B%20wd%3AQ42%20wdt%3AP31%20%3Ft%20%7D%20LIMIT%201',
         { headers: { Accept: 'application/sparql-results+json' } },
       );
-      if (!testR.ok) throw new Error(`HTTP ${testR.status}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       addLog('✓ Wikidata reachable', 'ok');
     } catch (e: unknown) {
       addLog(`❌ Wikidata blocked: ${e instanceof Error ? e.message : String(e)}`, 'error');
@@ -428,25 +422,18 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
       return;
     }
 
-    // ── 9-minute run ───────────────────────────────────────────────────────
-    const deadline = Date.now() + 9 * 60 * 1000;
-    let outcome: 'complete' | 'paused' | 'aborted' = 'complete';
+    // ── Run until complete or manually stopped — NO time limit ────────────
+    addLog('Running until vault complete — press Stop to pause anytime.', 'info');
 
     for (const year of yearsToIngest) {
-      if (abortRef.current || Date.now() >= deadline) {
-        outcome = abortRef.current ? 'aborted' : 'paused';
-        break;
-      }
-      outcome = await ingestOneYear(year, deadline);
-      if (outcome !== 'complete') break;
+      if (abortRef.current) break;
+      const outcome = await ingestOneYear(year);
+      if (outcome === 'aborted') break;
     }
 
-    const phaseMsg =
-      outcome === 'aborted' ? 'Stopped — press again to resume.' :
-      outcome === 'paused'  ? '9-min limit reached — press again to continue.' :
-                              '✓ All ingestion complete!';
-    setIngestPhase(phaseMsg);
-    addLog(phaseMsg, outcome === 'complete' ? 'ok' : 'warn');
+    const stopped = abortRef.current;
+    setIngestPhase(stopped ? 'Stopped — press again to resume.' : '✓ Vault complete!');
+    addLog(stopped ? '⏹ Manually stopped' : '✓ All years complete!', stopped ? 'warn' : 'ok');
     setIngesting(false);
     await refreshMetas();
   }
@@ -463,7 +450,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
   // ── Clear vault ────────────────────────────────────────────────────────────
   function clearVault() {
     setDialog({
-      message: `Delete all stored people data for ${targetYear} conflict years? This cannot be undone — years marked complete with 0 people will also be reset so they can be re-fetched correctly.`,
+      message: `Reset all ${uniqueYears.length} conflict years back to pending? All stored people data will be cleared. This cannot be undone.`,
       onConfirm: async () => {
         setDialog(null);
         await Promise.all(uniqueYears.map(y =>
@@ -499,10 +486,9 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
         const pyPoints   = py === 4 ? 2 : 1;
         const totalScore = conflict.config.score + pyPoints;
         results.push({
-          ...p,
-          animal: conflict.config.animal, conflictType: conflict.type,
-          config: conflict.config, py, pyPoints, totalScore,
-          tier: getDangerTier(totalScore),
+          ...p, animal: conflict.config.animal,
+          conflictType: conflict.type, config: conflict.config,
+          py, pyPoints, totalScore, tier: getDangerTier(totalScore),
         });
       }
       results.sort((a, b) => b.totalScore - a.totalScore);
@@ -618,7 +604,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
               <p className={`text-[10px] font-cinzel text-center ${
                 ingestPhase.startsWith('✓') ? 'text-emerald-400' :
                 ingestPhase.includes('error') || ingestPhase.includes('unreachable') || ingestPhase.includes('blocked') ? 'text-rose-400' :
-                'text-primary/70'
+                'text-amber-400'
               }`}>
                 {ingestPhase}
               </p>
@@ -655,7 +641,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 {ingesting ? 'Stop Ingest' :
                  vaultSummary.pending === 0 && vaultSummary.partial === 0
                    ? 'Vault Complete ✓'
-                   : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left · 9 min runs)`}
+                   : `Local Ingest (${vaultSummary.pending + vaultSummary.partial} left)`}
               </Button>
               <Button variant="outline" size="icon" onClick={() => void refreshMetas()}
                 className="border-white/10 text-slate-400 h-auto px-3">
@@ -669,11 +655,11 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                 <CloudLightning className="h-3 w-3" /> How Ingestion Works
               </p>
               <p className="text-[11px] text-slate-400 font-body leading-relaxed">
-                Fetches from Wikidata in pages of {PAGE_SIZE} records per request — no single
-                request is large enough to timeout. Each press runs up to{' '}
-                <strong className="text-slate-200">9 minutes</strong> and resumes automatically.
-                If years were previously ingested with 0 people, use the{' '}
-                <strong className="text-rose-400">trash icon</strong> to clear and re-run.
+                Fetches from Wikidata in small pages of{' '}
+                <strong className="text-slate-200">{PAGE_SIZE} records</strong> — fast, no timeouts.
+                Runs continuously until the vault is full or you press Stop.
+                Keep the screen on and plugged in overnight for best results.
+                If any months show errors, press Local Ingest again to retry them.
               </p>
             </div>
 
@@ -705,7 +691,7 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                       <span className="text-[7px] text-slate-500 font-cinzel uppercase">{status}</span>
                     </div>
                     {meta && meta.count > 0 && (
-                      <div className="text-[7px] text-slate-600 font-cinzel mt-0.5">
+                      <div className="text-[7px] text-slate-500 font-cinzel mt-0.5">
                         {meta.count.toLocaleString()}
                       </div>
                     )}
@@ -779,12 +765,6 @@ export function CosmicRiskScanner({ targetYear }: { targetYear: number }) {
                             onClick={() => setExpandedId(expandedId === person.wikidataId ? null : person.wikidataId)}>
                             <div className="flex-1" style={{ minWidth: 0 }}>
                               <h4 className="text-sm font-bold text-slate-100 font-body leading-snug">{person.name}</h4>
-                              {person.description && (
-                                <p className="text-[10px] text-primary/70 font-cinzel uppercase leading-relaxed mt-0.5"
-                                  style={{ wordBreak: 'break-word' }}>
-                                  {person.description}
-                                </p>
-                              )}
                               <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-cinzel">
                                 <span>{person.birthDay} {MONTHS_SHORT[person.birthMonth - 1]} {person.birthYear}</span>
                                 <span>•</span>
