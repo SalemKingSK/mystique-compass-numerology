@@ -68,11 +68,19 @@
 }
 
 .reading {
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(212, 175, 55, 0.25);
   color: #fdf1b8;
-  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
   border-radius: 4px;
   padding: 0 2px;
+  transition: all 0.3s ease;
+}
+
+.scroll-container {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 8px;
 }
 
 .glass-card {

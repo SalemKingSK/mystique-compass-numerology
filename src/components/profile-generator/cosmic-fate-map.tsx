@@ -113,6 +113,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const pmNames = ['', 'Initiation', 'Partnership', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Retreat', 'Power', 'Completion'];
 
+  // Top-level stats memoized to ensure Hook stability
   const stats = useMemo(() => {
     const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(readYear));
     const uy = reduce(readYear);
@@ -203,14 +204,13 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const renderSynthesis = () => {
     const yr = YD[stats.py];
-    const uy = YD[stats.uy];
     return (
       <div key={readYear} className="space-y-6 relative z-10 animate-in fade-in duration-500 dash-panel active">
         <div className="core-strip">
           <div className="core-chip hl-py">
             <div className="core-chip-label">Personal Year {readYear}</div>
             <div className="core-chip-num">{stats.py}</div>
-            <div className="core-chip-name">{yr.title}</div>
+            <div className="core-chip-name">{yr?.title}</div>
           </div>
           <div className="core-chip">
             <div className="core-chip-label">Life Path</div>
@@ -243,8 +243,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       <div key={readYear} className="year-deep-dive animate-in fade-in duration-500 relative z-10 dash-panel active">
         <div className="year-dive-header">
           <div className="year-num-big" style={{ color: 'var(--cf-gold)' }}>{stats.py}</div>
-          <div className="year-dive-title">{yr.title}</div>
-          <div className="year-dive-sub">{yr.phase}</div>
+          <div className="year-dive-title">{yr?.title}</div>
+          <div className="year-dive-sub">{yr?.phase}</div>
         </div>
         <div className="tab-nav">
           {['ov', 'es', 'py', 've', 'ch', 'ca', 'pr'].map(id => (
@@ -256,7 +256,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         <div className="p-4 min-h-[300px]">
           {diveSubTab === 'pr' ? (
             <div className="practice-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {yr.pr.map((p: any, idx: number) => (
+              {yr?.pr?.map((p: any, idx: number) => (
                 <div key={idx} className="pi p-4 rounded-xl bg-black/40 border border-white/5">
                   <div className="pi-icon text-xl mb-2">{p.i}</div>
                   <div className="pi-name font-cinzel text-[10px] font-black uppercase text-primary/80 mb-1">{p.n}</div>
@@ -266,12 +266,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             </div>
           ) : (
             <AccordionContentWithPlayer text={
-              diveSubTab === 'ov' ? yr.overview :
-              diveSubTab === 'es' ? yr.esoteric :
-              diveSubTab === 'py' ? yr.pyth :
-              diveSubTab === 've' ? yr.vedic :
-              diveSubTab === 'ch' ? yr.chinese :
-              yr.chald
+              diveSubTab === 'ov' ? yr?.overview :
+              diveSubTab === 'es' ? yr?.esoteric :
+              diveSubTab === 'py' ? yr?.pyth :
+              diveSubTab === 've' ? yr?.vedic :
+              diveSubTab === 'ch' ? yr?.chinese :
+              yr?.chald
             } />
           )}
         </div>
@@ -371,6 +371,32 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     );
   };
 
+  const renderEnemy = () => (
+    <div key={readYear} className="space-y-6 relative z-10 animate-in fade-in duration-500 dash-panel active">
+      <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
+      <div className="space-y-6">
+        {CONVERGENCE_CARDS.map(card => (
+          <Card key={card.year} className="p-6 bg-slate-950/60 border-primary/20">
+            <h3 className="text-xl font-cinzel text-primary mb-2">{card.title}</h3>
+            <p className="text-sm italic text-muted-foreground mb-4">{card.sub}</p>
+            <AccordionContentWithPlayer text={card.intro} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              {card.chips.map((chip, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-black/40 border border-white/5">
+                  <div className="text-[10px] font-black uppercase text-primary mb-2">{chip.t}</div>
+                  <p className="text-xs text-slate-400 leading-relaxed">{chip.p}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 p-4 bg-rose-950/20 border border-rose-500/30 rounded-xl text-xs text-rose-300 italic">
+              <div dangerouslySetInnerHTML={{ __html: card.warning }} />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="cosmic-fate-root relative min-h-screen rounded-3xl overflow-hidden">
       <div id="stars-cf"></div>
@@ -430,6 +456,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             { id: 'intersections', label: '🔥 Critical', icon: <Zap className="h-3 w-3" /> },
             { id: 'zodiac', label: '☯ Zodiac', icon: <BookOpen className="h-3 w-3" /> },
             { id: 'pinnacles', label: '◈ Pinnacle', icon: <Activity className="h-3 w-3" /> },
+            { id: 'enemy', label: '⚠ Enemy', icon: <ShieldAlert className="h-3 w-3" /> },
             { id: 'scanner', label: '🔭 Scan', icon: <Telescope className="h-3 w-3" /> },
           ].map(tab => (
             <button 
@@ -448,6 +475,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           {activeTab === 'intersections' && renderIntersections()}
           {activeTab === 'zodiac' && renderZodiac()}
           {activeTab === 'pinnacles' && renderPinnacles()}
+          {activeTab === 'enemy' && renderEnemy()}
           {activeTab === 'scanner' && <CosmicRiskScanner targetYear={readYear} />}
         </div>
       </div>

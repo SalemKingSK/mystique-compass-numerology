@@ -13,7 +13,7 @@ import { NumerologyDisplay } from './numerology-display';
 import { CosmicFateMap } from './cosmic-fate-map';
 import {
   ArrowLeft, History, Heart, Home, Users, Briefcase,
-  AlertTriangle, Brain, Loader2, ChevronDown, BookUser
+  AlertTriangle, Brain, ChevronDown, BookUser
 } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import InstallButton from '../InstallButton';
@@ -110,7 +110,7 @@ function ConstellationReveal({ onDone }: { onDone: () => void }) {
   );
 }
 
-// ── AI Cosmic Profiler (Rules-Based with Speech) ──────────────────────────
+// ── Rules-Based Cosmic Profiler ──────────────────────────
 function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOutput; numerology: NumerologyData }) {
   const [revealed, setRevealed] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -126,7 +126,7 @@ function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOut
           <Brain style={{ color: '#d4af37', width: 20, height: 20 }} />
           <div>
             <div style={{ fontFamily: "'Cinzel',serif", fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.85)' }}>Cosmic Profile Synthesis</div>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(200,180,240,0.4)', fontStyle: 'italic' }}>Deterministic character analysis with Speech</div>
+            <div style={{ fontSize: '0.6rem', color: 'rgba(200,180,240,0.4)', fontStyle: 'italic' }}>Field-strict character analysis with Speech</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -280,10 +280,10 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
           <CosmicProfilerPanel insight={insight} numerology={numerology} />
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 10, scale: 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.99 }} transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}>
-              {activeTab === 'astro' && <AstroDisplay insight={insight} />}
-              {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
-              {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
-              {activeTab === 'cosmic-fate' && <CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear} />}
+              {activeTab === 'astro'        && <AstroDisplay insight={insight} />}
+              {activeTab === 'numerology'   && <NumerologyDisplay numerology={numerology} />}
+              {activeTab === 'new-astro'    && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
+              {activeTab === 'cosmic-fate'  && <CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear} />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -35,15 +35,15 @@ function personalYearNow(d: number, m: number) {
 }
 function calcPinnacles(lp: number, d: number, m: number, y: number) {
   const firstEnd = 36 - lp;
-  const yd = (yr: number) => reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0));
+  const yearDigits = (yr: number) => reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0));
   const p1 = reduceNum(reduceNum(d)+reduceNum(m));
-  const p2 = reduceNum(reduceNum(d)+yd(y));
+  const p2 = reduceNum(reduceNum(d)+yearDigits(y));
   const p3 = reduceNum(p1+p2);
-  const p4 = reduceNum(reduceNum(m)+yd(y));
+  const p4 = reduceNum(reduceNum(m)+yearDigits(y));
   const c1 = reduceNum(Math.abs(reduceNum(d)-reduceNum(m)));
-  const c2 = reduceNum(Math.abs(reduceNum(d)-yd(y)));
+  const c2 = reduceNum(Math.abs(reduceNum(d)-yearDigits(y)));
   const c3 = reduceNum(Math.abs(c1-c2));
-  const c4 = reduceNum(Math.abs(reduceNum(m)-yd(y)));
+  const c4 = reduceNum(Math.abs(reduceNum(m)-yearDigits(y)));
   const age = new Date().getFullYear() - y;
   return [
     { stage:1, label:'First Pinnacle',  ages:`0 – ${firstEnd}`,              p:p1, c:c1, active:age<firstEnd },
@@ -65,6 +65,19 @@ const YEAR_THEME: Record<number,{title:string;keyword:string;warning?:true}> = {
   8:{title:'Power',keyword:'Abundance & Authority'},
   9:{title:'Completion',keyword:'Release & Transformation',warning:true},
 };
+
+const KUA_DATA_COMPASS: Record<number,{name:string;best:string[];avoid:string[];element:string;colour:string}> = {
+  1:{name:'Water',  best:['SE','E','S','N'],    avoid:['W','NW','NE','SW'], element:'Water', colour:'#60a5fa'},
+  2:{name:'Earth',  best:['NE','W','NW','SW'],  avoid:['E','SE','S','N'],   element:'Earth', colour:'#fbbf24'},
+  3:{name:'Thunder',best:['S','N','SE','E'],    avoid:['SW','NE','W','NW'], element:'Wood',  colour:'#34d399'},
+  4:{name:'Wind',   best:['N','S','E','SE'],    avoid:['NE','NW','SW','W'], element:'Wood',  colour:'#6ee7b7'},
+  5:{name:'Earth',  best:['NE','W','NW','SW'],  avoid:['E','SE','S','N'],   element:'Earth', colour:'#f59e0b'},
+  6:{name:'Heaven', best:['W','NE','SW','NW'],  avoid:['E','SE','S','N'],   element:'Metal', colour:'#c0c0c0'},
+  7:{name:'Lake',   best:['NW','SW','NE','W'],  avoid:['N','SE','S','E'],   element:'Metal', colour:'#a78bfa'},
+  8:{name:'Mountain',best:['SW','NW','W','NE'], avoid:['SE','S','N','E'],   element:'Earth', colour:'#fb923c'},
+  9:{name:'Fire',   best:['E','SE','N','S'],    avoid:['W','NW','SW','NE'], element:'Fire',  colour:'#ef4444'},
+};
+
 const MISSING_ANALYSIS: Record<number,{title:string;layers:[string,string,string]}> = {
   1:{title:'Self-Reliance',layers:['Over-dependency on external approval — you seek validation before acting.','Leadership is a skill, not a trait you were born lacking. This life teaches you to author yourself.','Daily practice: Make one significant decision entirely without seeking consensus.']},
   2:{title:'Emotional Depth',layers:['Emotional detachment or hypersensitivity used as armour against being truly known.','Partnership is your greatest classroom — vulnerability is not weakness here, it\'s currency.','Daily practice: Sit with one uncomfortable feeling for 60 seconds before reacting.']},
@@ -75,17 +88,6 @@ const MISSING_ANALYSIS: Record<number,{title:string;layers:[string,string,string
   7:{title:'Inner Wisdom',layers:['Over-rationalisation blocks intuition. You dismiss the non-logical before it can inform you.','Your spiritual bandwidth is vast but sealed — trauma or conditioning closed the channel.','Daily practice: 5 minutes of unstructured silence every morning before any screen.']},
   8:{title:'Abundance',layers:['Money and power carry unexamined ancestral fear — either chased desperately or sabotaged.','Financial karma is highly active. Your relationship with resources mirrors your self-worth.','Daily practice: Track every transaction this week without judgement. Awareness precedes shift.']},
   9:{title:'Completion',layers:['You struggle to close chapters — people, roles, identities are clung to past their expiry.','Old wounds orbit without resolution because forgiveness has been confused with condoning.','Daily practice: Write a completion letter to one unresolved chapter. Sending is optional.']},
-};
-const KUA_COMPASS: Record<number,{name:string;best:string[];avoid:string[];element:string;colour:string}> = {
-  1:{name:'Water',  best:['SE','E','S','N'],    avoid:['W','NW','NE','SW'], element:'Water', colour:'#60a5fa'},
-  2:{name:'Earth',  best:['NE','W','NW','SW'],  avoid:['E','SE','S','N'],   element:'Earth', colour:'#fbbf24'},
-  3:{name:'Thunder',best:['S','N','SE','E'],    avoid:['SW','NE','W','NW'], element:'Wood',  colour:'#34d399'},
-  4:{name:'Wind',   best:['N','S','E','SE'],    avoid:['NE','NW','SW','W'], element:'Wood',  colour:'#6ee7b7'},
-  5:{name:'Earth',  best:['NE','W','NW','SW'],  avoid:['E','SE','S','N'],   element:'Earth', colour:'#f59e0b'},
-  6:{name:'Heaven', best:['W','NE','SW','NW'],  avoid:['E','SE','S','N'],   element:'Metal', colour:'#c0c0c0'},
-  7:{name:'Lake',   best:['NW','SW','NE','W'],  avoid:['N','SE','S','E'],   element:'Metal', colour:'#a78bfa'},
-  8:{name:'Mountain',best:['SW','NW','W','NE'], avoid:['SE','S','N','E'],   element:'Earth', colour:'#fb923c'},
-  9:{name:'Fire',   best:['E','SE','N','S'],    avoid:['W','NW','SW','NE'], element:'Fire',  colour:'#ef4444'},
 };
 
 // ── Section Header ────────────────────────────────────────────────────────────

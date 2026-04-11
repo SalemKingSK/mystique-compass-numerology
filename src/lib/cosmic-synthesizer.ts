@@ -213,19 +213,6 @@ const COMPOUND_PHRASE: Record<number, string> = {
   22: 'the Compound 22 cautions against the specific spiritual laziness of assuming the world will arrange itself favourably without deliberate co-creation — the gift here is the cultivation of active, empowered manifestation',
 };
 
-const PINNACLE_OPPORTUNITY: Record<number, string> = {
-  0: 'a rare period requiring complete mastery across all life dimensions simultaneously — the absence of a single fixed orientation is itself the invitation to total adaptability',
-  1: 'a long arc oriented toward authentic self-definition — the defining question is who they are, independent of inheritance, expectation, and the roles others have cast for them',
-  2: 'a period in which the primary classroom is relationship — the depth of genuine partnership, the skill of true cooperation, and the courage of emotional honesty are this arc\'s curriculum',
-  3: 'a creatively fertile arc in which their communicative and artistic gifts reach their highest expression — the shadow is the temptation to scatter this abundance across too many surfaces',
-  4: 'a foundational arc that rewards methodical, unglamorous structural work — what is built here with genuine patience outlasts what was built with frantic urgency in previous decades',
-  5: 'a period of genuine liberation in which the full range of experience becomes available — travel, diverse encounters, and the expansion of the known world are this arc\'s specific gifts',
-  6: 'a period centred on love, creative responsibility, and the sustained care of what has been committed to — the beauty that emerges from this arc is specific to sustained attention',
-  7: 'a profoundly inward arc in which the most important developments are invisible to external observers — study, contemplation, and spiritual deepening are the period\'s primary currencies',
-  8: 'a period of genuine material and executive development — what was built in earlier arcs now generates earned authority and the material recognition that genuine competence deserves',
-  9: 'a completion arc in which accumulated wisdom finds its synthesis — the humanitarian dimension of the life now calls for active expression',
-};
-
 const CHINESE_YEAR_RELATION: Record<string, string> = {
   clash: 'this year brings a direct elemental confrontation — the environmental energy actively challenges the native orientation, making proactive adaptation far more effective than defensive resistance',
   harm: 'the current year\'s hidden erosion dynamic requires vigilance in trusted relationships and business partnerships — harm operates through concealed depletion rather than visible confrontation',
@@ -282,7 +269,7 @@ export function buildCosmicProfile(
 
   const {
     psycheNum, destinyNum,
-    missingNumbers = [],
+    numberCounts = {},
     arrowsOfStrength = [], arrowsOfWeakness = [],
     compoundNum, karmicFateNum,
     birthDay, birthMonth, birthYear,
@@ -323,6 +310,7 @@ export function buildCosmicProfile(
 
   // ── PARAGRAPH 2: SHADOW & WOUNDS ────────────────────────────────────────
 
+  const missingNumbers = [1,2,3,4,5,6,7,8,9].filter(n => !numberCounts[String(n)]);
   const primaryMissing = missingNumbers[0];
   const p2_opening = primaryMissing
     ? `The Lo Shu Grid speaks as clearly through its absences: ${MISSING_SHADOW[primaryMissing] || `the absent ${primaryMissing} marks a specific developmental frontier`}.`
