@@ -104,6 +104,10 @@ const pyColors: Record<number, string> = {
   1: "#e8b830", 2: "#98b4de", 3: "#68c268", 4: "#c86040", 5: "#dca030", 6: "#de78a0", 7: "#8870c8", 8: "#a8b5cc", 9: "#c84848"
 };
 
+const stripHtml = (html: string) => {
+  return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ');
+};
+
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const [activeTab, setActiveTab] = useState('synthesis');
   const [readYear, setReadYear] = useState(new Date().getFullYear());
@@ -113,7 +117,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const pmNames = ['', 'Initiation', 'Partnership', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Retreat', 'Power', 'Completion'];
 
-  // Top-level stats memoized to ensure Hook stability
   const stats = useMemo(() => {
     const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(readYear));
     const uy = reduce(readYear);
@@ -123,7 +126,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     const currentMonthIndex = today.getMonth() + 1;
     const pm = reduce(py + currentMonthIndex);
     
-    // Pinnacles
     const p1 = reduce(reduce(birthMonth) + reduce(birthDay));
     const p2 = reduce(reduce(birthDay) + reduce(birthYear));
     const p3 = reduce(p1 + p2);
@@ -177,10 +179,22 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     const list = [];
     for (let y = readYear; y <= readYear + 11; y++) {
       const yearAni = getAnimalForDate(15, 6, y);
-      const zCat = getCategory(stats.birthSign, yearAni);
+      const category = getCategory(stats.birthSign, yearAni);
       const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
       const age = y - birthYear;
-      list.push({ y, yearAni, zCat, pyn, age });
+      
+      const isCritical = pyn === 4 || pyn === 7;
+      const isEnemy = category === 'clash' || category === 'harm' || category === 'destruction';
+      const isBen = category === 'ben';
+      const isAlliance = category === 'alliance';
+
+      let state = 5;
+      if (isEnemy && isCritical) state = 1;
+      else if (isBen && isCritical) state = 2;
+      else if (isCritical) state = 3;
+      else if (isAlliance) state = 4;
+
+      list.push({ y, yearAni, category, pyn, state, age });
     }
     return list;
   }, [stats.birthSign, birthDay, birthMonth, birthYear, readYear]);
@@ -301,37 +315,121 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     </div>
   );
 
-  const renderZodiac = () => (
-    <div key={readYear} className="space-y-8 py-4 animate-in fade-in duration-500 relative z-10 dash-panel active">
-      <div className="text-center px-4">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <span className="text-2xl">{ZOO[stats.birthSign].e}</span>
-          <h2 className="text-xl font-bold tracking-[0.3em] uppercase text-primary font-cinzel">Your {stats.birthSign} Zodiac</h2>
-          <span className="text-2xl">{ZOO[stats.birthSign].e}</span>
+  const renderZodiacCard = (item: any) => {
+    const { y, yearAni, category, pyn, state, age } = item;
+    const ya = ZOO[yearAni];
+    const pyColor = pyColors[pyn] || "#ffffff";
+    const statusTag = getStatusLabelShort(category);
+
+    let cardStyles: React.CSSProperties = {};
+    let badge = "";
+    let statusColor = "rgba(120, 136, 160, 0.6)";
+
+    if (state === 1) {
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(180,20,40,.35), rgba(7,13,28,.98))",
+        border: "2px solid rgba(200,30,50,.7)",
+        boxShadow: "0 0 24px rgba(200,30,50,.4)"
+      };
+      badge = `⚠ PY${pyn} + ${statusTag}`;
+      statusColor = "#ef4444";
+    } else if (state === 2) {
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(220,140,0,.2), rgba(7,13,28,.98))",
+        border: "2px solid rgba(220,140,0,.6)"
+      };
+      badge = "⭐ BEN MING + PY4/7";
+      statusColor = "#f59e0b";
+    } else if (state === 3) {
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(100,70,180,.18), rgba(7,13,28,.98))",
+        border: "1px solid rgba(136,112,200,.45)"
+      };
+      badge = `PY${pyn} CRITICAL`;
+      statusColor = "#a78bfa";
+    } else if (state === 4) {
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(50,160,90,.1), rgba(7,13,28,.95))",
+        border: "1px solid rgba(50,160,90,.45)"
+      };
+      statusColor = "#4daa78";
+    } else {
+      cardStyles = {
+        background: "linear-gradient(140deg, rgba(14,24,46,.9), rgba(8,14,28,.95))",
+        border: "1px solid rgba(200,168,75,.13)"
+      };
+    }
+
+    return (
+      <div 
+        key={y} 
+        style={cardStyles}
+        className="flex flex-col items-center justify-center p-6 rounded-2xl text-center transition-all hover:scale-[1.02] cursor-pointer"
+        onClick={() => setSelectedZodiacYear(item)}
+      >
+        <div className="text-4xl mb-3">{ya.e}</div>
+        <div className="text-[13px] font-bold text-white mb-1 font-cinzel">{y}</div>
+        <div className="text-[18px] font-black font-decorative" style={{ color: pyColor }}>PY {pyn}</div>
+        <div className="text-[10px] font-black uppercase tracking-tighter font-cinzel" style={{ color: statusColor }}>{statusTag} YEAR</div>
+        <div className="text-[10px] text-muted-foreground mt-1 font-cinzel">Age {age}</div>
+        {badge && (
+          <div 
+            className={`mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase border ${
+              state === 1 ? 'bg-rose-500/20 text-rose-500 border-rose-500/30' :
+              state === 2 ? 'bg-amber-500/20 text-amber-500 border-amber-500/30' :
+              'bg-purple-500/20 text-purple-400 border-purple-500/30'
+            }`}
+          >
+            {badge}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderZodiac = () => {
+    const bz = ZOO[stats.birthSign];
+    const az = ANIMALS.find(a => a.n === stats.birthSign);
+
+    return (
+      <div key={readYear} className="space-y-8 py-4 animate-in fade-in duration-500 relative z-10 dash-panel active">
+        <div className="text-center px-4">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <span className="text-2xl">{bz.e}</span>
+            <h2 className="text-xl font-bold tracking-[0.3em] uppercase text-primary font-cinzel">Your Chinese Zodiac — {stats.birthSign}</h2>
+            <span className="text-2xl">{bz.e}</span>
+          </div>
+          
+          <div className="cp text-lg leading-relaxed text-slate-300 max-w-2xl mx-auto mb-8 font-body text-center">
+            <AccordionContentWithPlayer text={`Born in a ${stats.birthSign} year — ${bz.el} element, ${bz.pol} polarity, Branch ${az?.br || bz.br}. Your characteristic nature: ${bz.trait}. Your health domains: ${bz.organ}. Your cardinal direction: ${bz.dir}. Below are your next 12 years mapped through Tai Sui astrology — click any year for detailed analysis.`} />
+          </div>
+
+          <div className="flex flex-col items-center gap-3 mb-6">
+            <div className="flex flex-wrap justify-center gap-3">
+              <div className="px-3 py-1.5 rounded-lg border border-rose-500/50 bg-rose-500/10 text-[10px] font-black uppercase text-rose-400 font-cinzel">
+                ⚠️ ENEMY × PY 4 OR 7
+              </div>
+              <div className="px-3 py-1.5 rounded-lg border border-yellow-500/50 bg-yellow-500/10 text-[10px] font-black uppercase text-yellow-400 font-cinzel">
+                ⭐ BEN MING + PY 4/7
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              <div className="px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/10 text-[10px] font-black uppercase text-indigo-400 font-cinzel">
+                ◈ CRITICAL PY ONLY
+              </div>
+              <div className="px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 text-[10px] font-black uppercase text-primary/70 font-cinzel">
+                PY # Legend
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="zodiac-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 px-2">
+          {zodiacList.map(renderZodiacCard)}
         </div>
       </div>
-      <div className="zodiac-grid grid grid-cols-2 md:grid-cols-4 gap-3">
-        {zodiacList.map(item => {
-          const isCritical = item.pyn === 4 || item.pyn === 7;
-          const isEnemy = item.zCat === 'clash' || item.zCat === 'harm' || item.zCat === 'destruction';
-          return (
-            <div 
-              key={item.y} 
-              onClick={() => setSelectedZodiacYear(item)}
-              className={`zc flex flex-col items-center justify-center p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.03] ${
-                isEnemy && isCritical ? 'border-rose-500 bg-rose-950/20' : 'border-white/10'
-              }`}
-            >
-              <div className="text-3xl mb-2">{ZOO[item.yearAni].e}</div>
-              <div className="text-xs font-bold text-white font-cinzel">{item.y}</div>
-              <div className="text-lg font-black" style={{ color: pyColors[item.pyn] }}>PY {item.pyn}</div>
-              <div className="text-[9px] uppercase font-bold text-muted-foreground">{getStatusLabelShort(item.zCat)}</div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderPinnacles = () => {
     const pStages = [
@@ -489,17 +587,24 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                 {selectedZodiacYear.y}: {selectedZodiacYear.yearAni} Year
               </DialogTitle>
               <DialogDescription className="text-xs uppercase tracking-[0.3em] text-center opacity-60 mb-8 font-cinzel text-slate-400">
-                {stats.birthSign} × {selectedZodiacYear.yearAni} — {catLabel(selectedZodiacYear.zCat)}
+                {stats.birthSign} × {selectedZodiacYear.yearAni} — {catLabel(selectedZodiacYear.category)}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin">
               <div className="p-4 bg-primary/5 border-l-[3px] border-primary rounded-r-lg font-body italic text-sm text-slate-300">
-                <AccordionContentWithPlayer text={`${selectedZodiacYear.y} (${selectedZodiacYear.yearAni} Year, Age ${selectedZodiacYear.age}) — Tai Sui: ${catLabel(selectedZodiacYear.zCat)}`} />
+                <AccordionContentWithPlayer text={`${selectedZodiacYear.y} (${selectedZodiacYear.yearAni} Year, Age ${selectedZodiacYear.age}) — Tai Sui: ${catLabel(selectedZodiacYear.category)}`} />
               </div>
+
+              {BOOK.categories[selectedZodiacYear.category === 'destruction' ? 'destruction' : selectedZodiacYear.category] && (
+                <div className="p-4 bg-white/5 border-l-[3px] border-primary/40 rounded-r-lg font-body text-sm leading-relaxed text-slate-300">
+                  <AccordionContentWithPlayer text={stripHtml(BOOK.categories[selectedZodiacYear.category === 'destruction' ? 'destruction' : selectedZodiacYear.category])} />
+                </div>
+              )}
+
               <div className="space-y-4">
                 <h4 className="font-cinzel text-xs uppercase tracking-widest opacity-60">Your {stats.birthSign.toUpperCase()} in {selectedZodiacYear.yearAni.toUpperCase()} Year</h4>
                 <div className="font-body text-base leading-relaxed text-slate-200">
-                  <AccordionContentWithPlayer text={ZOO[stats.birthSign][`${selectedZodiacYear.zCat}Desc`] || ZOO[stats.birthSign][`${selectedZodiacYear.zCat === 'destruction' ? 'destruction' : selectedZodiacYear.zCat}Desc`] || `This ${selectedZodiacYear.y} ${selectedZodiacYear.yearAni} year is a Neutral period for ${stats.birthSign}.`} />
+                  <AccordionContentWithPlayer text={ZOO[stats.birthSign][`${selectedZodiacYear.category}Desc`] || ZOO[stats.birthSign][`${selectedZodiacYear.category === 'destruction' ? 'destruction' : selectedZodiacYear.category}Desc`] || `This ${selectedZodiacYear.y} ${selectedZodiacYear.yearAni} year is a Neutral period for ${stats.birthSign}.`} />
                 </div>
               </div>
               <div className="space-y-2">
