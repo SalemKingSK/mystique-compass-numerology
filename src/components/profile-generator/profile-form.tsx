@@ -181,7 +181,7 @@ export function ProfileForm({
           onSubmit={onSubmit}
           className="w-full space-y-5"
           style={{
-            backgroundImage: 'linear-gradient(140deg, rgba(18,30,58,0.97) 0%, rgba(9,16,35,0.98) 100%)',
+            background: 'linear-gradient(140deg, rgba(18,30,58,0.97) 0%, rgba(9,16,35,0.98) 100%)',
             border: '1px solid rgba(200,168,75,0.22)',
             borderRadius: '16px',
             padding: '24px 20px',
@@ -425,6 +425,7 @@ export function ProfileForm({
               backgroundImage: isPending
                 ? 'linear-gradient(135deg, #4a3818, #8a7030, #4a3818)'
                 : 'linear-gradient(135deg, #6a5220, #c8a84b, #6a5220)',
+              backgroundColor: isPending ? '#4a3818' : '#6a5220',
               backgroundSize: '200% 100%',
               border: 'none',
               color: 'var(--cf-void)',

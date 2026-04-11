@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getAstroInsightAction } from '@/app/actions';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from '@/components/ui/button';
 import { History } from 'lucide-react';
 import { useUser, useFirestore, useAuth } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -68,50 +67,72 @@ export function ProfileGenerator() {
       try {
         const db = await openDB();
         
-        // 1. Check for legacy localStorage data
-        const legacyRaw = localStorage.getItem(HISTORY_KEY);
-        if (legacyRaw) {
-          try {
-            const legacyItems = JSON.parse(legacyRaw) as AstroInsightInput[];
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            const store = tx.objectStore(STORE_NAME);
-            
-            legacyItems.forEach(item => {
-              if (item.name && item.day && item.month && item.year) {
-                const soulId = `${item.name.trim().replace(/\s+/g, '_')}-${item.day}-${item.month}-${item.year}`;
-                store.put({ 
-                  ...item, 
-                  id: soulId, 
-                  name: item.name.trim(),
-                  timestamp: (item as any).timestamp || Date.now() 
-                });
-              }
-            });
+        // 1. Load existing IDB items
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const getRequest = store.getAll();
 
-            tx.oncomplete = () => {
-              localStorage.removeItem(HISTORY_KEY);
-              loadFromIDB(db);
-            };
-          } catch (e) {
-            console.error("Legacy migration failed", e);
-            loadFromIDB(db);
+        getRequest.onsuccess = () => {
+          const idbItems = getRequest.result;
+          
+          // 2. Check for legacy data to migrate
+          const legacyRaw = localStorage.getItem(HISTORY_KEY);
+          if (legacyRaw) {
+            try {
+              const legacyItems = JSON.parse(legacyRaw) as any[];
+              const migrateTx = db.transaction(STORE_NAME, 'readwrite');
+              const migrateStore = migrateTx.objectStore(STORE_NAME);
+              
+              let migratedCount = 0;
+              legacyItems.forEach(item => {
+                // More lenient mapping for different possible legacy formats
+                const name = item.name || item.fullName;
+                const d = item.day || item.birthDay;
+                const m = item.month || item.birthMonth;
+                const y = item.year || item.birthYear;
+                
+                if (name && d && m && y) {
+                  const soulId = `${String(name).trim().replace(/\s+/g, '_')}-${d}-${m}-${y}`;
+                  migrateStore.put({
+                    ...item,
+                    id: soulId,
+                    name: String(name).trim(),
+                    day: Number(d),
+                    month: Number(m),
+                    year: Number(y),
+                    gender: item.gender || 'other',
+                    timestamp: item.timestamp || Date.now()
+                  });
+                  migratedCount++;
+                }
+              });
+
+              migrateTx.oncomplete = () => {
+                if (migratedCount > 0) {
+                  localStorage.removeItem(HISTORY_KEY);
+                  // Final refresh from IDB
+                  const finalTx = db.transaction(STORE_NAME, 'readonly');
+                  const finalStore = finalTx.objectStore(STORE_NAME);
+                  const finalRequest = finalStore.getAll();
+                  finalRequest.onsuccess = () => {
+                    const sorted = finalRequest.result.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    setHistory(sorted);
+                  };
+                }
+              };
+            } catch (migrationError) {
+              console.error("Migration failed:", migrationError);
+              const sorted = idbItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+              setHistory(sorted);
+            }
+          } else {
+            const sorted = idbItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            setHistory(sorted);
           }
-        } else {
-          loadFromIDB(db);
-        }
+        };
       } catch (e) {
-        console.error("Could not initialize IndexedDB", e);
+        console.error("Could not initialize IndexedDB:", e);
       }
-    };
-
-    const loadFromIDB = (db: IDBDatabase) => {
-      const tx = db.transaction(STORE_NAME, 'readonly');
-      const store = tx.objectStore(STORE_NAME);
-      const request = store.getAll();
-      request.onsuccess = () => {
-        const sorted = request.result.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        setHistory(sorted);
-      };
     };
 
     initHistory();
@@ -121,7 +142,15 @@ export function ProfileGenerator() {
     const sanitizedName = item.name.trim();
     const soulId = `${sanitizedName.replace(/\s+/g, '_')}-${item.day}-${item.month}-${item.year}`;
     const timestamp = Date.now();
-    const record = { ...item, name: sanitizedName, id: soulId, timestamp };
+    const record = { 
+      ...item, 
+      name: sanitizedName, 
+      id: soulId, 
+      timestamp,
+      day: Number(item.day),
+      month: Number(item.month),
+      year: Number(item.year)
+    };
 
     try {
       const db = await openDB();
@@ -273,7 +302,7 @@ export function ProfileGenerator() {
                   {history.length > 0 ? (
                       history.map((item, index) => (
                           <button 
-                            key={`${(item as any).id}-${index}`} 
+                            key={`${(item as any).id || index}`} 
                             className="w-full text-left p-4 rounded-xl transition-all duration-300 group relative overflow-hidden"
                             style={{ 
                               background: 'rgba(255,255,255,0.03)',
