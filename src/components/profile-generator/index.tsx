@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -8,6 +7,11 @@ import { getAstroInsightAction } from '@/app/actions';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from '@/components/ui/button';
+import { History } from 'lucide-react';
+import { useUser, useFirestore, useAuth } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 import type { AstroInsightInput, AstroInsightOutput, NumerologyData } from './types';
 import { ProfileForm } from './profile-form';
@@ -15,38 +19,139 @@ import { ResultsDisplay } from './results-display';
 import { FamousPerson } from '@/lib/famous-birthdays';
 
 const HISTORY_KEY = 'mystiqueCompassHistory';
+const IDB_NAME = 'MystiqueArchivum';
+const IDB_VERSION = 1;
+const STORE_NAME = 'souls';
+
+/**
+ * Robust IndexedDB Initialization
+ */
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IDB_NAME, IDB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = (e.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
 
 export function ProfileGenerator() {
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const auth = useAuth();
+  
   const [isPending, startTransition] = React.useTransition();
   const [formData, setFormData] = React.useState<AstroInsightInput>({ name: '', day: 0, month: 0, year: 0, gender: '' });
   const [insight, setInsight] = React.useState<AstroInsightOutput | null>(null);
   const [numerology, setNumerology] = React.useState<NumerologyData | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
   const [history, setHistory] = React.useState<AstroInsightInput[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = React.useState(false);
 
+  // Ensure user is signed in anonymously for backup
   React.useEffect(() => {
-    try {
-        const storedHistory = localStorage.getItem(HISTORY_KEY);
-        if (storedHistory) {
-            setHistory(JSON.parse(storedHistory));
-        }
-    } catch (e) {
-        console.error("Could not read history from localStorage", e)
+    if (!user && auth) {
+      initiateAnonymousSignIn(auth);
     }
+  }, [user, auth]);
+
+  /**
+   * Safe batch migration and initialization
+   */
+  React.useEffect(() => {
+    const initHistory = async () => {
+      try {
+        const db = await openDB();
+        
+        // 1. Check for legacy localStorage data
+        const legacyRaw = localStorage.getItem(HISTORY_KEY);
+        if (legacyRaw) {
+          try {
+            const legacyItems = JSON.parse(legacyRaw) as AstroInsightInput[];
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            
+            legacyItems.forEach(item => {
+              if (item.name && item.day && item.month && item.year) {
+                const soulId = `${item.name.trim().replace(/\s+/g, '_')}-${item.day}-${item.month}-${item.year}`;
+                store.put({ 
+                  ...item, 
+                  id: soulId, 
+                  name: item.name.trim(),
+                  timestamp: (item as any).timestamp || Date.now() 
+                });
+              }
+            });
+
+            tx.oncomplete = () => {
+              localStorage.removeItem(HISTORY_KEY);
+              loadFromIDB(db);
+            };
+          } catch (e) {
+            console.error("Legacy migration failed", e);
+            loadFromIDB(db);
+          }
+        } else {
+          loadFromIDB(db);
+        }
+      } catch (e) {
+        console.error("Could not initialize IndexedDB", e);
+      }
+    };
+
+    const loadFromIDB = (db: IDBDatabase) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const sorted = request.result.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        setHistory(sorted);
+      };
+    };
+
+    initHistory();
   }, []);
 
-  const addToHistory = (newItem: AstroInsightInput) => {
-    setHistory(prevHistory => {
-        const newHistory = [newItem, ...prevHistory.filter(item => item.name !== newItem.name)];
-        try {
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
-        } catch (e) {
-            console.error("Could not save history to localStorage", e);
+  const addHistoryRecord = async (item: AstroInsightInput) => {
+    const sanitizedName = item.name.trim();
+    const soulId = `${sanitizedName.replace(/\s+/g, '_')}-${item.day}-${item.month}-${item.year}`;
+    const timestamp = Date.now();
+    const record = { ...item, name: sanitizedName, id: soulId, timestamp };
+
+    try {
+      const db = await openDB();
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      
+      store.put(record);
+
+      tx.oncomplete = () => {
+        setHistory(prev => {
+          const filtered = prev.filter(h => (h as any).id !== soulId);
+          return [record, ...filtered];
+        });
+
+        // CLOUD BACKUP
+        if (user && firestore) {
+          const backupRef = doc(firestore, 'users', user.uid, 'history', soulId);
+          setDocumentNonBlocking(backupRef, {
+            name: record.name,
+            day: record.day,
+            month: record.month,
+            year: record.year,
+            gender: record.gender,
+            timestamp
+          }, { merge: true });
         }
-        return newHistory;
-    });
+      };
+    } catch (e) {
+      console.error("Failed to add record to IndexedDB", e);
+    }
   };
   
   const handleReset = () => {
@@ -55,12 +160,10 @@ export function ProfileGenerator() {
     }
     setInsight(null);
     setNumerology(null);
-    setError(null);
     setFormData({ name: '', day: 0, month: 0, year: 0, gender: '' });
   };
   
   const processRequest = React.useCallback((data: AstroInsightInput) => {
-    setError(null);
     if (!data.name || !data.day || !data.month || !data.year || !data.gender) {
       toast({
         variant: 'destructive',
@@ -76,11 +179,10 @@ export function ProfileGenerator() {
         if (result.success && result.insight && result.numerology) {
             setInsight(result.insight);
             setNumerology(result.numerology);
-            addToHistory(data);
+            addHistoryRecord(data);
         } else {
             setInsight(null);
             setNumerology(null);
-            setError(result.error || 'An unexpected error occurred.');
             toast({
               variant: 'destructive',
               title: 'Error Generating Profile',
@@ -88,7 +190,7 @@ export function ProfileGenerator() {
             });
         }
     });
-  }, [toast]);
+  }, [toast, user, firestore]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,20 +263,44 @@ export function ProfileGenerator() {
           </motion.div>
         )}
       </AnimatePresence>
-      <SheetContent>
-          <SheetHeader>
-              <SheetTitle>Search History</SheetTitle>
+      <SheetContent className="w-[90%] sm:max-w-md">
+          <SheetHeader className="pb-6 border-b border-white/10">
+              <SheetTitle className="font-decorative text-xl text-primary">Archivum of Souls</SheetTitle>
+              <p className="text-[10px] font-cinzel uppercase tracking-widest text-slate-500">indefinite records • local & cloud backup</p>
           </SheetHeader>
-          <ScrollArea className="h-[calc(100%-4rem)]">
-              <div className="space-y-2 py-4">
+          <ScrollArea className="h-[calc(100vh-8rem)] mt-4">
+              <div className="space-y-3 py-4 pr-4">
                   {history.length > 0 ? (
                       history.map((item, index) => (
-                          <Button key={`${item.name}-${index}`} variant="ghost" className="w-full justify-start" onClick={() => handleHistoryClick(item)}>
-                              {item.name}
-                          </Button>
+                          <button 
+                            key={`${(item as any).id}-${index}`} 
+                            className="w-full text-left p-4 rounded-xl transition-all duration-300 group relative overflow-hidden"
+                            style={{ 
+                              background: 'rgba(255,255,255,0.03)',
+                              border: '1px solid rgba(255,255,255,0.08)' 
+                            }}
+                            onClick={() => handleHistoryClick(item)}
+                          >
+                              <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none" 
+                                   style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                              
+                              <div className="flex flex-col gap-1 relative z-10">
+                                  <span className="font-body text-base font-bold text-slate-100 group-hover:text-primary transition-colors">
+                                    {item.name}
+                                  </span>
+                                  <div className="flex items-center gap-2 text-[10px] font-cinzel uppercase tracking-wider text-slate-500">
+                                      <span>Born {item.day}/{item.month}/{item.year}</span>
+                                      <span className="opacity-30">•</span>
+                                      <span className={item.gender === 'male' ? 'text-blue-400/70' : 'text-pink-400/70'}>{item.gender}</span>
+                                  </div>
+                              </div>
+                          </button>
                       ))
                   ) : (
-                      <p className="text-sm text-center text-gray-400">No history yet.</p>
+                      <div className="flex flex-col items-center justify-center py-20 opacity-20 text-center space-y-4">
+                          <History className="h-12 w-12 stroke-[1]" />
+                          <p className="font-cinzel text-xs uppercase tracking-widest">The Archivum is empty</p>
+                      </div>
                   )}
               </div>
           </ScrollArea>

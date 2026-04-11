@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "PersonRecord": {
@@ -51,6 +52,21 @@
         "url"
       ]
     },
+    "UserSoul": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserSoul",
+      "type": "object",
+      "description": "A record of a generated cosmic profile saved in the user's history backup.",
+      "properties": {
+        "name": { "type": "string" },
+        "day": { "type": "number" },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "gender": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["name", "day", "month", "year", "gender", "timestamp"]
+    },
     "YearMeta": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "YearMeta",
@@ -97,132 +113,6 @@
         "monthsDone",
         "updatedAt"
       ]
-    },
-    "ScanResult": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ScanResult",
-      "type": "object",
-      "description": "Represents a person record that has been flagged by the Cosmic Risk Scanner, including computed risk scores and associated conflict details. This entity flattens properties from the PersonRecord, ConflictConfig, and DangerTier.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ScanResult entity, which corresponds to the 'wikidataId' of the associated person. (Relationship: PersonRecord 1:1 ScanResult, implicitly)"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the person as found in the PersonRecord."
-        },
-        "birthDay": {
-          "type": "number",
-          "description": "The day of birth (1-31) of the person."
-        },
-        "birthMonth": {
-          "type": "number",
-          "description": "The month of birth (1-12) of the person."
-        },
-        "birthYear": {
-          "type": "number",
-          "description": "The year of birth of the person."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description or profession of the person from Wikidata."
-        },
-        "url": {
-          "type": "string",
-          "description": "URL to the person's Wikipedia page.",
-          "format": "uri"
-        },
-        "conflictAnimal": {
-          "type": "string",
-          "description": "The Chinese zodiac animal associated with the specific conflict type (e.g., 'Rat' if the target year is Horse and the conflict is 'Chong')."
-        },
-        "conflictType": {
-          "type": "string",
-          "description": "The programmatic key for the astrological conflict type (e.g., 'Chong', 'Xing', 'Hai', 'Po')."
-        },
-        "conflictLabel": {
-          "type": "string",
-          "description": "The human-readable label for the conflict type (e.g., 'Direct Clash', 'Self-Punishment')."
-        },
-        "conflictScore": {
-          "type": "number",
-          "description": "The base score assigned to this conflict type before adding Personal Year points."
-        },
-        "conflictColor": {
-          "type": "string",
-          "description": "Hex or RGBA color string associated with the conflict type for UI display."
-        },
-        "conflictBg": {
-          "type": "string",
-          "description": "RGBA background color string for the conflict type for UI display."
-        },
-        "conflictBorder": {
-          "type": "string",
-          "description": "RGBA border color string for the conflict type for UI display."
-        },
-        "conflictGlyph": {
-          "type": "string",
-          "description": "A symbolic character (glyph) representing the conflict type (e.g., '☠', '⚔')."
-        },
-        "py": {
-          "type": "number",
-          "description": "The calculated Personal Year (PY) number (1-9) for the person."
-        },
-        "pyPoints": {
-          "type": "number",
-          "description": "Points added to the total score based on the Personal Year calculation (e.g., 2 points for PY 4, 1 point for PY 7)."
-        },
-        "totalScore": {
-          "type": "number",
-          "description": "The combined astrological risk score for the person, including conflict score and Personal Year points."
-        },
-        "tierMinScore": {
-          "type": "number",
-          "description": "The minimum total score required to fall into this specific danger tier."
-        },
-        "tierLabel": {
-          "type": "string",
-          "description": "The human-readable label for the danger tier (e.g., 'CRITICAL', 'SEVERE', 'HIGH')."
-        },
-        "tierColor": {
-          "type": "string",
-          "description": "Hex or RGBA color string associated with the danger tier for UI display."
-        },
-        "tierBg": {
-          "type": "string",
-          "description": "RGBA background color string for the danger tier for UI display."
-        },
-        "tierBorder": {
-          "type": "string",
-          "description": "RGBA border color string for the danger tier for UI display."
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "birthDay",
-        "birthMonth",
-        "birthYear",
-        "description",
-        "url",
-        "conflictAnimal",
-        "conflictType",
-        "conflictLabel",
-        "conflictScore",
-        "conflictColor",
-        "conflictBg",
-        "conflictBorder",
-        "conflictGlyph",
-        "py",
-        "pyPoints",
-        "totalScore",
-        "tierMinScore",
-        "tierLabel",
-        "tierColor",
-        "tierBg",
-        "tierBorder"
-      ]
     }
   },
   "auth": {
@@ -234,19 +124,23 @@
   "firestore": {
     "structure": [
       {
+        "path": "users/{userId}/history/{soulId}",
+        "definition": {
+          "entityName": "UserSoul",
+          "schema": {
+            "$ref": "#/backend/entities/UserSoul"
+          },
+          "description": "Stores a backup of the user's generated profile history."
+        }
+      },
+      {
         "path": "cosmic_vault_meta/{yearId}",
         "definition": {
           "entityName": "YearMeta",
           "schema": {
             "$ref": "#/backend/entities/YearMeta"
           },
-          "description": "Stores metadata for each birth year's data ingestion status. The `yearId` is the string representation of the birth year (e.g., '1980'). Authorization is typically global (e.g., authenticated read, admin write) without hierarchical dependencies, supporting collection-level security rules.",
-          "params": [
-            {
-              "name": "yearId",
-              "description": "The string representation of the birth year (e.g., '1980'), serving as the document ID."
-            }
-          ]
+          "description": "Stores metadata for each birth year's data ingestion status."
         }
       },
       {
@@ -256,16 +150,9 @@
           "schema": {
             "$ref": "#/backend/entities/PersonRecord"
           },
-          "description": "Contains detailed records of individuals fetched from Wikidata. The `wikidataId` serves as the document ID for direct access. Includes `birthYear` for efficient 'in' queries required by the scanner. Authorization is typically global (e.g., authenticated read, admin write) without hierarchical dependencies, supporting collection-level security rules.",
-          "params": [
-            {
-              "name": "wikidataId",
-              "description": "The Wikidata Q-ID of the person, used as the document ID."
-            }
-          ]
+          "description": "Contains detailed records of individuals fetched from Wikidata."
         }
       }
-    ],
-    "reasoning": "The Firestore data structure is designed to support the Cosmic Risk Scanner application by segregating and optimizing data for efficient ingestion and scanning. It comprises two main collections: 'cosmic_vault_meta' for ingestion progress tracking and 'cosmic_vault_people' for storing individual person records.\n\n**Authorization Independence:** Both collections are designed with authorization independence in mind. The data stored in these collections is global and not tied to specific user ownership beyond the 'admin' role performing ingestion. Therefore, authorization rules do not rely on hierarchical dependencies or `get()` calls to check parent document attributes. Access can be granted at the collection level, for example, allowing any authenticated user to read the data for scanning purposes, while restricting write operations (for ingestion and clearing the vault) to a designated administrator UID or a simple authenticated state if the tool is for a single user.\n\n**QAPs (Rules are not Filters):**\n- **`/cosmic_vault_meta/{yearId}`:** Documents in this collection (representing `YearMeta` entities) are primarily accessed directly by their `yearId` (the stringified birth year) using `getDoc`. This pattern is inherently QAP-compliant as it targets specific documents without requiring broad list operations or complex rule-based filtering.\n- **`/cosmic_vault_people/{wikidataId}`:** Documents in this collection (representing `PersonRecord` entities) are queried using `getDocs` with a `where('birthYear', 'in', years)` clause. The `birthYear` field is explicitly included in each `PersonRecord` document, making it an indexed field suitable for efficient equality-based queries. This ensures that `list` operations are performant and secure, as the client explicitly filters on a known, indexed attribute. The security rules would primarily need to verify that `request.auth.uid` is present for read access to enable the scanner, and specific UIDs or roles for write access to enable ingestion, without needing to re-filter the data on the server side.\n\n**Structural Segregation:** Each collection holds a single type of entity (`YearMeta` in `cosmic_vault_meta`, `PersonRecord` in `cosmic_vault_people`), adhering to the principle of homogeneous security posture and simplifying security rules. The `ScanResult` entity is identified as a client-side computed aggregate, not a persisted Firestore entity, which avoids unnecessary storage of transient data."
+    ]
   }
 }

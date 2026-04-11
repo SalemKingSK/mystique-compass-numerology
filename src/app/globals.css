@@ -79,8 +79,8 @@
     --primary: 263 80% 65%;
     --primary-foreground: 210 40% 98%;
     
-    --secondary: 48 98% 50%;
-    --secondary-foreground: 260 25% 15%;
+    --secondary: 48 98% 50%; /* Golden-yellow for selected tabs */
+    --secondary-foreground: 260 25% 15%; /* Dark purple text for selected tabs */
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -169,16 +169,16 @@
 .divider-orn { display:flex; align-items:center; gap:10px; justify-content:center; margin:8px 0; color:var(--cf-gold-dim); font-size:.75rem; letter-spacing:.28em; }
 .divider-orn::before, .divider-orn::after { content:''; flex:1; max-width:70px; height:1px; background:linear-gradient(90deg,transparent,var(--cf-gold-dim),transparent); }
 
-.calc-card { background:linear-gradient(140deg,rgba(18,30,58,.97) 0%,rgba(9,16,35,.98) 100%); border:1px solid rgba(200,168,75,.22); border-radius:var(--cf-radius); padding:16px 12px; margin-bottom:20px; box-shadow:var(--cf-glow),inset 0 1px 0 rgba(200,168,75,.1); position:relative; overflow:hidden; }
+.calc-card { background:linear-gradient(140deg,rgba(18,30,58,.97) 0%,rgba(9,16,35,.98) 100%); border:1px solid rgba(200,168,75,0.22); border-radius:var(--cf-radius); padding:16px 12px; margin-bottom:20px; box-shadow:var(--cf-glow),inset 0 1px 0 rgba(200,168,75,0.1); position:relative; overflow:hidden; }
 .calc-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--cf-gold),transparent); }
 .calc-title { font-family:'Cinzel', serif; font-size:.65rem; letter-spacing:.3em; text-transform:uppercase; color:var(--cf-gold-dim); margin-bottom:12px; text-align:center; }
 .calc-inputs { display:flex; gap:11px; flex-wrap:wrap; justify-content:center; margin-bottom:16px; }
 .input-group { display:flex; flex-direction:column; gap:4px; }
 .input-group label { font-family:'Cinzel', serif; font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:var(--cf-silver-dim); }
-.input-group input, .input-group select { background:rgba(5,9,20,.88); border:1px solid rgba(200,168,75,.18); border-radius:8px; padding:7px 11px; color:var(--cf-text); font-family:'Cormorant Garamond', serif; font-size:1rem; width:100%; min-width:135px; outline:none; transition:border-color .3s,box-shadow .3s; -webkit-appearance:none; }
-.input-group input:focus, .input-group select:focus { border-color:var(--cf-gold); box-shadow:0 0 14px rgba(200,168,75,.18); }
-.btn-reveal { display:block; width:100%; max-width:260px; margin:0 auto; background:linear-gradient(135deg,#6a5220,#c8a84b,#6a5220); background-size:200% 100%; border:none; border-radius:10px; padding:11px 20px; color:var(--cf-void); font-family:'Cinzel', serif; font-size:.78rem; font-weight:600; letter-spacing:.22em; text-transform:uppercase; cursor:pointer; transition:all .3s; box-shadow:0 4px 24px rgba(200,168,75,.28); }
-.btn-reveal:hover { background-position:100% 0; box-shadow:0 6px 36px rgba(200,168,75,.52); transform:translateY(-2px); }
+.input-group input, .input-group select { background:rgba(5,9,20,.88); border:1px solid rgba(200,168,75,0.18); border-radius:8px; padding:7px 11px; color:var(--cf-text); font-family:'Cormorant Garamond', serif; font-size:1rem; width:100%; min-width:135px; outline:none; transition:border-color .3s,box-shadow .3s; -webkit-appearance:none; }
+.input-group input:focus, .input-group select:focus { border-color:var(--cf-gold); box-shadow:0 0 14px rgba(200,168,75,0.18); }
+.btn-reveal { display:block; width:100%; max-width:260px; margin:0 auto; background:linear-gradient(135deg,#6a5220,#c8a84b,#6a5220); background-size:200% 100%; border:none; border-radius:10px; padding:11px 20px; color:var(--cf-void); font-family:'Cinzel', serif; font-size:.78rem; font-weight:600; letter-spacing:.22em; text-transform:uppercase; cursor:pointer; transition:all .3s; box-shadow:0 4px 24px rgba(200,168,75,0.28); }
+.btn-reveal:hover { background-position:100% 0; box-shadow:0 6px 36px rgba(200,168,75,0.52); transform:translateY(-2px); }
 
 .tts-btn { display:inline-flex; align-items:center; gap:6px; background:rgba(200,168,75,0.1); border:1px solid rgba(200,168,75,0.22); border-radius:20px; padding:4px 12px; cursor:pointer; font-family:'Cinzel', serif; font-size:.55rem; letter-spacing:.1em; text-transform:uppercase; color:var(--cf-gold-dim); transition:all 0.2s; margin-top:8px; }
 .tts-btn:hover { background:rgba(200,168,75,0.2); color:var(--cf-gold); border-color:rgba(200,168,75,0.4); }
@@ -394,4 +394,20 @@
 }
 .scroll-container::-webkit-scrollbar-thumb:hover {
   background-color: hsl(var(--primary));
+}
+
+/* Remove number input spinners globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Cosmic placeholder color */
+input::placeholder, textarea::placeholder {
+  color: var(--cf-text-dim);
+  opacity: 0.7;
 }
