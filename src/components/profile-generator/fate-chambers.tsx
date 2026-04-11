@@ -13,6 +13,15 @@ interface FateChambersProps {
   karmicFateMeaning: string | null;
   activeLayer: number | null;
   onLayerChange: (layer: number | null) => void;
+  // Legacy/Alternate support
+  psycheNum?: number;
+  destinyNum?: number;
+  birthDay?: number;
+  birthMonth?: number;
+  birthYear?: number;
+  repeatedNumberMeanings?: Record<string, string>;
+  onFateNavigation?: (n: number) => void;
+  activeFateLayer?: number | null;
 }
 
 export const FateChambers = forwardRef<HTMLDivElement, FateChambersProps>(({

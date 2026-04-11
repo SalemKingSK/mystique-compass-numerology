@@ -1,22 +1,22 @@
-// src/components/lo-shu-grid.tsx
 'use client';
 import React, { useState } from 'react';
 import type { ArrowData } from '@/lib/numerology';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Layers, X, Activity } from 'lucide-react';
 import LoshuNumberDetailPanel from '@/components/LoshuNumberDetailPanel';
 import LoshuArrowDetailPanel from '@/components/LoshuArrowDetailPanel';
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 interface LoShuGridProps {
-  gridData: (string | null)[][];
-  arrows: (ArrowData & { type: 'strength' | 'weakness' | 'shadow' })[];
+  gridData?: (string | null)[][];
+  grid?: (string | null)[][]; // Alias for compatibility
+  arrows?: (ArrowData & { type: 'strength' | 'weakness' | 'shadow' })[];
   numberCounts: { [key: string]: number };
-  repeatedNumberMeanings: { [key: string]: string };
+  repeatedNumberMeanings?: { [key: string]: string };
   onArrowClick?: (arrowName: string) => void;
-  title: string;
-  birthDate: string;
+  title?: string;
+  birthDate?: string;
 }
 
 const PLANETARY_LABELS: { [key: number]: string } = {
@@ -42,10 +42,16 @@ const ARROW_PATHS: { [key: string]: { x1: string; y1: string; x2: string; y2: st
   '2-5-8': { x1: '83.33%', y1: '16.67%', x2: '16.67%', y2: '83.33%' },
 };
 
-export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, numberCounts, repeatedNumberMeanings, birthDate }: LoShuGridProps) {
+export default function LoShuGrid({ 
+  gridData, grid, arrows = [], onArrowClick, 
+  title = "Numerology Matrix", numberCounts, 
+  repeatedNumberMeanings = {}, birthDate = "" 
+}: LoShuGridProps) {
   const [selectedArrow, setSelectedArrow] = useState<ArrowData | null>(null);
+  
+  const finalGrid = grid || gridData;
 
-  if (!gridData || gridData.length !== 3) return <p className="font-body">Grid data unavailable.</p>;
+  if (!finalGrid || finalGrid.length !== 3) return <p className="font-body">Grid data unavailable.</p>;
   
   const getPathKeyForArrow = (arrow: ArrowData) => {
     const directMatch = Object.keys(ARROW_PATHS).find(key => {
@@ -61,7 +67,7 @@ export default function LoShuGrid({ gridData, arrows = [], onArrowClick, title, 
   const gridOrder = [4, 9, 2, 3, 5, 7, 8, 1, 6];
 
   const renderCell = (gridNum: number, index: number) => {
-    const cell = gridData.flat().find(c => c?.startsWith(String(gridNum)));
+    const cell = finalGrid.flat().find(c => c?.startsWith(String(gridNum)));
     const count = numberCounts[String(gridNum)] || 0;
     const meaning = repeatedNumberMeanings[`${gridNum}_${Math.min(count || 1, 5)}`];
 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { forwardRef } from "react";
@@ -14,6 +13,13 @@ interface CoreVibrationsProps {
   specialTraitMeaning: string | null;
   activeLayer: string | null;
   onLayerChange: (layer: string | null) => void;
+  // Legacy support for complex pass-through
+  compoundNum?: number | null;
+  compoundMeaning?: string | null;
+  reducedCompoundNum?: number | null;
+  reducedCompoundMeaning?: string | null;
+  karmicFateNum?: number | null;
+  karmicFateMeaning?: string | null;
 }
 
 export const CoreVibrations = forwardRef<HTMLDivElement, CoreVibrationsProps>(({
