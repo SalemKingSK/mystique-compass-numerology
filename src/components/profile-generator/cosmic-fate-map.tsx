@@ -297,6 +297,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             </div>
             <div class="tab-nav grid grid-cols-3 gap-1 p-2">
               <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button>
+              <button class="tab-btn" onclick="window.swT('es',this)">Esoteric</button>
               <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button>
               <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button>
               <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button>
@@ -305,6 +306,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             </div>
             <div class="tab-content p-2" id="year-dive-content-wrapper">
               <div class="tab-panel active" id="tp-ov"><div id="tp-ov-text">${paras(yr.overview)}</div></div>
+              <div class="tab-panel" id="tp-es"><h4 class="content-h">The Orthodox & Esoteric Lens</h4><div id="tp-es-text">${paras(yr.esoteric)}</div></div>
               <div class="tab-panel" id="tp-py"><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div></div>
               <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
               <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
