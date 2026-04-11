@@ -55,8 +55,29 @@ function WarningBanner({ message }: { message: string }) {
   if (dismissed) return null;
   return (
     <motion.div initial={{ opacity: 0, y: -12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.5, delay: 0.4 }}
-      style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.9rem 1rem', marginBottom: '1rem', borderRadius: '0.9rem', background: 'linear-gradient(135deg,rgba(239,68,68,0.12),rgba(154,12,50,0.1))', border: '1px solid rgba(239,68,68,0.3)', boxShadow: '0 0 24px rgba(239,68,68,0.08),inset 0 1px 0 rgba(239,68,68,0.1)' }}>
-      <div style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: 1, background: 'linear-gradient(90deg,transparent,rgba(239,68,68,0.5),transparent)' }} />
+      className="rd-warning"
+    >
+      <style>{`
+        .rd-warning {
+          position: relative;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          padding: 0.9rem 1rem;
+          margin-bottom: 1rem;
+          border-radius: 0.9rem;
+          background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(154,12,50,0.1));
+          border: 1px solid rgba(239,68,68,0.3);
+          box-shadow: 0 0 24px rgba(239,68,68,0.08), inset 0 1px 0 rgba(239,68,68,0.1);
+        }
+        .rd-warning::before {
+          content:'';
+          position:absolute;
+          top:0; left:10%; right:10%;
+          height:1px;
+          background:linear-gradient(90deg,transparent,rgba(239,68,68,0.5),transparent);
+        }
+      `}</style>
       <AlertTriangle style={{ width: 20, height: 20, color: '#ef4444', flexShrink: 0, marginTop: 2 }} />
       <div style={{ flex: 1 }}>
         <div style={{ fontFamily: "'Cinzel',serif", fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#ef4444', marginBottom: '0.3rem' }}>
@@ -115,7 +136,7 @@ function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOut
           {!revealed && (
             <button onClick={e => { e.stopPropagation(); setRevealed(true); setOpen(true); }}
               style={{ background: 'linear-gradient(135deg,#5b21b6,#d4af37,#7c3aed)', backgroundSize: '200%', border: 'none', borderRadius: '0.65rem', padding: '0.45rem 1rem', fontFamily: "'Cinzel',serif", fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#1a0a2e', cursor: 'pointer', boxShadow: '0 4px 18px rgba(212,175,55,0.25)', transition: 'box-shadow 0.3s' }}>
-              Generate
+              Reveal
             </button>
           )}
           {revealed && <ChevronDown style={{ color: 'rgba(212,175,55,0.4)', width: 16, height: 16, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />}
@@ -125,8 +146,16 @@ function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOut
         {open && revealed && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
             style={{ padding: '0 1.25rem 1.25rem' }}>
-            <div style={{ fontSize: '0.82rem', lineHeight: 1.75, color: 'rgba(210,195,240,0.8)', whiteSpace: 'pre-wrap' }}>
-              {profile.split('\n\n').map((p, i) => <p key={i} style={{ marginBottom: '0.9rem' }}>{p}</p>)}
+            <div style={{ fontSize: '0.82rem', lineHeight: 1.75, color: 'rgba(210,195,240,0.8)', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-body, serif)' }}>
+              {profile.split('\n\n').map((para, i) => {
+                const labels = ['Core Essence', 'Shadow & Wounds', 'Gifts & Peak Power', 'Timing & Directive'];
+                return (
+                  <div key={i} style={{ marginBottom: '1.2rem' }}>
+                    <span style={{ display: 'block', fontSize: '0.48rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.4)', marginBottom: '0.35rem', fontFamily: "'Cinzel', serif" }}>{labels[i]}</span>
+                    <p style={{ margin: 0 }}>{para}</p>
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         )}

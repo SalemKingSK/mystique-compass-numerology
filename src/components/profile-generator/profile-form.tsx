@@ -2,10 +2,9 @@
 
 /**
  * MYSTIQUE COMPASS — Premium Profile Form
- * REPLACE: src/components/profile-generator/profile-form.tsx
  *
  * Changes:
- *  • Deep purple/gold colour scheme (no more slate-blue)
+ *  • Deep purple/gold colour scheme
  *  • Cinematic particle-burst submit animation
  *  • Floating label inputs with gold focus rings
  *  • Animated conic-gradient border on the card
@@ -167,16 +166,12 @@ export function ProfileForm({
 
   return (
     <>
-      {/* ── INLINE STYLES ── */}
       <style>{`
-        /* ── Purple/Gold Cosmic Body ── */
         .pf-root {
           display: flex;
           flex-direction: column;
           min-height: calc(100vh - 4rem);
         }
-
-        /* ── Pulsing gold conic border card ── */
         .pf-card-wrap {
           position: relative;
           border-radius: 1.25rem;
@@ -193,7 +188,6 @@ export function ProfileForm({
           initial-value: 0deg;
         }
         @keyframes pf-spin { to { --pf-angle: 360deg; } }
-
         .pf-card {
           background: rgba(15, 5, 35, 0.92);
           backdrop-filter: blur(20px);
@@ -201,23 +195,6 @@ export function ProfileForm({
           padding: 1.5rem;
         }
         @media (min-width: 768px) { .pf-card { padding: 2rem; } }
-
-        /* ── Inputs ── */
-        .pf-card input, .pf-card [data-radix-select-trigger] {
-          background: rgba(124, 58, 237, 0.06) !important;
-          border: 1px solid rgba(212, 175, 55, 0.18) !important;
-          color: #f0e6ff !important;
-          border-radius: 0.75rem !important;
-          transition: border-color 0.25s, box-shadow 0.25s !important;
-        }
-        .pf-card input:focus, .pf-card [data-radix-select-trigger][data-state=open] {
-          border-color: rgba(212, 175, 55, 0.6) !important;
-          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12), 0 0 18px rgba(212, 175, 55, 0.14) !important;
-          outline: none !important;
-        }
-        .pf-card input::placeholder { color: rgba(192, 132, 252, 0.4) !important; }
-
-        /* ── Labels ── */
         .pf-label {
           font-family: 'Cinzel', serif;
           font-size: 0.6rem;
@@ -227,13 +204,12 @@ export function ProfileForm({
           display: block;
           margin-bottom: 0.4rem;
         }
-
-        /* ── Reveal Button ── */
         .pf-btn {
           position: relative;
           width: 100%;
-          background: linear-gradient(135deg, #5b21b6 0%, #d4af37 50%, #7c3aed 100%);
+          background-image: linear-gradient(135deg, #5b21b6 0%, #d4af37 50%, #7c3aed 100%);
           background-size: 200% 100%;
+          background-color: transparent;
           border: none;
           border-radius: 0.9rem;
           padding: 0.9rem 1.5rem;
@@ -264,8 +240,6 @@ export function ProfileForm({
         @keyframes pf-shimmer {
           100% { transform: translateX(100%); }
         }
-
-        /* ── Particle burst ring ── */
         .pf-particle-ring {
           position: absolute;
           inset: 0;
@@ -287,8 +261,6 @@ export function ProfileForm({
           0%  { transform: translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(1); opacity:1; }
           100%{ transform: translate(-50%,-50%) rotate(var(--angle)) translateX(60px) scale(0); opacity:0; }
         }
-
-        /* ── Constellation ── */
         .pf-constellation {
           position: absolute;
           bottom: 0; left: 0; right: 0;
@@ -296,8 +268,6 @@ export function ProfileForm({
           opacity: 0.5;
           pointer-events: none;
         }
-
-        /* ── Search result items ── */
         .pf-search-result {
           padding: 0.75rem 1rem;
           cursor: pointer;
@@ -307,8 +277,6 @@ export function ProfileForm({
           font-family: var(--font-body, sans-serif);
         }
         .pf-search-result:hover { background: rgba(124, 58, 237, 0.18); }
-
-        /* ── Wikipedia row ── */
         .pf-wiki-row {
           padding: 0.75rem 1rem;
           cursor: pointer;
@@ -323,8 +291,6 @@ export function ProfileForm({
           transition: background 0.2s;
         }
         .pf-wiki-row:hover { background: rgba(192, 132, 252, 0.12); }
-
-        /* ── Section divider ── */
         .pf-divider {
           display: flex;
           align-items: center;
@@ -344,8 +310,6 @@ export function ProfileForm({
           color: rgba(212, 175, 55, 0.5);
           white-space: nowrap;
         }
-
-        /* ── Title header ── */
         .pf-card-title {
           font-family: 'Cinzel Decorative', 'Cinzel', serif;
           font-size: 1.35rem;
@@ -356,8 +320,6 @@ export function ProfileForm({
           background-clip: text;
           letter-spacing: 0.04em;
         }
-
-        /* ── Tagline ── */
         .pf-tagline {
           color: rgba(192, 132, 252, 0.6);
           font-style: italic;
@@ -365,8 +327,6 @@ export function ProfileForm({
           margin-top: -0.5rem;
           font-family: var(--font-body, serif);
         }
-
-        /* ── Footer quote ── */
         .pf-footer {
           text-align: center;
           padding: 1rem;

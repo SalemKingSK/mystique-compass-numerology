@@ -164,8 +164,8 @@ input[type="email"],
 input[type="search"],
 textarea,
 [data-radix-select-trigger] {
-  background: rgba(124,58,237,0.06) !important;
-  border-color: rgba(212,175,55,0.15) !important;
+  background: rgba(124, 58, 237, 0.06) !important;
+  border-color: rgba(212, 175, 55, 0.15) !important;
   color: #f0e6ff !important;
   transition: border-color 0.25s, box-shadow 0.25s !important;
 }
@@ -173,8 +173,8 @@ input:focus,
 input:focus-visible,
 textarea:focus,
 [data-radix-select-trigger][data-state="open"] {
-  border-color: rgba(212,175,55,0.55) !important;
-  box-shadow: 0 0 0 3px rgba(212,175,55,0.1), 0 0 16px rgba(212,175,55,0.12) !important;
+  border-color: rgba(212, 175, 55, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1), 0 0 16px rgba(212, 175, 55, 0.12) !important;
   outline: none !important;
 }
 
@@ -220,11 +220,11 @@ html { scroll-behavior: smooth; }
 .dash-panel{display:none;padding:12px 8px;animation:PanelIn-cf .22s ease;}
 .dash-panel.active{display:block;}
 @keyframes PanelIn-cf{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.core-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px;}
-.core-chip{background:linear-gradient(140deg,rgba(18,30,58,.95),rgba(9,16,35,.98));border:1px solid rgba(200,168,75,.16);border-radius:12px;padding:12px 8px;text-align:center;position:relative;overflow:hidden;}
-.core-chip-label{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.24em;text-transform:uppercase;color:var(--cf-silver-dim);margin-bottom:5px;}
-.core-chip-num{font-family:'Cinzel Decorative',serif;font-size:1.8rem;color:var(--cf-gold);line-height:1;margin-bottom:3px;text-shadow:0 0 22px rgba(200,168,75,.4);}
-.core-chip-name{font-style:italic;font-size:.72rem;color:var(--cf-silver);}
+.core-strip { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; margin-bottom:12px; }
+.core-chip { background:linear-gradient(140deg,rgba(18,30,58,.95),rgba(9,16,35,.98)); border:1px solid rgba(200,168,75,.16); border-radius:12px; padding:12px 8px; text-align:center; position:relative; overflow:hidden; }
+.core-chip-label { font-family:'Cinzel',serif; font-size:.5rem; letter-spacing:.24em; text-transform:uppercase; color:var(--cf-silver-dim); margin-bottom:5px; }
+.core-chip-num { font-family:'Cinzel Decorative',serif; font-size:1.8rem; color:var(--cf-gold); line-height:1; margin-bottom:3px; text-shadow:0 0 22px rgba(200,168,75,.4); }
+.core-chip-name { font-style:italic; font-size:.72rem; color:var(--cf-silver); }
 .core-chip.hl-py{border-color:rgba(200,168,75,.48);}
 .core-chip.hl-py .core-chip-num{font-size:2.2rem;}
 .alert-banner{background:linear-gradient(135deg,rgba(150,28,42,0.18),rgba(100,38,55,0.12));border:1px solid rgba(192,58,90,0.32);border-radius:10px;padding:10px 12px;font-size:.85rem;color:var(--cf-rose);text-align:center;display:none;margin-bottom:12px;line-height:1.65;}
