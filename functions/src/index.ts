@@ -7,7 +7,8 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/ge
 const geminiApiKey = defineString("GEMINI_API_KEY");
 
 // Constants
-const GEMINI_MODEL = "gemini-1.5-pro-latest";
+// Using Gemini 1.5 Flash for the best free-tier performance and rate limits
+const GEMINI_MODEL = "gemini-1.5-flash";
 
 // Define interfaces for our function
 interface OracleInput {
@@ -82,7 +83,7 @@ ${userQuestion}`;
     const chat = model.startChat({
         history,
         generationConfig: {
-            maxOutputTokens: 600,
+            maxOutputTokens: 1000,
             temperature: 0.85,
         },
         safetySettings: [

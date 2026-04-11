@@ -15,6 +15,8 @@ import {
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import InstallButton from '../InstallButton';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useFirebase } from '@/firebase';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function reduceNum(n: number): number {
@@ -84,12 +86,13 @@ function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOut
   const [state,setState]=React.useState<'idle'|'loading'|'done'>('idle');
   const [profile,setProfile]=React.useState('');
   const [open,setOpen]=React.useState(false);
+  const { firebaseApp } = useFirebase();
 
   const generate=async()=>{
     setState('loading'); setOpen(true);
     const missing=[1,2,3,4,5,6,7,8,9].filter(n=>!numerology.numberCounts?.[String(n)]).join(', ')||'none';
-    const prompt=`You are a premium cosmic profiler. Based on the following multi-system birth data, write a 4-paragraph synthesised character analysis. Be insightful, specific, and use vivid language. Do NOT list numbers — weave them into narrative.
-
+    
+    const dataContext = `
 Name: ${insight.name}
 Western Sign: ${insight.western_sign} | New Astrology Sign: ${insight.new_astrology_sign}
 Psyche Number: ${numerology.psycheNum} (${numerology.psychicMeaning?.title})
@@ -100,6 +103,9 @@ Missing Numbers: ${missing}
 Arrows of Strength: ${(numerology.arrowsOfStrength||[]).map(a=>a.name).join(', ')||'none'}
 Arrows of Weakness: ${(numerology.arrowsOfWeakness||[]).map(a=>a.name).join(', ')||'none'}
 Chinese Sign: ${insight.sign} (${insight.element})
+    `.trim();
+
+    const instruction = `You are a premium cosmic profiler. Based on the provided multi-system birth data, write a 4-paragraph synthesised character analysis. Be insightful, specific, and use vivid language. Do NOT list numbers — weave them into narrative.
 
 PARAGRAPH 1: Core Character — who this person fundamentally IS at soul-level. Use Psyche number, Western sign and Chinese animal together.
 PARAGRAPH 2: Shadow & Wounds — what holds them back, karmic patterns, missing energies.
@@ -107,11 +113,18 @@ PARAGRAPH 3: Gifts & Peak Power — what they are destined for and when they wil
 PARAGRAPH 4: This Year & Forecast — what the current Personal Year means specifically, and one concrete action they should take right now.`.trim();
 
     try {
-      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-      const data=await res.json();
-      setProfile(data.content?.find((b:any)=>b.type==='text')?.text||'The stars are silent right now — please try again.');
+      const functions = getFunctions(firebaseApp);
+      const consult = httpsCallable(functions, 'consultoracle');
+      const result = await consult({
+        userReport: dataContext,
+        userQuestion: instruction
+      });
+      
+      const resData = result.data as { response: string };
+      setProfile(resData.response || 'The stars are silent right now — please try again.');
       setState('done');
-    } catch {
+    } catch (e) {
+      console.error('AI Profiler Error:', e);
       setProfile('The stars are silent right now — please try again shortly.');
       setState('done');
     }
@@ -287,12 +300,14 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
           <ResultsHeader name={insight.name} newAstroSign={insight.new_astrology_sign} birthDate={formatDate()} onTabClick={setActiveTab} activeTab={activeTab}/>
           <AnimatePresence>{warning&&<WarningBanner message={warning}/>}</AnimatePresence>
           <CosmicProfilerPanel insight={insight} numerology={numerology}/>
-          <div className="mt-6">
-            {activeTab==='astro'       && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><AstroDisplay insight={insight}/></motion.div>}
-            {activeTab==='numerology'  && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><NumerologyDisplay numerology={numerology}/></motion.div>}
-            {activeTab==='new-astro'   && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData}/></motion.div>}
-            {activeTab==='cosmic-fate' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear}/></motion.div>}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div key={activeTab} initial={{ opacity:0, y:10, scale:0.99 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:-10, scale:0.99 }} transition={{ duration:0.35, ease:[0.23,1,0.32,1] }}>
+              {activeTab==='astro'       &&<AstroDisplay insight={insight}/>}
+              {activeTab==='numerology'  &&<NumerologyDisplay numerology={numerology}/>}
+              {activeTab==='new-astro'   &&<NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData}/>}
+              {activeTab==='cosmic-fate' &&<CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear}/>}
+            </motion.div>
+          </AnimatePresence>
         </div>
         <footer className="text-center p-4 pb-24 text-white/50 text-[0.65rem] whitespace-pre-line font-body italic leading-relaxed">
           {"He who knows others is learned;\nHe who knows himself is wise.\n— Lao Tzu, Dao De Jing"}
