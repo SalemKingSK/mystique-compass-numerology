@@ -1,7 +1,7 @@
 
 /**
  * @fileOverview Precision-engineered Cosmic Fate Map refactored to native React state.
- * Year selection has been removed to lock the focus to the current year.
+ * Year selection is now UNLOCKED, allowing for any year to be searched.
  */
 'use client';
 
@@ -18,8 +18,10 @@ import { CosmicRiskScanner } from './cosmic-risk-scanner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe } from 'lucide-react';
+import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe, RotateCcw } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 interface Props {
@@ -109,7 +111,7 @@ const pyColors: Record<number, string> = {
 
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const [activeTab, setActiveTab] = useState('synthesis');
-  const readYear = new Date().getFullYear(); // LOCKED TO CURRENT YEAR
+  const [readYear, setReadYear] = useState(new Date().getFullYear());
   const [selectedZodiacYear, setSelectedZodiacYear] = useState<any>(null);
   const [diveSubTab, setDiveSubTab] = useState('ov');
 
@@ -121,6 +123,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     const lp = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(birthYear));
     const bv = reduce(birthDay);
     const today = new Date();
+    // Use the current month for calculation even if searching other years
     const currentMonthIndex = today.getMonth() + 1;
     const pm = reduce(py + currentMonthIndex);
     
@@ -175,7 +178,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <div className="core-chip hl-py">
             <div className="core-chip-label">Personal Year {readYear}</div>
             <div className="core-chip-num">{stats.py}</div>
-            <div className="core-chip-name">{yr?.title}</div>
+            <div className="core-chip-name">{yr.title}</div>
           </div>
           <div className="core-chip">
             <div className="core-chip-label">Life Path</div>
@@ -322,6 +325,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       <div className="space-y-4 px-2">
         {useMemo(() => {
           const list = [];
+          // Use current dynamic readYear as base for intersections list
           for (let y = readYear; y <= readYear + 30; y++) {
             const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
             if (pyn === 4 || pyn === 7) {
@@ -453,9 +457,24 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
               <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
                 <CalendarDays className="h-6 w-6 text-primary" />
               </div>
-              <div>
+              <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Temporal Focus</label>
-                <div className="text-2xl font-bold text-white font-cinzel">Current Year {readYear}</div>
+                <div className="flex items-center gap-3">
+                  <Input 
+                    type="number"
+                    value={readYear}
+                    onChange={(e) => setReadYear(parseInt(e.target.value) || new Date().getFullYear())}
+                    className="w-24 h-9 bg-black/40 border-primary/20 text-white font-bold"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setReadYear(new Date().getFullYear())}
+                    className="h-9 border-primary/20 text-[10px] uppercase font-bold text-primary/80 hover:bg-primary/10"
+                  >
+                    <RotateCcw className="h-3 w-3 mr-2" /> Today
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 
 /**
  * @fileOverview Overhauled Cosmic Fate Display mirroring the "Personal Year Oracle" structure.
- * Year selection has been locked to the current year.
+ * Year selection is now UNLOCKED, allowing for any year to be searched.
  */
 
 'use client';
@@ -13,11 +13,14 @@ import { BOOK } from '@/lib/cosmic-fate/book';
 import { YEAR_DESCRIPTIONS, PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/oracle-data';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   Star, CalendarDays, 
   BookOpen, Activity,
-  Compass, Telescope
+  Compass, Telescope,
+  RotateCcw
 } from 'lucide-react';
 import { SpeechPlayer } from './speech-player';
 import { ScrollableTextDisplay } from './scrollable-text-display';
@@ -37,9 +40,9 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const [diveSubTab, setDiveSubTab] = useState('ov');
   const [codexSign, setCodexSign] = useState('Rat');
   
-  // Year Selector State - LOCKED
+  // Year Selector State - UNLOCKED
+  const [readYear, setReadYear] = useState(new Date().getFullYear());
   const today = new Date();
-  const readYear = today.getFullYear();
 
   const { birthDay: d, birthMonth: m, birthYear: by } = numerology;
   const birthSign = insight.sign;
@@ -360,7 +363,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 max-w-full overflow-x-hidden pb-20">
-      {/* Year Selector - LOCKED DISPLAY */}
+      {/* Year Selector - UNLOCKED DISPLAY */}
       <Card className="p-4 bg-slate-900/60 border-primary/20">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -373,9 +376,20 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="px-4 py-2 bg-black/40 border border-white/10 rounded-md text-sm font-bold text-white">
-              Year {readYear}
-            </div>
+            <Input 
+              type="number"
+              value={readYear}
+              onChange={(e) => setReadYear(parseInt(e.target.value) || new Date().getFullYear())}
+              className="w-24 h-9 bg-black/40 border-white/10 text-white font-bold"
+            />
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setReadYear(new Date().getFullYear())}
+              className="h-9 border-white/10 text-[10px] uppercase font-bold text-white/70 hover:bg-white/5"
+            >
+              <RotateCcw className="h-3 w-3 mr-2" /> Today
+            </Button>
           </div>
         </div>
       </Card>
