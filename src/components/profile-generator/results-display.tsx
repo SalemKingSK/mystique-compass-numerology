@@ -96,7 +96,7 @@ function ConstellationReveal({ onDone }: { onDone: () => void }) {
   const lines = [[60, 80, 140, 50], [140, 50, 200, 90], [200, 90, 280, 60], [280, 60, 340, 100], [60, 160, 140, 140], [140, 140, 200, 90], [200, 90, 260, 170], [260, 170, 340, 150]];
   const dots = [[60, 80], [140, 50], [200, 90], [280, 60], [340, 100], [60, 160], [140, 140], [260, 170], [340, 150]];
   return (
-    <motion.div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(5,1,18,0.95)' }}
+    <motion.div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent:'center', background: 'rgba(5,1,18,0.95)' }}
       initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, delay: 1.3 }}>
       <svg viewBox="0 0 400 220" style={{ width: '100%', maxWidth: '22rem', opacity: 0.8 }}>
         <defs><filter id="cr-glow"><feGaussianBlur stdDeviation="3" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs>

@@ -384,6 +384,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
   const coreVibrationsRef=React.useRef<HTMLDivElement>(null);
   const fateChambersRef=React.useRef<HTMLDivElement>(null);
+  const arrowsRef=React.useRef<HTMLDivElement>(null);
   const kuaRef=React.useRef<HTMLDivElement>(null);
   const pyDetailRef=React.useRef<HTMLDivElement>(null);
   const birthDate=`${birthDay}/${birthMonth}/${birthYear}`;
