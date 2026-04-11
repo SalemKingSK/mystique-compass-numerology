@@ -181,7 +181,7 @@ export function ProfileForm({
           onSubmit={onSubmit}
           className="w-full space-y-5"
           style={{
-            background: 'linear-gradient(140deg, rgba(18,30,58,0.97) 0%, rgba(9,16,35,0.98) 100%)',
+            backgroundImage: 'linear-gradient(140deg, rgba(18,30,58,0.97) 0%, rgba(9,16,35,0.98) 100%)',
             border: '1px solid rgba(200,168,75,0.22)',
             borderRadius: '16px',
             padding: '24px 20px',
@@ -208,16 +208,16 @@ export function ProfileForm({
               onClick={onHistoryOpen}
               className="p-2 rounded-lg transition-all duration-200"
               style={{
-                background: 'rgba(200,168,75,0.08)',
+                backgroundColor: 'rgba(200,168,75,0.08)',
                 border: '1px solid rgba(200,168,75,0.18)',
                 color: 'var(--cf-gold-dim)',
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(200,168,75,0.15)';
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(200,168,75,0.15)';
                 (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-gold)';
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(200,168,75,0.08)';
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(200,168,75,0.08)';
                 (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-gold-dim)';
               }}
             >
@@ -247,7 +247,7 @@ export function ProfileForm({
                       autoComplete="off"
                       className="w-full pl-9 pr-4 py-2.5 font-body text-sm outline-none transition-all duration-300"
                       style={{
-                        background: 'rgba(5,9,20,0.88)',
+                        backgroundColor: 'rgba(5,9,20,0.88)',
                         border: '1px solid rgba(200,168,75,0.18)',
                         borderRadius: '8px',
                         color: 'var(--cf-text)',
@@ -325,7 +325,7 @@ export function ProfileForm({
               required
               className="w-full px-4 py-2.5 font-body text-sm outline-none transition-all duration-300"
               style={{
-                background: 'rgba(5,9,20,0.88)',
+                backgroundColor: 'rgba(5,9,20,0.88)',
                 border: '1px solid rgba(200,168,75,0.18)',
                 borderRadius: '8px',
                 color: 'var(--cf-text)',
@@ -364,7 +364,7 @@ export function ProfileForm({
                   max={max}
                   className="w-full px-3 py-2.5 font-body text-sm outline-none transition-all duration-300 text-center"
                   style={{
-                    background: 'rgba(5,9,20,0.88)',
+                    backgroundColor: 'rgba(5,9,20,0.88)',
                     border: '1px solid rgba(200,168,75,0.18)',
                     borderRadius: '8px',
                     color: 'var(--cf-text)',
@@ -395,7 +395,7 @@ export function ProfileForm({
               required
               className="w-full px-4 py-2.5 font-body text-sm outline-none transition-all duration-300 cursor-pointer"
               style={{
-                background: 'rgba(5,9,20,0.88)',
+                backgroundColor: 'rgba(5,9,20,0.88)',
                 border: '1px solid rgba(200,168,75,0.18)',
                 borderRadius: '8px',
                 color: formData.gender ? 'var(--cf-text)' : 'var(--cf-text-dim)',
@@ -422,7 +422,7 @@ export function ProfileForm({
             disabled={isPending}
             className="w-full font-cinzel font-semibold text-xs tracking-[0.22em] uppercase py-3 px-5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
-              background: isPending
+              backgroundImage: isPending
                 ? 'linear-gradient(135deg, #4a3818, #8a7030, #4a3818)'
                 : 'linear-gradient(135deg, #6a5220, #c8a84b, #6a5220)',
               backgroundSize: '200% 100%',
