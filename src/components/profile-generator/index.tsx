@@ -86,10 +86,11 @@ export function ProfileGenerator() {
         // Put legacy items into IDB
         if (legacyItems.length > 0) {
           legacyItems.forEach(item => {
+            // Data Sanitization: handle multiple legacy formats
             const name = item.name || item.fullName || item.title;
-            const d = item.day || item.birthDay;
-            const m = item.month || item.birthMonth;
-            const y = item.year || item.birthYear;
+            const d = item.day || item.birthDay || item.dayOfBirth;
+            const m = item.month || item.birthMonth || item.monthOfBirth;
+            const y = item.year || item.birthYear || item.yearOfBirth;
             
             if (name && d && m && y) {
               const soulId = `${String(name).trim().replace(/\s+/g, '_')}-${d}-${m}-${y}`;
@@ -122,7 +123,7 @@ export function ProfileGenerator() {
         };
 
         tx.onerror = (event) => {
-          console.error("IDB Transaction Error", event);
+          console.error("IDB Transaction Error during migration", event);
           // Fallback: just fetch what's there
           const fallbackTx = db.transaction(STORE_NAME, 'readonly');
           const fallbackStore = fallbackTx.objectStore(STORE_NAME);

@@ -1,5 +1,5 @@
 
-import { onCall } from "firebase-functions/v2/https";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { defineString } from "firebase-functions/params";
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
@@ -7,7 +7,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/ge
 const geminiApiKey = defineString("GEMINI_API_KEY");
 
 // Constants
-// Using Gemini 1.5 Flash for the best free-tier performance and rate limits
+// Using Gemini 1.5 Flash for the best free-tier performance
 const GEMINI_MODEL = "gemini-1.5-flash";
 
 // Define interfaces for our function
@@ -53,22 +53,25 @@ ${APP_KNOWLEDGE_BASE}
 /**
  * Firebase Callable Function to consult the Gemini AI Oracle.
  */
-export const consultoracle = onCall(async (request) => {
-  const { userReport, userQuestion, chatHistory } = request.data as OracleInput;
+export const consultoracle = onCall({ region: 'us-central1' }, async (request) => {
+  const data = request.data as OracleInput;
+  const { userReport, userQuestion, chatHistory } = data;
   const apiKey = geminiApiKey.value();
 
   if (!apiKey) {
     console.error("GEMINI_API_KEY is not set in environment.");
-    // Using a more specific error code for the client to handle
-    throw new Error("Server configuration error: API key not found.");
+    throw new HttpsError("failed-precondition", "Server configuration error: API key not found.");
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL, systemInstruction: SYSTEM_PROMPT });
+  const model = genAI.getGenerativeModel({ 
+    model: GEMINI_MODEL, 
+    systemInstruction: SYSTEM_PROMPT 
+  });
 
   // Convert our app's chat history to the format Gemini expects
   const history = (chatHistory || []).map(msg => ({
-    role: msg.role, // 'user' or 'model'
+    role: msg.role === 'model' ? 'model' : 'user',
     parts: [{ text: msg.text }],
   }));
   
@@ -96,15 +99,14 @@ ${userQuestion}`;
     const responseText = result.response.text();
 
     if (!responseText) {
-      throw new Error('Gemini returned an empty response.');
+      throw new HttpsError("internal", "Gemini returned an empty response.");
     }
 
     return { response: responseText } as OracleOutput;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Oracle Function] Gemini API error:', error);
-    // Throwing an error here will be caught by the client's .catch() block
-    throw new Error('Failed to get a response from the Oracle.');
+    throw new HttpsError("internal", error.message || "Failed to get a response from the Oracle.");
   }
 });
 

@@ -83,25 +83,26 @@ function ConstellationReveal({ onDone }: { onDone: () => void }) {
 
 // ── AI Cosmic Profiler ────────────────────────────────────────────────────────
 function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOutput; numerology: NumerologyData }) {
-  const [state,setState]=React.useState<'idle'|'loading'|'done'>('idle');
-  const [profile,setProfile]=React.useState('');
-  const [open,setOpen]=React.useState(false);
+  const [state, setState] = React.useState<'idle'|'loading'|'done'>('idle');
+  const [profile, setProfile] = React.useState('');
+  const [open, setOpen] = React.useState(false);
   const { firebaseApp } = useFirebase();
 
-  const generate=async()=>{
-    setState('loading'); setOpen(true);
-    const missing=[1,2,3,4,5,6,7,8,9].filter(n=>!numerology.numberCounts?.[String(n)]).join(', ')||'none';
+  const generate = async () => {
+    setState('loading'); 
+    setOpen(true);
+    const missing = [1,2,3,4,5,6,7,8,9].filter(n => !numerology.numberCounts?.[String(n)]).join(', ') || 'none';
     
     const dataContext = `
 Name: ${insight.name}
 Western Sign: ${insight.western_sign} | New Astrology Sign: ${insight.new_astrology_sign}
 Psyche Number: ${numerology.psycheNum} (${numerology.psychicMeaning?.title})
 Destiny Number: ${numerology.destinyNum} (${numerology.destinyMeaning?.title})
-Kua: ${numerology.kuaNum} | Personal Year: ${getPersonalYear(numerology.birthDay,numerology.birthMonth)}
-Karmic Fate: ${numerology.karmicFateNum||'none'} | Compound: ${numerology.compoundNum}
+Kua: ${numerology.kuaNum} | Personal Year: ${getPersonalYear(numerology.birthDay, numerology.birthMonth)}
+Karmic Fate: ${numerology.karmicFateNum || 'none'} | Compound: ${numerology.compoundNum}
 Missing Numbers: ${missing}
-Arrows of Strength: ${(numerology.arrowsOfStrength||[]).map(a=>a.name).join(', ')||'none'}
-Arrows of Weakness: ${(numerology.arrowsOfWeakness||[]).map(a=>a.name).join(', ')||'none'}
+Arrows of Strength: ${(numerology.arrowsOfStrength || []).map(a => a.name).join(', ') || 'none'}
+Arrows of Weakness: ${(numerology.arrowsOfWeakness || []).map(a => a.name).join(', ') || 'none'}
 Chinese Sign: ${insight.sign} (${insight.element})
     `.trim();
 
@@ -113,7 +114,8 @@ PARAGRAPH 3: Gifts & Peak Power — what they are destined for and when they wil
 PARAGRAPH 4: This Year & Forecast — what the current Personal Year means specifically, and one concrete action they should take right now.`.trim();
 
     try {
-      const functions = getFunctions(firebaseApp);
+      // Explicitly specify region 'us-central1' to prevent internal error mismatch
+      const functions = getFunctions(firebaseApp, 'us-central1');
       const consult = httpsCallable(functions, 'consultoracle');
       const result = await consult({
         userReport: dataContext,
@@ -132,7 +134,7 @@ PARAGRAPH 4: This Year & Forecast — what the current Personal Year means speci
 
   return (
     <div style={{ borderRadius:'1.1rem', overflow:'hidden', border:'1px solid rgba(212,175,55,0.22)', background: 'rgba(15,5,40,0.95)', marginBottom:'1.25rem' }}>
-      <div style={{ height:1, background:'linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)', marginBottom:'0.25rem' }}/>
+      <div style={{ height:1, background:'linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent)', marginBottom:'0.25rem' }}/>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'1rem 1.25rem', cursor: state!=='idle'?'pointer':'default', gap:'0.75rem' }}
         onClick={()=>state!=='idle'&&setOpen(o=>!o)}>
         <div style={{ display:'flex', alignItems:'center', gap:'0.6rem' }}>

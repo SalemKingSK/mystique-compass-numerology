@@ -1,8 +1,7 @@
 
 /**
  * @fileOverview Precision-engineered Cosmic Fate Map refactored to native React state.
- * Fixes the issue where tab details were flickering or disappearing.
- * Implements rich independent meanings for the Oracle dashboard.
+ * Expanded to include dedicated detail blocks for Personal Year, Universal Year, and Life Path.
  */
 'use client';
 
@@ -21,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe } from 'lucide-react';
+import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe, Info } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 interface Props {
@@ -168,38 +167,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     return `In ${readYear}, you are in a Personal Year ${stats.py} — ${yr?.title}, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${stats.uy} (${YD[stats.uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${stats.pm} (${pmNames[stats.pm]}), offering a finer-grained window into this season's immediate texture. Your ${stats.birthSign} nature meets a ${stats.yearAnimalName} year (${catLabel(stats.cat)}) — a ${stats.cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(stats.cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${stats.lp} (${lpName(stats.lp)}) ${lpInteractionText} Personal Year ${stats.py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${stats.pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${stats.cNum} (${lpName(stats.cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${readYear}.`;
   }, [stats, readYear]);
 
-  const intersections = useMemo(() => {
-    const list = [];
-    for (let y = readYear; y <= readYear + 30; y++) {
-      const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
-      if (pyn === 4 || pyn === 7) {
-        const yearAni = getAnimalForDate(15, 6, y);
-        const iCat = getCategory(stats.birthSign, yearAni);
-        const uyn = reduce(y);
-        const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
-        
-        const synKey = `${pyn}_${iCat}`;
-        const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', yearAni + ' Neutral');
-        const dyn = ZOO[stats.birthSign][`${iCat}Desc`] || ZOO[stats.birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${yearAni} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
-
-        list.push({ y, pyn, yearAni, iCat, uyn, isNegative, synth, dyn });
-      }
-    }
-    return list;
-  }, [stats.birthSign, birthDay, birthMonth, readYear]);
-
-  const zodiacCycle = useMemo(() => {
-    const list = [];
-    for (let y = readYear; y <= readYear + 11; y++) {
-      const yearAni = getAnimalForDate(15, 6, y);
-      const zCat = getCategory(stats.birthSign, yearAni);
-      const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
-      const age = y - birthYear;
-      list.push({ y, yearAni, zCat, pyn, age });
-    }
-    return list;
-  }, [stats.birthSign, birthDay, birthMonth, birthYear, readYear]);
-
   const renderSynthesis = () => {
     const yr = YD[stats.py];
     const uy = YD[stats.uy];
@@ -238,30 +205,65 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="p-5 bg-slate-900/60 border-primary/20">
-             <div className="flex items-center gap-2 mb-3">
-                <Star className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Your Personal Arc</span>
-             </div>
-             <div className="text-xl font-bold text-white mb-2">{yr.title}</div>
-             <div className="text-sm italic text-muted-foreground mb-4">{yr.phase}</div>
-             <p className="text-xs text-slate-300 leading-relaxed mb-4">{yr.overview.split('\n')[0]}</p>
-             <div className="flex gap-2">
-                <Badge variant="outline" className="text-[8px] border-primary/30">{yr.planet}</Badge>
-                <Badge variant="outline" className="text-[8px] border-emerald-500/30">{yr.chakra}</Badge>
-             </div>
-          </Card>
-          <Card className="p-5 bg-slate-900/60 border-primary/20">
-             <div className="flex items-center gap-2 mb-3">
-                <Globe className="h-4 w-4 text-purple-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Universal Backdrop</span>
-             </div>
-             <div className="text-xl font-bold text-white mb-2">{uy.title}</div>
-             <div className="text-sm italic text-muted-foreground mb-4">{uy.phase}</div>
-             <p className="text-xs text-slate-300 leading-relaxed mb-4">{uy.overview.split('\n')[0]}</p>
-             <Badge variant="outline" className="text-[8px] border-purple-400/30">{uy.planet}</Badge>
-          </Card>
+        <div className="space-y-4">
+          <Accordion type="single" collapsible className="w-full space-y-3">
+            <AccordionItem value="py-detail" className="border-none bg-white/5 rounded-xl overflow-hidden px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <div className="flex items-center gap-3">
+                  <Star className="h-5 w-5 text-primary" />
+                  <div className="text-left">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-primary/60">Active Personal Year</div>
+                    <div className="text-sm font-bold text-white">Year ${stats.py}: ${yr.title}</div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-6">
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="text-[8px] border-primary/30 text-primary uppercase">{yr.planet}</Badge>
+                    <Badge variant="outline" className="text-[8px] border-emerald-500/30 text-emerald-400 uppercase">{yr.chakra}</Badge>
+                  </div>
+                  <AccordionContentWithPlayer text={yr.overview} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="uy-detail" className="border-none bg-white/5 rounded-xl overflow-hidden px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <div className="flex items-center gap-3">
+                  <Globe className="h-5 w-5 text-purple-400" />
+                  <div className="text-left">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-purple-400/60">Collective Universal Year</div>
+                    <div className="text-sm font-bold text-white">Year ${stats.uy}: ${uy.title}</div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-6">
+                <div className="space-y-4">
+                  <Badge variant="outline" className="text-[8px] border-purple-400/30 text-purple-400 uppercase">{uy.planet}</Badge>
+                  <AccordionContentWithPlayer text={uy.overview} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="lp-detail" className="border-none bg-white/5 rounded-xl overflow-hidden px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <div className="flex items-center gap-3">
+                  <Activity className="h-5 w-5 text-emerald-400" />
+                  <div className="text-left">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-emerald-400/60">Soul Path / Life Path</div>
+                    <div className="text-sm font-bold text-white">Path ${stats.lp}: ${lpName(stats.lp)}</div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-6">
+                <div className="space-y-4">
+                  <p className="text-xs text-slate-300 leading-relaxed italic">Your Life Path represents the core developmental mission of your soul in this incarnation. It is the fixed frequency beneath all temporary annual cycles.</p>
+                  <AccordionContentWithPlayer text={PINNACLE_DESC[stats.lp] || "Description not available."} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
 
         <Card className="p-6 bg-slate-900/60 border-primary/20">
@@ -290,12 +292,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         </div>
         <div className="p-4 min-h-[300px]">
           {diveSubTab === 'pr' ? (
-            <div className="practice-grid">
+            <div className="practice-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
               {yr.pr.map((p: any, idx: number) => (
-                <div key={idx} className="pi">
-                  <div className="pi-icon">{p.i}</div>
-                  <div className="pi-name">{p.n}</div>
-                  <div className="pi-desc">{p.d}</div>
+                <div key={idx} className="pi p-4 rounded-xl bg-black/40 border border-white/5">
+                  <div className="pi-icon text-xl mb-2">{p.i}</div>
+                  <div className="pi-name font-cinzel text-[10px] font-black uppercase text-primary/80 mb-1">{p.n}</div>
+                  <div className="pi-desc text-xs text-slate-400">{p.d}</div>
                 </div>
               ))}
             </div>
@@ -316,21 +318,34 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const renderIntersections = () => (
     <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
-      <div className="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>
+      <div className="section-header">🔥 &nbsp; Critical Year Intersections &nbsp; 🔥</div>
       <p className="text-xs text-muted-foreground text-center mb-4 px-4 italic">Years where Personal Years 4 and 7 intersect with your Chinese cycle.</p>
       <div className="space-y-4 px-2">
-        {intersections.map(i => (
-          <Card key={i.y} className="intersection-card p-4 border-rose-500/20 bg-rose-950/5">
-            <div className="intersection-header">
-              <div className="intersection-year">{i.y}</div>
-              <div className="intersection-title">Personal Year {i.pyn} · {i.yearAni} Year {ZOO[i.yearAni].e}</div>
-              {i.isNegative && (
-                <div className="text-[10px] font-black uppercase mt-1 text-rose-400">
-                  High Tension — {getStatusLabelShort(i.iCat)} Year + Critical PY
-                </div>
-              )}
+        {useMemo(() => {
+          const list = [];
+          for (let y = readYear; y <= readYear + 30; y++) {
+            const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
+            if (pyn === 4 || pyn === 7) {
+              const yearAni = getAnimalForDate(15, 6, y);
+              const iCat = getCategory(stats.birthSign, yearAni);
+              const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
+              const synKey = `${pyn}_${iCat}`;
+              const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', yearAni + ' Neutral');
+              const dyn = ZOO[stats.birthSign][`${iCat}Desc`] || ZOO[stats.birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${yearAni} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
+              list.push({ y, pyn, yearAni, iCat, isNegative, synth, dyn });
+            }
+          }
+          return list;
+        }, [stats.birthSign, birthDay, birthMonth, readYear]).map(i => (
+          <Card key={i.y} className="intersection-card p-5 border-rose-500/20 bg-rose-950/5">
+            <div className="flex justify-between items-start border-b border-rose-500/10 pb-3 mb-4">
+              <div>
+                <div className="text-2xl font-serif font-bold text-rose-400">{i.y}</div>
+                <div className="text-xs font-bold text-white">PY ${i.pyn} · ${i.yearAni} Year ${ZOO[i.yearAni].e}</div>
+              </div>
+              {i.isNegative && <Badge className="bg-rose-500 text-[8px] px-2 py-0">HIGH TENSION</Badge>}
             </div>
-            <div className="mt-4 space-y-2">
+            <div className="space-y-4">
               <AccordionContentWithPlayer text={`${i.synth}\n\nSpecific dynamics: ${i.dyn}`} />
             </div>
           </Card>
@@ -352,11 +367,19 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         </div>
       </div>
       <div className="zodiac-grid grid grid-cols-2 md:grid-cols-4 gap-3">
-        {zodiacCycle.map(item => {
+        {useMemo(() => {
+          const list = [];
+          for (let y = readYear; y <= readYear + 11; y++) {
+            const yearAni = getAnimalForDate(15, 6, y);
+            const zCat = getCategory(stats.birthSign, yearAni);
+            const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
+            const age = y - birthYear;
+            list.push({ y, yearAni, zCat, pyn, age });
+          }
+          return list;
+        }, [stats.birthSign, birthDay, birthMonth, birthYear, readYear]).map(item => {
           const isCritical = item.pyn === 4 || item.pyn === 7;
           const isEnemy = item.zCat === 'clash' || item.zCat === 'harm' || item.zCat === 'destruction';
-          const pyCol = pyColors[item.pyn];
-          
           return (
             <div 
               key={item.y} 
@@ -367,7 +390,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             >
               <div className="text-3xl mb-2">{ZOO[item.yearAni].e}</div>
               <div className="text-xs font-bold text-white font-cinzel">{item.y}</div>
-              <div className="text-lg font-black" style={{ color: pyCol }}>PY {item.pyn}</div>
+              <div className="text-lg font-black" style={{ color: pyColors[item.pyn] }}>PY {item.pyn}</div>
               <div className="text-[9px] uppercase font-bold text-muted-foreground">{getStatusLabelShort(item.zCat)}</div>
             </div>
           );
@@ -405,7 +428,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                 </div>
               </div>
               <div className="space-y-3">
-                <p className="text-xs leading-relaxed text-slate-300">{PINNACLE_DESC[s.p]}</p>
+                <p className="text-xs text-slate-300">{PINNACLE_DESC[s.p]}</p>
                 <p className="text-[11px] italic text-rose-300/80">Challenge: {CHALLENGE_DESC[s.c]}</p>
               </div>
             </Card>
@@ -414,36 +437,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
       </div>
     );
   };
-
-  const renderEnemy = () => (
-    <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
-      <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
-      <div className="space-y-8">
-        {CONVERGENCE_CARDS.map(c => (
-          <Card key={c.year} className="conv-card border-rose-500/20 bg-rose-950/5 overflow-hidden">
-            <div className="p-6 bg-rose-500/10 border-b border-rose-500/20">
-              <div className="text-2xl font-bold text-rose-400">{c.title}</div>
-              <div className="text-sm italic text-muted-foreground">{c.sub}</div>
-            </div>
-            <div className="p-6 space-y-6">
-              <AccordionContentWithPlayer text={c.intro} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {c.chips.map((chip, idx) => (
-                  <div key={idx} className="p-4 rounded-xl bg-black/40 border border-white/5">
-                    <div className="text-[10px] font-black uppercase text-rose-400 mb-2">{chip.t}</div>
-                    <p className="text-xs leading-relaxed text-slate-300">{chip.p}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="wbox p-4 rounded-r-xl text-sm italic border-l-4 border-rose-500 bg-rose-500/5">
-                <AccordionContentWithPlayer text={c.warning} />
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
 
   return (
     <div className="cosmic-fate-root relative min-h-screen rounded-3xl overflow-hidden">
@@ -510,8 +503,36 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           {activeTab === 'intersections' && renderIntersections()}
           {activeTab === 'zodiac' && renderZodiac()}
           {activeTab === 'pinnacles' && renderPinnacles()}
-          {activeTab === 'convergence' && renderEnemy()}
           {activeTab === 'scanner' && <CosmicRiskScanner targetYear={readYear} />}
+          {activeTab === 'convergence' && (
+            <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
+              <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
+              <div className="space-y-8">
+                {CONVERGENCE_CARDS.map(c => (
+                  <Card key={c.year} className="conv-card border-rose-500/20 bg-rose-950/5 overflow-hidden">
+                    <div className="p-6 bg-rose-500/10 border-b border-rose-500/20">
+                      <div className="text-2xl font-bold text-rose-400">{c.title}</div>
+                      <div className="text-sm italic text-muted-foreground">{c.sub}</div>
+                    </div>
+                    <div className="p-6 space-y-6">
+                      <AccordionContentWithPlayer text={c.intro} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {c.chips.map((chip, idx) => (
+                          <div key={idx} className="p-4 rounded-xl bg-black/40 border border-white/5">
+                            <div className="text-[10px] font-black uppercase text-rose-400 mb-2">{chip.t}</div>
+                            <p className="text-xs leading-relaxed text-slate-300">{chip.p}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="wbox p-4 rounded-r-xl text-sm italic border-l-4 border-rose-500 bg-rose-500/5">
+                        <AccordionContentWithPlayer text={c.warning} />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
