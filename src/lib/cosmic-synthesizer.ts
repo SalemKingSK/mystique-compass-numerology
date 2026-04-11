@@ -18,8 +18,9 @@ import type { AstroInsightOutput, NumerologyData } from '@/components/profile-ge
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 function reduce(n: number): number {
-  while (n > 9) n = String(n).split('').reduce((a, d) => a + +d, 0);
-  return n;
+  let val = Math.abs(n);
+  while (val > 9) val = String(val).split('').reduce((a, d) => a + +d, 0);
+  return val || 9;
 }
 
 function getCurrentPersonalYear(birthDay: number, birthMonth: number): number {
@@ -281,12 +282,10 @@ export function buildCosmicProfile(
 
   const {
     psycheNum, destinyNum,
-    soulUrgeNum, personalityNum, maturityNum,
     missingNumbers = [],
     arrowsOfStrength = [], arrowsOfWeakness = [],
     compoundNum, karmicFateNum,
-    pinnacleStages = [],
-    birthDay, birthMonth, birthYear,
+    birthDay, birthMonth,
   } = numerology;
 
   // Derived timing
@@ -302,10 +301,6 @@ export function buildCosmicProfile(
 
   // Zoo/element polarity from the constants (yin/yang)
   const elementLine = ELEMENT_PHRASE[element] || '';
-
-  // Current pinnacle
-  const currentPinnacle = pinnacleStages.find(s => s.active) || pinnacleStages[0];
-  const nextPinnacleAge = currentPinnacle?.ages.split(' – ')[1];
 
   // Arrow of Strength (first/most significant)
   const primaryStrength = arrowsOfStrength.find(a => ARROW_STRENGTH_PHRASE[a.name]);
@@ -323,14 +318,8 @@ export function buildCosmicProfile(
   const p1_element = elementLine ? `${elementLine}, and this colours every dimension of their expression.` : '';
   const p1_western = `Fused with the ${western_sign} archetype — ${WESTERN_SIGN_ESSENCE[western_sign] || 'a complex astrological intelligence'} — this creates a specific combination of qualities that is genuinely unrepeatable.`;
   const p1_psyche = `Internally, they ${PSYCHE_ESSENCE[psycheNum] || 'carry a distinctive inner orientation'}.`;
-  const p1_soul = soulUrgeNum
-    ? `Beneath the visible personality, ${SOUL_URGE_DRIVE[soulUrgeNum] || 'a deep inner drive operates'}.`
-    : '';
-  const p1_personality = personalityNum
-    ? `To the world, they ${PERSONALITY_MASK[personalityNum] || 'present a particular face'} — which may or may not correspond to the fuller interior they actually inhabit.`
-    : '';
 
-  const para1 = [p1_opening, p1_element, p1_western, p1_psyche, p1_soul, p1_personality]
+  const para1 = [p1_opening, p1_element, p1_western, p1_psyche]
     .filter(Boolean).join(' ');
 
   // ── PARAGRAPH 2: SHADOW & WOUNDS ────────────────────────────────────────
@@ -356,20 +345,12 @@ export function buildCosmicProfile(
     ? `The Karmic Fate number ${karmicFateNum} adds a further layer — the suggestion of a pattern arriving from previous cycles of experience that is not merely biographical but carries the specific weight of something that must be consciously worked through rather than simply endured.`
     : '';
 
-  const p2_challenge = currentPinnacle
-    ? `The current life arc presents Challenge ${currentPinnacle.c} as its primary developmental invitation — ${(MISSING_SHADOW[currentPinnacle.c] || `the work of Challenge ${currentPinnacle.c}`).replace('the absent', 'this challenge around')}.`
-    : '';
-
-  const para2 = [p2_opening, p2_second_missing, p2_weakness, p2_psyche_shadow, p2_karmic, p2_challenge]
+  const para2 = [p2_opening, p2_second_missing, p2_weakness, p2_psyche_shadow, p2_karmic]
     .filter(Boolean).join(' ');
 
   // ── PARAGRAPH 3: GIFTS & PEAK POWER ────────────────────────────────────
 
-  const expressionNum = reduce(reduce(birthDay) + reduce(birthMonth) + reduce(birthYear)); // rough estimate for expression in logic mode
-
-  const p3_expression = expressionNum
-    ? `Read through the Expression frequency, ${name} is ${EXPRESSION_GIFT[expressionNum] || 'a person of distinctive external gifts'}.`
-    : '';
+  const p3_expression = `Read through the lens of their unique chart, ${name} exhibits ${EXPRESSION_GIFT[destinyNum] || 'a person of distinctive external gifts'}.`;
 
   const p3_strength = primaryStrength
     ? `${ARROW_STRENGTH_PHRASE[primaryStrength.name] || 'A significant arrow of strength appears in the grid'}.`
@@ -379,11 +360,7 @@ export function buildCosmicProfile(
 
   const p3_chinese_gift = `The ${chineseSign}'s characteristic gift — ${chineseData.gift} — becomes a specific professional and creative advantage when the life's work genuinely aligns with their deepest orientation.`;
 
-  const p3_pinnacle = currentPinnacle
-    ? `The ${currentPinnacle.label} — ${PINNACLE_OPPORTUNITY[currentPinnacle.p] || 'a significant life arc'} — ${nextPinnacleAge ? `runs until approximately age ${nextPinnacleAge}` : 'continues for the foreseeable arc of the life'}.`
-    : '';
-
-  const para3 = [p3_expression, p3_strength, p3_destiny, p3_chinese_gift, p3_pinnacle]
+  const para3 = [p3_expression, p3_strength, p3_destiny, p3_chinese_gift]
     .filter(Boolean).join(' ');
 
   // ── PARAGRAPH 4: THIS YEAR & DIRECTIVE ──────────────────────────────────
@@ -407,13 +384,11 @@ export function buildCosmicProfile(
     ? `At the Chaldean layer, ${compoundLine}.`
     : '';
 
-  const p4_kua = `The Kua ${kuaNum} element group means that certain directions — literally and figuratively — carry the year's strongest support; working with these alignments rather than against them is not superstition but the intelligent use of what is actually available.`;
-
   const p4_directive = pyData
     ? `The single most important action available right now: ${pyData.directive}.`
     : 'The invitation is to meet the current cycle with full presence rather than the diminished attention of the merely habitual.';
 
-  const para4 = [p4_opening, p4_month, p4_year_relation, p4_compound, p4_kua, p4_directive]
+  const para4 = [p4_opening, p4_month, p4_year_relation, p4_compound, p4_directive]
     .filter(Boolean).join(' ');
 
   return [para1, para2, para3, para4].join('\n\n');
