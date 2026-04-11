@@ -35,10 +35,6 @@
     --purple-mid:    #1e0e48;
     --purple-lift:   #2d1668;
 
-    --arc-selected-bg: 273 100% 12%;
-    --arc-selected-fg: 240 67% 94%;
-    --arc-unselected-fg: 260 58% 64%;
-
     --cf-void:#030609;--cf-abyss:#060b14;--cf-deep:#09101e;--cf-mid:#0d1628;
     --cf-surface:#111d38;--cf-lift:#162445;
     --cf-gold:#c8a84b;--cf-gold-bright:#ecd870;--cf-gold-dim:#7a6228;--cf-gold-pale:#f5e8b0;
@@ -57,28 +53,6 @@
     --color-violet-hsl: 300 100% 60%;
     --bg-dark-hsl: 270 40% 3%;
   }
-
-  .dark {
-    --background: 270 40% 3%;
-    --foreground: 270 20% 96%;
-    --card: 270 50% 5%;
-    --card-foreground: 270 20% 96%;
-    --popover: 270 50% 5%;
-    --popover-foreground: 270 20% 96%;
-    --primary: 270 80% 62%;
-    --primary-foreground: 270 20% 98%;
-    --secondary: 45 95% 52%;
-    --secondary-foreground: 270 40% 10%;
-    --muted: 270 30% 12%;
-    --muted-foreground: 270 20% 55%;
-    --accent: 270 20% 14%;
-    --accent-foreground: 270 20% 96%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 270 25% 14%;
-    --input: 270 25% 12%;
-    --ring: 270 80% 62%;
-  }
 }
 
 @layer base {
@@ -91,6 +65,14 @@
       radial-gradient(ellipse 60% 50% at 80% 100%, rgba(109,40,217,0.18) 0%, transparent 55%),
       radial-gradient(ellipse 40% 35% at 50% 50%, rgba(76,29,149,0.08) 0%, transparent 70%);
   }
+}
+
+.reading {
+  background: rgba(212, 175, 55, 0.2);
+  color: #fdf1b8;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+  padding: 0 2px;
 }
 
 .glass-card {
@@ -190,7 +172,7 @@ html { scroll-behavior: smooth; }
   border-radius: 99px;
 }
 
-/* ── COSMIC FATE MAP (all original styles preserved) ── */
+/* ── COSMIC FATE MAP ── */
 .cosmic-fate-root { font-family: 'Cormorant Garamond', serif; color: var(--cf-text); line-height: 1.75; }
 #stars-cf { position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse 70% 50% at 12% 20%,rgba(20,40,90,.35) 0%,transparent 60%),radial-gradient(ellipse 55% 45% at 88% 78%,rgba(50,12,70,.25) 0%,transparent 58%),var(--cf-void); border-radius:inherit; }
 #stars-cf::before,#stars-cf::after{content:'';position:absolute;inset:0;border-radius:inherit;}
@@ -241,7 +223,7 @@ html { scroll-behavior: smooth; }
 .kw{background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.16);border-radius:20px;padding:2px 8px;font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cf-gold-dim);}
 .tab-nav{display:flex;gap:2px;background:rgba(3,6,14,.6);padding:4px 8px;border-bottom:1px solid rgba(200,168,75,.07);flex-wrap:wrap;}
 .tab-btn{padding:6px 10px;border:none;background:transparent;font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cf-silver-dim);border-radius:6px;cursor:pointer;transition:all .2s;}
-.tab-btn.active{background:rgba(200,168,75,.15);color:var(--cf-gold);border:1px solid rgba(200,168,75,.28);}
+.tab-btn.active{background:rgba(200,168,75,0.15);color:var(--cf-gold);border:1px solid rgba(200,168,75,0.28);}
 .tab-panel{display:none;padding:12px;animation:PanelIn-cf .2s ease;}
 .tab-panel.active{display:block;}
 .prose-cf{font-size:.88rem;line-height:1.8;color:var(--cf-text);}

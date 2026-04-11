@@ -2,9 +2,6 @@
 
 /**
  * MYSTIQUE COMPASS — Premium Results Display
- *
- * Rules-based synthesis engine replaces external AI.
- * Deterministic character profiling across all systems.
  */
 
 import * as React from 'react';
@@ -113,7 +110,7 @@ function ConstellationReveal({ onDone }: { onDone: () => void }) {
   );
 }
 
-// ── AI Cosmic Profiler (Rules-Based) ──────────────────────────────────────────
+// ── AI Cosmic Profiler (Rules-Based with Speech) ──────────────────────────
 function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOutput; numerology: NumerologyData }) {
   const [revealed, setRevealed] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -129,7 +126,7 @@ function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOut
           <Brain style={{ color: '#d4af37', width: 20, height: 20 }} />
           <div>
             <div style={{ fontFamily: "'Cinzel',serif", fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.85)' }}>Cosmic Profile Synthesis</div>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(200,180,240,0.4)', fontStyle: 'italic' }}>Rules-based deterministic character analysis</div>
+            <div style={{ fontSize: '0.6rem', color: 'rgba(200,180,240,0.4)', fontStyle: 'italic' }}>Deterministic character analysis with Speech</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -146,17 +143,7 @@ function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOut
         {open && revealed && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
             style={{ padding: '0 1.25rem 1.25rem' }}>
-            <div style={{ fontSize: '0.82rem', lineHeight: 1.75, color: 'rgba(210,195,240,0.8)', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-body, serif)' }}>
-              {profile.split('\n\n').map((para, i) => {
-                const labels = ['Core Essence', 'Shadow & Wounds', 'Gifts & Peak Power', 'Timing & Directive'];
-                return (
-                  <div key={i} style={{ marginBottom: '1.2rem' }}>
-                    <span style={{ display: 'block', fontSize: '0.48rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.4)', marginBottom: '0.35rem', fontFamily: "'Cinzel', serif" }}>{labels[i]}</span>
-                    <p style={{ margin: 0 }}>{para}</p>
-                  </div>
-                );
-              })}
-            </div>
+            <AccordionContentWithPlayer text={profile} />
           </motion.div>
         )}
       </AnimatePresence>

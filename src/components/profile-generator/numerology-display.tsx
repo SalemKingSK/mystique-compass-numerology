@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * MYSTIQUE COMPASS — Premium Numerology Display
+ */
+
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoShuGrid from '@/components/lo-shu-grid';
@@ -117,7 +121,6 @@ function ThisYearBanner({ birthDay, birthMonth }: { birthDay: number; birthMonth
         padding:'1rem 1.25rem', marginBottom:'1.25rem',
         boxShadow:`0 0 0 1px ${col}26, 0 8px 40px ${col}2e, inset 0 1px 0 ${col}33`,
       }}>
-      {/* top gold line */}
       <div style={{ position:'absolute', top:0, left:'10%', right:'10%', height:'1.5px', background:`linear-gradient(90deg,transparent,${col},transparent)`, borderRadius:99 }}/>
       <div style={{ fontFamily:"'Cinzel',serif", fontSize:'0.55rem', letterSpacing:'0.22em', textTransform:'uppercase', color:'rgba(212,175,55,0.5)', marginBottom:'0.6rem' }}>{dateStr}</div>
       <div style={{ display:'flex', marginBottom:'0.75rem' }}>
@@ -248,9 +251,9 @@ function PinnaclesAccordion({ destinyNum, birthDay, birthMonth, birthYear }: { d
                     { label:`✦ Pinnacle ${s.p} — Opportunity`, text:PINNACLE_DESC[s.p]||'', gold:true },
                     { label:`⚡ Challenge ${s.c} — Lesson`,     text:CHALLENGE_DESC[s.c]||'', gold:false },
                   ].map(({ label, text, gold },i) => (
-                    <div key={i} style={{ borderRadius:'0.6rem', padding:'0.75rem', fontSize:'0.75rem', lineHeight:1.65, color:'rgba(210,195,240,0.7)', background: gold ? 'rgba(212,175,55,0.06)' : 'rgba(239,68,68,0.06)', borderLeft: gold ? '2px solid rgba(212,175,55,0.4)' : '2px solid rgba(239,68,68,0.35)' }}>
+                    <div key={i} style={{ border:'1px solid rgba(255,255,255,0.05)', borderRadius:'0.6rem', padding:'0.75rem', fontSize:'0.75rem', lineHeight:1.65, color:'rgba(210,195,240,0.7)', background: gold ? 'rgba(212,175,55,0.06)' : 'rgba(239,68,68,0.06)', borderLeft: gold ? '2px solid rgba(212,175,55,0.4)' : '2px solid rgba(239,68,68,0.35)' }}>
                       <div style={{ fontFamily:"'Cinzel',serif", fontSize:'0.55rem', letterSpacing:'0.18em', textTransform:'uppercase', color: gold ? 'rgba(212,175,55,0.7)' : 'rgba(239,68,68,0.7)', marginBottom:'0.4rem' }}>{label}</div>
-                      {text.slice(0,220)}…
+                      {text}
                     </div>
                   ))}
                 </div>
@@ -265,7 +268,7 @@ function PinnaclesAccordion({ destinyNum, birthDay, birthMonth, birthYear }: { d
 
 // ── Lucky Compass SVG ─────────────────────────────────────────────────────────
 function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttributes:NumerologyData['kuaAttributes'] }) {
-  const kua = KUA_COMPASS[kuaNum] || KUA_COMPASS[1];
+  const kua = KUA_DATA_COMPASS[kuaNum] || KUA_DATA_COMPASS[1];
   const dirs8 = ['N','NE','E','SE','S','SW','W','NW'];
   const CX=130, CY=130, R=110, RN=82;
   function pos(dir: string, r: number){ const a=(dirs8.indexOf(dir)*45-90)*Math.PI/180; return {x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)}; }
@@ -299,7 +302,6 @@ function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttribut
         <text x={CX} y={CY+48} textAnchor="middle" fontFamily="'Cinzel Decorative',serif" fontSize="18" fontWeight="700" fill="#d4af37" fillOpacity="0.8" filter="url(#lc-glow)">{kuaNum}</text>
         <text x={CX} y={CY+60} textAnchor="middle" fontFamily="'Cinzel',serif" fontSize="5.5" letterSpacing="3" fill="rgba(212,175,55,0.4)">KUA NUMBER</text>
       </svg>
-      {/* Legend */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.4rem 1rem', width:'100%' }}>
         {[...kua.best.slice(0,4).map(d=>({d,t:'Auspicious',c:kua.colour})), ...kua.avoid.slice(0,4).map(d=>({d,t:'Avoid',c:'#ef4444'}))].map(({d,t,c},i)=>(
           <div key={i} style={{ display:'flex', alignItems:'center', gap:'0.4rem', fontSize:'0.68rem', color:'rgba(210,195,240,0.65)' }}>
@@ -309,7 +311,6 @@ function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttribut
           </div>
         ))}
       </div>
-      {/* Meta */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flexWrap:'wrap', gap:'0.5rem', padding:'0.6rem 1rem', borderRadius:'0.75rem', background:'rgba(212,175,55,0.06)', border:'1px solid rgba(212,175,55,0.15)', width:'100%' }}>
         {[['Trigram',kua.name],['Element',kua.element]].map(([l,v],i)=>(
           <span key={i} style={{ fontFamily:"'Cinzel',serif", fontSize:'0.55rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(212,175,55,0.65)' }}>
