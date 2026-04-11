@@ -1,8 +1,3 @@
-
-/**
- * @fileOverview Precision-engineered Cosmic Fate Map refactored to native React state.
- * Year selection is now UNLOCKED, allowing for any year to be searched.
- */
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -123,7 +118,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     const lp = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(birthYear));
     const bv = reduce(birthDay);
     const today = new Date();
-    // Use the current month for calculation even if searching other years
     const currentMonthIndex = today.getMonth() + 1;
     const pm = reduce(py + currentMonthIndex);
     
@@ -162,7 +156,6 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const oracleText = useMemo(() => {
     const yr = YD[stats.py];
-    const cm = CAT_META[stats.cat === 'alliance' ? 'sanhe' : stats.cat === 'ben' ? 'self' : stats.cat];
     const lpRelationText = (stats.py === stats.lp) ? "exceptional harmony" : (Math.abs(stats.py - stats.lp) === 4 || Math.abs(stats.py - stats.lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
     const lpInteractionText = (stats.py === stats.lp) ? "match" : (Math.abs(stats.py - stats.lp) === 4 || Math.abs(stats.py - stats.lp) === 5) ? "creates notable friction with" : "and";
     
@@ -173,7 +166,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     const yr = YD[stats.py];
     const uy = YD[stats.uy];
     return (
-      <div className="space-y-6 relative z-10 animate-in fade-in duration-500 dash-panel active">
+      <div key={readYear} className="space-y-6 relative z-10 animate-in fade-in duration-500 dash-panel active">
         <div className="core-strip">
           <div className="core-chip hl-py">
             <div className="core-chip-label">Personal Year {readYear}</div>
@@ -279,7 +272,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const renderDive = () => {
     const yr = YD[stats.py];
     return (
-      <div className="year-deep-dive animate-in fade-in duration-500 relative z-10 dash-panel active">
+      <div key={readYear} className="year-deep-dive animate-in fade-in duration-500 relative z-10 dash-panel active">
         <div className="year-dive-header">
           <div className="year-num-big" style={{ color: 'var(--cf-gold)' }}>{stats.py}</div>
           <div className="year-dive-title">{yr.title}</div>
@@ -319,13 +312,12 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   };
 
   const renderIntersections = () => (
-    <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
+    <div key={readYear} className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
       <div className="section-header">🔥 &nbsp; Critical Year Intersections &nbsp; 🔥</div>
       <p className="text-xs text-muted-foreground text-center mb-4 px-4 italic">Years where Personal Years 4 and 7 intersect with your Chinese cycle.</p>
       <div className="space-y-4 px-2">
         {useMemo(() => {
           const list = [];
-          // Use current dynamic readYear as base for intersections list
           for (let y = readYear; y <= readYear + 30; y++) {
             const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
             if (pyn === 4 || pyn === 7) {
@@ -358,7 +350,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   );
 
   const renderZodiac = () => (
-    <div className="space-y-8 py-4 animate-in fade-in duration-500 relative z-10 dash-panel active">
+    <div key={readYear} className="space-y-8 py-4 animate-in fade-in duration-500 relative z-10 dash-panel active">
       <div className="text-center px-4">
         <div className="flex items-center justify-center gap-4 mb-6">
           <span className="text-2xl">{ZOO[stats.birthSign].e}</span>
@@ -411,7 +403,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     ];
 
     return (
-      <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
+      <div key={readYear} className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
         <div className="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {pStages.map(s => (
@@ -500,7 +492,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           ))}
         </nav>
 
-        <div className="dash-body p-6 min-h-[600px]">
+        <div className="dash-body p-6 min-h-[600px] relative z-10">
           {activeTab === 'synthesis' && renderSynthesis()}
           {activeTab === 'yeardive' && renderDive()}
           {activeTab === 'intersections' && renderIntersections()}
@@ -508,7 +500,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           {activeTab === 'pinnacles' && renderPinnacles()}
           {activeTab === 'scanner' && <CosmicRiskScanner targetYear={readYear} />}
           {activeTab === 'convergence' && (
-            <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
+            <div key={readYear} className="space-y-6 animate-in fade-in duration-500 dash-panel active">
               <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
               <div className="space-y-8">
                 {CONVERGENCE_CARDS.map(c => (
