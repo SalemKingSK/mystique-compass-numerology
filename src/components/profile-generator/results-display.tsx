@@ -7,330 +7,299 @@ import type { AstroInsightOutput, NumerologyData } from './types';
 import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
 import { CosmicFateMap } from './cosmic-fate-map';
-import { ArrowLeft, History, BookUser, Heart, Home, Users, Briefcase } from "lucide-react";
+import {
+  ArrowLeft, History, BookUser, Heart, Home, Users, Briefcase,
+  AlertTriangle, Brain, Loader2, ChevronDown,
+} from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import InstallButton from '../InstallButton';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
 
+// ── helpers ───────────────────────────────────────────────────────────────────
+function reduceNum(n: number): number {
+  if (n===11||n===22||n===33) return n;
+  while (n>9) n=String(n).split('').reduce((a,d)=>a+ +d,0);
+  return n;
+}
+function getPersonalYear(d: number, m: number): number {
+  const yr=new Date().getFullYear();
+  return reduceNum(reduceNum(d)+reduceNum(m)+reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0)));
+}
+function detectWarning(numerology: NumerologyData): string|null {
+  const py=getPersonalYear(numerology.birthDay,numerology.birthMonth);
+  if (py===4) return 'Personal Year 4 detected — the Consolidation cycle often brings restriction and forced slowing. Prioritise foundations over ambition this year.';
+  if (py===7) return 'Personal Year 7 detected — an inward, sacrificial year. Avoid major financial or relational decisions. The cosmos asks for retreat, not expansion.';
+  if (py===9) return 'Personal Year 9 detected — the Great Completion. Endings are imminent. Avoid clinging to what is already departing. Radical release unlocks Year 1.';
+  const missing8=!numerology.numberCounts?.[String(8)]||numerology.numberCounts[String(8)]===0;
+  if (missing8&&(py===2||py===4)) return 'Financial karma is active — Missing 8 combined with your current Personal Year creates a vulnerable window. Caution with investments.';
+  return null;
+}
 
-// --- SUB-COMPONENTS ---
+// ── Warning Banner ────────────────────────────────────────────────────────────
+function WarningBanner({ message }: { message: string }) {
+  const [dismissed,setDismissed]=React.useState(false);
+  if (dismissed) return null;
+  return (
+    <motion.div initial={{ opacity:0, y:-12, scale:0.97 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:-12 }} transition={{ duration:0.5, delay:0.4 }}
+      style={{ position:'relative', display:'flex', alignItems:'flex-start', gap:'0.75rem', padding:'0.9rem 1rem', marginBottom:'1rem', borderRadius:'0.9rem', background:'linear-gradient(135deg,rgba(239,68,68,0.12),rgba(154,12,50,0.1))', border:'1px solid rgba(239,68,68,0.3)', boxShadow:'0 0 24px rgba(239,68,68,0.08),inset 0 1px 0 rgba(239,68,68,0.1)' }}>
+      <div style={{ position:'absolute', top:0, left:'10%', right:'10%', height:1, background:'linear-gradient(90deg,transparent,rgba(239,68,68,0.5),transparent)' }}/>
+      <AlertTriangle style={{ width:20, height:20, color:'#ef4444', flexShrink:0, marginTop:2 }}/>
+      <div style={{ flex:1 }}>
+        <div style={{ fontFamily:"'Cinzel',serif", fontSize:'0.58rem', letterSpacing:'0.18em', textTransform:'uppercase', color:'#ef4444', marginBottom:'0.3rem' }}>
+          ⚠ Cosmic Warning Detected
+        </div>
+        <div style={{ fontSize:'0.78rem', color:'rgba(255,180,180,0.85)', lineHeight:1.6 }}>{message}</div>
+      </div>
+      <button onClick={()=>setDismissed(true)} style={{ background:'none', border:'none', color:'rgba(239,68,68,0.4)', cursor:'pointer', fontSize:'1.2rem', lineHeight:1, padding:0, flexShrink:0, transition:'color 0.2s' }}>×</button>
+    </motion.div>
+  );
+}
 
-function AnimatedTab({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) {
+// ── Constellation Reveal ──────────────────────────────────────────────────────
+function ConstellationReveal({ onDone }: { onDone: () => void }) {
+  React.useEffect(()=>{ const t=setTimeout(onDone,1800); return ()=>clearTimeout(t); },[onDone]);
+  const lines=[[60,80,140,50],[140,50,200,90],[200,90,280,60],[280,60,340,100],[60,160,140,140],[140,140,200,90],[200,90,260,170],[260,170,340,150]];
+  const dots=[[60,80],[140,50],[200,90],[280,60],[340,100],[60,160],[140,140],[260,170],[340,150]];
+  return (
+    <motion.div style={{ position:'fixed', inset:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(5,1,18,0.95)' }}
+      initial={{ opacity:1 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={{ duration:0.6, delay:1.3 }}>
+      <svg viewBox="0 0 400 220" style={{ width:'100%', maxWidth:'22rem', opacity:0.8 }}>
+        <defs><filter id="cr-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        {lines.map(([x1,y1,x2,y2],i)=>(
+          <motion.line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(212,175,55,0.6)" strokeWidth="0.8"
+            initial={{ pathLength:0, opacity:0 }} animate={{ pathLength:1, opacity:1 }} transition={{ delay:i*0.08, duration:0.4 }}/>
+        ))}
+        {dots.map(([cx,cy],i)=>(
+          <motion.circle key={i} cx={cx} cy={cy} r={i===2?4:2.5} fill={i===2?'#d4af37':'rgba(212,175,55,0.7)'} filter="url(#cr-glow)"
+            initial={{ scale:0, opacity:0 }} animate={{ scale:1, opacity:1 }} transition={{ delay:i*0.09+0.2, duration:0.3, type:'spring' }}/>
+        ))}
+      </svg>
+    </motion.div>
+  );
+}
+
+// ── AI Cosmic Profiler ────────────────────────────────────────────────────────
+function CosmicProfilerPanel({ insight, numerology }: { insight: AstroInsightOutput; numerology: NumerologyData }) {
+  const [state,setState]=React.useState<'idle'|'loading'|'done'>('idle');
+  const [profile,setProfile]=React.useState('');
+  const [open,setOpen]=React.useState(false);
+
+  const generate=async()=>{
+    setState('loading'); setOpen(true);
+    const missing=[1,2,3,4,5,6,7,8,9].filter(n=>!numerology.numberCounts?.[String(n)]).join(', ')||'none';
+    const prompt=`You are a premium cosmic profiler. Based on the following multi-system birth data, write a 4-paragraph synthesised character analysis. Be insightful, specific, and use vivid language. Do NOT list numbers — weave them into narrative.
+
+Name: ${insight.name}
+Western Sign: ${insight.western_sign} | New Astrology Sign: ${insight.new_astrology_sign}
+Psyche Number: ${numerology.psycheNum} (${numerology.psychicMeaning?.title})
+Destiny Number: ${numerology.destinyNum} (${numerology.destinyMeaning?.title})
+Kua: ${numerology.kuaNum} | Personal Year: ${getPersonalYear(numerology.birthDay,numerology.birthMonth)}
+Karmic Fate: ${numerology.karmicFateNum||'none'} | Compound: ${numerology.compoundNum}
+Missing Numbers: ${missing}
+Arrows of Strength: ${(numerology.arrowsOfStrength||[]).map(a=>a.name).join(', ')||'none'}
+Arrows of Weakness: ${(numerology.arrowsOfWeakness||[]).map(a=>a.name).join(', ')||'none'}
+Chinese Sign: ${insight.sign} (${insight.element})
+
+PARAGRAPH 1: Core Character — who this person fundamentally IS at soul-level. Use Psyche number, Western sign and Chinese animal together.
+PARAGRAPH 2: Shadow & Wounds — what holds them back, karmic patterns, missing energies.
+PARAGRAPH 3: Gifts & Peak Power — what they are destined for and when they will peak.
+PARAGRAPH 4: This Year & Forecast — what the current Personal Year means specifically, and one concrete action they should take right now.`.trim();
+
+    try {
+      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+      const data=await res.json();
+      setProfile(data.content?.find((b:any)=>b.type==='text')?.text||'The stars are silent right now — please try again.');
+      setState('done');
+    } catch {
+      setProfile('The stars are silent right now — please try again shortly.');
+      setState('done');
+    }
+  };
+
+  return (
+    <div style={{ borderRadius:'1.1rem', overflow:'hidden', border:'1px solid rgba(212,175,55,0.22)', background:'linear-gradient(145deg,rgba(15,5,40,0.95),rgba(8,2,22,0.98))', marginBottom:'1.25rem' }}>
+      <div style={{ height:1, background:'linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)', marginBottom:'0.25rem' }}/>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'1rem 1.25rem', cursor: state!=='idle'?'pointer':'default', gap:'0.75rem' }}
+        onClick={()=>state!=='idle'&&setOpen(o=>!o)}>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.6rem' }}>
+          <Brain style={{ color:'#d4af37', width:20, height:20 }}/>
+          <div>
+            <div style={{ fontFamily:"'Cinzel',serif", fontSize:'0.72rem', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'rgba(212,175,55,0.85)' }}>AI Cosmic Profile</div>
+            <div style={{ fontSize:'0.6rem', color:'rgba(200,180,240,0.4)', fontStyle:'italic' }}>Deep synthesis across all 4 systems</div>
+          </div>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
+          {state==='idle'&&(
+            <button onClick={e=>{e.stopPropagation();generate();}}
+              style={{ background:'linear-gradient(135deg,#5b21b6,#d4af37,#7c3aed)', backgroundSize:'200%', border:'none', borderRadius:'0.65rem', padding:'0.45rem 1rem', fontFamily:"'Cinzel',serif", fontSize:'0.6rem', fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', color:'#1a0a2e', cursor:'pointer', boxShadow:'0 4px 18px rgba(212,175,55,0.25)', transition:'box-shadow 0.3s' }}>
+              Generate
+            </button>
+          )}
+          {state!=='idle'&&<ChevronDown style={{ color:'rgba(212,175,55,0.4)', width:16, height:16, transform:open?'rotate(180deg)':'none', transition:'transform 0.3s' }}/>}
+        </div>
+      </div>
+      <AnimatePresence>
+        {open&&(
+          <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }} transition={{ duration:0.4, ease:[0.23,1,0.32,1] }}
+            style={{ padding:'0 1.25rem 1.25rem' }}>
+            {state==='loading'&&(
+              <div style={{ display:'flex', alignItems:'center', gap:'0.6rem', color:'rgba(212,175,55,0.6)', fontFamily:"'Cinzel',serif", fontSize:'0.65rem', letterSpacing:'0.14em', padding:'1rem 0' }}>
+                <Loader2 style={{ width:16, height:16, animation:'spin 1s linear infinite' }}/> Reading your cosmic blueprint…
+              </div>
+            )}
+            {state==='done'&&(
+              <div style={{ fontSize:'0.82rem', lineHeight:1.75, color:'rgba(210,195,240,0.8)', whiteSpace:'pre-wrap' }}>
+                {profile.split('\n\n').map((p,i)=><p key={i} style={{ marginBottom:'0.9rem' }}>{p}</p>)}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Animated Tab (original) ───────────────────────────────────────────────────
+function AnimatedTab({ isActive, onClick, children }: { isActive:boolean; onClick:()=>void; children:React.ReactNode }) {
   return (
     <div className="animated-border">
-      <button
-          onClick={onClick}
-          className={`w-full h-full rounded-lg py-2 px-4 text-[0.65rem] font-cinzel tracking-widest font-medium cursor-pointer transition-colors duration-300 relative uppercase ${
-            isActive ? 'text-yellow-300' : 'text-white/70'
-          }`}
-      >
-          {children}
+      <button onClick={onClick} className={`w-full h-full rounded-lg py-2 px-4 text-[0.65rem] font-cinzel tracking-widest font-medium cursor-pointer transition-colors duration-300 relative uppercase ${isActive?'text-yellow-300':'text-white/70'}`}>
+        {children}
       </button>
     </div>
-  )
+  );
 }
 
-interface NewAstroLayerProps {
-  layerNum: number;
-  title: string;
-  icon: React.ReactNode;
-  content: string | undefined;
-  badgeColor: string;
-  isOpen: boolean;
-  onToggle: () => void;
-}
-
-function NewAstroLayer({ layerNum, title, icon, content, badgeColor, isOpen, onToggle }: NewAstroLayerProps) {
+// ── New Astro Layer (original) ────────────────────────────────────────────────
+function NewAstroLayer({ layerNum, title, icon, content, badgeColor, isOpen, onToggle }: { layerNum:number; title:string; icon:React.ReactNode; content:string|undefined; badgeColor:string; isOpen:boolean; onToggle:()=>void }) {
   if (!content) return null;
   return (
-    <div className="newastro-accordion">
-      <button
-        className="newastro-acc-header"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-      >
-        <div className="newastro-acc-left">
-          <span 
-            className="newastro-layer-badge" 
-            style={{ background: `${badgeColor}22`, color: badgeColor, borderColor: `${badgeColor}55` }}
-          >
-            Layer {layerNum}
-          </span>
-          <span className="newastro-acc-title">{title}</span>
+    <div style={{ borderTop:'1px solid #2a2340' }}>
+      <button onClick={onToggle} aria-expanded={isOpen} style={{ width:'100%', background:'transparent', border:'none', padding:'14px 0', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', gap:10 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <span style={{ fontSize:10, fontWeight:700, letterSpacing:'0.08em', padding:'2px 7px', borderRadius:20, border:'1px solid', background:`${badgeColor}22`, color:badgeColor, borderColor:`${badgeColor}55`, fontFamily:"'Cinzel',serif" }}>Layer {layerNum}</span>
+          <span style={{ fontSize:13.5, fontWeight:600, letterSpacing:'0.03em', color:'#c4b8e8', fontFamily:"'Cinzel',serif" }}>{title}</span>
         </div>
-        <span className="newastro-acc-arrow" style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0)" }}>▾</span>
+        <span style={{ fontSize:18, color:'#7a6fa0', transition:'transform 0.2s ease', transform:isOpen?'rotate(180deg)':'none', lineHeight:1 }}>▾</span>
       </button>
-
-      {isOpen && (
-        <div className="newastro-acc-body">
-          <div className="newastro-meaning-card" style={{ borderLeftColor: badgeColor }}>
-            <div className="flex items-center gap-2 mb-3">
+      {isOpen&&(
+        <div style={{ padding:'4px 0 18px', animation:'naFadeIn 0.2s ease' }}>
+          <style>{`@keyframes naFadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
+          <div style={{ background:'rgba(255,255,255,0.02)', borderLeft:`3px solid ${badgeColor}`, borderRadius:'0 10px 10px 0', padding:16 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
               {icon}
-              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: badgeColor }}>
-                {title} Analysis
-              </span>
+              <span style={{ fontSize:11, fontWeight:'bold', textTransform:'uppercase', letterSpacing:'0.08em', color:badgeColor }}>{title} Analysis</span>
             </div>
-            <AccordionContentWithPlayer text={content} />
+            <AccordionContentWithPlayer text={content}/>
           </div>
         </div>
       )}
-      <style jsx>{`
-        .newastro-accordion { border-top: 1px solid #2a2340; }
-        .newastro-accordion:first-of-type { border-top: none; }
-        .newastro-acc-header {
-          width: 100%;
-          background: transparent;
-          border: none;
-          padding: 14px 0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          cursor: pointer;
-          gap: 10px;
-        }
-        .newastro-acc-left { display: flex; align-items: center; gap: 10px; }
-        .newastro-acc-title { 
-          font-size: 13.5px; 
-          font-weight: 600; 
-          letter-spacing: 0.03em; 
-          color: #c4b8e8; 
-          text-align: left; 
-          font-family: 'Cinzel', serif;
-        }
-        .newastro-acc-arrow { font-size: 18px; color: #7a6fa0; transition: transform 0.2s ease; line-height: 1; }
-        .newastro-acc-body { padding: 4px 0 18px; animation: naFadeIn 0.2s ease; }
-        @keyframes naFadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        .newastro-layer-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 20px; border: 1px solid; white-space: nowrap; font-family: 'Cinzel', serif; }
-        .newastro-meaning-card { background: rgba(255,255,255,0.02); border-left: 3px solid; border-radius: 0 10px 10px 0; padding: 16px; }
-      `}</style>
     </div>
   );
 }
 
-function NewAstroSignDetails({ sign, signData }: { sign: string, signData: AstroInsightOutput['signData'] }) {
-    const [openLayer, setOpenLayer] = React.useState<number | null>(1);
-    const animalName = sign.split('/')[1]?.trim();
-    const animalEmoji = ZOO[animalName]?.e || '';
-
-    const toggle = (num: number) => setOpenLayer(openLayer === num ? null : num);
-
-    return (
-        <div className="glass-card p-4 space-y-4">
-            <div className="flex items-center gap-4 mb-2">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-                <h2 className="font-decorative text-xl text-primary flex items-center justify-center gap-3">
-                    <span>{animalEmoji}</span>
-                    {sign}
-                    <span>{animalEmoji}</span>
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-            </div>
-
-            <div className="flex flex-col">
-                <NewAstroLayer 
-                  layerNum={1} 
-                  title="Psychological Profile" 
-                  icon={<BookUser className="h-4 w-4" />} 
-                  content={signData.description} 
-                  badgeColor="#9b8ec4" 
-                  isOpen={openLayer === 1}
-                  onToggle={() => toggle(1)}
-                />
-                <NewAstroLayer 
-                  layerNum={2} 
-                  title="Romantic Blueprint" 
-                  icon={<Heart className="h-4 w-4" />} 
-                  content={signData.love} 
-                  badgeColor="#3a8ee0" 
-                  isOpen={openLayer === 2}
-                  onToggle={() => toggle(2)}
-                />
-                <NewAstroLayer 
-                  layerNum={3} 
-                  title="Domestic Sphere" 
-                  icon={<Home className="h-4 w-4" />} 
-                  content={signData.homeAndFamily} 
-                  badgeColor="#4caf7d" 
-                  isOpen={openLayer === 3}
-                  onToggle={() => toggle(3)}
-                />
-                <NewAstroLayer 
-                  layerNum={4} 
-                  title="Social Resonance" 
-                  icon={<Users className="h-4 w-4" />} 
-                  content={signData.compatibilities} 
-                  badgeColor="#e0a83a" 
-                  isOpen={openLayer === 4}
-                  onToggle={() => toggle(4)}
-                />
-                <NewAstroLayer 
-                  layerNum={5} 
-                  title="Professional Path" 
-                  icon={<Briefcase className="h-4 w-4" />} 
-                  content={signData.profession} 
-                  badgeColor="#de78a0" 
-                  isOpen={openLayer === 5}
-                  onToggle={() => toggle(5)}
-                />
-            </div>
-        </div>
-    );
+function NewAstroSignDetails({ sign, signData }: { sign:string; signData:AstroInsightOutput['signData'] }) {
+  const [openLayer,setOpenLayer]=React.useState<number|null>(1);
+  const animalName=sign.split('/')[1]?.trim();
+  const animalEmoji=ZOO[animalName]?.e||'';
+  const toggle=(num:number)=>setOpenLayer(openLayer===num?null:num);
+  return (
+    <div className="glass-card p-4 space-y-4">
+      <div className="flex items-center gap-4 mb-2">
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"/>
+        <h2 className="font-decorative text-xl text-primary flex items-center justify-center gap-3"><span>{animalEmoji}</span>{sign}<span>{animalEmoji}</span></h2>
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"/>
+      </div>
+      <div className="flex flex-col">
+        <NewAstroLayer layerNum={1} title="Psychological Profile" icon={<BookUser className="h-4 w-4"/>} content={signData.description} badgeColor="#9b8ec4" isOpen={openLayer===1} onToggle={()=>toggle(1)}/>
+        <NewAstroLayer layerNum={2} title="Romantic Blueprint"   icon={<Heart className="h-4 w-4"/>}    content={signData.love}          badgeColor="#3a8ee0" isOpen={openLayer===2} onToggle={()=>toggle(2)}/>
+        <NewAstroLayer layerNum={3} title="Domestic Sphere"      icon={<Home className="h-4 w-4"/>}     content={signData.homeAndFamily} badgeColor="#4caf7d" isOpen={openLayer===3} onToggle={()=>toggle(3)}/>
+        <NewAstroLayer layerNum={4} title="Social Resonance"     icon={<Users className="h-4 w-4"/>}    content={signData.compatibilities} badgeColor="#e0a83a" isOpen={openLayer===4} onToggle={()=>toggle(4)}/>
+        <NewAstroLayer layerNum={5} title="Professional Path"    icon={<Briefcase className="h-4 w-4"/>} content={signData.profession}  badgeColor="#de78a0" isOpen={openLayer===5} onToggle={()=>toggle(5)}/>
+      </div>
+    </div>
+  );
 }
 
-function ResultsHeader({
-  name,
-  newAstroSign,
-  birthDate,
-  onTabClick,
-  activeTab
-}: {
-  name: string,
-  newAstroSign: string,
-  birthDate: string,
-  onTabClick: (tab: string) => void,
-  activeTab: string
-}) {
-  const animalName = newAstroSign.split('/')[1]?.trim();
-  const animalEmoji = ZOO[animalName]?.e || '';
-
+// ── Results Header ────────────────────────────────────────────────────────────
+function ResultsHeader({ name, newAstroSign, birthDate, onTabClick, activeTab }: { name:string; newAstroSign:string; birthDate:string; onTabClick:(t:string)=>void; activeTab:string }) {
+  const animalName=newAstroSign.split('/')[1]?.trim();
+  const animalEmoji=ZOO[animalName]?.e||'';
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
-        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center font-decorative mb-2">
-            {name}
-        </h1>
-        <p className="text-[0.7rem] text-white/50 mt-1 font-cinzel uppercase tracking-[0.2em]">{birthDate}</p>
-        <div className='relative grid grid-cols-2 gap-3 w-full max-w-2xl mx-auto mt-6 px-4'>
-             <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>
-                {animalEmoji} {newAstroSign} {animalEmoji}
-             </AnimatedTab>
-             <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>
-                Astrology
-             </AnimatedTab>
-             <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>
-                Numerology
-             </AnimatedTab>
-             <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>
-                🌌 Cosmic Fate Map
-             </AnimatedTab>
-        </div>
+      <motion.h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center font-decorative mb-2"
+        initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }} transition={{ duration:0.7, ease:[0.23,1,0.32,1] }}>
+        {name}
+      </motion.h1>
+      <p className="text-[0.7rem] text-white/50 mt-1 font-cinzel uppercase tracking-[0.2em]">{birthDate}</p>
+      <div className="relative grid grid-cols-2 gap-3 w-full max-w-2xl mx-auto mt-6 px-4">
+        <AnimatedTab isActive={activeTab==='new-astro'} onClick={()=>onTabClick('new-astro')}>{animalEmoji} {newAstroSign} {animalEmoji}</AnimatedTab>
+        <AnimatedTab isActive={activeTab==='astro'} onClick={()=>onTabClick('astro')}>Astrology</AnimatedTab>
+        <AnimatedTab isActive={activeTab==='numerology'} onClick={()=>onTabClick('numerology')}>Numerology</AnimatedTab>
+        <AnimatedTab isActive={activeTab==='cosmic-fate'} onClick={()=>onTabClick('cosmic-fate')}>🌌 Cosmic Fate Map</AnimatedTab>
+      </div>
     </div>
   );
 }
 
-function ResultsFooter() {
-    return (
-        <div className="flex flex-col items-center justify-center mt-8 pb-24 w-full max-w-4xl mx-auto px-4">
-             <footer className="text-center p-4 text-white/50 text-[0.65rem] whitespace-pre-line font-body italic leading-relaxed">
-                {"He who knows others is learned;\nHe who knows himself is wise.\nLao Tzu, Dao De Jing"}
-            </footer>
-        </div>
-    );
-}
-
-function FloatingNavigation({ onReset, onHistoryOpen }: { onReset: () => void; onHistoryOpen: () => void; }) {
+// ── Floating Nav (original) ───────────────────────────────────────────────────
+function FloatingNavigation({ onReset, onHistoryOpen }: { onReset:()=>void; onHistoryOpen:()=>void }) {
   return (
     <>
       <div className="fixed bottom-6 left-6 z-50 pointer-events-auto">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={onReset} 
-          className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
-        >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="sr-only">Back</span>
-        </Button>
+        <Button variant="ghost" size="icon" onClick={onReset} className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"><ArrowLeft className="h-5 w-5"/></Button>
       </div>
-
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-        <InstallButton minimal />
-      </div>
-
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto"><InstallButton minimal/></div>
       <div className="fixed bottom-6 right-6 z-50 pointer-events-auto">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={onHistoryOpen} 
-          className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
-        >
-            <History className="h-5 w-5" />
-            <span className="sr-only">History</span>
-        </Button>
+        <Button variant="ghost" size="icon" onClick={onHistoryOpen} className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"><History className="h-5 w-5"/></Button>
       </div>
     </>
   );
 }
 
+// ── Main Export ───────────────────────────────────────────────────────────────
+export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: { insight:AstroInsightOutput; numerology:NumerologyData; onReset:()=>void; onHistoryOpen:()=>void }) {
+  const [activeTab,setActiveTab]=React.useState('astro');
+  const [showReveal,setShowReveal]=React.useState(true);
+  const warning=React.useMemo(()=>detectWarning(numerology),[numerology]);
 
-export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: { insight: AstroInsightOutput; numerology: NumerologyData, onReset: () => void; onHistoryOpen: () => void; }) {
-  const [activeTab, setActiveTab] = React.useState('astro');
+  React.useEffect(()=>{
+    return ()=>{ if (typeof window!=='undefined'&&window.speechSynthesis?.speaking) window.speechSynthesis.cancel(); };
+  },[activeTab]);
 
-  // Stop any speaking when the component unmounts or the tab changes
-  React.useEffect(() => {
-    return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [activeTab]);
-
-  const getOrdinalSuffix = (day: number) => {
-    if (day > 3 && day < 21) return 'th';
-    switch (day % 10) {
-      case 1:  return "st";
-      case 2:  return "nd";
-      case 3:  return "rd";
-      default: return "th";
-    }
+  const getOrdinalSuffix=(day:number)=>{
+    if(day>3&&day<21)return'th';
+    switch(day%10){case 1:return'st';case 2:return'nd';case 3:return'rd';default:return'th';}
   };
-
-  const formatDate = () => {
-    const { birthDay } = numerology;
-    const { month, year } = insight;
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"];
-      
-    const dayWithSuffix = `${birthDay}${getOrdinalSuffix(birthDay)}`;
-    return `Born ${dayWithSuffix} ${monthNames[month - 1]} ${year}`;
+  const formatDate=()=>{
+    const{birthDay}=numerology;const{month,year}=insight;
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return`Born ${birthDay}${getOrdinalSuffix(birthDay)} ${months[month-1]} ${year}`;
   };
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.5 }}
-        className="results-background w-full min-h-screen flex flex-col p-4"
-      >
+      <AnimatePresence>{showReveal&&<ConstellationReveal onDone={()=>setShowReveal(false)}/>}</AnimatePresence>
+      <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-20 }} transition={{ duration:0.5 }}
+        className="results-background w-full min-h-screen flex flex-col p-4">
         <div className="w-full max-w-4xl mx-auto flex-grow">
-          <ResultsHeader
-              name={insight.name}
-              newAstroSign={insight.new_astrology_sign}
-              birthDate={formatDate()}
-              onTabClick={setActiveTab}
-              activeTab={activeTab}
-          />
-
+          <ResultsHeader name={insight.name} newAstroSign={insight.new_astrology_sign} birthDate={formatDate()} onTabClick={setActiveTab} activeTab={activeTab}/>
+          <AnimatePresence>{warning&&<WarningBanner message={warning}/>}</AnimatePresence>
+          <CosmicProfilerPanel insight={insight} numerology={numerology}/>
           <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                {activeTab === 'astro' && <AstroDisplay insight={insight} />}
-                {activeTab === 'numerology' && <NumerologyDisplay numerology={numerology} />}
-                {activeTab === 'new-astro' && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
-                {activeTab === 'cosmic-fate' && <CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear} />}
-              </motion.div>
+            <motion.div key={activeTab} initial={{ opacity:0, y:10, scale:0.99 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:-10, scale:0.99 }} transition={{ duration:0.35, ease:[0.23,1,0.32,1] }}>
+              {activeTab==='astro'       &&<AstroDisplay insight={insight}/>}
+              {activeTab==='numerology'  &&<NumerologyDisplay numerology={numerology}/>}
+              {activeTab==='new-astro'   &&<NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData}/>}
+              {activeTab==='cosmic-fate' &&<CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear}/>}
+            </motion.div>
           </AnimatePresence>
-
         </div>
-         <ResultsFooter />
+        <footer className="text-center p-4 pb-24 text-white/50 text-[0.65rem] whitespace-pre-line font-body italic leading-relaxed">
+          {"He who knows others is learned;\nHe who knows himself is wise.\n— Lao Tzu, Dao De Jing"}
+        </footer>
       </motion.div>
-      <FloatingNavigation onReset={onReset} onHistoryOpen={onHistoryOpen} />
+      <FloatingNavigation onReset={onReset} onHistoryOpen={onHistoryOpen}/>
     </>
   );
 }
