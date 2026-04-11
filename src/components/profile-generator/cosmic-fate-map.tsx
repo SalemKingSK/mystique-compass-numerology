@@ -1,7 +1,8 @@
+
 /**
  * @fileOverview Precision-engineered Cosmic Fate Map refactored to native React state.
- * Fixes the issue where tab details were not showing by removing imperative DOM manipulation.
- * Implements full relationship mapping (Harms, Destructions, Alliances) and critical year logic.
+ * Fixes the issue where tab details were flickering or disappearing.
+ * Implements rich independent meanings for the Oracle dashboard.
  */
 'use client';
 
@@ -20,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap } from 'lucide-react';
+import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 interface Props {
@@ -199,52 +200,82 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     return list;
   }, [stats.birthSign, birthDay, birthMonth, birthYear, readYear]);
 
-  const renderSynthesis = () => (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="core-strip">
-        <div className="core-chip hl-py">
-          <div className="core-chip-label">Personal Year {readYear}</div>
-          <div className="core-chip-num">{stats.py}</div>
-          <div className="core-chip-name">{YD[stats.py]?.title}</div>
+  const renderSynthesis = () => {
+    const yr = YD[stats.py];
+    const uy = YD[stats.uy];
+    return (
+      <div className="space-y-6 relative z-10 animate-in fade-in duration-500 dash-panel active">
+        <div className="core-strip">
+          <div className="core-chip hl-py">
+            <div className="core-chip-label">Personal Year {readYear}</div>
+            <div className="core-chip-num">{stats.py}</div>
+            <div className="core-chip-name">{yr?.title}</div>
+          </div>
+          <div className="core-chip">
+            <div className="core-chip-label">Life Path</div>
+            <div className="core-chip-num" style={{ color: 'var(--cf-jade-bright)' }}>{stats.lp}</div>
+            <div className="core-chip-name">{lpName(stats.lp)}</div>
+          </div>
+          <div className="core-chip">
+            <div className="core-chip-label">Universal Year</div>
+            <div className="core-chip-num" style={{ color: 'var(--cf-amethyst)' }}>{stats.uy}</div>
+            <div className="core-chip-name">{YD[stats.uy]?.title}</div>
+          </div>
+          <div className="core-chip">
+            <div className="core-chip-label">Birth Vibration</div>
+            <div className="core-chip-num" style={{ color: '#de78a0' }}>{stats.bv}</div>
+            <div className="core-chip-name">{lpName(stats.bv)}</div>
+          </div>
         </div>
-        <div className="core-chip">
-          <div className="core-chip-label">Life Path</div>
-          <div className="core-chip-num" style={{ color: 'var(--cf-jade-bright)' }}>{stats.lp}</div>
-          <div className="core-chip-name">{lpName(stats.lp)}</div>
+
+        {(stats.py === stats.uy || stats.py === stats.bv || stats.py === stats.lp) && (
+          <div className="alert-banner visible">
+            <AccordionContentWithPlayer text={
+              stats.py === stats.uy ? `⚡ Double Amplification: Personal Year ${stats.py} aligns with Universal Year ${stats.uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency.` :
+              stats.py === stats.bv ? `✦ Core Identity Activation: Personal Year ${stats.py} matches your Birth Vibration ${stats.bv}. It is as if the universe is reflecting your core essence back to you, allowing for an effortless expression of your authentic self.` :
+              `✦ Life Path Activation: Personal Year ${stats.py} matches your Life Path ${stats.lp} — a year of destiny alignment. The immediate tasks of this year are in direct service to your overall life mission.`
+            } />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="p-5 bg-slate-900/60 border-primary/20">
+             <div className="flex items-center gap-2 mb-3">
+                <Star className="h-4 w-4 text-primary" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Your Personal Arc</span>
+             </div>
+             <div className="text-xl font-bold text-white mb-2">{yr.title}</div>
+             <div className="text-sm italic text-muted-foreground mb-4">{yr.phase}</div>
+             <p className="text-xs text-slate-300 leading-relaxed mb-4">{yr.overview.split('\n')[0]}</p>
+             <div className="flex gap-2">
+                <Badge variant="outline" className="text-[8px] border-primary/30">{yr.planet}</Badge>
+                <Badge variant="outline" className="text-[8px] border-emerald-500/30">{yr.chakra}</Badge>
+             </div>
+          </Card>
+          <Card className="p-5 bg-slate-900/60 border-primary/20">
+             <div className="flex items-center gap-2 mb-3">
+                <Globe className="h-4 w-4 text-purple-400" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Universal Backdrop</span>
+             </div>
+             <div className="text-xl font-bold text-white mb-2">{uy.title}</div>
+             <div className="text-sm italic text-muted-foreground mb-4">{uy.phase}</div>
+             <p className="text-xs text-slate-300 leading-relaxed mb-4">{uy.overview.split('\n')[0]}</p>
+             <Badge variant="outline" className="text-[8px] border-purple-400/30">{uy.planet}</Badge>
+          </Card>
         </div>
-        <div className="core-chip">
-          <div className="core-chip-label">Universal Year</div>
-          <div className="core-chip-num" style={{ color: 'var(--cf-amethyst)' }}>{stats.uy}</div>
-          <div className="core-chip-name">{YD[stats.uy]?.title}</div>
-        </div>
-        <div className="core-chip">
-          <div className="core-chip-label">Birth Vibration</div>
-          <div className="core-chip-num" style={{ color: '#de78a0' }}>{stats.bv}</div>
-          <div className="core-chip-name">{lpName(stats.bv)}</div>
-        </div>
+
+        <Card className="p-6 bg-slate-900/60 border-primary/20">
+          <div className="section-header">✦ &nbsp; Your ${readYear} Reading &nbsp; ✦</div>
+          <AccordionContentWithPlayer text={oracleText} />
+        </Card>
       </div>
-
-      {(stats.py === stats.uy || stats.py === stats.bv || stats.py === stats.lp) && (
-        <div className="alert-banner visible">
-          <AccordionContentWithPlayer text={
-            stats.py === stats.uy ? `⚡ Double Amplification: Personal Year ${stats.py} aligns with Universal Year ${stats.uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency.` :
-            stats.py === stats.bv ? `✦ Core Identity Activation: Personal Year ${stats.py} matches your Birth Vibration ${stats.bv}. It is as if the universe is reflecting your core essence back to you, allowing for an effortless expression of your authentic self.` :
-            `✦ Life Path Activation: Personal Year ${stats.py} matches your Life Path ${stats.lp} — a year of destiny alignment. The immediate tasks of this year are in direct service to your overall life mission.`
-          } />
-        </div>
-      )}
-
-      <Card className="p-6 bg-slate-900/60 border-primary/20">
-        <div className="section-header">✦ &nbsp; Your ${readYear} Reading &nbsp; ✦</div>
-        <AccordionContentWithPlayer text={oracleText} />
-      </Card>
-    </div>
-  );
+    );
+  };
 
   const renderDive = () => {
     const yr = YD[stats.py];
     return (
-      <div className="year-deep-dive animate-in fade-in duration-500">
+      <div className="year-deep-dive animate-in fade-in duration-500 relative z-10 dash-panel active">
         <div className="year-dive-header">
           <div className="year-num-big" style={{ color: 'var(--cf-gold)' }}>{stats.py}</div>
           <div className="year-dive-title">{yr.title}</div>
@@ -284,7 +315,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   };
 
   const renderIntersections = () => (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
       <div className="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>
       <p className="text-xs text-muted-foreground text-center mb-4 px-4 italic">Years where Personal Years 4 and 7 intersect with your Chinese cycle.</p>
       <div className="space-y-4 px-2">
@@ -295,7 +326,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
               <div className="intersection-title">Personal Year {i.pyn} · {i.yearAni} Year {ZOO[i.yearAni].e}</div>
               {i.isNegative && (
                 <div className="text-[10px] font-black uppercase mt-1 text-rose-400">
-                  🟠 HIGH TENSION — {getStatusLabelShort(i.iCat)} Year + Critical PY
+                  High Tension — {getStatusLabelShort(i.iCat)} Year + Critical PY
                 </div>
               )}
             </div>
@@ -309,7 +340,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   );
 
   const renderZodiac = () => (
-    <div className="space-y-8 py-4 animate-in fade-in duration-500">
+    <div className="space-y-8 py-4 animate-in fade-in duration-500 relative z-10 dash-panel active">
       <div className="text-center px-4">
         <div className="flex items-center justify-center gap-4 mb-6">
           <span className="text-2xl">{ZOO[stats.birthSign].e}</span>
@@ -354,7 +385,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     ];
 
     return (
-      <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
         <div className="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {pStages.map(s => (
@@ -385,7 +416,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   };
 
   const renderEnemy = () => (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 relative z-10 dash-panel active">
       <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
       <div className="space-y-8">
         {CONVERGENCE_CARDS.map(c => (
@@ -424,7 +455,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <p className="hero-sub">Destiny Synthesis & Critical Year Oracle</p>
         </div>
 
-        <Card className="calc-card p-6 bg-slate-950/80 mb-8 border-primary/30 shadow-2xl">
+        <Card className="calc-card p-6 bg-slate-950/80 mb-8 border-primary/30 shadow-2xl relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
@@ -453,7 +484,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           </div>
         </Card>
 
-        <nav className="dash-nav grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1 mb-6">
+        <nav className="dash-nav grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1 mb-6 relative z-20">
           {[
             { id: 'synthesis', label: '✦ Oracle', icon: <Star className="h-3 w-3" /> },
             { id: 'yeardive', label: '☽ Dive', icon: <Compass className="h-3 w-3" /> },
@@ -473,7 +504,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           ))}
         </nav>
 
-        <div className="dash-body p-6">
+        <div className="dash-body p-6 min-h-[600px]">
           {activeTab === 'synthesis' && renderSynthesis()}
           {activeTab === 'yeardive' && renderDive()}
           {activeTab === 'intersections' && renderIntersections()}

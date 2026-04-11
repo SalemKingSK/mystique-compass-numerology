@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -117,7 +118,7 @@ PARAGRAPH 4: This Year & Forecast — what the current Personal Year means speci
   };
 
   return (
-    <div style={{ borderRadius:'1.1rem', overflow:'hidden', border:'1px solid rgba(212,175,55,0.22)', background:'linear-gradient(145deg,rgba(15,5,40,0.95),rgba(8,2,22,0.98))', marginBottom:'1.25rem' }}>
+    <div style={{ borderRadius:'1.1rem', overflow:'hidden', border:'1px solid rgba(212,175,55,0.22)', background: 'rgba(15,5,40,0.95)', marginBottom:'1.25rem' }}>
       <div style={{ height:1, background:'linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)', marginBottom:'0.25rem' }}/>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'1rem 1.25rem', cursor: state!=='idle'?'pointer':'default', gap:'0.75rem' }}
         onClick={()=>state!=='idle'&&setOpen(o=>!o)}>
@@ -286,14 +287,12 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
           <ResultsHeader name={insight.name} newAstroSign={insight.new_astrology_sign} birthDate={formatDate()} onTabClick={setActiveTab} activeTab={activeTab}/>
           <AnimatePresence>{warning&&<WarningBanner message={warning}/>}</AnimatePresence>
           <CosmicProfilerPanel insight={insight} numerology={numerology}/>
-          <AnimatePresence mode="wait">
-            <motion.div key={activeTab} initial={{ opacity:0, y:10, scale:0.99 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:-10, scale:0.99 }} transition={{ duration:0.35, ease:[0.23,1,0.32,1] }}>
-              {activeTab==='astro'       &&<AstroDisplay insight={insight}/>}
-              {activeTab==='numerology'  &&<NumerologyDisplay numerology={numerology}/>}
-              {activeTab==='new-astro'   &&<NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData}/>}
-              {activeTab==='cosmic-fate' &&<CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear}/>}
-            </motion.div>
-          </AnimatePresence>
+          <div className="mt-6">
+            {activeTab==='astro'       && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><AstroDisplay insight={insight}/></motion.div>}
+            {activeTab==='numerology'  && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><NumerologyDisplay numerology={numerology}/></motion.div>}
+            {activeTab==='new-astro'   && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData}/></motion.div>}
+            {activeTab==='cosmic-fate' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear}/></motion.div>}
+          </div>
         </div>
         <footer className="text-center p-4 pb-24 text-white/50 text-[0.65rem] whitespace-pre-line font-body italic leading-relaxed">
           {"He who knows others is learned;\nHe who knows himself is wise.\n— Lao Tzu, Dao De Jing"}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -67,68 +68,68 @@ export function ProfileGenerator() {
       try {
         const db = await openDB();
         
-        // 1. Load existing IDB items
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const getRequest = store.getAll();
-
-        getRequest.onsuccess = () => {
-          const idbItems = getRequest.result;
-          
-          // 2. Check for legacy data to migrate
-          const legacyRaw = localStorage.getItem(HISTORY_KEY);
-          if (legacyRaw) {
-            try {
-              const legacyItems = JSON.parse(legacyRaw) as any[];
-              const migrateTx = db.transaction(STORE_NAME, 'readwrite');
-              const migrateStore = migrateTx.objectStore(STORE_NAME);
-              
-              let migratedCount = 0;
-              legacyItems.forEach(item => {
-                // More lenient mapping for different possible legacy formats
-                const name = item.name || item.fullName;
-                const d = item.day || item.birthDay;
-                const m = item.month || item.birthMonth;
-                const y = item.year || item.birthYear;
-                
-                if (name && d && m && y) {
-                  const soulId = `${String(name).trim().replace(/\s+/g, '_')}-${d}-${m}-${y}`;
-                  migrateStore.put({
-                    ...item,
-                    id: soulId,
-                    name: String(name).trim(),
-                    day: Number(d),
-                    month: Number(m),
-                    year: Number(y),
-                    gender: item.gender || 'other',
-                    timestamp: item.timestamp || Date.now()
-                  });
-                  migratedCount++;
-                }
-              });
-
-              migrateTx.oncomplete = () => {
-                if (migratedCount > 0) {
-                  localStorage.removeItem(HISTORY_KEY);
-                  // Final refresh from IDB
-                  const finalTx = db.transaction(STORE_NAME, 'readonly');
-                  const finalStore = finalTx.objectStore(STORE_NAME);
-                  const finalRequest = finalStore.getAll();
-                  finalRequest.onsuccess = () => {
-                    const sorted = finalRequest.result.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                    setHistory(sorted);
-                  };
-                }
-              };
-            } catch (migrationError) {
-              console.error("Migration failed:", migrationError);
-              const sorted = idbItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-              setHistory(sorted);
-            }
-          } else {
-            const sorted = idbItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            setHistory(sorted);
+        // 1. Load legacy data for migration
+        const legacyRaw = localStorage.getItem(HISTORY_KEY);
+        let legacyItems: any[] = [];
+        if (legacyRaw) {
+          try {
+            legacyItems = JSON.parse(legacyRaw);
+          } catch (e) {
+            console.error("JSON parse error for legacy history", e);
           }
+        }
+
+        // 2. Perform everything in ONE transaction to avoid timeouts/race conditions
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+
+        // Put legacy items into IDB
+        if (legacyItems.length > 0) {
+          legacyItems.forEach(item => {
+            const name = item.name || item.fullName || item.title;
+            const d = item.day || item.birthDay;
+            const m = item.month || item.birthMonth;
+            const y = item.year || item.birthYear;
+            
+            if (name && d && m && y) {
+              const soulId = `${String(name).trim().replace(/\s+/g, '_')}-${d}-${m}-${y}`;
+              store.put({
+                ...item,
+                id: soulId,
+                name: String(name).trim(),
+                day: Number(d),
+                month: Number(m),
+                year: Number(y),
+                gender: item.gender || 'male',
+                timestamp: item.timestamp || Date.now()
+              });
+            }
+          });
+        }
+
+        tx.oncomplete = () => {
+          if (legacyItems.length > 0) {
+            localStorage.removeItem(HISTORY_KEY);
+          }
+          // Now fetch the final list
+          const finalTx = db.transaction(STORE_NAME, 'readonly');
+          const finalStore = finalTx.objectStore(STORE_NAME);
+          const finalRequest = finalStore.getAll();
+          finalRequest.onsuccess = () => {
+            const sorted = finalRequest.result.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            setHistory(sorted);
+          };
+        };
+
+        tx.onerror = (event) => {
+          console.error("IDB Transaction Error", event);
+          // Fallback: just fetch what's there
+          const fallbackTx = db.transaction(STORE_NAME, 'readonly');
+          const fallbackStore = fallbackTx.objectStore(STORE_NAME);
+          const request = fallbackStore.getAll();
+          request.onsuccess = () => {
+            setHistory(request.result.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)));
+          };
         };
       } catch (e) {
         console.error("Could not initialize IndexedDB:", e);
@@ -292,7 +293,7 @@ export function ProfileGenerator() {
           </motion.div>
         )}
       </AnimatePresence>
-      <SheetContent className="w-[90%] sm:max-w-md">
+      <SheetContent className="w-[90%] sm:max-w-md" style={{ background: 'rgba(9,16,35,0.98)', borderLeft: '1px solid rgba(200,168,75,0.22)' }}>
           <SheetHeader className="pb-6 border-b border-white/10">
               <SheetTitle className="font-decorative text-xl text-primary">Archivum of Souls</SheetTitle>
               <p className="text-[10px] font-cinzel uppercase tracking-widest text-slate-500">indefinite records • local & cloud backup</p>
