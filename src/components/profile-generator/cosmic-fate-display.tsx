@@ -1,26 +1,23 @@
 
 /**
  * @fileOverview Overhauled Cosmic Fate Display mirroring the "Personal Year Oracle" structure.
- * Integrated with functional year selection, multi-traditional sub-tabs, and auto-scrolling TTS.
- * Updated to include the new Cosmic Risk Scanner discovery engine.
+ * Year selection has been locked to the current year.
  */
 
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AstroInsightOutput, NumerologyData } from './types';
-import { ANIMALS, RELATIONS, CAT_META, LIFESTAGES } from '@/lib/cosmic-fate/constants';
+import { ANIMALS, RELATIONS, CAT_META } from '@/lib/cosmic-fate/constants';
 import { BOOK } from '@/lib/cosmic-fate/book';
-import { YEAR_DESCRIPTIONS, CONVERGENCE_CARDS, PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/oracle-data';
+import { YEAR_DESCRIPTIONS, PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/oracle-data';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
-  Sparkles, Star, Info, CalendarDays, 
-  Zap, BookOpen, ShieldAlert, Users, 
-  MapIcon, Compass, BrainCircuit, Activity,
-  ChevronRight, Target, Telescope
+  Star, CalendarDays, 
+  BookOpen, Activity,
+  Compass, Telescope
 } from 'lucide-react';
 import { SpeechPlayer } from './speech-player';
 import { ScrollableTextDisplay } from './scrollable-text-display';
@@ -40,10 +37,9 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const [diveSubTab, setDiveSubTab] = useState('ov');
   const [codexSign, setCodexSign] = useState('Rat');
   
-  // Year Selector State
+  // Year Selector State - LOCKED
   const today = new Date();
-  const [readYear, setReadYear] = useState(today.getFullYear());
-  const [yearInput, setYearInput] = useState(today.getFullYear().toString());
+  const readYear = today.getFullYear();
 
   const { birthDay: d, birthMonth: m, birthYear: by } = numerology;
   const birthSign = insight.sign;
@@ -68,7 +64,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
   const currentPY = useMemo(() => getPY(d, m, readYear), [d, m, readYear]);
   const currentUY = useMemo(() => reduce(readYear), [readYear]);
   const currentBV = useMemo(() => reduce(d), [d]);
-  const currentPM = useMemo(() => reduce(currentPY + (readYear === today.getFullYear() ? today.getMonth() + 1 : 1)), [currentPY, readYear]);
+  const currentPM = useMemo(() => reduce(currentPY + (today.getMonth() + 1)), [currentPY]);
   const pmNames = ['', 'New Beginnings', 'Cooperation', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Reflection', 'Power', 'Completion'];
 
   // Pinnacles Logic
@@ -364,7 +360,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 max-w-full overflow-x-hidden pb-20">
-      {/* Year Selector */}
+      {/* Year Selector - LOCKED DISPLAY */}
       <Card className="p-4 bg-slate-900/60 border-primary/20">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -376,31 +372,10 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
               <p className="text-[10px] text-muted-foreground italic">Casting Fate Map for year {readYear}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Input
-              type="number"
-              value={yearInput}
-              onChange={(e) => {
-                setYearInput(e.target.value);
-                const val = parseInt(e.target.value);
-                if (!isNaN(val) && val >= 1900 && val <= 2100) {
-                  setReadYear(val);
-                }
-              }}
-              className="w-24 bg-black/40 border-white/10 text-center font-bold"
-              min={1900}
-              max={2100}
-            />
-            <button 
-              onClick={() => {
-                const cy = today.getFullYear();
-                setReadYear(cy);
-                setYearInput(cy.toString());
-              }}
-              className="px-3 py-2 bg-primary/10 border border-primary/20 rounded-md text-[10px] font-bold uppercase hover:bg-primary/20 transition-colors"
-            >
-              Today
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="px-4 py-2 bg-black/40 border border-white/10 rounded-md text-sm font-bold text-white">
+              Year {readYear}
+            </div>
           </div>
         </div>
       </Card>
@@ -430,7 +405,7 @@ export function CosmicFateDisplay({ insight, numerology }: { insight: AstroInsig
         {activeTab === 'dive' && renderDive()}
         {activeTab === 'map' && renderMap()}
         {activeTab === 'library' && renderLibrary()}
-        {activeTab === 'scanner' && <CosmicRiskScanner />}
+        {activeTab === 'scanner' && <CosmicRiskScanner targetYear={readYear} />}
         {activeTab === 'pinnacles' && (
           <div className="space-y-6 fu">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

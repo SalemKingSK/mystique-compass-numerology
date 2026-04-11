@@ -1,7 +1,7 @@
 
 /**
  * @fileOverview Precision-engineered Cosmic Fate Map refactored to native React state.
- * Expanded to include dedicated detail blocks for Personal Year, Universal Year, and Life Path.
+ * Year selection has been removed to lock the focus to the current year.
  */
 'use client';
 
@@ -18,9 +18,8 @@ import { CosmicRiskScanner } from './cosmic-risk-scanner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe, Info } from 'lucide-react';
+import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 interface Props {
@@ -110,7 +109,7 @@ const pyColors: Record<number, string> = {
 
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
   const [activeTab, setActiveTab] = useState('synthesis');
-  const [readYear, setReadYear] = useState(new Date().getFullYear());
+  const readYear = new Date().getFullYear(); // LOCKED TO CURRENT YEAR
   const [selectedZodiacYear, setSelectedZodiacYear] = useState<any>(null);
   const [diveSubTab, setDiveSubTab] = useState('ov');
 
@@ -122,7 +121,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     const lp = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(birthYear));
     const bv = reduce(birthDay);
     const today = new Date();
-    const currentMonthIndex = readYear === today.getFullYear() ? today.getMonth() + 1 : 1;
+    const currentMonthIndex = today.getMonth() + 1;
     const pm = reduce(py + currentMonthIndex);
     
     // Pinnacles
@@ -213,7 +212,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                   <Star className="h-5 w-5 text-primary" />
                   <div className="text-left">
                     <div className="text-[10px] font-black uppercase tracking-widest text-primary/60">Active Personal Year</div>
-                    <div className="text-sm font-bold text-white">Year ${stats.py}: ${yr.title}</div>
+                    <div className="text-sm font-bold text-white">Year {stats.py}: {yr.title}</div>
                   </div>
                 </div>
               </AccordionTrigger>
@@ -234,7 +233,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                   <Globe className="h-5 w-5 text-purple-400" />
                   <div className="text-left">
                     <div className="text-[10px] font-black uppercase tracking-widest text-purple-400/60">Collective Universal Year</div>
-                    <div className="text-sm font-bold text-white">Year ${stats.uy}: ${uy.title}</div>
+                    <div className="text-sm font-bold text-white">Year {stats.uy}: {uy.title}</div>
                   </div>
                 </div>
               </AccordionTrigger>
@@ -252,7 +251,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
                   <Activity className="h-5 w-5 text-emerald-400" />
                   <div className="text-left">
                     <div className="text-[10px] font-black uppercase tracking-widest text-emerald-400/60">Soul Path / Life Path</div>
-                    <div className="text-sm font-bold text-white">Path ${stats.lp}: ${lpName(stats.lp)}</div>
+                    <div className="text-sm font-bold text-white">Path {stats.lp}: {lpName(stats.lp)}</div>
                   </div>
                 </div>
               </AccordionTrigger>
@@ -267,7 +266,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         </div>
 
         <Card className="p-6 bg-slate-900/60 border-primary/20">
-          <div className="section-header">✦ &nbsp; Your ${readYear} Reading &nbsp; ✦</div>
+          <div className="section-header">✦ &nbsp; Your {readYear} Reading &nbsp; ✦</div>
           <AccordionContentWithPlayer text={oracleText} />
         </Card>
       </div>
@@ -341,7 +340,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             <div className="flex justify-between items-start border-b border-rose-500/10 pb-3 mb-4">
               <div>
                 <div className="text-2xl font-serif font-bold text-rose-400">{i.y}</div>
-                <div className="text-xs font-bold text-white">PY ${i.pyn} · ${i.yearAni} Year ${ZOO[i.yearAni].e}</div>
+                <div className="text-xs font-bold text-white">PY {i.pyn} · {i.yearAni} Year {ZOO[i.yearAni].e}</div>
               </div>
               {i.isNegative && <Badge className="bg-rose-500 text-[8px] px-2 py-0">HIGH TENSION</Badge>}
             </div>
@@ -456,23 +455,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
               </div>
               <div>
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Temporal Focus</label>
-                <div className="text-2xl font-bold text-white font-cinzel">Year {readYear}</div>
+                <div className="text-2xl font-bold text-white font-cinzel">Current Year {readYear}</div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Input 
-                type="number" 
-                value={readYear} 
-                onChange={(e) => setReadYear(parseInt(e.target.value) || new Date().getFullYear())}
-                className="w-28 bg-black/40 border-white/10 font-bold text-lg text-center"
-                min={1900} max={2100}
-              />
-              <button 
-                onClick={() => setReadYear(new Date().getFullYear())}
-                className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-md text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all"
-              >
-                Today
-              </button>
             </div>
           </div>
         </Card>
