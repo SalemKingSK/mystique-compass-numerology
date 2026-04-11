@@ -1,13 +1,11 @@
 /**
- * @fileOverview Precision-engineered Cosmic Fate Map with exact Lunar calendar tracking.
- * Adopts the corrected Tai Sui relationship matrix across all animals.
+ * @fileOverview Precision-engineered Cosmic Fate Map refactored to native React state.
+ * Fixes the issue where tab details were not showing by removing imperative DOM manipulation.
  * Implements full relationship mapping (Harms, Destructions, Alliances) and critical year logic.
- * Enhanced Read Aloud with sentence highlighting and auto-scrolling.
- * Includes the Auto-Discovery Cosmic Risk Scanner linked to dynamic years.
  */
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
 import { YD } from '@/lib/cosmic-fate/oracle';
 import { CONVERGENCE_CARDS } from '@/lib/cosmic-fate/convergence';
@@ -15,8 +13,15 @@ import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { INTERSECTION_SYNTHESIS } from '@/lib/cosmic-fate/intersections';
 import { CHINESE_CALENDAR } from '@/lib/new-astrology/chinese-calendar';
 import { BOOK } from '@/lib/cosmic-fate/book';
-import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
+import { ANIMALS, RELATIONS, CAT_META } from '@/lib/cosmic-fate/constants';
 import { CosmicRiskScanner } from './cosmic-risk-scanner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap } from 'lucide-react';
+import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 interface Props {
   birthDay: number;
@@ -99,443 +104,318 @@ const getStatusLabelShort = (c: string) => ({
   'destruction': 'DESTRUCTION', 'alliance': 'ALLIANCE', 'neutral': 'NEUTRAL' 
 }[c] || 'NEUTRAL');
 
+const pyColors: Record<number, string> = {
+  1: "#e8b830", 2: "#98b4de", 3: "#68c268", 4: "#c86040", 5: "#dca030", 6: "#de78a0", 7: "#8870c8", 8: "#a8b5cc", 9: "#c84848"
+};
+
 export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
-  const initialized = useRef(false);
-  const [readYearState, setReadYearState] = useState(new Date().getFullYear());
+  const [activeTab, setActiveTab] = useState('synthesis');
+  const [readYear, setReadYear] = useState(new Date().getFullYear());
+  const [selectedZodiacYear, setSelectedZodiacYear] = useState<any>(null);
+  const [diveSubTab, setDiveSubTab] = useState('ov');
 
-  useEffect(() => {
-    (window as any).switchDash = (btn: HTMLElement) => {
-      const panelId = btn.getAttribute('data-panel');
-      const nav = document.getElementById('dash-nav');
-      if (!nav) return;
-      
-      nav.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      
-      document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
-      const targetPanel = document.getElementById(`panel-${panelId}`);
-      if (targetPanel) targetPanel.classList.add('active');
-    };
+  const pmNames = ['', 'Initiation', 'Partnership', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Retreat', 'Power', 'Completion'];
 
-    (window as any).closePop = () => {
-      document.getElementById('overlay')?.classList.remove('visible');
-    };
+  const stats = useMemo(() => {
+    const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(readYear));
+    const uy = reduce(readYear);
+    const lp = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(birthYear));
+    const bv = reduce(birthDay);
+    const today = new Date();
+    const currentMonthIndex = readYear === today.getFullYear() ? today.getMonth() + 1 : 1;
+    const pm = reduce(py + currentMonthIndex);
+    
+    // Pinnacles
+    const p1 = reduce(reduce(birthMonth) + reduce(birthDay));
+    const p2 = reduce(reduce(birthDay) + reduce(birthYear));
+    const p3 = reduce(p1 + p2);
+    const p4 = reduce(reduce(birthMonth) + reduce(birthYear));
+    const p1end = 36 - lp;
+    const p2end = p1end + 9;
+    const p3end = p2end + 9;
+    const age = readYear - birthYear;
+    
+    let pNum, pStage;
+    if (age <= p1end) { pStage = 1; pNum = p1; }
+    else if (age <= p2end) { pStage = 2; pNum = p2; }
+    else if (age <= p3end) { pStage = 3; pNum = p3; }
+    else { pStage = 4; pNum = p4; }
 
-    (window as any).openZodiacPop = (ya: string, bs: string, y: string, age: string, cat: string) => {
-      const pg = document.getElementById('pg');
-      const ph = document.getElementById('ph');
-      const ps = document.getElementById('ps');
-      const pb = document.getElementById('pb');
-      const overlay = document.getElementById('overlay');
-      if (!pg || !ph || !ps || !pb || !overlay) return;
+    const c1 = Math.abs(reduce(birthMonth) - reduce(birthDay));
+    const c2 = Math.abs(reduce(birthDay) - reduce(birthYear));
+    const c3 = Math.abs(c1 - c2);
+    const c4 = Math.abs(reduce(birthMonth) - reduce(birthYear));
+    let cNum;
+    if (age <= p1end) cNum = c1;
+    else if (age <= p2end) cNum = c2;
+    else if (age <= p3end) cNum = c3;
+    else cNum = c4;
 
-      const zooYa = ZOO[ya];
-      const zooBs = ZOO[bs];
-      
-      pg.innerText = zooYa.e;
-      ph.innerText = `${y}: ${ya} Year`;
-      ps.innerText = `${bs} × ${ya} — ${catLabel(cat)}`;
-      
-      const catKey = cat === 'destruction' ? 'destruction' : cat;
-      const catText = BOOK.categories[catKey] || "";
-      const signSpecificText = zooBs[`${cat}Desc`] || zooBs[`${cat === 'destruction' ? 'destruction' : cat}Desc`] || `Neutral year dynamics.`;
-      const yearQualities = `${zooYa.trait}. Health focus: ${zooYa.organ}. Direction: ${zooYa.dir}.`;
+    const birthSign = getAnimalForDate(birthDay, birthMonth, birthYear);
+    const yearAnimalName = getAnimalForDate(15, 6, readYear); 
+    const cat = getCategory(birthSign, yearAnimalName);
 
-      pb.innerHTML = `
-        <div class="space-y-6">
-          <div class="p-4 bg-primary/5 border-l-[3px] border-primary rounded-r-lg font-body italic text-sm text-slate-300">
-            ${y} (${ya} Year, Age ${age}) — Tai Sui: ${catLabel(cat)}
-          </div>
-          <div class="p-4 bg-white/5 border-l-[3px] border-primary/40 rounded-r-lg font-body text-sm leading-relaxed text-slate-300">
-            ${catText}
-          </div>
-          <div class="space-y-4">
-            <h4 class="font-cinzel text-xs uppercase tracking-widest opacity-60">Your ${bs.toUpperCase()} in ${ya.toUpperCase()} Year</h4>
-            <div class="font-body text-base leading-relaxed text-slate-200">${signSpecificText}</div>
-          </div>
-          <div class="space-y-2">
-            <h4 class="font-cinzel text-xs uppercase tracking-widest opacity-60">${ya.toUpperCase()} Year Qualities</h4>
-            <div class="font-body text-sm text-slate-400">${yearQualities}</div>
-          </div>
-        </div>
-      `;
-      overlay.classList.add('visible');
-    };
+    return { py, uy, lp, bv, pm, pNum, pStage, cNum, age, birthSign, yearAnimalName, cat, p1end, p2end, p3end, p1, p2, p3, p4, c1, c2, c3, c4 };
+  }, [birthDay, birthMonth, birthYear, readYear]);
 
-    (window as any).ttsPlay = (btn: HTMLButtonElement, targetId: string) => {
-      const target = document.getElementById(targetId);
-      if (!target) return;
-      const text = target.innerText || target.textContent || "";
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-        btn.classList.remove('playing');
-        btn.innerText = "🔊 Read Aloud";
-        return;
-      }
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.onstart = () => {
-        btn.classList.add('playing');
-        btn.innerText = "⏹ Stop";
-      };
-      utterance.onend = () => {
-        btn.classList.remove('playing');
-        btn.innerText = "🔊 Read Aloud";
-      };
-      window.speechSynthesis.speak(utterance);
-    };
+  const oracleText = useMemo(() => {
+    const yr = YD[stats.py];
+    const cm = CAT_META[stats.cat === 'alliance' ? 'sanhe' : stats.cat === 'ben' ? 'self' : stats.cat];
+    const lpRelationText = (stats.py === stats.lp) ? "exceptional harmony" : (Math.abs(stats.py - stats.lp) === 4 || Math.abs(stats.py - stats.lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
+    const lpInteractionText = (stats.py === stats.lp) ? "match" : (Math.abs(stats.py - stats.lp) === 4 || Math.abs(stats.py - stats.lp) === 5) ? "creates notable friction with" : "and";
+    
+    return `In ${readYear}, you are in a Personal Year ${stats.py} — ${yr?.title}, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${stats.uy} (${YD[stats.uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${stats.pm} (${pmNames[stats.pm]}), offering a finer-grained window into this season's immediate texture. Your ${stats.birthSign} nature meets a ${stats.yearAnimalName} year (${catLabel(stats.cat)}) — a ${stats.cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(stats.cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${stats.lp} (${lpName(stats.lp)}) ${lpInteractionText} Personal Year ${stats.py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${stats.pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${stats.cNum} (${lpName(stats.cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all converging in ${readYear}.`;
+  }, [stats, readYear]);
 
-    (window as any).swT = (id: string, btn: HTMLElement) => {
-      const parent = btn.parentElement;
-      if (!parent) return;
-      parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const content = parent.nextElementSibling;
-      if (!content) return;
-      content.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      content.querySelector(`#tp-${id}`)?.classList.add('active');
-    };
-
-    (window as any).calculate = () => {
-      const ryInput = document.getElementById('cf-readYear') as HTMLInputElement;
-      if (!ryInput) return;
-      const ryValue = parseInt(ryInput.value);
-      if (!ryValue || isNaN(ryValue)) return;
-      const ry = ryValue;
-      
-      setReadYearState(ry);
-
-      const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(ry));
-      const uy = reduce(ry);
-      const lp = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(birthYear));
-      const bv = reduce(birthDay);
-      
-      const today = new Date();
-      const currentMonthIndex = ry === today.getFullYear() ? today.getMonth() + 1 : 1;
-      const pm = reduce(py + currentMonthIndex);
-      const pmNames = ['', 'Initiation', 'Partnership', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Retreat', 'Power', 'Completion'];
-
-      const p1 = reduce(reduce(birthMonth) + reduce(birthDay));
-      const p2 = reduce(reduce(birthDay) + reduce(birthYear));
-      const p3 = reduce(p1 + p2);
-      const p4 = reduce(reduce(birthMonth) + reduce(birthYear));
-      const p1end = 36 - lp;
-      const p2end = p1end + 9;
-      const p3end = p2end + 9;
-      const age = ry - birthYear;
-      
-      let pNum, pStage;
-      if (age <= p1end) { pStage = 1; pNum = p1; }
-      else if (age <= p2end) { pStage = 2; pNum = p2; }
-      else if (age <= p3end) { pStage = 3; pNum = p3; }
-      else { pStage = 4; pNum = p4; }
-
-      const c1 = Math.abs(reduce(birthMonth) - reduce(birthDay));
-      const c2 = Math.abs(reduce(birthDay) - reduce(birthYear));
-      const c3 = Math.abs(c1 - c2);
-      const c4 = Math.abs(reduce(birthMonth) - reduce(birthYear));
-      let cNum;
-      if (age <= p1end) cNum = c1;
-      else if (age <= p2end) cNum = c2;
-      else if (age <= p3end) cNum = c3;
-      else cNum = c4;
-
-      const birthSign = getAnimalForDate(birthDay, birthMonth, birthYear);
-      const bz = ZOO[birthSign];
-      const az = ANIMALS.find(a => a.n === birthSign);
-      const yearAnimalName = getAnimalForDate(15, 6, ry); 
-      const ya = ZOO[yearAnimalName];
-      const cat = getCategory(birthSign, yearAnimalName);
-
-      const coreStrip = document.getElementById('core-strip');
-      if (coreStrip) {
-        coreStrip.innerHTML = `
-          <div class="core-chip hl-py"> <div class="core-chip-label">Personal Year ${ry}</div> <div class="core-chip-num">${py}</div> <div class="core-chip-name">${YD[py]?.title}</div> </div> 
-          <div class="core-chip"> <div class="core-chip-label">Life Path</div> <div class="core-chip-num" style="color:var(--cf-jade-bright)">${lp}</div> <div class="core-chip-name">${lpName(lp)}</div> </div> 
-          <div class="core-chip"> <div class="core-chip-label">Universal Year</div> <div class="core-chip-num" style="color:var(--cf-amethyst)">${uy}</div> <div class="core-chip-name">${YD[uy]?.title}</div> </div> 
-          <div class="core-chip"> <div class="core-chip-label">Birth Vibration</div> <div class="core-chip-num" style="color:#de78a0">${bv}</div> <div class="core-chip-name">${lpName(bv)}</div> </div>`;
-      }
-
-      const ab = document.getElementById('alert-banner');
-      if (ab) {
-        let alertText = '';
-        if (py === uy) alertText = `<strong>⚡ Double Amplification:</strong> Personal Year ${py} aligns with Universal Year ${uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency. Decisions made now have double the impact, as you are swimming with the current of the world's current evolutionary requirements.`;
-        else if (py === bv) alertText = `<strong>✦ Core Identity Activation:</strong> Personal Year ${py} matches your Birth Vibration ${bv} — your deepest nature and current developmental phase in perfect alignment. Unusual clarity about who you are and where you're heading. It is as if the universe is reflecting your core essence back to you, allowing for an effortless expression of your authentic self.`;
-        else if (py === lp) alertText = `<strong>✦ Life Path Activation:</strong> Personal Year ${py} matches your Life Path ${lp} — a year of destiny alignment. The immediate tasks of this year are in direct service to your overall life mission. The resistance you usually encounter when trying to merge your daily reality with your soul's purpose dissolves, creating a streamlined path toward meaningful achievement and legacy building.`;
-        
-        if (alertText) { 
-          ab.innerHTML = `<button class="tts-btn mb-2" onclick="window.ttsPlay(this, 'alert-text')">🔊 Read Aloud</button><div id="alert-text">${alertText}</div>`; 
-          ab.classList.add('visible'); 
-        } else { 
-          ab.classList.remove('visible'); 
-        }
-      }
-
-      const yr = YD[py];
-      const lpRelationText = (py === lp) ? "exceptional harmony" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "notable friction" : "productive dialogue — neither in obvious tension nor exceptional harmony";
-      const lpInteractionText = (py === lp) ? "match" : (Math.abs(py - lp) === 4 || Math.abs(py - lp) === 5) ? "creates notable friction with" : "and";
-      
-      const synthText = `In ${ry}, you are in a <strong>Personal Year ${py} — ${yr?.title}</strong>, riding the ${yr?.phase.toLowerCase()} phase of your nine-year cycle. The Universal Year ${uy} (${YD[uy]?.title}) sets the collective backdrop — the shared frequency every person on earth is navigating alongside their personal arc. Your current Personal Month is ${pm} (${pmNames[pm]}), offering a finer-grained window into this season's immediate texture. Your ${birthSign} nature meets a ${yearAnimalName} year (${catLabel(cat)}) — a ${cat === 'neutral' ? 'neutral year where outcomes reflect pure personal effort rather than exceptional external forces' : catLabel(cat).toLowerCase() + ' where trajectories are specifically influenced by Tai Sui energy'}. Your Life Path ${lp} (${lpName(lp)}) ${lpInteractionText} Personal Year ${py} (${yr?.title}) are in ${lpRelationText} — allowing this year's work to proceed through genuine effort. Your active Pinnacle is ${pNum} — the long-arc life theme operating beneath every annual cycle — while your active Challenge number ${cNum} (${lpName(cNum)}) names the specific resistance pattern this life chapter asks you to develop through. Taken together, these layers describe not one story but several simultaneous ones: the year's momentum, the month's focus, the decade's theme, and the lifetime's direction — all cocnverging in ${ry}.`;
-      
-      const sc = document.getElementById('synthesis-container');
-      if (sc) {
-        sc.innerHTML = `
-          <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'synthesis-text')">🔊 Read Aloud</button>
-          <div class="section-header">✦ &nbsp; Your ${ry} Reading — Oracle Synthesis &nbsp; ✦</div>
-          <div id="synthesis-text" class="cp">${synthText}</div>`;
-      }
-
-      const paras = (t: string) => (t || '').split('\n\n').map(p => `<p class="cp">${p.trim()}</p>`).join('');
-      const ydc = document.getElementById('year-dive-container');
-      if (ydc) {
-        ydc.innerHTML = `
-          <div class="year-deep-dive">
-            <button class="tts-btn mb-2 w-full" onclick="window.ttsPlay(this, 'year-dive-content-wrapper')">🔊 Read Aloud Section</button>
-            <div class="year-dive-header">
-              <div class="year-num-big" style="color:var(--cf-gold)">${py}</div>
-              <div class="year-dive-title">${yr.title}</div>
-              <div class="year-dive-sub">${yr.phase}</div>
-            </div>
-            <div class="tab-nav grid grid-cols-3 gap-1 p-2">
-              <button class="tab-btn active" onclick="window.swT('ov',this)">Overview</button>
-              <button class="tab-btn" onclick="window.swT('es',this)">Esoteric</button>
-              <button class="tab-btn" onclick="window.swT('py',this)">Pythagorean</button>
-              <button class="tab-btn" onclick="window.swT('ve',this)">Vedic</button>
-              <button class="tab-btn" onclick="window.swT('ch',this)">Chinese</button>
-              <button class="tab-btn" onclick="window.swT('ca',this)">Chaldean</button>
-              <button class="tab-btn" onclick="window.swT('pr',this)">Practices</button>
-            </div>
-            <div class="tab-content p-2" id="year-dive-content-wrapper">
-              <div class="tab-panel active" id="tp-ov"><div id="tp-ov-text">${paras(yr.overview)}</div></div>
-              <div class="tab-panel" id="tp-es"><h4 class="content-h">The Orthodox & Esoteric Lens</h4><div id="tp-es-text">${paras(yr.esoteric)}</div></div>
-              <div class="tab-panel" id="tp-py"><h4 class="content-h">Challenges, Shadows & Spiritual Curriculum</h4><div id="tp-py-text">${paras(yr.pyth)}</div></div>
-              <div class="tab-panel" id="tp-ve"><div id="tp-ve-text">${paras(yr.vedic)}</div></div>
-              <div class="tab-panel" id="tp-ch"><div id="tp-ch-text">${paras(yr.chinese)}</div></div>
-              <div class="tab-panel" id="tp-ca"><div id="tp-ca-text">${paras(yr.chald)}</div></div>
-              <div class="tab-panel" id="tp-pr"><div class="practice-grid">${yr.pr.map((p: any) => `<div class="pi"><div class="pi-icon">${p.i}</div><div class="pi-name">${p.n}</div><div class="pi-desc">${p.d}</div></div>`).join('')}</div></div>
-            </div>
-          </div>`;
-      }
-
-      const intersections = [];
-      for (let y = ry; y <= ry + 30; y++) {
-        const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
-        if (pyn === 4 || pyn === 7) {
-          const yearAni = getAnimalForDate(15, 6, y);
-          const iCat = getCategory(birthSign, yearAni);
-          const uyn = reduce(y);
-          const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
-          
-          let badge = '';
-          if (isNegative) {
-            badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-amber)">🟠 HIGH TENSION — ${getStatusLabelShort(iCat)} Year + Critical Personal Year</div>`;
-          } else {
-            badge = `<div class="text-[10px] font-black uppercase mt-1" style="color:var(--cf-silver-dim)">◦ Critical Personal Year ${pyn} in ${yearAni} Year</div>`;
-          }
-
-          const synKey = `${pyn}_${iCat}`;
-          const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', yearAni + ' Neutral');
-          const dyn = ZOO[birthSign][`${iCat}Desc`] || ZOO[birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${yearAni} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
-
-          intersections.push(`
-            <div class="intersection-card p-4">
-              <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'int-text-${y}')">🔊 Read Aloud</button>
-              <div class="intersection-header">
-                <div class="intersection-year">${y}</div>
-                <div class="intersection-title">Personal Year ${pyn} · Year of ${pyn === 4 ? 'Foundation' : 'the Mystic'} · ${yearAni} Year ${ZOO[yearAni].e}</div>
-                ${badge}
-              </div>
-              <div class="intersection-body" id="int-text-${y}">
-                <div class="text-xs text-muted-foreground mb-3">Universal Year ${uyn} — ${YD[uyn].title}  |  Chinese: ${catLabel(iCat)}</div>
-                <div class="cp text-sm leading-relaxed mb-4">${synth}<br/><br/><strong>Specific dynamics:</strong> ${dyn}</div>
-              </div>
-            </div>`);
-        }
-      }
-      const pic = document.getElementById('personal-intersections-container');
-      if (pic) {
-        pic.innerHTML = `
-          <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'personal-intersections-list')">🔊 Read Aloud All</button>
-          <div class="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>
-          <p class="text-xs text-muted-foreground text-center mb-8 px-4">These are the specific years — calculated from your exact birth date — when Personal Years 4 and 7 intersect with your Chinese zodiac cycle.</p>
-          <div class="px-2" id="personal-intersections-list">${intersections.join('')}</div>`;
-      }
-
-      const pyColors: Record<number, string> = {
-        1: "#e8b830", 2: "#98b4de", 3: "#68c268", 4: "#c86040", 5: "#dca030", 6: "#de78a0", 7: "#8870c8", 8: "#a8b5cc", 9: "#c84848"
-      };
-
-      const getIcon = (c: string) => ({
-        'clash': '⚡', 'harm': '⚠', 'destruction': '💀', 'alliance': '✅', 'ben': '✦', 'neutral': '◦'
-      }[c] || '◦');
-
-      let zHtml = '<div class="zodiac-grid grid grid-cols-2 gap-3 px-2">';
-      for (let y = ry; y <= ry + 11; y++) {
+  const intersections = useMemo(() => {
+    const list = [];
+    for (let y = readYear; y <= readYear + 30; y++) {
+      const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
+      if (pyn === 4 || pyn === 7) {
         const yearAni = getAnimalForDate(15, 6, y);
-        const zCat = getCategory(birthSign, yearAni);
-        const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
+        const iCat = getCategory(stats.birthSign, yearAni);
+        const uyn = reduce(y);
+        const isNegative = iCat === 'clash' || iCat === 'harm' || iCat === 'destruction' || iCat === 'ben';
         
-        const isCritical = pyn === 4 || pyn === 7;
-        const isEnemy = zCat === 'clash' || zCat === 'harm' || zCat === 'destruction';
-        const isBen = zCat === 'ben';
-        const isAlliance = zCat === 'alliance';
+        const synKey = `${pyn}_${iCat}`;
+        const synth = INTERSECTION_SYNTHESIS[synKey] || INTERSECTION_SYNTHESIS[`${pyn}_neutral`].replace('Neutral', yearAni + ' Neutral');
+        const dyn = ZOO[stats.birthSign][`${iCat}Desc`] || ZOO[stats.birthSign][`${iCat === 'destruction' ? 'destruction' : iCat}Desc`] || `Personal Year ${pyn}'s discipline proceeds in a ${yearAni} Neutral year — neither amplified by alliance support nor undermined by conflict energy.`;
 
-        let cardStyle = "";
-        let badgeHtml = "";
-        let statusLabelColor = "";
-        const statusTag = getStatusLabelShort(zCat);
-        const icon = getIcon(zCat);
-
-        if (isEnemy && isCritical) {
-          cardStyle = "background: linear-gradient(140deg, rgba(180,20,40,.35), rgba(7,13,28,.98)); border: 2px solid rgba(200,30,50,.7); box-shadow: 0 0 24px rgba(200,30,50,.4);";
-          badgeHtml = `<div class="mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-rose-500/20 text-rose-500 border border-rose-500/30">⚠ PY${pyn} + ${statusTag}</div>`;
-          statusLabelColor = "color: #ef4444;";
-        } else if (isBen && isCritical) {
-          cardStyle = "background: linear-gradient(140deg, rgba(220,140,0,.2), rgba(7,13,28,.98)); border: 2px solid rgba(220,140,0,.6);";
-          badgeHtml = `<div class="mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30">⭐ BEN MING + PY 4/7</div>`;
-          statusLabelColor = "color: #f59e0b;";
-        } else if (isCritical) {
-          cardStyle = "background: linear-gradient(140deg, rgba(100,70,180,.18), rgba(7,13,28,.98)); border: 1px solid rgba(136,112,200,.45);";
-          badgeHtml = `<div class="mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-purple-500/20 text-purple-400 border border-purple-500/30">PY${pyn} CRITICAL</div>`;
-          statusLabelColor = "color: #a78bfa;";
-        } else if (isAlliance) {
-          cardStyle = "background: linear-gradient(140deg, rgba(50,160,90,.1), rgba(7,13,28,.95)); border: 1px solid rgba(50,160,90,.45);";
-          statusLabelColor = "color: #4daa78;";
-        } else {
-          cardStyle = "background: linear-gradient(140deg, rgba(14,24,46,.9), rgba(8,14,28,.95)); border: 1px solid rgba(200,168,75,.13);";
-          statusLabelColor = `color: ${isEnemy ? '#ef4444' : isBen ? '#fbbf24' : 'var(--cf-text-dim)'};`;
-        }
-
-        const pyColor = pyColors[pyn] || "#ffffff";
-
-        zHtml += `<div class="zc flex flex-col items-center justify-center p-6 rounded-2xl text-center transition-all hover:scale-[1.02]" style="${cardStyle}" onClick="window.openZodiacPop('${yearAni}','${birthSign}','${y}','${y-birthYear}','${zCat}')">
-          <div class="text-4xl mb-3">${ZOO[yearAni].e}</div>
-          <div class="text-[13px] font-bold text-white mb-1">${y}</div>
-          <div class="text-[18px] font-black" style="color:${pyColor}">PY ${pyn}</div>
-          <div class="text-[10px] font-black uppercase tracking-tighter" style="${statusLabelColor}">${statusTag} YEAR ${icon}</div>
-          <div class="text-[10px] text-muted-foreground mt-1">Age ${y-birthYear}</div>
-          ${badgeHtml}
-        </div>`;
+        list.push({ y, pyn, yearAni, iCat, uyn, isNegative, synth, dyn });
       }
-
-      const zodiacTopHtml = `
-        <div class="text-center mb-8 px-4 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div class="flex items-center justify-center gap-4 mb-6">
-            <span class="text-2xl">${bz.e}</span>
-            <h2 class="text-xl font-bold tracking-[0.3em] uppercase text-primary">Your Chinese Zodiac — ${birthSign}</h2>
-            <span class="text-2xl">${bz.e}</span>
-          </div>
-          
-          <div class="cp text-lg leading-relaxed text-slate-300 max-w-2xl mx-auto mb-8">
-            Born in a <strong class="text-primary">${birthSign}</strong> year — ${bz.el} element, 
-            ${bz.pol} polarity, Branch ${az?.br || bz.br}. Your characteristic nature: 
-            <em class="text-slate-400 italic">${bz.trait}</em>. Your health domains: 
-            <span class="text-slate-400">${bz.organ}</span>. Your cardinal direction: 
-            <span class="text-slate-400">${bz.dir}</span>. Below are your next 12 years mapped through Tai Sui astrology — click any year for detailed analysis.
-          </div>
-
-          <div class="flex flex-col items-center gap-3 mb-6">
-            <div class="flex gap-3">
-              <div class="px-3 py-1.5 rounded-lg border border-rose-500/50 bg-rose-500/10 text-[10px] font-black uppercase text-rose-400">
-                ⚠️ ENEMY × PY 4 OR 7
-              </div>
-              <div class="px-3 py-1.5 rounded-lg border border-yellow-500/50 bg-yellow-500/10 text-[10px] font-black uppercase text-yellow-400">
-                ⭐ BEN MING + PY 4/7
-              </div>
-            </div>
-            <div class="flex gap-3">
-              <div class="px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/10 text-[10px] font-black uppercase text-indigo-400">
-                ◈ CRITICAL PY ONLY
-              </div>
-              <div class="px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 text-[10px] font-black uppercase text-primary/70">
-                PY # Legend
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      const zc = document.getElementById('zodiac-container');
-      if (zc) {
-        zc.innerHTML = `
-          <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'zodiac-list-wrapper')">🔊 Read Aloud List</button>
-          ${zodiacTopHtml}
-          <div id="zodiac-list-wrapper">` + zHtml + '</div></div>';
-      }
-
-      const pStages = [
-        { n: 1, p: p1, c: c1, label: `Birth - Age ${p1end}`, active: age <= p1end },
-        { n: 2, p: p2, c: c2, label: `Age ${p1end+1} - ${p2end}`, active: age > p1end && age <= p2end },
-        { n: 3, p: p3, c: c3, label: `Age ${p2end+1} - ${p3end}`, active: age > p2end && age <= p3end },
-        { n: 4, p: p4, c: c4, label: `Age ${p3end+1}+`, active: age > p3end }
-      ];
-      const pCards = pStages.map(s => `
-        <div class="p-6 mb-4 border rounded-3xl ${s.active ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'border-white/5 bg-slate-900/40'}">
-          <div class="flex justify-between items-center mb-6">
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">${s.label}</div>
-            ${s.active ? `<span class="bg-primary text-[8px] px-2 py-0.5 rounded text-white font-bold">ACTIVE STAGE</span>` : ''}
-          </div>
-          <div class="flex gap-10 mb-6 justify-center">
-            <div class="text-center">
-              <div class="text-5xl font-serif font-bold text-emerald-400">${s.p}</div>
-              <div class="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Pinnacle</div>
-            </div>
-            <div class="text-center">
-              <div class="text-5xl font-serif font-bold text-rose-400">${s.c}</div>
-              <div class="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Challenge</div>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <p class="text-sm leading-relaxed text-slate-300">${PINNACLE_DESC[s.p]}</p>
-            <p class="text-xs leading-relaxed text-rose-300/90 italic font-medium">Challenge ${s.c}: ${CHALLENGE_DESC[s.c]}</p>
-          </div>
-        </div>`).join('');
-      const pc = document.getElementById('pinnacles-container');
-      if (pc) {
-        pc.innerHTML = `
-          <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'pinnacles-list')">🔊 Read Aloud Stages</button>
-          <div class="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
-          <div id="pinnacles-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">${pCards}</div>`;
-      }
-
-      let convHtml = '';
-      CONVERGENCE_CARDS.forEach(c => {
-        convHtml += `
-          <div class="conv-card mb-8"> 
-            <button class="tts-btn mb-4 w-full" onclick="window.ttsPlay(this, 'conv-text-${c.year}')">🔊 Read Aloud</button> 
-            <div class="conv-header p-6 bg-primary/10 border-b border-primary/20"> 
-              <div class="conv-title text-2xl font-bold text-primary">${c.title}</div> 
-              <div class="conv-sub text-sm italic text-muted-foreground">${c.sub}</div> 
-            </div> 
-            <div class="conv-body p-6" id="conv-text-${c.year}"> 
-              <div>
-                <p class="cp mb-6 text-sm leading-relaxed">${c.intro}</p> 
-                <div class="enemy-grid">
-                  ${c.chips.map(ch => `<div class="enemy-chip"><div class="enemy-chip-title font-bold text-primary text-xs mb-2">${ch.t}</div><p class="text-xs leading-relaxed text-slate-300">${ch.p}</p></div>`).join('')}
-                </div> 
-                <div class="wbox p-4 rounded-r-xl text-sm italic">${c.warning}</div> 
-              </div>
-            </div> 
-          </div>`;
-      });
-      const cc = document.getElementById('convergence-cards');
-      if (cc) {
-        cc.innerHTML = `<div class="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>` + convHtml;
-      }
-
-      const ra = document.getElementById('result-area');
-      if (ra) {
-        ra.classList.remove('result-hidden');
-      }
-    };
-
-    if (!initialized.current) {
-      (window as any).calculate();
-      initialized.current = true;
     }
-  }, [birthDay, birthMonth, birthYear]);
+    return list;
+  }, [stats.birthSign, birthDay, birthMonth, readYear]);
+
+  const zodiacCycle = useMemo(() => {
+    const list = [];
+    for (let y = readYear; y <= readYear + 11; y++) {
+      const yearAni = getAnimalForDate(15, 6, y);
+      const zCat = getCategory(stats.birthSign, yearAni);
+      const pyn = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(y));
+      const age = y - birthYear;
+      list.push({ y, yearAni, zCat, pyn, age });
+    }
+    return list;
+  }, [stats.birthSign, birthDay, birthMonth, birthYear, readYear]);
+
+  const renderSynthesis = () => (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="core-strip">
+        <div className="core-chip hl-py">
+          <div className="core-chip-label">Personal Year {readYear}</div>
+          <div className="core-chip-num">{stats.py}</div>
+          <div className="core-chip-name">{YD[stats.py]?.title}</div>
+        </div>
+        <div className="core-chip">
+          <div className="core-chip-label">Life Path</div>
+          <div className="core-chip-num" style={{ color: 'var(--cf-jade-bright)' }}>{stats.lp}</div>
+          <div className="core-chip-name">{lpName(stats.lp)}</div>
+        </div>
+        <div className="core-chip">
+          <div className="core-chip-label">Universal Year</div>
+          <div className="core-chip-num" style={{ color: 'var(--cf-amethyst)' }}>{stats.uy}</div>
+          <div className="core-chip-name">{YD[stats.uy]?.title}</div>
+        </div>
+        <div className="core-chip">
+          <div className="core-chip-label">Birth Vibration</div>
+          <div className="core-chip-num" style={{ color: '#de78a0' }}>{stats.bv}</div>
+          <div className="core-chip-name">{lpName(stats.bv)}</div>
+        </div>
+      </div>
+
+      {(stats.py === stats.uy || stats.py === stats.bv || stats.py === stats.lp) && (
+        <div className="alert-banner visible">
+          <AccordionContentWithPlayer text={
+            stats.py === stats.uy ? `⚡ Double Amplification: Personal Year ${stats.py} aligns with Universal Year ${stats.uy}. This creates a high-voltage energetic resonance where your personal mission and the collective momentum of the planet are vibrating on the same frequency.` :
+            stats.py === stats.bv ? `✦ Core Identity Activation: Personal Year ${stats.py} matches your Birth Vibration ${stats.bv}. It is as if the universe is reflecting your core essence back to you, allowing for an effortless expression of your authentic self.` :
+            `✦ Life Path Activation: Personal Year ${stats.py} matches your Life Path ${stats.lp} — a year of destiny alignment. The immediate tasks of this year are in direct service to your overall life mission.`
+          } />
+        </div>
+      )}
+
+      <Card className="p-6 bg-slate-900/60 border-primary/20">
+        <div className="section-header">✦ &nbsp; Your ${readYear} Reading &nbsp; ✦</div>
+        <AccordionContentWithPlayer text={oracleText} />
+      </Card>
+    </div>
+  );
+
+  const renderDive = () => {
+    const yr = YD[stats.py];
+    return (
+      <div className="year-deep-dive animate-in fade-in duration-500">
+        <div className="year-dive-header">
+          <div className="year-num-big" style={{ color: 'var(--cf-gold)' }}>{stats.py}</div>
+          <div className="year-dive-title">{yr.title}</div>
+          <div className="year-dive-sub">{yr.phase}</div>
+        </div>
+        <div className="tab-nav">
+          {['ov', 'es', 'py', 've', 'ch', 'ca', 'pr'].map(id => (
+            <button key={id} onClick={() => setDiveSubTab(id)} className={`tab-btn ${diveSubTab === id ? 'active' : ''}`}>
+              {id === 'ov' ? 'Overview' : id === 'es' ? 'Esoteric' : id === 'py' ? 'Pythagorean' : id === 've' ? 'Vedic' : id === 'ch' ? 'Chinese' : id === 'ca' ? 'Chaldean' : 'Practices'}
+            </button>
+          ))}
+        </div>
+        <div className="p-4 min-h-[300px]">
+          {diveSubTab === 'pr' ? (
+            <div className="practice-grid">
+              {yr.pr.map((p: any, idx: number) => (
+                <div key={idx} className="pi">
+                  <div className="pi-icon">{p.i}</div>
+                  <div className="pi-name">{p.n}</div>
+                  <div className="pi-desc">{p.d}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <AccordionContentWithPlayer text={
+              diveSubTab === 'ov' ? yr.overview :
+              diveSubTab === 'es' ? yr.esoteric :
+              diveSubTab === 'py' ? yr.pyth :
+              diveSubTab === 've' ? yr.vedic :
+              diveSubTab === 'ch' ? yr.chinese :
+              yr.chald
+            } />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderIntersections = () => (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="section-header">🔥 &nbsp; Your Personal Critical Year Intersections &nbsp; 🔥</div>
+      <p className="text-xs text-muted-foreground text-center mb-4 px-4 italic">Years where Personal Years 4 and 7 intersect with your Chinese cycle.</p>
+      <div className="space-y-4 px-2">
+        {intersections.map(i => (
+          <Card key={i.y} className="intersection-card p-4 border-rose-500/20 bg-rose-950/5">
+            <div className="intersection-header">
+              <div className="intersection-year">{i.y}</div>
+              <div className="intersection-title">Personal Year {i.pyn} · {i.yearAni} Year {ZOO[i.yearAni].e}</div>
+              {i.isNegative && (
+                <div className="text-[10px] font-black uppercase mt-1 text-rose-400">
+                  🟠 HIGH TENSION — {getStatusLabelShort(i.iCat)} Year + Critical PY
+                </div>
+              )}
+            </div>
+            <div className="mt-4 space-y-2">
+              <AccordionContentWithPlayer text={`${i.synth}\n\nSpecific dynamics: ${i.dyn}`} />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderZodiac = () => (
+    <div className="space-y-8 py-4 animate-in fade-in duration-500">
+      <div className="text-center px-4">
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <span className="text-2xl">{ZOO[stats.birthSign].e}</span>
+          <h2 className="text-xl font-bold tracking-[0.3em] uppercase text-primary font-cinzel">Your {stats.birthSign} Zodiac</h2>
+          <span className="text-2xl">{ZOO[stats.birthSign].e}</span>
+        </div>
+        <div className="cp text-lg leading-relaxed text-slate-300 max-w-2xl mx-auto mb-8 font-body">
+          <AccordionContentWithPlayer text={`Born in a ${stats.birthSign} year — ${ZOO[stats.birthSign].el} element, Branch ${ZOO[stats.birthSign].br}. Nature: ${ZOO[stats.birthSign].trait}. Health: ${ZOO[stats.birthSign].organ}.`} />
+        </div>
+      </div>
+      <div className="zodiac-grid grid grid-cols-2 md:grid-cols-4 gap-3">
+        {zodiacCycle.map(item => {
+          const isCritical = item.pyn === 4 || item.pyn === 7;
+          const isEnemy = item.zCat === 'clash' || item.zCat === 'harm' || item.zCat === 'destruction';
+          const pyCol = pyColors[item.pyn];
+          
+          return (
+            <div 
+              key={item.y} 
+              onClick={() => setSelectedZodiacYear(item)}
+              className={`zc flex flex-col items-center justify-center p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.03] ${
+                isEnemy && isCritical ? 'border-rose-500 bg-rose-950/20' : 'border-white/10'
+              }`}
+            >
+              <div className="text-3xl mb-2">{ZOO[item.yearAni].e}</div>
+              <div className="text-xs font-bold text-white font-cinzel">{item.y}</div>
+              <div className="text-lg font-black" style={{ color: pyCol }}>PY {item.pyn}</div>
+              <div className="text-[9px] uppercase font-bold text-muted-foreground">{getStatusLabelShort(item.zCat)}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const renderPinnacles = () => {
+    const pStages = [
+      { n: 1, p: stats.p1, c: stats.c1, label: `Birth - Age ${stats.p1end}`, active: stats.age <= stats.p1end },
+      { n: 2, p: stats.p2, c: stats.c2, label: `Age ${stats.p1end+1} - ${stats.p2end}`, active: stats.age > stats.p1end && stats.age <= stats.p2end },
+      { n: 3, p: stats.p3, c: stats.c3, label: `Age ${stats.p2end+1} - ${stats.p3end}`, active: stats.age > stats.p2end && stats.age <= stats.p3end },
+      { n: 4, p: stats.p4, c: stats.c4, label: `Age ${stats.p3end+1}+`, active: stats.age > stats.p3end }
+    ];
+
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="section-header">◈ &nbsp; Pinnacles & Challenges &nbsp; ◈</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {pStages.map(s => (
+            <Card key={s.n} className={`p-5 border rounded-2xl ${s.active ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'bg-slate-900/40 border-white/5'}`}>
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{s.label}</div>
+                {s.active && <Badge className="bg-primary text-[8px] py-0 px-2">ACTIVE</Badge>}
+              </div>
+              <div className="flex gap-8 mb-4 justify-center">
+                <div className="text-center">
+                  <div className="text-4xl font-serif font-bold text-emerald-400">{s.p}</div>
+                  <div className="text-[8px] uppercase tracking-widest text-muted-foreground">Pinnacle</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-serif font-bold text-rose-400">{s.c}</div>
+                  <div className="text-[8px] uppercase tracking-widest text-muted-foreground">Challenge</div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <p className="text-xs leading-relaxed text-slate-300">{PINNACLE_DESC[s.p]}</p>
+                <p className="text-[11px] italic text-rose-300/80">Challenge: {CHALLENGE_DESC[s.c]}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderEnemy = () => (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
+      <div className="space-y-8">
+        {CONVERGENCE_CARDS.map(c => (
+          <Card key={c.year} className="conv-card border-rose-500/20 bg-rose-950/5 overflow-hidden">
+            <div className="p-6 bg-rose-500/10 border-b border-rose-500/20">
+              <div className="text-2xl font-bold text-rose-400">{c.title}</div>
+              <div className="text-sm italic text-muted-foreground">{c.sub}</div>
+            </div>
+            <div className="p-6 space-y-6">
+              <AccordionContentWithPlayer text={c.intro} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {c.chips.map((chip, idx) => (
+                  <div key={idx} className="p-4 rounded-xl bg-black/40 border border-white/5">
+                    <div className="text-[10px] font-black uppercase text-rose-400 mb-2">{chip.t}</div>
+                    <p className="text-xs leading-relaxed text-slate-300">{chip.p}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="wbox p-4 rounded-r-xl text-sm italic border-l-4 border-rose-500 bg-rose-500/5">
+                <AccordionContentWithPlayer text={c.warning} />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="cosmic-fate-root relative min-h-screen rounded-3xl overflow-hidden bg-black/40">
+    <div className="cosmic-fate-root relative min-h-screen rounded-3xl overflow-hidden">
       <div id="stars-cf"></div>
       <div className="cf-page p-4">
         <div className="cf-hero">
@@ -544,54 +424,98 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
           <p className="hero-sub">Destiny Synthesis & Critical Year Oracle</p>
         </div>
 
-        <div className="calc-card p-6">
-          <div className="calc-title">✦ Forecast Your Destiny ✦</div>
-          <div className="flex flex-col items-center justify-center gap-6">
-            <div className="input-group text-center">
-              <label className="mb-2 block">Year to Read</label>
-              <input type="number" id="cf-readYear" className="bg-black/40 border border-white/10 rounded-lg px-6 py-3 text-center font-bold text-2xl w-full max-w-[200px]" defaultValue={new Date().getFullYear()} min={1900} max={2100} onChange={() => (window as any).calculate()} />
+        <Card className="calc-card p-6 bg-slate-950/80 mb-8 border-primary/30 shadow-2xl">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
+                <CalendarDays className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Temporal Focus</label>
+                <div className="text-2xl font-bold text-white font-cinzel">Year {readYear}</div>
+              </div>
             </div>
-            <button className="btn-reveal w-full py-4 text-lg font-bold" onClick={() => (window as any).calculate()}>✦ Cast Fate Map</button>
-          </div>
-        </div>
-
-        <div id="result-area" className="result-hidden">
-          <div className="core-strip" id="core-strip"></div>
-          <div className="alert-banner" id="alert-banner"></div>
-
-          <nav className="dash-nav grid grid-cols-2 sm:grid-cols-4 gap-1 mb-4" id="dash-nav">
-            <button className="dash-tab active" data-panel="synthesis" onClick={(e) => (window as any).switchDash(e.currentTarget)}>✦ Oracle</button>
-            <button className="dash-tab" data-panel="yeardive" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☽ Dive</button>
-            <button className="dash-tab" data-panel="intersections" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔥 Critical</button>
-            <button className="dash-tab" data-panel="zodiac" onClick={(e) => (window as any).switchDash(e.currentTarget)}>☯ Zodiac</button>
-            <button className="dash-tab" data-panel="pinnacles" onClick={(e) => (window as any).switchDash(e.currentTarget)}>◈ Pinnacles</button>
-            <button className="dash-tab" data-panel="convergence" onClick={(e) => (window as any).switchDash(e.currentTarget)}>⚠ Enemy</button>
-            <button className="dash-tab" data-panel="scanner" onClick={(e) => (window as any).switchDash(e.currentTarget)}>🔭 Scan</button>
-          </nav>
-
-          <div className="dash-body p-4">
-            <div className="dash-panel active" id="panel-synthesis"><div id="synthesis-container"></div></div>
-            <div className="dash-panel" id="panel-yeardive"><div id="year-dive-container"></div></div>
-            <div className="dash-panel" id="panel-intersections"><div id="personal-intersections-container"></div></div>
-            <div className="dash-panel" id="panel-zodiac"><div id="zodiac-container"></div></div>
-            <div className="dash-panel" id="panel-pinnacles"><div id="pinnacles-container"></div></div>
-            <div className="dash-panel" id="panel-convergence"><div id="convergence-cards"></div></div>
-            <div className="dash-panel" id="panel-scanner">
-              <CosmicRiskScanner targetYear={readYearState} />
+            <div className="flex items-center gap-2">
+              <Input 
+                type="number" 
+                value={readYear} 
+                onChange={(e) => setReadYear(parseInt(e.target.value) || new Date().getFullYear())}
+                className="w-28 bg-black/40 border-white/10 font-bold text-lg text-center"
+                min={1900} max={2100}
+              />
+              <button 
+                onClick={() => setReadYear(new Date().getFullYear())}
+                className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-md text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all"
+              >
+                Today
+              </button>
             </div>
           </div>
+        </Card>
+
+        <nav className="dash-nav grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1 mb-6">
+          {[
+            { id: 'synthesis', label: '✦ Oracle', icon: <Star className="h-3 w-3" /> },
+            { id: 'yeardive', label: '☽ Dive', icon: <Compass className="h-3 w-3" /> },
+            { id: 'intersections', label: '🔥 Critical', icon: <Zap className="h-3 w-3" /> },
+            { id: 'zodiac', label: '☯ Zodiac', icon: <BookOpen className="h-3 w-3" /> },
+            { id: 'pinnacles', label: '◈ Pinnacle', icon: <Activity className="h-3 w-3" /> },
+            { id: 'convergence', label: '⚠ Enemy', icon: <ShieldAlert className="h-3 w-3" /> },
+            { id: 'scanner', label: '🔭 Scan', icon: <Telescope className="h-3 w-3" /> },
+          ].map(tab => (
+            <button 
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`dash-tab flex items-center justify-center gap-2 ${activeTab === tab.id ? 'active' : ''}`}
+            >
+              {tab.icon} {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="dash-body p-6">
+          {activeTab === 'synthesis' && renderSynthesis()}
+          {activeTab === 'yeardive' && renderDive()}
+          {activeTab === 'intersections' && renderIntersections()}
+          {activeTab === 'zodiac' && renderZodiac()}
+          {activeTab === 'pinnacles' && renderPinnacles()}
+          {activeTab === 'convergence' && renderEnemy()}
+          {activeTab === 'scanner' && <CosmicRiskScanner targetYear={readYear} />}
         </div>
       </div>
 
-      <div className="cf-overlay" id="overlay" onClick={(e) => (e.target === e.currentTarget) && (window as any).closePop()}>
-        <div className="popover-cf">
-          <button className="absolute top-6 right-6 text-white/40 hover:text-white" onClick={() => (window as any).closePop()}>✕</button>
-          <span className="text-6xl mb-4 block text-center" id="pg"></span>
-          <div className="text-3xl font-bold text-primary text-center mb-2" id="ph"></div>
-          <div className="text-xs uppercase tracking-[0.3em] text-center opacity-60 mb-8" id="ps"></div>
-          <div id="pb" className="text-sm leading-relaxed"></div>
-        </div>
-      </div>
+      <Dialog open={!!selectedZodiacYear} onOpenChange={() => setSelectedZodiacYear(null)}>
+        {selectedZodiacYear && (
+          <DialogContent className="max-w-2xl bg-slate-950 border-primary/20 text-white">
+            <DialogHeader>
+              <div className="text-6xl mb-4 block text-center">{ZOO[selectedZodiacYear.yearAni].e}</div>
+              <DialogTitle className="text-3xl font-bold text-primary text-center mb-2 font-cinzel">
+                {selectedZodiacYear.y}: {selectedZodiacYear.yearAni} Year
+              </DialogTitle>
+              <DialogDescription className="text-xs uppercase tracking-[0.3em] text-center opacity-60 mb-8 font-cinzel text-slate-400">
+                {stats.birthSign} × {selectedZodiacYear.yearAni} — {catLabel(selectedZodiacYear.zCat)}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin">
+              <div className="p-4 bg-primary/5 border-l-[3px] border-primary rounded-r-lg font-body italic text-sm text-slate-300">
+                <AccordionContentWithPlayer text={`${selectedZodiacYear.y} (${selectedZodiacYear.yearAni} Year, Age ${selectedZodiacYear.age}) — Tai Sui: ${catLabel(selectedZodiacYear.zCat)}`} />
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-cinzel text-xs uppercase tracking-widest opacity-60">Your {stats.birthSign.toUpperCase()} in {selectedZodiacYear.yearAni.toUpperCase()} Year</h4>
+                <div className="font-body text-base leading-relaxed text-slate-200">
+                  <AccordionContentWithPlayer text={ZOO[stats.birthSign][`${selectedZodiacYear.zCat}Desc`] || ZOO[stats.birthSign][`${selectedZodiacYear.zCat === 'destruction' ? 'destruction' : selectedZodiacYear.zCat}Desc`] || `This ${selectedZodiacYear.y} ${selectedZodiacYear.yearAni} year is a Neutral period for ${stats.birthSign}.`} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-cinzel text-xs uppercase tracking-widest opacity-60">{selectedZodiacYear.yearAni.toUpperCase()} Year Qualities</h4>
+                <div className="font-body text-sm text-slate-400">
+                  <AccordionContentWithPlayer text={`${ZOO[selectedZodiacYear.yearAni].trait}. Health focus: ${ZOO[selectedZodiacYear.yearAni].organ}. Direction: ${ZOO[selectedZodiacYear.yearAni].dir}.`} />
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 }
