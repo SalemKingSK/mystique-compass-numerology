@@ -410,11 +410,21 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         </div>
       </div>
 
-      <CoreVibrations ref={coreVibrationsRef} psycheNum={psycheNum} destinyNum={destinyNum} psychicMeaning={psychicMeaning} destinyMeaning={destinyMeaning} compoundNum={compoundNum} compoundMeaning={compoundMeaning} reducedCompoundNum={reducedCompoundNum} reducedCompoundMeaning={reducedCompoundMeaning} karmicFateNum={karmicFateNum} karmicFateMeaning={karmicFateMeaning} specialTraitMeaning={specialTraitMeaning} activeLayer={activeCoreLayer} onLayerChange={setActiveCoreLayer}/>
+      <CoreVibrations 
+        ref={coreVibrationsRef} 
+        psycheNum={psycheNum} 
+        psychicMeaning={psychicMeaning}
+        destinyNum={destinyNum} 
+        destinyMeaning={destinyMeaning} 
+        birthDay={birthDay}
+        specialTraitMeaning={specialTraitMeaning} 
+        activeLayer={activeCoreLayer} 
+        onLayerChange={setActiveCoreLayer}
+      />
 
       <div className="glass-card p-4">
         <SH icon={<Grid className="h-4 w-4"/>} title="Lo Shu Grid"/>
-        <LoShuGrid grid={loShuGrid} numberCounts={numberCounts}/>
+        <LoShuGrid gridData={loShuGrid} arrows={[]} numberCounts={numberCounts} repeatedNumberMeanings={repeatedNumberMeanings} title="Numerology Matrix" birthDate={birthDate} />
       </div>
 
       <div className="glass-card p-4">
@@ -427,11 +437,21 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         <PinnaclesAccordion destinyNum={destinyNum} birthDay={birthDay} birthMonth={birthMonth} birthYear={birthYear}/>
       </div>
 
-      <FateChambers ref={fateChambersRef} psycheNum={psycheNum} destinyNum={destinyNum} birthDay={birthDay} birthMonth={birthMonth} birthYear={birthYear} repeatedNumberMeanings={repeatedNumberMeanings} onFateNavigation={(n)=>{setActiveFateLayer(n);setTimeout(()=>fateChambersRef.current?.scrollIntoView({behavior:'smooth',block:'center'}),150);}} activeFateLayer={activeFateLayer} onLayerChange={setActiveFateLayer}/>
+      <FateChambers 
+        ref={fateChambersRef} 
+        compoundNum={compoundNum}
+        compoundMeaning={compoundMeaning}
+        reducedCompoundNum={reducedCompoundNum}
+        reducedCompoundMeaning={reducedCompoundMeaning}
+        karmicFateNum={karmicFateNum}
+        karmicFateMeaning={karmicFateMeaning}
+        activeLayer={activeFateLayer} 
+        onLayerChange={setActiveFateLayer}
+      />
 
       <div className="glass-card p-4">
         <SH icon={<CalendarDays className="h-4 w-4"/>} title="Personal Year Wave"/>
-        <PersonalYearChart birthDay={birthDay} birthMonth={birthMonth} birthYear={birthYear} personalYears={numerology.personalYears} onYearSelect={handleYearSelect} selectedYear={selectedPersonalYear?.year}/>
+        <PersonalYearChart birthDay={birthDay} birthMonth={birthMonth} birthYear={birthYear} onYearSelect={handleYearSelect} />
       </div>
 
       {selectedPersonalYear && (

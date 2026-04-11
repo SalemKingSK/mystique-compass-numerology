@@ -1,30 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { forwardRef } from "react";
 import { BookUser, Star, Sparkles, Lock } from "lucide-react";
 import { AccordionContentWithPlayer } from "./accordion-content-with-player";
 
 interface CoreVibrationsProps {
   psycheNum: number;
-  psycheMeaning: { title: string; description: string };
+  psychicMeaning: { title: string; description: string };
   destinyNum: number;
   destinyMeaning: { title: string; description: string };
   birthDay: number;
   specialTraitMeaning: string | null;
   activeLayer: string | null;
-  onLayerToggle: (layer: string | null) => void;
+  onLayerChange: (layer: string | null) => void;
 }
 
-export function CoreVibrations({
+export const CoreVibrations = forwardRef<HTMLDivElement, CoreVibrationsProps>(({
   psycheNum,
-  psycheMeaning,
+  psychicMeaning,
   destinyNum,
   destinyMeaning,
   birthDay,
   specialTraitMeaning,
   activeLayer,
-  onLayerToggle
-}: CoreVibrationsProps) {
+  onLayerChange
+}, ref) => {
   
   const renderLayer = (
     id: string,
@@ -41,7 +41,7 @@ export function CoreVibrations({
       <div className={`core-v-accordion ${isLocked ? 'core-v-locked' : ''}`} id={`layer-${id}`}>
         <button
           className="core-v-acc-header"
-          onClick={() => !isLocked && onLayerToggle(isOpen ? null : id)}
+          onClick={() => !isLocked && onLayerChange(isOpen ? null : id)}
           aria-expanded={isOpen}
         >
           <div className="core-v-acc-left">
@@ -93,7 +93,7 @@ export function CoreVibrations({
   };
 
   return (
-    <div className="core-v-root glass-card p-4 mt-4">
+    <div ref={ref} className="core-v-root glass-card p-4 mt-4">
       <div className="flex items-center gap-4 mb-4">
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <h3 className="font-cinzel font-semibold text-[0.75rem] text-primary flex items-center gap-2 uppercase tracking-[0.3em]">
@@ -102,9 +102,9 @@ export function CoreVibrations({
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       </div>
 
-      {renderLayer("psyche", 1, `The Psychic Essence (${psycheNum})`, psycheMeaning.description, <BookUser className="h-4 w-4" />, "#9b8ec4")}
+      {renderLayer("psyche", 1, `The Psychic Essence (${psycheNum})`, psychicMeaning?.description || null, <BookUser className="h-4 w-4" />, "#9b8ec4")}
       {renderLayer("day", 2, `The Day of Incarnation (${birthDay})`, specialTraitMeaning, <Star className="h-4 w-4" />, "#3a8ee0", !specialTraitMeaning)}
-      {renderLayer("destiny", 3, `The Destiny Path (${destinyNum})`, destinyMeaning.description, <Sparkles className="h-4 w-4" />, "#e0a83a")}
+      {renderLayer("destiny", 3, `The Destiny Path (${destinyNum})`, destinyMeaning?.description || null, <Sparkles className="h-4 w-4" />, "#e0a83a")}
 
       <style>{`
         .core-v-root { display: flex; flex-direction: column; gap: 0; }
@@ -133,4 +133,6 @@ export function CoreVibrations({
       `}</style>
     </div>
   );
-}
+});
+
+CoreVibrations.displayName = "CoreVibrations";

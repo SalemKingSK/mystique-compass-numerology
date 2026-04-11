@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { forwardRef } from "react";
 import { Activity, Wand2, ShieldAlert, Lock } from "lucide-react";
 import { AccordionContentWithPlayer } from "./accordion-content-with-player";
 
@@ -12,10 +12,10 @@ interface FateChambersProps {
   karmicFateNum: number | null;
   karmicFateMeaning: string | null;
   activeLayer: number | null;
-  onLayerToggle: (layer: number | null) => void;
+  onLayerChange: (layer: number | null) => void;
 }
 
-export function FateChambers({
+export const FateChambers = forwardRef<HTMLDivElement, FateChambersProps>(({
   compoundNum,
   compoundMeaning,
   reducedCompoundNum,
@@ -23,11 +23,11 @@ export function FateChambers({
   karmicFateNum,
   karmicFateMeaning,
   activeLayer,
-  onLayerToggle
-}: FateChambersProps) {
+  onLayerChange
+}, ref) => {
 
   const renderLayer = (
-    layerNum: 1 | 2 | 3,
+    layerNum: number,
     title: string,
     num: number | null,
     meaning: string | null,
@@ -41,7 +41,7 @@ export function FateChambers({
       <div className={`fate-accordion ${isLocked ? 'fate-locked' : ''}`} id={`fate-layer-${layerNum}`}>
         <button
           className="fate-acc-header"
-          onClick={() => !isLocked && onLayerToggle(isOpen ? null : layerNum)}
+          onClick={() => !isLocked && onLayerChange(isOpen ? null : layerNum)}
           aria-expanded={isOpen}
           disabled={isLocked}
         >
@@ -77,7 +77,7 @@ export function FateChambers({
                         {title} Activation
                     </span>
                 </div>
-                <AccordionContentWithPlayer text={meaning} />
+                <AccordionContentWithPlayer text={meaning!} />
              </div>
           </div>
         )}
@@ -94,7 +94,7 @@ export function FateChambers({
   };
 
   return (
-    <div className="fate-root glass-card p-4 mt-4">
+    <div ref={ref} className="fate-root glass-card p-4 mt-4">
       <div className="flex items-center gap-4 mb-4">
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <h3 className="font-cinzel font-semibold text-[0.75rem] text-primary flex items-center gap-2 uppercase tracking-[0.3em]">
@@ -135,4 +135,6 @@ export function FateChambers({
       `}</style>
     </div>
   );
-}
+});
+
+FateChambers.displayName = "FateChambers";
