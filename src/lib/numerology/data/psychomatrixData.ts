@@ -123,7 +123,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   2: {
     digit: 2,
     cellName: 'Energy',
-    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan.',
+    intro: "The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person's behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person 'energetic' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan. The energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from '22' to '4' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.",
     lineContext: 'Row 2 (2, 5, 8) — Family orientation. Column 1 (1, 2, 3) — Self-esteem.',
     meanings: [
       {
@@ -159,7 +159,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
       {
         count: 5,
         label: 'Extreme Donor Overload',
-        verbatim: 'Five or more 2\'s represents a profound overload of the donor quality. Energy floods outward in ways the person cannot fully contain. Indifference to personal matters increases; the person gives freely but struggles to protect their own reserves. The risk of energy depletion through others\' crises is high. Physical and creative outlets — sport, medicine, hands-on work — are essential safety valves. Without them, the accumulated energy can turn into a desire for conflict as a release mechanism. Cats, paradoxically, help drain surplus energy through their natural vampirism.',
+        verbatim: 'Five 2\'s represents a profound overload of the donor quality. Energy floods outward in ways the person cannot fully contain. Indifference to personal matters increases; the person gives freely but struggles to protect their own reserves. The risk of energy depletion through others\' crises is high. Physical and creative outlets — sport, medicine, hands-on work — are essential safety valves. Without them, the accumulated energy can turn into a desire for conflict as a release mechanism. Cats, paradoxically, help drain surplus energy through their natural vampirism.',
         scale: 'dominant'
       },
       {
@@ -173,7 +173,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   3: {
     digit: 3,
     cellName: 'Interests / Sciences',
-    intro: 'The number 3 in the square of Pythagoras is responsible for interest in the sciences and, above all, in the exact sciences or technology. Never forget that 3 is contained in several rows when you are going to evaluate this number in the Pythagorean square, namely the column (1, 2, 3), the ascending diagonal (3, 5, 7) and the 3rd row (3, 6, 9). The reason is that number 3 is responsible for persons interests in general. To decide what this interest consists of, it is necessary to determine what line owns the 3s at the moment.',
+    intro: 'The number 3 in the square of Pythagoras is responsible for interest in the sciences and, above all, in the exact sciences or technology. Never forget that 3 is contained in several rows when you are going to evaluate this number in the Pythagorean square, namely the column (1, 2, 3), the ascending diagonal (3, 5, 7) and the 3rd row (3, 6, 9). The reason is that number 3 is responsible for persons interests in general. To decide what this interest consists of, it is necessary to determine what line owns the 3s at the moment. Column (1,2,3) — Self-appraisal is strongly affected. If 3 is owned by this column, the person\'s self-appraisal becomes overpriced; they think those around them are more foolish. Ascending Diagonal (3,5,7) — Carnal, financial, and intimate interests. The person is actively interested in intimate life and money. Endless changing of sex-partners shows absorption of number 3 by this diagonal. Row (3,6,9) — Stability. The person acquires habits and rituals that become very important; they demand performance of these habits from others.',
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 1 (1, 2, 3) — Self-esteem. Ascending diagonal (3, 5, 7) — Carnal/temperament.',
     meanings: [
       {
@@ -273,7 +273,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   5: {
     digit: 5,
     cellName: 'Logic / Intuition',
-    intro: 'Digit 5 in the psychomatrix answers for human logic and intuition, which, in turn, determines a person\'s ability to make plans and analyze situations, understand exact sciences and technique. Intuition (the ability to foresee steps or events) is almost impossible to strengthen, as it is either given from birth or a person does not use it. By logic we accept a person\'s ability to compose logical (sequential) links of reasoning that will lead to a correct decision.',
+    intro: 'Digit 5 in the psychomatrix answers for human logic and intuition, which, in turn, determines a person\'s ability to make plans and analyze situations, understand exact sciences and technique. Intuition (the ability to foresee steps or events) is almost impossible to strengthen, as it is either given from birth or a person does not use it. By logic we accept a person\'s ability to compose logical (sequential) links of reasoning that will lead to a correct decision. Important digit transitions: \'55 gives 9 and 99 gives 5.\' Very often we attribute logical actions to those people who have no \'5\'s in their Pythagorean Square, but have many \'9\'s (two and more). The matter is that remembering plenty of possible situations, the person with strong memory in similar situations tries to recollect what he already did earlier, and he explains this decision as the most logical one. Presence of \'99\' in Pythagorean Square adds another \'5\'. Number 5 belongs to four lines: 2nd column (4,5,6) — maintenance of family; 2nd row (2,5,8) — quality of family man; carnal diagonal (3,5,7) — carnal interests; spiritual diagonal (1,5,9) — spiritual life.',
     lineContext: '2nd column (4,5,6) — maintenance of family; 2nd row (2,5,8) — quality of family man; carnal diagonal (3,5,7) — carnal interests; spiritual diagonal (1,5,9) — spiritual life.',
     meanings: [
       {
@@ -341,19 +341,19 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
       {
         count: 2,
         label: 'Labor Given in Norm; Master of Any Craft',
-        verbatim: 'The sign \'66\' gives its owner ability to do everything — he is a master of any craft. Very often such people are great architects. The sign \'66\' can be named as sign of grounding. The matter is that people having this sign don\'t really like reading; they better watch telecasts or do anything but not reading. If somehow you managed to control the sign, then reading takes 1st place, and manual labor has the last. Before you decide what to do with your child who has \'66\' (Numbers 7 are absent — and this is very important), it is necessary to find out its opportunities as the future master. For a craftsman it is necessary to have good energy and good health: 22 (or 2222 and more) and 4 or more. In case the child possesses \'7\' (or more), it can become a master only carefully serving a duty to its parents. I would not advise choosing any profession connected with authority as it makes the person strict and indifferent towards others\' lives.',
+        verbatim: "The sign '66' gives its owner ability to do everything — he is a master of any craft. Very often such people are great architects. The sign '66' can be named as sign of grounding. The matter is that people having this sign don't really like reading; they better watch telecasts or do anything but not reading. If somehow you managed to control the sign, then reading takes 1st place, and manual labor has the last. Before you decide what to do with your child who has '66' (Numbers 7 are absent — and this is very important), it is necessary to find out its opportunities as the future master. For a craftsman it is necessary to have good energy and good health: 22 (or 2222 and more) and 4 or more. In case the child possesses '7' (or more), it can become a master only carefully serving a duty to its parents. I would not advise choosing any profession connected with authority as it makes the person strict and indifferent towards others' lives.",
         scale: 'norm'
       },
       {
         count: 3,
         label: 'Number of the Beast - Black Knowledge',
-        verbatim: 'The number of the beast. Satan (number 666) is the image of man and belongs to men. The greater number of \'6\' can be named \'number of the sorcerer or a witch\' as this sign is stronger. You should not be prejudiced, for that sign doesn\'t mean anything as the presence of such numbers as 8 and 7 constrain \'6\'. For example, a person has a set of numbers: 666, 7, 8. Then we can delete two numbers 6 and, accordingly, numbers 7 and 8, there will be left only one \'6\' — the man of moods (such deletion is able only when both numbers 7 and 8 haven\'t made transition; otherwise we deal with the person who, having started the conflict with the parents, has received a new quality: 666, 7, 8 transforms into 6666 and 11 with the loss of 4 or 22, that leads to irritability and authoritativeness).',
+        verbatim: "The number of the beast. Satan (number 666) is the image of man and belongs to men. The greater number of '6' can be named 'number of the sorcerer or a witch' as this sign is stronger. You should not be prejudiced, for that sign doesn't mean anything as the presence of such numbers as 8 and 7 constrain '6'. For example, a person has a set of numbers: 666, 7, 8. Then we can delete two numbers 6 and, accordingly, numbers 7 and 8, there will be left only one '6' — the man of moods (such deletion is able only when both numbers 7 and 8 haven't made transition; otherwise we deal with the person who, having started the conflict with the parents, has received a new quality: 666, 7, 8 transforms into 6666 and 11 with the loss of 4 or 22, that leads to irritability and authoritativeness).",
         scale: 'special'
       },
       {
         count: 4,
         label: 'Sorcerer Sign - Hidden Abilities',
-        verbatim: 'If there is \'6666\', being attached to similar ones (they are four in this case), they create a stable line, and the person starts to gather similar people around himself, and they show their hidden abilities: authority, cruelty, aggression. To protect yourself: if somebody tries to involve you into a conflict, the only way is to leave with an emotion of emptiness and indifference. The simplest way is laughter, which doesn\'t support any fright and doesn\'t bring any irritability or aggression. This is the Grand Chinese technique of leaving in emptiness which chi kung masters used when they met an opponent.',
+        verbatim: "If there is '6666', being attached to similar ones (they are four in this case), they create a stable line, and the person starts to gather similar people around himself, and they show their hidden abilities: authority, cruelty, aggression. To protect yourself: if somebody tries to involve you into a conflict, the only way is to leave with an emotion of emptiness and indifference. The simplest way is laughter, which doesn't support any fright and doesn't bring any irritability or aggression. This is the Grand Chinese technique of leaving in emptiness which chi kung masters used when they met an opponent.",
         scale: 'strong'
       },
       {
@@ -373,49 +373,49 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   7: {
     digit: 7,
     cellName: 'Luck / Talent',
-    intro: 'The number 7 in the square of Pythagoras indicates nature\'s interest in revealing its talents.',
+    intro: "The number 7 in the square of Pythagoras indicates nature's interest in revealing its talents. Let's imagine that Newton, the creator of the theory of mechanics, was born two hundred years later or earlier. The result would change the history of the Earth, because all physics, mechanics and other technical disciplines are based on these laws. At any moment in history, there is a need to reveal some natural laws. This need can be so necessary that people whose brains have such important current information are marked by Nature with special signs — the numbers 7 and 0. The number 0 gives a person a chance to succeed in some fields of knowledge, maybe even find new laws. At the same time, the number 7 means the following: a person received in his brain very important information for this historical period in the exact field of human knowledge. Nature protects him in all unexpected situations and accidents, which is interpreted as 'happiness'. The bigger the '7', the bigger the task a person has to complete. In many ancient cults, number 7 is considered to be the number of the divine. 'Seven stars', 'seven steps of Buddha', 'seven days of creation', and so on. Numerology defines 7 in the Pythagoras square as a mark of fortune, good luck, or Divine Providence.",
     lineContext: 'Row 1 (1, 4, 7) — Purposefulness. Column 3 (7, 8, 9) — Talent potential. Ascending diagonal (3, 5, 7) — Temperament.',
     meanings: [
       {
         count: 0,
-        label: 'No Special Talent or Luck',
-        verbatim: 'Absence of Number 7 in Pythagoras Square means no special talent or luck from nature. The person must rely entirely on their own effort, energy, and learned skills. Success is earned rather than graced.',
+        label: 'No Special Talent or Luck from Nature',
+        verbatim: 'Absence of Number 7 in Pythagoras Square means no special talent or luck from nature. The person must rely entirely on their own effort, energy, and learned skills. There is no special protective force from nature guiding unexpected situations.',
         scale: 'absent'
       },
       {
         count: 1,
-        label: 'Weak Luck / Talent',
-        verbatim: 'Very weak luck and talent. The protection of nature is barely perceptible. The person has a small task assigned by nature, and must work diligently to fulfill it. The quality needs development and improvement.',
+        label: 'Very Weak Luck/Talent',
+        verbatim: 'Very weak luck/talent. The protection of nature is barely perceptible. The person has a small task assigned by nature, and must work diligently to fulfill it. The quality needs development and improvement.',
         scale: 'very-weak'
       },
       {
         count: 2,
-        label: 'Luck / Talent in Norm',
+        label: 'Luck/Talent Given in Norm',
         verbatim: 'Luck and talent given in norm. Nature provides a reasonable degree of protection and the person carries a meaningful task. The talent is developed and actively used in life. A good balance for a fulfilled life purpose.',
         scale: 'norm'
       },
       {
         count: 3,
-        label: 'Strong Luck - Nature Protects',
-        verbatim: 'Strong luck. Nature protects the person in unexpected situations and accidents. The task assigned by nature is significant. Fortune arrives in flashes, often at pivotal moments, in a way that leaves bystanders astonished.',
+        label: 'Strong Luck, Nature Protects',
+        verbatim: "Strong luck. Nature protects the person in unexpected situations and accidents. The task assigned by nature is significant. The person includes this quality urgently and spontaneously — the '3 digits' special sign rule applies, meaning luck appears suddenly and unexpectedly rather than as a constant background.",
         scale: 'special'
       },
       {
         count: 4,
-        label: 'Sign of Alarm - Angels',
-        verbatim: '7777 is a sign of alarm. The angels — the ones with four sevens — descended to earth. Four or more sevens indicates an extremely high task set by nature — so high that it carries special dangers.',
+        label: 'Sign of Alarm; Angels',
+        verbatim: '"7777 is a sign of alarm. The angels — the ones with four sevens — descended to earth and die already in infancy. People with this sign should be very careful." Four or more sevens indicates an extremely high task set by nature — so high that it carries special dangers. The luck is maximally strong, but dominates and may suppress other qualities.',
         scale: 'strong'
       },
       {
         count: 5,
         label: 'Divine Mark',
-        verbatim: 'Five 7\'s represents the most extreme positive expression of nature\'s intent — a person whose entire existence is saturated with divine assignment. Their life will be marked by extraordinary events and near-miraculous survivals.',
+        verbatim: "Five 7's represents the most extreme positive expression of nature's intent — a person whose entire existence is saturated with divine assignment. Their life will be marked by extraordinary events and near-miraculous survivals.",
         scale: 'dominant'
       },
       {
         count: 6,
         label: 'Luck Overload - Cosmic Burden',
-        verbatim: 'Six or more 7\'s represents the overload of divine assignment. The protection of nature becomes a kind of crushing weight. Fortune in external affairs co-exists with profound inner difficulty.',
+        verbatim: "Six or more 7's represents the overload of divine assignment. The protection of nature becomes a kind of crushing weight. Fortune in external affairs co-exists with profound inner difficulty.",
         scale: 'overload'
       }
     ]
