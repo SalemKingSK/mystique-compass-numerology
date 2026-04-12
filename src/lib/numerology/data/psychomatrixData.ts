@@ -497,7 +497,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
       {
         count: 3,
         label: 'Strong Memory - Very Smart',
-        verbatim: 'Strong memory, mind; very smart. Bored if not interested in what they are doing. Have good eloquence. Often see \'prophetic\' dreams; can predict the course of events; are usually quite good physiognomists.',
+        verbatim: 'Strong memory, mind; very smart. Bored if not interested in what they are doing. Have good eloquence. Often see \'prophetic\' dreams; can predict the course of events; are usually quite good physionomists.',
         scale: 'special'
       },
       {
@@ -538,7 +538,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [2, 5, 8],
     name: 'Second Row — Family Orientation',
     quality: 'Desire to Build Relationships & Family',
-    description: '"Shows how strong a person\'s desire to create a family is, the desire to build a relationship system based on close interaction with the opposite sex. With a clear understanding of the importance of such a step. After all, the family is not just legalized sexual cohabitation, as one German philosopher exotically described, but a complex system that includes reproductive, economic, psychological, educational, creative functions and a large share of responsibility for loved ones."\n\nThe stronger the second row, the stronger the attachment to family and the family responsibilities that fall on a person\'s shoulders. It is pointless to \'educate\' the qualities of a family man in a person with a weak second row — it will push them away from the family.'
+    description: '"Shows how strong a person\'s desire to create a family is, the desire to build a relationship system based on close interaction with the opposite sex. With a clear understanding of the importance of such a step. After all, the family is not just legalized sexual cohabitation, as one German philosopher exotically described, but a complex system that includes reproductive, economic, psychological, educational, creative functions and a large share of responsibility for loved ones."'
   },
   {
     id: 'row_3',
@@ -546,7 +546,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [3, 6, 9],
     name: 'Third Row — Stability',
     quality: 'Resistance to Change & Habitual Consistency',
-    description: '"The indicators of the stability of a person\'s character. That is, they describe the balance between usual habits and certain thinking, on the one hand, and the desire for change, on the other. Thus, the value of personal stability is the answer to the question of the reliability of this person in a particular situation."\n\nA strong third row person has very stable habits and rituals, and may demand their performance from others. It is desirable that the number of digits in this line be the same between partners, or differ by not more than 2 digits.'
+    description: '"The indicators of the stability of a person\'s character. That is, they describe the balance between usual habits and certain thinking, on the one hand, and the desire for change, on the other. Thus, the value of personal stability is the answer to the question of the reliability of this person in a particular situation."'
   },
   // COLUMNS (Vertical Lines)
   {
@@ -555,7 +555,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [1, 2, 3],
     name: 'First Column — Self-Esteem',
     quality: 'Self-Appraisal & Personal Confidence',
-    description: '"A numerical indicator of the level of self-esteem. Hardly any other parameter is more important in the context of a person\'s desire to realize his own potential. But if low self-esteem is only indecisiveness, self-doubt, and therefore eternal circling in circles, then unjustifiably overestimated capabilities can lead to fatal mistakes and cruel disappointments."\n\nThe first column is the self-appraisal of the person. The stronger the column, the more confident — but potentially overconfident — the person is. People with a very strong first column think those around them are more foolish. Most of the family responsibilities should fall on the shoulders of those who have more digits in the second (family) line.'
+    description: '"A numerical indicator of the level of self-esteem. Hardly any other parameter is more important in the context of a person\'s desire to realize his own potential. But if low self-esteem is only indecisiveness, self-doubt, and therefore eternal circling in circles, then unjustifiably overestimated capabilities can lead to fatal mistakes and cruel disappointments."'
   },
   {
     id: 'col_2',
@@ -563,7 +563,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [4, 5, 6],
     name: 'Second Column — Labor Efficiency',
     quality: 'Physical & Practical Capacity for Material Success',
-    description: '"Describe a person\'s physical health, level of endurance, degree of inclination to work and possession of practical skills, as well as the ability to think logically. Thus, the second column serves as an indicator of labor efficiency as a qualitative characteristic of a person\'s ability to achieve a certain social status, to ensure his well-being and the well-being of his family."\n\nA strong second column means the person is physically capable, practically skilled, and logically sharp — key ingredients for material success. A weak column means difficulty in these areas, requiring extra care and effort to support oneself and one\'s family.'
+    description: '"Describe a person\'s physical health, level of endurance, degree of inclination to work and possession of practical skills, as well as the ability to think logically. Thus, the second column serves as an indicator of labor efficiency as a qualitative characteristic of a person\'s ability to achieve a certain social status, to ensure his well-being and the well-being of his family."'
   },
   {
     id: 'col_3',
@@ -571,7 +571,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [7, 8, 9],
     name: 'Third Column — Talent & Potential',
     quality: 'Natural Gifts & Life Purpose',
-    description: '"Contains information about a person\'s talent. However, \'talents should be helped...\', people say, and the vast majority of people live their lives without ever discovering their talent, often without even suspecting its existence. Therefore, we can only talk about potential, the realization of which depends on all other personal qualities: diligence, purposefulness, sense of self-worth, etc."\n\nA strong third column means rich natural talent waiting to be developed. A weak column does not mean the person has no purpose — it means their direction is more earthly and practical. The talent potential requires all other qualities (energy, character, purpose) to be realized.'
+    description: '"Contains information about a person\'s talent. However, \'talents should be helped...\', people say, and the vast majority of people live their lives without ever discovering their talent, often without even suspecting its existence. Therefore, we can only talk about potential, the realization of which depends on all other personal qualities: diligence, purposefulness, sense of self-worth, etc."'
   },
   // DIAGONALS
   {
@@ -580,7 +580,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [1, 5, 9],
     name: 'Descending Diagonal — Spiritual',
     quality: 'Degree of Inner Unity with Nature / God',
-    description: '"Spiritual diagonal. Indicates the level of a person\'s spirituality. Do not confuse spirituality with religiosity. This quality has nothing to do with religious denominations, and it is completely alien to the exaltation of zealots of faith. The degree of unity of a person with Nature (Nus, God) is determined by firmness of convictions and clarity of perception, balanced principles and willingness to compromise, to accept a different perspective."\n\nA strong spiritual diagonal means deep inner coherence — the person\'s will (1), logic (5), and memory/mind (9) are well-developed and aligned, producing a spiritually grounded individual. Weakness in this diagonal indicates fragmentation of inner life.'
+    description: '"Spiritual diagonal. Indicates the level of a person\'s spirituality. Do not confuse spirituality with religiosity. This quality has nothing to do with religious denominations, and it is completely alien to the exaltation of zealots of faith. The degree of unity of a person with Nature (Nus, God) is determined by firmness of convictions and clarity of perception, balanced principles and willingness to compromise, to accept a different perspective."'
   },
   {
     id: 'diag_carnal',
@@ -588,7 +588,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [3, 5, 7],
     name: 'Ascending Diagonal — Carnal',
     quality: 'Temperament & Sexual Compatibility',
-    description: '"Carnal diagonal. An indicator of a person\'s temperament in terms of intimate, sexual relationships. And no matter what supporters of unions built on mutual respect and material well-being say, it is the degree of matching of temperaments that often becomes the main factor that determines the duration and quality of a marriage."\n\nWhen choosing a partner, look at the sensual diagonal of each partner — it allows assessment of temperament. A person may have many \'4\'s, giving them a beautiful body, but if their sensual diagonal is weak, there may be problems of an intimate nature if one person has a stronger libido than the other. Strong hands and broad shoulders do not always mean sexual strength or strong libido. The number 4 has nothing to do with the intimate life of a person; you must look at the carnal diagonal. It is optimal if the man is stronger than the woman by 1 digit, or they have the same number of digits in this diagonal.'
+    description: '"Carnal diagonal. An indicator of a person\'s temperament in terms of intimate, sexual relationships. And no matter what supporters of unions built on mutual respect and material well-being say, it is the degree of matching of temperaments that often becomes the main factor that determines the duration and quality of a marriage."'
   }
 ];
 

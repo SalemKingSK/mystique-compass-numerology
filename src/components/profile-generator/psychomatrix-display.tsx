@@ -14,6 +14,7 @@ import {
 import {
   calculatePsychomatrix,
   PSYCHOMATRIX_CELL_MEANINGS,
+  PSYCHOMATRIX_LINE_MEANINGS,
   SCALE_LABELS,
   SCALE_COLORS,
   type PsychomatrixResult,
@@ -23,7 +24,8 @@ import {
 } from '@/lib/numerology/data/psychomatrixData';
 import {
   PSYCHOMATRIX_LINE_INTERPRETATIONS,
-  getLineLevel
+  getLineLevel,
+  LINE_SCALE_COLORS
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -315,7 +317,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
         const level = getLineLevel(line.id, total);
         const isActive = total >= 3;
         const isOpen = expanded === line.id;
-        const color = SCALE_COLORS[level.scale];
+        const color = LINE_SCALE_COLORS[level.scale] || SCALE_COLORS[level.scale];
 
         return (
           <div key={line.id}
@@ -552,6 +554,13 @@ function WorkingNumbersPanel({ result }: { result: PsychomatrixResult }) {
 const TABS = ['Matrix', 'Detail', 'Lines', 'Synergies', 'Origins'] as const;
 type Tab = typeof TABS[number];
 
+interface PsychomatrixDisplayProps {
+  day: number;
+  month: number;
+  year: number;
+  name?: string;
+}
+
 export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisplayProps) {
   const result = React.useMemo(() =>
     calculatePsychomatrix(day, month, year),
@@ -654,7 +663,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                 <div className="mt-3 flex items-center justify-between px-2">
                   <div className="flex gap-3 flex-wrap">
                     {result.activeLines.map(lineId => {
-                      const line = PSYCHOMATRIX_LINE_INTERPRETATIONS.find(l => l.id === lineId);
+                      const line = PSYCHOMATRIX_LINE_MEANINGS.find(l => l.id === lineId);
                       if (!line) return null;
                       const typeColor = line.type === 'row' ? '#60a5fa' : line.type === 'column' ? '#34d399' : '#a78bfa';
                       return (
