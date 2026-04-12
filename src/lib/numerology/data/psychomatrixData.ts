@@ -123,7 +123,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   2: {
     digit: 2,
     cellName: 'Energy',
-    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan.\n\nThe energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from \'22\' to \'4\' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.',
+    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan. The energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from \'22\' to \'4\' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.',
     lineContext: 'Row 2 (2, 5, 8) — Family orientation. Column 1 (1, 2, 3) — Self-esteem.',
     meanings: [
       {
@@ -173,7 +173,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   3: {
     digit: 3,
     cellName: 'Interests / Sciences',
-    intro: 'The number 3 in the square of Pythagoras is responsible for interest in the sciences and, above all, in the exact sciences or technology. Never forget that 3 is contained in several rows when you are going to evaluate this number in the Pythagorean square, namely the column (1, 2, 3), the ascending diagonal (3, 5, 7) and the 3rd row (3, 6, 9). The reason is that number 3 is responsible for persons interests in general. To decide what this interest consists of, it is necessary to determine what line owns the 3s at the moment.\n\nLine analysis for Number 3:\n- Column (1,2,3): Self-appraisal is strongly affected. If 3 is owned by this column, the person\'s self-appraisal becomes overpriced; they think those around them are more foolish.\n- Ascending Diagonal (3,5,7): Carnal, financial, and intimate interests. The person is actively interested in intimate life and money. Endless changing of sex-partners shows absorption of number 3 by this diagonal.\n- Row (3,6,9): Stability. The person acquires habits and rituals that become very important; they demand performance of these habits from others.',
+    intro: 'The number 3 in the square of Pythagoras is responsible for interest in the sciences and, above all, in the exact sciences or technology. Never forget that 3 is contained in several rows when you are going to evaluate this number in the Pythagorean square, namely the column (1, 2, 3), the ascending diagonal (3, 5, 7) and the 3rd row (3, 6, 9). The reason is that number 3 is responsible for persons interests in general. To decide what this interest consists of, it is necessary to determine what line owns the 3s at the moment.',
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 1 (1, 2, 3) — Self-esteem. Ascending diagonal (3, 5, 7) — Carnal/temperament.',
     meanings: [
       {
@@ -203,19 +203,19 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
       {
         count: 4,
         label: 'Born Inventor / Constructor',
-        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can condemn the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
+        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can delete the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
         scale: 'strong'
       },
       {
         count: 5,
-        label: 'Dominant Inventor Sign',
-        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can condemn the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
+        label: 'Obsessive Technical Focus',
+        verbatim: 'Five 3\'s represents an almost total absorption of conscious life by one area of technical or scientific fascination. The person thinks in systems, mechanisms, and patterns. Social interaction, emotional processing, and everyday practicalities feel like intrusions on the real work of the mind. This can produce genius-level output in a narrow domain while leaving relationships and bodily needs neglected.',
         scale: 'dominant'
       },
       {
         count: 6,
-        label: 'Overload — Inventor Sign',
-        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can condemn the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
+        label: 'Interest Overload — Fragmentation',
+        verbatim: 'Six or more 3\'s triggers the overload inversion for interests: rather than deep focus, the person becomes fragmented and scattered across too many simultaneous fascinations. Nothing holds for long because everything is equally stimulating and equally abandoned. Mastery is rarely reached due to diffusion.',
         scale: 'overload'
       }
     ]
@@ -223,37 +223,37 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   4: {
     digit: 4,
     cellName: 'Health / Body',
-    intro: 'Digit 4 in the psychomatrix answers for the health of a person. It answers for the human body, but this characteristic is more interesting than the state of health.',
+    intro: 'Digit 4 in the psychomatrix answers for the health of a person. The assessment of fours in the psychomatrix does not allow evaluating the strength of a specific organ or highlighting those diseases to which a person is prone due to the peculiarities of his energy. Digit 4 answers for the human body, but this characteristic is more interesting than the state of health. By the presence of digit 4 in the psychomatrix, one can (without seeing the person and knowing nothing about him) assume how he looks, how attractive he is, how physically strong. Number 4 is included into following lines: 1st row (1, 4, 7) — purposefulness of the person, and 2nd column (4, 5, 6) — material maintenance of the family.',
     lineContext: 'Row 1 (1, 4, 7) — Purposefulness. Column 2 (4, 5, 6) — Labor efficiency & material capacity.',
     meanings: [
       {
         count: 0,
         label: 'No Health Given from Birth',
-        verbatim: 'If in your psychomatrix there are no digits 4, this means you were not given health from birth and it is necessary to strengthen and take care of it. A strong body is quite difficult to grow, as it requires spending a lot of energy on this. Professional sports are not recommended.',
+        verbatim: 'If in your psychomatrix there are no digits 4, this means you were not given health from birth and it is necessary to strengthen and take care of it. A strong body is quite difficult to grow, as it requires spending a lot of energy on this. Professional sports are not recommended, because exhausting of an organism from trainings is going to exceed the energy the person receives from a mobile way of life; after such overloads the person starts to hurt. People who don\'t have any \'4\'s are not good for performing manual labor as they don\'t have the health for it. If the person works physically he will search for sources of energy — alcohol, drugs, quarrels and family conflicts. It is necessary to strengthen the health through ancient improving systems: chi kung, yoga and others. Strengthening the health will make you able to target higher goals. It is possible to strengthen through transition: \'11\' transforms into \'8\' with additional \'4\', or \'6\' transforms into \'7\' with additional \'4\'. For this purpose it is necessary to become more tolerant or to make art a part of your life.',
         scale: 'absent'
       },
       {
         count: 1,
         label: 'Very Weak Health',
-        verbatim: 'Your Pythagoras Square has only one \'4\'. It speaks that you have health from birth, but it is insufficiently strong to say that prophylactics is not required. All recommendations for strengthening energy given for \'4-none\' will be useful here too.',
+        verbatim: 'Your Pythagoras Square has only one \'4\'. It speaks that you have health from birth, but it is insufficiently strong to say that prophylactics is not required. If you have \'2222 and more\' then you can try yourself in sports or manual labor. As when there is no \'4\', having only one the person starts to avoid conflicts as they lose health and energy through them. All recommendations for strengthening energy given for \'4-none\' will be useful here too. If you have poor health do not hurry with trying yourself in places where you will have authority above people. If you have good energy \'22\' or \'2222 and more\' and strong character with tolerance — 111 and 8, 1111 and 8, 11111 and 8 — it is possible to try yourself as \'the person of authority\'. If you do not have strong character (11, 1) you will quickly lose your health on the way to your dream (transition 8 to 11 with loss of 4 or 22). House affairs such as kitchen or garden also lead to loss of health, as transition of Number 7 to 6 causes loss of 4 or 22.',
         scale: 'very-weak'
       },
       {
         count: 2,
         label: 'Health Given in Norm',
-        verbatim: 'Health given in norm. A beautiful, strong body is given from birth. It is possible to try sports safely, even professionally, provided other numbers are also favorable. The body, when cared for, becomes an asset and source of personal confidence.',
+        verbatim: 'Health given in norm. A beautiful, strong body is given from birth. It is possible to try sports safely, even professionally, provided other numbers are also favorable (e.g., Number 6 for interest in manual labor).',
         scale: 'norm'
       },
       {
         count: 3,
         label: 'Strong Health',
-        verbatim: 'Your Pythagoras Square has \'444\' or more — it means strong health is given from birth and also a beautiful, strong body. At such strong numbers it is hard for the person to catch illness; if this happens it is necessary to find the reason of illness.',
+        verbatim: 'Your Pythagoras Square has \'44\' or more — it means strong health is given from birth and also a beautiful, strong body. It is possible to try yourself in sports safely, even professionally. Manual labor is also possible. Together with health you have sufficient purposefulness which allows you to target goals and reach them. At such strong numbers it is hard for the person to catch illness; if this happens (serious diseases) it is necessary to find the reason of illness. The basic problem — and it will inevitably arise before you — is a physical strength which is given to you from birth and which is often applied as the last \'argument\' in a dispute. Try to avoid using it in this case. The confidence in physical strength pushes to fisticuffs, especially those ones who have three fours (444). Possessing a strong body, they often lose health because of its undermining, not knowing any limits in work or sports.',
         scale: 'special'
       },
       {
         count: 4,
-        label: 'Exceptional Physical Strength',
-        verbatim: 'Very good health and virtually unlimited physical possibilities. Both men and women are naturally very strong physically. Men especially so. This combination personifies a healthy person with an active lifestyle and high sexual potential.',
+        label: 'Exceptional Physical Strength & Vitality',
+        verbatim: 'Very good health and virtually unlimited physical possibilities. Both men and women are naturally very strong physically. Men especially so — usually they find consolation not in women, but in alcohol, as strong health allows taking alcohol in almost unlimited quantities. This combination personifies a healthy person with an active lifestyle and high sexual potential.',
         scale: 'strong'
       },
       {
