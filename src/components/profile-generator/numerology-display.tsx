@@ -1,3 +1,4 @@
+
 'use client';
 
 /**
@@ -11,7 +12,7 @@ import type { NumerologyData, PersonalYearData } from './types';
 import {
   Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass,
   Activity, ChevronRight, CalendarDays, Zap, Star,
-  AlertTriangle, TrendingUp,
+  AlertTriangle, TrendingUp, CheckCircle2, ShieldAlert
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
@@ -21,6 +22,7 @@ import LoshuArrowDetailPanel from '@/components/LoshuArrowDetailPanel';
 import { FateChambers } from './fate-chambers';
 import { CoreVibrations } from './core-vibrations';
 import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
+import { Button } from '@/components/ui/button';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 function reduceNum(n: number): number {
@@ -271,30 +273,95 @@ function PinnaclesAccordion({ destinyNum, birthDay, birthMonth, birthYear }: { d
 // ── Lucky Compass SVG ─────────────────────────────────────────────────────────
 function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttributes:NumerologyData['kuaAttributes'] }) {
   const kua = KUA_DATA_COMPASS[kuaNum] || KUA_DATA_COMPASS[1];
+  const [heading, setHeading] = React.useState(0);
+  const [isLevel, setIsLevel] = React.useState(true);
+  const [permissionState, setPermissionState] = React.useState<'unasked' | 'granted' | 'denied'>('unasked');
+
   const dirs8 = ['N','NE','E','SE','S','SW','W','NW'];
   const CX=130, CY=130, R=110, RN=82;
-  function pos(dir: string, r: number){ const a=(dirs8.indexOf(dir)*45-90)*Math.PI/180; return {x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)}; }
+
+  React.useEffect(() => {
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      // heading (alpha) relative to north
+      const h = e.webkitCompassHeading || (360 - (e.alpha || 0));
+      setHeading(h);
+
+      // pitch/roll (beta/gamma) to check if device is flat
+      const pitch = Math.abs(e.beta || 0);
+      const roll = Math.abs(e.gamma || 0);
+      setIsLevel(pitch < 15 && roll < 15);
+    };
+
+    if (permissionState === 'granted') {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    return () => window.removeEventListener('deviceorientation', handleOrientation);
+  }, [permissionState]);
+
+  const requestPermission = async () => {
+    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      try {
+        const res = await (DeviceOrientationEvent as any).requestPermission();
+        setPermissionState(res === 'granted' ? 'granted' : 'denied');
+      } catch (e) {
+        setPermissionState('denied');
+      }
+    } else {
+      setPermissionState('granted');
+    }
+  };
+
+  function pos(dir: string, r: number){ 
+    const idx = dirs8.indexOf(dir);
+    const a = (idx * 45 - 90) * Math.PI / 180; 
+    return {x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)}; 
+  }
+
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'1rem' }}>
+      
+      {/* Compass Header / Status */}
+      <div className="flex w-full justify-between items-center px-2 mb-2">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full animate-pulse ${isLevel ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+          <span className={`font-cinzel text-[0.6rem] uppercase tracking-widest ${isLevel ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {isLevel ? 'Level & Reliable' : 'Tilted / Unreliable'}
+          </span>
+        </div>
+        {permissionState !== 'granted' && (
+          <Button variant="ghost" size="sm" onClick={requestPermission} className="h-6 text-[0.5rem] uppercase tracking-tighter border border-primary/30">
+            Activate Sensor
+          </Button>
+        )}
+      </div>
+
       <svg viewBox="0 0 260 260" style={{ width:'100%', maxWidth:280 }}>
         <defs>
           <radialGradient id="lc-bg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#1a0a3a"/><stop offset="100%" stopColor="#080318"/></radialGradient>
           <filter id="lc-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           <filter id="lc-ng"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
+        
+        {/* Static Background */}
         <circle cx={CX} cy={CY} r={R+8} fill="url(#lc-bg)" stroke="rgba(124,58,237,0.18)" strokeWidth="1"/>
-        {Array.from({length:72},(_,i)=>{const a=(i*5-90)*Math.PI/180,big=i%9===0,r1=R-(big?12:5);return(<line key={i} x1={CX+r1*Math.cos(a)} y1={CY+r1*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke={big?'rgba(212,175,55,0.35)':'rgba(124,58,237,0.2)'} strokeWidth={big?1.2:0.6}/>);})}
-        <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(212,175,55,0.22)" strokeWidth="1"/>
-        <circle cx={CX} cy={CY} r={60} fill="none" stroke="rgba(124,58,237,0.15)" strokeWidth="0.8" strokeDasharray="3 4"/>
-        <circle cx={CX} cy={CY} r={35} fill="none" stroke="rgba(212,175,55,0.1)" strokeWidth="0.8"/>
-        {[0,45,90,135].map(deg=>{const a=deg*Math.PI/180;return(<line key={deg} x1={CX-R*Math.cos(a)} y1={CY-R*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke="rgba(124,58,237,0.1)" strokeWidth="0.6"/>);})}
-        {dirs8.map(dir=>{const p=pos(dir,RN),best=kua.best.includes(dir),avoid=kua.avoid.includes(dir),nr=best?12:avoid?9:7,nc=best?kua.colour:avoid?'#ef4444':'rgba(255,255,255,0.2)';return(
-          <g key={dir} filter={best?'url(#lc-ng)':undefined}>
-            <circle cx={p.x} cy={p.y} r={nr} fill={`${nc}22`} stroke={nc} strokeWidth={best?2:1}/>
-            {best&&<circle cx={p.x} cy={p.y} r={nr*1.6} fill="none" stroke={nc} strokeWidth="0.8" strokeOpacity="0.3"><animate attributeName="r" values={`${nr};${nr*2.2};${nr}`} dur="2.5s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite"/></circle>}
-            <text x={p.x} y={p.y+1} textAnchor="middle" dominantBaseline="middle" fontSize={best?7:6} fill={best?nc:avoid?'#ef4444':'rgba(200,180,240,0.4)'} fontFamily="'Cinzel',serif" fontWeight={best?'bold':'normal'}>{dir}</text>
-          </g>
-        );})}
+        
+        {/* Rotating Dial Group */}
+        <g style={{ transformOrigin: `${CX}px ${CY}px`, transform: `rotate(${-heading}deg)`, transition: 'transform 0.1s linear' }}>
+          {Array.from({length:72},(_,i)=>{const a=(i*5-90)*Math.PI/180,big=i%9===0,r1=R-(big?12:5);return(<line key={i} x1={CX+r1*Math.cos(a)} y1={CY+r1*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke={big?'rgba(212,175,55,0.35)':'rgba(124,58,237,0.2)'} strokeWidth={big?1.2:0.6}/>);})}
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(212,175,55,0.22)" strokeWidth="1"/>
+          <circle cx={CX} cy={CY} r={60} fill="none" stroke="rgba(124,58,237,0.15)" strokeWidth="0.8" strokeDasharray="3 4"/>
+          <circle cx={CX} cy={CY} r={35} fill="none" stroke="rgba(212,175,55,0.1)" strokeWidth="0.8"/>
+          {[0,45,90,135].map(deg=>{const a=deg*Math.PI/180;return(<line key={deg} x1={CX-R*Math.cos(a)} y1={CY-R*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke="rgba(124,58,237,0.1)" strokeWidth="0.6"/>);})}
+          {dirs8.map(dir=>{const p=pos(dir,RN),best=kua.best.includes(dir),avoid=kua.avoid.includes(dir),nr=best?12:avoid?9:7,nc=best?kua.colour:avoid?'#ef4444':'rgba(255,255,255,0.2)';return(
+            <g key={dir} filter={best?'url(#lc-ng)':undefined}>
+              <circle cx={p.x} cy={p.y} r={nr} fill={`${nc}22`} stroke={nc} strokeWidth={best?2:1}/>
+              {best&&<circle cx={p.x} cy={p.y} r={nr*1.6} fill="none" stroke={nc} strokeWidth="0.8" strokeOpacity="0.3"><animate attributeName="r" values={`${nr};${nr*2.2};${nr}`} dur="2.5s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite"/></circle>}
+              <text x={p.x} y={p.y+1} textAnchor="middle" dominantBaseline="middle" fontSize={best?7:6} fill={best?nc:avoid?'#ef4444':'rgba(200,180,240,0.4)'} fontFamily="'Cinzel',serif" fontWeight={best?'bold':'normal'}>{dir}</text>
+            </g>
+          );})}
+        </g>
+
+        {/* Static Pointer Overlay */}
         <g filter="url(#lc-glow)">
           <polygon points={`${CX},${CY-32} ${CX-7},${CY} ${CX},${CY-10} ${CX+7},${CY}`} fill="#d4af37" fillOpacity="0.9"/>
           <polygon points={`${CX},${CY+32} ${CX-7},${CY} ${CX},${CY+10} ${CX+7},${CY}`} fill="#7c3aed" fillOpacity="0.7"/>
@@ -304,15 +371,24 @@ function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttribut
         <text x={CX} y={CY+48} textAnchor="middle" fontFamily="'Cinzel Decorative',serif" fontSize="18" fontWeight="700" fill="#d4af37" fillOpacity="0.8" filter="url(#lc-glow)">{kuaNum}</text>
         <text x={CX} y={CY+60} textAnchor="middle" fontFamily="'Cinzel',serif" fontSize="5.5" letterSpacing="3" fill="rgba(212,175,55,0.4)">KUA NUMBER</text>
       </svg>
+
+      {/* Legend & Direction List */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.4rem 1rem', width:'100%' }}>
         {[...kua.best.slice(0,4).map(d=>({d,t:'Auspicious',c:kua.colour})), ...kua.avoid.slice(0,4).map(d=>({d,t:'Avoid',c:'#ef4444'}))].map(({d,t,c},i)=>(
           <div key={i} style={{ display:'flex', alignItems:'center', gap:'0.4rem', fontSize:'0.68rem', color:'rgba(210,195,240,0.65)' }}>
             <div style={{ width:8, height:8, borderRadius:'50%', background:c, boxShadow:t==='Auspicious'?`0 0 6px ${c}`:'none', flexShrink:0 }}/>
             <span style={{ fontWeight:700 }}>{d}</span>
-            <span style={{ fontSize:'0.55rem', fontFamily:"'Cinzel',serif", letterSpacing:'0.12em', textTransform:'uppercase', color:'rgba(212,175,55,0.45)', marginLeft:'auto' }}>{t}</span>
+            <span style={{ fontSize:'0.55rem', fontFamily:"'Cinzel',serif", letterSpacing:'0.12em', textTransform:'uppercase', color: t==='Auspicious' ? '#34d399' : '#ef4444', opacity: 0.7, marginLeft:'auto' }}>{t}</span>
           </div>
         ))}
       </div>
+
+      {!isLevel && (
+        <div className="p-2 rounded bg-amber-500/10 border border-amber-500/30 text-[0.65rem] text-amber-200/80 italic text-center w-full">
+          <ShieldAlert className="inline h-3 w-3 mr-1" /> For accurate alignment, please hold your phone flat.
+        </div>
+      )}
+
       <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flexWrap:'wrap', gap:'0.5rem', padding:'0.6rem 1rem', borderRadius:'0.75rem', background:'rgba(212,175,55,0.06)', border:'1px solid rgba(212,175,55,0.15)', width:'100%' }}>
         {[['Trigram',kua.name],['Element',kua.element]].map(([l,v],i)=>(
           <span key={i} style={{ fontFamily:"'Cinzel',serif", fontSize:'0.55rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(212,175,55,0.65)' }}>
