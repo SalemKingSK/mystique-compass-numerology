@@ -220,8 +220,12 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
         </div>
       </div>
 
-      <div className="text-[0.7rem] text-stone-300 leading-relaxed border-l-2 border-amber-700/50 pl-3 italic bg-black/20 py-2 rounded-r-sm">
-        {cellDef.intro}
+      {/* Introductory Part with Listen Function */}
+      <div className="border-l-2 border-amber-700/50 pl-3 bg-black/40 p-4 rounded-r-lg">
+        <p className="text-[0.6rem] font-cinzel uppercase tracking-[0.2em] text-amber-500/60 mb-2">Introduction</p>
+        <div className="text-[0.7rem] text-stone-300 leading-relaxed italic">
+          <AccordionContentWithPlayer text={cellDef.intro} />
+        </div>
       </div>
 
       <div className="text-[0.65rem] text-stone-400 leading-relaxed px-1">
@@ -506,7 +510,7 @@ function WorkingNumbersPanel({ result }: { result: PsychomatrixResult }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {nums.map(({ n, title, role, desc }) => (
         <div key={title}
-          className="border border-amber-700/30 bg-black/40 backdrop-blur-md rounded-sm p-4 space-y-2"
+          className="border border-stone-700/30 bg-black/40 backdrop-blur-md rounded-sm p-4 space-y-2"
         >
           <div className="flex items-end gap-3">
             <span className="font-cinzel text-3xl font-black text-amber-400 leading-none">
@@ -704,7 +708,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
 
           {activeTab === 'Synergies' && (
             <div className="space-y-5">
-              <SectionHeader icon={<Sparkles className="w-4 h-4" />} title="Cross-Digit Interactions" />
+              <SectionHeader icon={<Sparkles className="w-3 h-3" />} title="Cross-Digit Interactions" />
               <SynergiesPanel insights={result.complementaryInsights} />
             </div>
           )}
