@@ -220,7 +220,6 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
         </div>
       </div>
 
-      {/* Introductory Part with Listen Function */}
       <div className="border-l-2 border-amber-700/50 pl-3 bg-black/40 p-4 rounded-r-lg">
         <p className="text-[0.6rem] font-cinzel uppercase tracking-[0.2em] text-amber-500/60 mb-2">Introduction</p>
         <div className="text-[0.7rem] text-stone-300 leading-relaxed italic">

@@ -218,6 +218,7 @@ function NewAstroSignDetails({ sign, signData }: { sign: string; signData: Astro
 function ResultsHeader({ name, newAstroSign, birthDate, onTabClick, activeTab }: { name: string; newAstroSign: string; birthDate: string; onTabClick: (t: string) => void; activeTab: string }) {
   const animalName = newAstroSign.split('/')[1]?.trim();
   const animalEmoji = ZOO[animalName]?.e || '';
+  
   return (
     <div className="flex flex-col items-center justify-center mb-6 p-4 rounded-xl w-full">
       <motion.h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-400 tracking-wider text-center font-decorative mb-2"
@@ -225,12 +226,26 @@ function ResultsHeader({ name, newAstroSign, birthDate, onTabClick, activeTab }:
         {name}
       </motion.h1>
       <p className="text-[0.7rem] text-white/50 mt-1 font-cinzel uppercase tracking-[0.2em]">{birthDate}</p>
-      <div className="relative grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 w-full max-w-4xl mx-auto mt-6 px-4">
-        <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>{animalEmoji} {newAstroSign} {animalEmoji}</AnimatedTab>
-        <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astrology</AnimatedTab>
-        <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Lo Shu</AnimatedTab>
-        <AnimatedTab isActive={activeTab === 'psychomatrix'} onClick={() => onTabClick('psychomatrix')}>Psychomatrix</AnimatedTab>
-        <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>🌌 Fate Map</AnimatedTab>
+      
+      {/* ── Overhauled Tab Arrangement ───────────────────────────────────── */}
+      {/* 2 Tabs Above, Numerology Central, 2 Tabs Below */}
+      <div className="w-full max-w-sm mx-auto mt-8 flex flex-col gap-3">
+        {/* Top Tier */}
+        <div className="grid grid-cols-2 gap-3">
+          <AnimatedTab isActive={activeTab === 'new-astro'} onClick={() => onTabClick('new-astro')}>{animalEmoji} {newAstroSign} {animalEmoji}</AnimatedTab>
+          <AnimatedTab isActive={activeTab === 'astro'} onClick={() => onTabClick('astro')}>Astrology</AnimatedTab>
+        </div>
+        
+        {/* Central Tier */}
+        <div className="w-full">
+          <AnimatedTab isActive={activeTab === 'numerology'} onClick={() => onTabClick('numerology')}>Numerology</AnimatedTab>
+        </div>
+        
+        {/* Bottom Tier */}
+        <div className="grid grid-cols-2 gap-3">
+          <AnimatedTab isActive={activeTab === 'psychomatrix'} onClick={() => onTabClick('psychomatrix')}>Psychomatrix</AnimatedTab>
+          <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>🌌 Fate Map</AnimatedTab>
+        </div>
       </div>
     </div>
   );
