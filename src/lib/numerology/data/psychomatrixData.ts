@@ -123,7 +123,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   2: {
     digit: 2,
     cellName: 'Energy',
-    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan. The energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from \'22\' to \'4\' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.',
+    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan.\n\nThe energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from \'22\' to \'4\' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.',
     lineContext: 'Row 2 (2, 5, 8) — Family orientation. Column 1 (1, 2, 3) — Self-esteem.',
     meanings: [
       {
@@ -155,55 +155,67 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
         label: 'Donor, Energy Overload',
         verbatim: 'If in your psychomatrix there are four or more twos, this means you are a donor, a person who has an excess of energy and can afford to spend it at his discretion. You will be surprised, but a donor has a problem with how to properly spend the available energy. Such people can spend energy on watching any TV programs, while doing nothing for their development. This can be called laziness, but already from excess of energy, from inertia. Sometimes excessive calmness may appear, bordering on indifference to everything. Donors, as a rule, are very slow, sluggish. They are inclined to sit, lie, but not run and fuss. The best for you is to try yourself in sports, medicine, teaching or manual labour — all these cause big losses of energy and are good for donors. If they will not spend the energy there can be a need for the conflict which will \'unload\' the donor. Superfluous energy is consumed well by cats.',
         scale: 'strong'
+      },
+      {
+        count: 5,
+        label: 'Extreme Donor Overload',
+        verbatim: 'Five or more 2\'s represents a profound overload of the donor quality. Energy floods outward in ways the person cannot fully contain. Indifference to personal matters increases; the person gives freely but struggles to protect their own reserves. The risk of energy depletion through others\' crises is high. Physical and creative outlets — sport, medicine, hands-on work — are essential safety valves. Without them, the accumulated energy can turn into a desire for conflict as a release mechanism. Cats, paradoxically, help drain surplus energy through their natural vampirism.',
+        scale: 'dominant'
+      },
+      {
+        count: 6,
+        label: 'Energy Overload Inversion',
+        verbatim: 'Six or more 2\'s triggers the overload inversion: the quality begins to transform into its opposite. The person who should be a radiant donor becomes withdrawn, lethargic, and emotionally flat. The energy, having nowhere constructive to go, turns inward and stagnates. Deep fatigue, existential indifference, and a sense of pointlessness characterize this state. Urgent need for intense physical activity, service roles, or creative channels to convert this reservoir into output. Without transformation, it can manifest as depression or inexplicable burnout.',
+        scale: 'overload'
       }
     ]
   },
   3: {
     digit: 3,
     cellName: 'Interests / Sciences',
-    intro: 'The number 3 in the square of Pythagoras is responsible for interest in the sciences and, above all, in the exact sciences or technology.',
+    intro: 'The number 3 in the square of Pythagoras is responsible for interest in the sciences and, above all, in the exact sciences or technology. Never forget that 3 is contained in several rows when you are going to evaluate this number in the Pythagorean square, namely the column (1, 2, 3), the ascending diagonal (3, 5, 7) and the 3rd row (3, 6, 9). The reason is that number 3 is responsible for persons interests in general. To decide what this interest consists of, it is necessary to determine what line owns the 3s at the moment.\n\nLine analysis for Number 3:\n- Column (1,2,3): Self-appraisal is strongly affected. If 3 is owned by this column, the person\'s self-appraisal becomes overpriced; they think those around them are more foolish.\n- Ascending Diagonal (3,5,7): Carnal, financial, and intimate interests. The person is actively interested in intimate life and money. Endless changing of sex-partners shows absorption of number 3 by this diagonal.\n- Row (3,6,9): Stability. The person acquires habits and rituals that become very important; they demand performance of these habits from others.',
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 1 (1, 2, 3) — Self-esteem. Ascending diagonal (3, 5, 7) — Carnal/temperament.',
     meanings: [
       {
         count: 0,
-        label: 'Humanities & Art',
-        verbatim: 'Absence of Number 3 in Pythagoras Square means propensity of the person to humanities and art. If your child has no 3s in Pythagoras Square you should allow it to complete its task for mankind: it\'s born to create new aspects of philosophy, art and culture. It perceives technics externally — by the principle of its grace and beauty.',
+        label: 'Propensity to Humanities & Art',
+        verbatim: 'Absence of Number 3 in Pythagoras Square means propensity of the person to humanities and art. When we speak about interests of the child, especially the boy, there is a problem. Most daddies think humanities and even more so arts, doesn\'t correspond to man\'s interests in any way and as consequence — such interests are in every possible way extinguished in the childhood by \'assiduous\' fathers who try to impart to the son man\'s interest to technics. It is not absolutely clever, because Nature forms the child and defines its applicability in its life. If your child has no 3s in Pythagoras Square you should allow it to complete its task for mankind: it\'s born to create new aspects of philosophy, art and culture. It perceives technics externally — by the principle of its grace and beauty.',
         scale: 'absent'
       },
       {
         count: 1,
-        label: 'Weak Developed Interest',
-        verbatim: 'You have one 3 in your Pythagoras Square. All depends on you only. If you choose the purpose to develop your talent, then you are definitely lucky as you can be engaged in any science, but the expert in exact sciences is not you yet. It is possible to find an optimum variant and choose science that is between these branches of knowledge: natural sciences, economy, legal practice, etc.',
+        label: 'Very Weakly Developed Interest',
+        verbatim: 'You have one 3 in your Pythagoras Square. All depends on you only. If you choose the purpose to develop your talent, then you are definitely lucky as you can be engaged in any science, but the expert in exact sciences is not you yet. It is possible to find an optimum variant and choose science that is between these branches of knowledge: natural sciences, economy, legal practice, etc. You should choose a direction where you can\'t harm yourself by multiplicity of your interests. Multiplicity is the negative side of \'3\' as it does not fix interest, but sprays it, leading to what even people who are strong in sciences can\'t define the interest. If it won\'t be clearly defined, you can surely say that the person does not have interest in any field of knowledge, especially if he has weak energy (2-not present, 2, 222).',
         scale: 'very-weak'
       },
       {
         count: 2,
         label: 'Interest Given in Norm',
-        verbatim: 'Your Pythagoras Square has 33, it means, that you have interest in exact science and engineering, but it doesn\'t mean you can easily be engaged in these sciences. It is necessary to define how you can open similar interest.',
+        verbatim: 'Your Pythagoras Square has 33, it means, that you have interest in exact science and engineering, but it doesn\'t mean you can easily be engaged in these sciences. It is necessary to define how you can open similar interest. If, having 33, your Pythagoras Square contains 55 (or more), 22, 6 — these figures show that you possess strong logic, good energy and you are a man of moods who can sometimes do manual labor for pleasure. The same numbers tell us that you could become the good engineer or the designer as you can understand any technological process.',
         scale: 'norm'
       },
       {
         count: 3,
         label: 'Special Sign — Saturated Interest',
-        verbatim: 'The most optimal can be considered those branches of knowledge that use exact sciences (mathematics, physics, technique). The main feature of interest \'333\' — is saturation with a concrete interest. As soon as a person understands that he has figured out a concrete branch of knowledge, he loses interest in this topic.',
+        verbatim: 'The most optimal can be considered those branches of knowledge that use exact sciences (mathematics, physics, technique), consequently, the area of application of one\'s knowledge should be sought at the junction of sciences: mathematical linguistics, computer technique, bionics, etc. The main feature of interest \'333\' — is saturation with a concrete interest. As soon as a person understands that he has figured out a concrete branch of knowledge, he loses interest in this topic. And one more thing. Having \'333\', he will never abandon the topic of his research until he gets to its essence. A person with interest \'333\' must periodically change it, but he must always remain in science, changing directions and topics. Very interesting results can be received from synthesis of various own interests into one theory. The only thing that can prevent one\'s personality realization is disbelief, laziness, worship for \'authorities\' which always denies everything new, for it threatens their prestige.',
         scale: 'special'
       },
       {
         count: 4,
         label: 'Born Inventor / Constructor',
-        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences.',
+        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can condemn the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
         scale: 'strong'
       },
       {
         count: 5,
-        label: 'Obsessive Technical Focus',
-        verbatim: 'Five 3\'s represents an almost total absorption of conscious life by one area of technical or scientific fascination. The person thinks in systems, mechanisms, and patterns. This can produce genius-level output in a narrow domain while leaving relationships and bodily needs neglected.',
+        label: 'Dominant Inventor Sign',
+        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can condemn the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
         scale: 'dominant'
       },
       {
         count: 6,
-        label: 'Interest Overload — Fragmentation',
-        verbatim: 'Six or more 3\'s triggers the overload inversion for interests: rather than deep focus, the person becomes fragmented and scattered across too many simultaneous fascinations. Nothing holds for long because everything is equally stimulating and equally abandoned. The mind is hyperactive but cannot settle into mastery.',
+        label: 'Overload — Inventor Sign',
+        verbatim: 'A fairly rare sign in our time, but sometimes encountered. It means strong interest in science and technique, inventing and constructing. A person is born an inventor and constructor. If in his psychomatrix there are active \'55 and more\', he must engage in technical sciences, work in research institutes, design bureaus, laboratories. If 5 and 9 are expressed poorly, there is a simple but reliable way — write the fantastic novel where your ideas will have a life. Who can condemn the writer for all his ideas being unreal? Fiction is a direction of literature where a person is free to express his ideas.',
         scale: 'overload'
       }
     ]
@@ -291,7 +303,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
       {
         count: 4,
         label: 'Prophetic Logic',
-        verbatim: 'Four or more 5\'s: this person can be called a prophet. Such people are almost never mistaken about their predictions. They can predict destinies. The horizon of logical vision is so large that the person naturally perceives patterns across time.',
+        verbatim: 'Four or more 5\'s: this person can be called a prophet. Such people are almost never mistaken about their predictions. They can predict destinies.',
         scale: 'strong'
       },
       {
@@ -472,7 +484,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
       },
       {
         count: 1,
-        label: 'Weak Memory',
+        label: 'Very Weak Memory',
         verbatim: 'Very weak memory. The channel of communication with the subtle world, with the cosmos, is essentially closed at birth. Such a person is constantly busy with calculations, experiments, trying to predict further events.',
         scale: 'very-weak'
       },
@@ -526,7 +538,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [2, 5, 8],
     name: 'Second Row — Family Orientation',
     quality: 'Desire to Build Relationships & Family',
-    description: '"Shows how strong a person\'s desire to create a family is, the desire to build a relationship system based on close interaction with the opposite sex. With a clear understanding of the importance of such a step. After all, the family is not just legalized sexual cohabitation, as one German philosopher exotically described, but a complex system that includes reproductive, economic, psychological, educational, creative functions and a large share of responsibility for loved ones."'
+    description: '"Shows how strong a person\'s desire to create a family is, the desire to build a relationship system based on close interaction with the opposite sex. With a clear understanding of the importance of such a step. After all, the family is not just legalized sexual cohabitation, as one German philosopher exotically described, but a complex system that includes reproductive, economic, psychological, educational, creative functions and a large share of responsibility for loved ones."\n\nThe stronger the second row, the stronger the attachment to family and the family responsibilities that fall on a person\'s shoulders. It is pointless to \'educate\' the qualities of a family man in a person with a weak second row — it will push them away from the family.'
   },
   {
     id: 'row_3',
@@ -534,7 +546,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [3, 6, 9],
     name: 'Third Row — Stability',
     quality: 'Resistance to Change & Habitual Consistency',
-    description: '"The indicators of the stability of a person\'s character. That is, they describe the balance between usual habits and certain thinking, on the one hand, and the desire for change, on the other. Thus, the value of personal stability is the answer to the question of the reliability of this person in a particular situation."'
+    description: '"The indicators of the stability of a person\'s character. That is, they describe the balance between usual habits and certain thinking, on the one hand, and the desire for change, on the other. Thus, the value of personal stability is the answer to the question of the reliability of this person in a particular situation."\n\nA strong third row person has very stable habits and rituals, and may demand their performance from others. It is desirable that the number of digits in this line be the same between partners, or differ by not more than 2 digits.'
   },
   // COLUMNS (Vertical Lines)
   {
@@ -543,7 +555,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [1, 2, 3],
     name: 'First Column — Self-Esteem',
     quality: 'Self-Appraisal & Personal Confidence',
-    description: '"A numerical indicator of the level of self-esteem. Hardly any other parameter is more important in the context of a person\'s desire to realize his own potential. But if low self-esteem is only indecisiveness, self-doubt, and therefore eternal circling in circles, then unjustifiably overestimated capabilities can lead to fatal mistakes and cruel disappointments."'
+    description: '"A numerical indicator of the level of self-esteem. Hardly any other parameter is more important in the context of a person\'s desire to realize his own potential. But if low self-esteem is only indecisiveness, self-doubt, and therefore eternal circling in circles, then unjustifiably overestimated capabilities can lead to fatal mistakes and cruel disappointments."\n\nThe first column is the self-appraisal of the person. The stronger the column, the more confident — but potentially overconfident — the person is. People with a very strong first column think those around them are more foolish. Most of the family responsibilities should fall on the shoulders of those who have more digits in the second (family) line.'
   },
   {
     id: 'col_2',
@@ -551,7 +563,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [4, 5, 6],
     name: 'Second Column — Labor Efficiency',
     quality: 'Physical & Practical Capacity for Material Success',
-    description: '"Describe a person\'s physical health, level of endurance, degree of inclination to work and possession of practical skills, as well as the ability to think logically. Thus, the second column serves as an indicator of labor efficiency as a qualitative characteristic of a person\'s ability to achieve a certain social status, to ensure his well-being and the well-being of his family."'
+    description: '"Describe a person\'s physical health, level of endurance, degree of inclination to work and possession of practical skills, as well as the ability to think logically. Thus, the second column serves as an indicator of labor efficiency as a qualitative characteristic of a person\'s ability to achieve a certain social status, to ensure his well-being and the well-being of his family."\n\nA strong second column means the person is physically capable, practically skilled, and logically sharp — key ingredients for material success. A weak column means difficulty in these areas, requiring extra care and effort to support oneself and one\'s family.'
   },
   {
     id: 'col_3',
@@ -559,7 +571,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [7, 8, 9],
     name: 'Third Column — Talent & Potential',
     quality: 'Natural Gifts & Life Purpose',
-    description: '"Contains information about a person\'s talent. However, \'talents should be helped...\', people say, and the vast majority of people live their lives without ever discovering their talent, often without even suspecting its existence. Therefore, we can only talk about potential, the realization of which depends on all other personal qualities: diligence, purposefulness, sense of self-worth, etc."'
+    description: '"Contains information about a person\'s talent. However, \'talents should be helped...\', people say, and the vast majority of people live their lives without ever discovering their talent, often without even suspecting its existence. Therefore, we can only talk about potential, the realization of which depends on all other personal qualities: diligence, purposefulness, sense of self-worth, etc."\n\nA strong third column means rich natural talent waiting to be developed. A weak column does not mean the person has no purpose — it means their direction is more earthly and practical. The talent potential requires all other qualities (energy, character, purpose) to be realized.'
   },
   // DIAGONALS
   {
@@ -568,7 +580,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [1, 5, 9],
     name: 'Descending Diagonal — Spiritual',
     quality: 'Degree of Inner Unity with Nature / God',
-    description: '"Spiritual diagonal. Indicates the level of a person\'s spirituality. Do not confuse spirituality with religiosity. This quality has nothing to do with religious denominations, and it is completely alien to the exaltation of zealots of faith. The degree of unity of a person with Nature (Nus, God) is determined by firmness of convictions and clarity of perception, balanced principles and willingness to compromise, to accept a different perspective."'
+    description: '"Spiritual diagonal. Indicates the level of a person\'s spirituality. Do not confuse spirituality with religiosity. This quality has nothing to do with religious denominations, and it is completely alien to the exaltation of zealots of faith. The degree of unity of a person with Nature (Nus, God) is determined by firmness of convictions and clarity of perception, balanced principles and willingness to compromise, to accept a different perspective."\n\nA strong spiritual diagonal means deep inner coherence — the person\'s will (1), logic (5), and memory/mind (9) are well-developed and aligned, producing a spiritually grounded individual. Weakness in this diagonal indicates fragmentation of inner life.'
   },
   {
     id: 'diag_carnal',
@@ -576,7 +588,7 @@ export const PSYCHOMATRIX_LINE_MEANINGS: PsychomatrixLineData[] = [
     digits: [3, 5, 7],
     name: 'Ascending Diagonal — Carnal',
     quality: 'Temperament & Sexual Compatibility',
-    description: '"Carnal diagonal. An indicator of a person\'s temperament in terms of intimate, sexual relationships. And no matter what supporters of unions built on mutual respect and material well-being say, it is the degree of matching of temperaments that often becomes the main factor that determines the duration and quality of a marriage."'
+    description: '"Carnal diagonal. An indicator of a person\'s temperament in terms of intimate, sexual relationships. And no matter what supporters of unions built on mutual respect and material well-being say, it is the degree of matching of temperaments that often becomes the main factor that determines the duration and quality of a marriage."\n\nWhen choosing a partner, look at the sensual diagonal of each partner — it allows assessment of temperament. A person may have many \'4\'s, giving them a beautiful body, but if their sensual diagonal is weak, there may be problems of an intimate nature if one person has a stronger libido than the other. Strong hands and broad shoulders do not always mean sexual strength or strong libido. The number 4 has nothing to do with the intimate life of a person; you must look at the carnal diagonal. It is optimal if the man is stronger than the woman by 1 digit, or they have the same number of digits in this diagonal.'
   }
 ];
 
