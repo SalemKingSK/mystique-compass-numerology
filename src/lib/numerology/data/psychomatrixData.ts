@@ -123,7 +123,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   2: {
     digit: 2,
     cellName: 'Energy',
-    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society.',
+    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan. The energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from \'22\' to \'4\' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.',
     lineContext: 'Row 2 (2, 5, 8) — Family orientation. Column 1 (1, 2, 3) — Self-esteem.',
     meanings: [
       {
@@ -155,18 +155,6 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
         label: 'Donor, Energy Overload',
         verbatim: 'If in your psychomatrix there are four or more twos, this means you are a donor, a person who has an excess of energy and can afford to spend it at his discretion. You will be surprised, but a donor has a problem with how to properly spend the available energy. Such people can spend energy on watching any TV programs, while doing nothing for their development. This can be called laziness, but already from excess of energy, from inertia. Sometimes excessive calmness may appear, bordering on indifference to everything. Donors, as a rule, are very slow, sluggish. They are inclined to sit, lie, but not run and fuss. The best for you is to try yourself in sports, medicine, teaching or manual labour — all these cause big losses of energy and are good for donors. If they will not spend the energy there can be a need for the conflict which will \'unload\' the donor. Superfluous energy is consumed well by cats.',
         scale: 'strong'
-      },
-      {
-        count: 5,
-        label: 'Extreme Donor Overload',
-        verbatim: 'Five or more 2\'s represents a profound overload of the donor quality. Energy floods outward in ways the person cannot fully contain. Indifference to personal matters increases; the person gives freely but struggles to protect their own reserves. The risk of energy depletion through others\' crises is high.',
-        scale: 'dominant'
-      },
-      {
-        count: 6,
-        label: 'Energy Overload Inversion',
-        verbatim: 'Six or more 2\'s triggers the overload inversion: the quality begins to transform into its opposite. The person who should be a radiant donor becomes withdrawn, lethargic, and emotionally flat. The energy, having nowhere constructive to go, turns inward and stagnates. Deep fatigue, existential indifference, and a sense of pointlessness characterize this state.',
-        scale: 'overload'
       }
     ]
   },
