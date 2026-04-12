@@ -2,7 +2,6 @@
 
 /**
  * MYSTIQUE COMPASS — Alexandrov Psychomatrix / Pythagorean Square
- * Enhanced with Translucent UI and Speech Integration.
  */
 
 import * as React from 'react';
@@ -25,7 +24,7 @@ import {
 import {
   PSYCHOMATRIX_LINE_INTERPRETATIONS,
   getLineLevel,
-  LINE_SCALE_COLORS
+  LINE_SCALE_LABELS
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -45,7 +44,7 @@ const DIGIT_ICONS: Record<number, React.ReactNode> = {
   9: <Eye    className="w-3 h-3" />,
 };
 
-const SCALE_GLYPH: Record<PsychomatrixCellMeaning['scale'], string> = {
+const SCALE_GLYPH: Record<string, string> = {
   'absent':    '◌',
   'very-weak': '○',
   'norm':      '◉',
@@ -80,15 +79,16 @@ function Diamond({ className = '' }: { className?: string }) {
   );
 }
 
-function ScalePill({ scale }: { scale: PsychomatrixCellMeaning['scale'] }) {
-  const color = SCALE_COLORS[scale];
+function ScalePill({ scale }: { scale: string }) {
+  const color = SCALE_COLORS[scale as keyof typeof SCALE_COLORS] || '#9ca3af';
+  const label = SCALE_LABELS[scale as keyof typeof SCALE_LABELS] || LINE_SCALE_LABELS[scale as keyof typeof LINE_SCALE_LABELS] || 'Unknown';
   return (
     <span
       className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-sm border"
       style={{ color, borderColor: `${color}44`, background: `${color}22` }}
     >
-      <span>{SCALE_GLYPH[scale]}</span>
-      {SCALE_LABELS[scale]}
+      <span>{SCALE_GLYPH[scale] || '●'}</span>
+      {label}
     </span>
   );
 }
@@ -243,7 +243,7 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
       >
         <div className="flex items-center gap-2">
           <span className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: scaleColor }}>
-            {SCALE_GLYPH[reading.scale]} {reading.label} Activation
+            {SCALE_GLYPH[reading.scale] || '●'} {reading.label} Activation
           </span>
         </div>
 
@@ -251,19 +251,6 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
           <AccordionContentWithPlayer text={reading.verbatim} />
         </div>
       </div>
-
-      {reading.modifiers.length > 0 && (
-        <div className="space-y-2 pt-2">
-          <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-amber-500/80">
-            ✦ Cross-Digit Interactions
-          </p>
-          {reading.modifiers.map((mod, i) => (
-            <div key={i} className="bg-black/30 p-2 rounded-sm border-l border-amber-700/40">
-               <AccordionContentWithPlayer text={mod} />
-            </div>
-          ))}
-        </div>
-      )}
 
       <div className="space-y-2 pt-4">
         <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-stone-500">
@@ -287,7 +274,7 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
                 <span className="w-4 text-center font-mono font-bold text-sm">
                   {lvl.count === 0 ? '—' : lvl.count}
                 </span>
-                <span className="shrink-0">{SCALE_GLYPH[lvl.scale]}</span>
+                <span className="shrink-0">{SCALE_GLYPH[lvl.scale] || '●'}</span>
                 <span className={isActive ? 'font-bold' : 'text-stone-500'}>
                   {lvl.label}
                 </span>
@@ -317,7 +304,8 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
         const level = getLineLevel(line.id, total);
         const isActive = total >= 3;
         const isOpen = expanded === line.id;
-        const color = LINE_SCALE_COLORS[level.scale] || SCALE_COLORS[level.scale];
+        // Fix: Use primary SCALE_COLORS map to avoid undefined lookups
+        const color = SCALE_COLORS[level.scale as keyof typeof SCALE_COLORS] || '#9ca3af';
 
         return (
           <div key={line.id}
@@ -383,7 +371,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                 >
                   <div className="px-4 pb-4 pt-0 space-y-3 border-t border-stone-700/30">
                     <div className="pt-3">
-                      <p className="text-[0.6rem] font-cinzel uppercase tracking-[0.2em] text-amber-500/60 mb-2">Introduction</p>
+                      <p className="text-[0.6rem] font-cinzel uppercase tracking-[0.2em] text-amber-500/60 mb-2">Alexandrov Definition</p>
                       <div className="text-[0.72rem] text-stone-400 leading-relaxed italic mb-4 bg-black/20 p-3 rounded-sm border-l border-amber-700/30">
                         <AccordionContentWithPlayer text={line.captionNote} />
                       </div>
@@ -391,7 +379,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
 
                     <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
                       <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
-                        {SCALE_LABELS[level.scale]} — {level.label} ({total} digits)
+                        {SCALE_GLYPH[level.scale] || '●'} {level.label} ({total} digits)
                       </p>
                       <div className="text-[0.75rem] text-stone-200 leading-relaxed">
                         <AccordionContentWithPlayer text={level.verbatim} />
@@ -551,7 +539,7 @@ function WorkingNumbersPanel({ result }: { result: PsychomatrixResult }) {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
-const TABS = ['Matrix', 'Detail', 'Lines', 'Synergies', 'Origins'] as const;
+const TABS = ['Matrix', 'Detail', 'Lines', 'Synthesis', 'Origins'] as const;
 type Tab = typeof TABS[number];
 
 interface PsychomatrixDisplayProps {
@@ -611,13 +599,14 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
         ))}
       </div>
 
-      <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg gap-1">
+      {/* Optimized Tab Bar Navigation */}
+      <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg gap-2 px-1">
         {TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`
-              flex-1 min-w-0 px-1 py-3 font-cinzel text-[0.55rem] uppercase tracking-wider
+              flex-1 min-w-0 px-1 py-3 font-cinzel text-[0.52rem] uppercase tracking-wider
               border-b-2 transition-all duration-300 whitespace-nowrap font-bold
               ${activeTab === tab
                 ? 'border-amber-500 text-amber-400 bg-amber-500/10'
@@ -663,7 +652,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                 <div className="mt-3 flex items-center justify-between px-2">
                   <div className="flex gap-3 flex-wrap">
                     {result.activeLines.map(lineId => {
-                      const line = PSYCHOMATRIX_LINE_MEANINGS.find(l => l.id === lineId);
+                      const line = PSYCHOMATRIX_LINE_INTERPRETATIONS.find(l => l.id === lineId);
                       if (!line) return null;
                       const typeColor = line.type === 'row' ? '#60a5fa' : line.type === 'column' ? '#34d399' : '#a78bfa';
                       return (
@@ -671,7 +660,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                           className="text-[0.58rem] uppercase tracking-widest font-black"
                           style={{ color: typeColor }}
                         >
-                          ✦ {line.quality.split('&')[0].trim()}
+                          ✦ {line.name}
                         </span>
                       );
                     })}
@@ -686,7 +675,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                   <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
                   <p className="text-[0.7rem] text-stone-200">
                     <strong>{result.complementaryInsights.length}</strong> inter-digit synerg{result.complementaryInsights.length === 1 ? 'y' : 'ies'} detected.
-                    {' '}<button onClick={() => setActiveTab('Synergies')} className="text-amber-400 font-bold underline underline-offset-4 hover:text-amber-300 transition-colors ml-1">View all →</button>
+                    {' '}<button onClick={() => setActiveTab('Synthesis')} className="text-amber-400 font-bold underline underline-offset-4 hover:text-amber-300 transition-colors ml-1">View all →</button>
                   </p>
                 </div>
               )}
@@ -710,7 +699,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                       }
                     >
                       <span className="font-cinzel text-sm font-black">{d}</span>
-                      <span className="text-[0.5rem] font-bold">{SCALE_GLYPH[r.scale]}</span>
+                      <span className="text-[0.5rem] font-bold">{SCALE_GLYPH[r.scale] || '●'}</span>
                     </button>
                   );
                 })}
@@ -728,7 +717,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
             </div>
           )}
 
-          {activeTab === 'Synergies' && (
+          {activeTab === 'Synthesis' && (
             <div className="space-y-5">
               <SectionHeader icon={<Sparkles className="w-3 h-3" />} title="Cross-Digit Interactions" />
               <SynergiesPanel insights={result.complementaryInsights} />
