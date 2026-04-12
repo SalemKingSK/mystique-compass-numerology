@@ -23,9 +23,7 @@ import {
 } from '@/lib/numerology/data/psychomatrixData';
 import {
   PSYCHOMATRIX_LINE_INTERPRETATIONS,
-  getLineLevel,
-  LINE_SCALE_COLORS,
-  LINE_SCALE_LABELS
+  getLineLevel
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -317,7 +315,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
         const level = getLineLevel(line.id, total);
         const isActive = total >= 3;
         const isOpen = expanded === line.id;
-        const color = LINE_SCALE_COLORS[level.scale];
+        const color = SCALE_COLORS[level.scale];
 
         return (
           <div key={line.id}
@@ -391,7 +389,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
 
                     <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
                       <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
-                        {LINE_SCALE_LABELS[level.scale]} — {level.label} ({total} digits)
+                        {SCALE_LABELS[level.scale]} — {level.label} ({total} digits)
                       </p>
                       <div className="text-[0.75rem] text-stone-200 leading-relaxed">
                         <AccordionContentWithPlayer text={level.verbatim} />
@@ -739,7 +737,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                   <p className="flex justify-between border-b border-white/5 pb-1"><span className="text-stone-500">Birth date digits: </span><span>{`${day}`.split('').join('+')}+{`${month}`.split('').join('+')}+{`${year}`.split('').join('+')} = <span className="text-amber-400 font-bold">{result.first}</span> <span className="text-stone-600 ml-2">(I)</span></span></p>
                   <p className="flex justify-between border-b border-white/5 pb-1"><span className="text-stone-500">Sum of (I): </span><span>{String(result.first).split('').join('+')} = <span className="text-amber-400 font-bold">{result.second}</span> <span className="text-stone-600 ml-2">(II)</span></span></p>
                   <p className="flex justify-between border-b border-white/5 pb-1"><span className="text-stone-500">(I) − 2×{String(day)[0]}: </span><span>{result.first} − {2 * Number(String(day)[0])} = <span className="text-amber-400 font-bold">{result.third}</span> <span className="text-stone-600 ml-2">(III)</span></span></p>
-                  <p className="flex justify-between pb-1"><span className="text-stone-500">Sum of (III): </span><span>{String(result.third).split('').join('+')} = <span className="text-amber-400 font-bold">{result.fourth}</span> <span className="text-stone-600 ml-2">(IV)</span></span></p>
+                  <p className="flex justify-between pb-1"><span className="text-stone-600">Sum of (III): </span><span>{String(result.third).split('').join('+')} = <span className="text-amber-400 font-bold">{result.fourth}</span> <span className="text-stone-600 ml-2">(IV)</span></span></p>
                 </div>
               </div>
             </div>
