@@ -14,7 +14,6 @@ import {
 import {
   calculatePsychomatrix,
   PSYCHOMATRIX_CELL_MEANINGS,
-  PSYCHOMATRIX_LINE_MEANINGS,
   SCALE_LABELS,
   SCALE_COLORS,
   type PsychomatrixResult,
@@ -22,6 +21,12 @@ import {
   type ComplementaryInsight,
   type PsychomatrixCellMeaning,
 } from '@/lib/numerology/data/psychomatrixData';
+import {
+  PSYCHOMATRIX_LINE_INTERPRETATIONS,
+  getLineLevel,
+  LINE_SCALE_COLORS,
+  LINE_SCALE_LABELS
+} from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -307,10 +312,12 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
 
   return (
     <div className="space-y-2">
-      {PSYCHOMATRIX_LINE_MEANINGS.map(line => {
+      {PSYCHOMATRIX_LINE_INTERPRETATIONS.map(line => {
         const total = lineTotal(line.digits);
-        const isActive = result.activeLines.includes(line.id);
+        const level = getLineLevel(line.id, total);
+        const isActive = total >= 3;
         const isOpen = expanded === line.id;
+        const color = LINE_SCALE_COLORS[level.scale];
 
         return (
           <div key={line.id}
@@ -375,11 +382,20 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                   className="overflow-hidden"
                 >
                   <div className="px-4 pb-4 pt-0 space-y-3 border-t border-stone-700/30">
-                    <p className="text-[0.65rem] text-amber-400 font-bold tracking-widest pt-3 uppercase">
-                      {line.quality}
-                    </p>
-                    <div className="text-[0.72rem] text-stone-200 leading-relaxed bg-black/20 p-3 rounded-sm">
-                      <AccordionContentWithPlayer text={line.description} />
+                    <div className="pt-3">
+                      <p className="text-[0.6rem] font-cinzel uppercase tracking-[0.2em] text-amber-500/60 mb-2">Introduction</p>
+                      <div className="text-[0.72rem] text-stone-400 leading-relaxed italic mb-4 bg-black/20 p-3 rounded-sm border-l border-amber-700/30">
+                        <AccordionContentWithPlayer text={line.captionNote} />
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
+                      <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
+                        {LINE_SCALE_LABELS[level.scale]} — {level.label} ({total} digits)
+                      </p>
+                      <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+                        <AccordionContentWithPlayer text={level.verbatim} />
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -640,7 +656,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                 <div className="mt-3 flex items-center justify-between px-2">
                   <div className="flex gap-3 flex-wrap">
                     {result.activeLines.map(lineId => {
-                      const line = PSYCHOMATRIX_LINE_MEANINGS.find(l => l.id === lineId);
+                      const line = PSYCHOMATRIX_LINE_INTERPRETATIONS.find(l => l.id === lineId);
                       if (!line) return null;
                       const typeColor = line.type === 'row' ? '#60a5fa' : line.type === 'column' ? '#34d399' : '#a78bfa';
                       return (
