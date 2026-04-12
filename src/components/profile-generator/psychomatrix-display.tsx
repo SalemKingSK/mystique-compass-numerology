@@ -2,7 +2,7 @@
 
 /**
  * MYSTIQUE COMPASS — Alexandrov Psychomatrix / Pythagorean Square
- * Premium display component mirroring Lo Shu Grid architecture.
+ * Enhanced with Translucent UI and Speech Integration.
  */
 
 import * as React from 'react';
@@ -22,6 +22,7 @@ import {
   type ComplementaryInsight,
   type PsychomatrixCellMeaning,
 } from '@/lib/numerology/data/psychomatrixData';
+import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -48,17 +49,6 @@ const SCALE_GLYPH: Record<PsychomatrixCellMeaning['scale'], string> = {
   'dominant':  '★',
   'overload':  '⚠',
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PROPS
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface PsychomatrixDisplayProps {
-  day: number;
-  month: number;
-  year: number;
-  name?: string;
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -90,7 +80,7 @@ function ScalePill({ scale }: { scale: PsychomatrixCellMeaning['scale'] }) {
   return (
     <span
       className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-sm border"
-      style={{ color, borderColor: `${color}44`, background: `${color}11` }}
+      style={{ color, borderColor: `${color}44`, background: `${color}22` }}
     >
       <span>{SCALE_GLYPH[scale]}</span>
       {SCALE_LABELS[scale]}
@@ -121,14 +111,15 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
       className={`
         relative aspect-square flex flex-col items-center justify-between p-2
         rounded-sm border transition-all duration-300 text-left w-full
+        backdrop-blur-md
         ${isSelected
-          ? 'border-amber-500/60 bg-amber-900/20 shadow-[0_0_18px_rgba(196,154,40,0.15)]'
+          ? 'border-amber-500/60 bg-amber-900/40 shadow-[0_0_18px_rgba(196,154,40,0.25)]'
           : isEmpty
-            ? 'border-stone-700/30 bg-stone-900/20 hover:border-stone-600/40'
-            : 'border-stone-600/40 bg-stone-900/30 hover:border-amber-700/40'
+            ? 'border-stone-700/30 bg-black/40 hover:border-stone-600/40'
+            : 'border-stone-600/40 bg-black/40 hover:border-amber-700/40'
         }
       `}
-      style={isSelected ? { boxShadow: `0 0 16px ${scaleColor}22` } : {}}
+      style={isSelected ? { boxShadow: `0 0 16px ${scaleColor}33` } : {}}
     >
       <span className="absolute top-1 left-1 w-1 h-1 rotate-45 opacity-30"
         style={{ background: scaleColor }} />
@@ -136,10 +127,10 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
         style={{ background: scaleColor }} />
 
       <div className="flex items-center gap-1 self-start">
-        <span className="text-[0.55rem] opacity-40" style={{ color: scaleColor }}>
+        <span className="text-[0.55rem] opacity-60" style={{ color: scaleColor }}>
           {DIGIT_ICONS[digit]}
         </span>
-        <span className="font-cinzel text-[0.6rem] opacity-50 tracking-widest"
+        <span className="font-cinzel text-[0.6rem] opacity-70 tracking-widest"
           style={{ color: scaleColor }}>
           {digit}
         </span>
@@ -147,7 +138,7 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
 
       <div className="flex-1 flex items-center justify-center">
         {isEmpty ? (
-          <span className="font-cinzel text-[1.4rem] text-stone-700/40">—</span>
+          <span className="font-cinzel text-[1.4rem] text-stone-700/60">—</span>
         ) : (
           <div className="flex flex-wrap justify-center gap-px max-w-[48px]">
             {Array.from({ length: Math.min(reading.count, 6) }).map((_, i) => (
@@ -163,7 +154,7 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
               </motion.span>
             ))}
             {reading.count > 6 && (
-              <span className="text-[0.6rem] self-end mb-0.5" style={{ color: scaleColor }}>
+              <span className="text-[0.6rem] self-end mb-0.5 font-bold" style={{ color: scaleColor }}>
                 +{reading.count - 6}
               </span>
             )}
@@ -172,7 +163,7 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
       </div>
 
       <div className="self-end text-right w-full">
-        <p className="font-cinzel text-[0.48rem] uppercase tracking-wider opacity-40 leading-tight">
+        <p className="font-cinzel text-[0.48rem] uppercase tracking-wider opacity-60 leading-tight">
           {PSYCHOMATRIX_CELL_MEANINGS[digit]?.cellName.split('/')[0].trim()}
         </p>
       </div>
@@ -181,7 +172,7 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
         <motion.span
           layoutId="cell-selector"
           className="absolute inset-0 rounded-sm pointer-events-none"
-          style={{ border: `1px solid ${scaleColor}`, opacity: 0.4 }}
+          style={{ border: `1px solid ${scaleColor}`, opacity: 0.6 }}
         />
       )}
     </motion.button>
@@ -193,7 +184,6 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function CellDetailPanel({ reading }: { reading: CellReading }) {
-  const [showFull, setShowFull] = React.useState(false);
   const scaleColor = SCALE_COLORS[reading.scale];
   const cellDef = PSYCHOMATRIX_CELL_MEANINGS[reading.digit];
   const allLevels = cellDef?.meanings ?? [];
@@ -217,93 +207,80 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
           </div>
           <div className="flex items-center gap-2">
             <ScalePill scale={reading.scale} />
-            <span className="text-[0.6rem] text-stone-500 uppercase tracking-widest">
+            <span className="text-[0.6rem] text-stone-400 uppercase tracking-widest">
               {reading.count === 0 ? 'Absent' : `${reading.count} ${reading.count === 1 ? 'instance' : 'instances'}`}
             </span>
           </div>
         </div>
         <div
-          className="font-cinzel text-3xl font-bold opacity-15 shrink-0"
+          className="font-cinzel text-3xl font-bold opacity-20 shrink-0"
           style={{ color: scaleColor }}
         >
           {reading.digit}
         </div>
       </div>
 
-      <div className="text-[0.7rem] text-stone-400/80 leading-relaxed border-l-2 border-amber-700/30 pl-3 italic">
+      <div className="text-[0.7rem] text-stone-300 leading-relaxed border-l-2 border-amber-700/50 pl-3 italic bg-black/20 py-2 rounded-r-sm">
         {cellDef.intro}
       </div>
 
-      <div className="text-[0.65rem] text-stone-500 leading-relaxed">
-        <span className="text-amber-600/70 uppercase tracking-widest font-semibold not-italic">Lines: </span>
+      <div className="text-[0.65rem] text-stone-400 leading-relaxed px-1">
+        <span className="text-amber-600/80 uppercase tracking-widest font-semibold not-italic">Lines: </span>
         {cellDef.lineContext}
       </div>
 
       <div
-        className="border rounded-sm p-3 space-y-2"
-        style={{ borderColor: `${scaleColor}33`, background: `${scaleColor}08` }}
+        className="border rounded-sm p-4 space-y-3 backdrop-blur-md"
+        style={{ borderColor: `${scaleColor}44`, background: `${scaleColor}11` }}
       >
         <div className="flex items-center gap-2">
-          <span className="font-cinzel text-xs font-bold" style={{ color: scaleColor }}>
-            {SCALE_GLYPH[reading.scale]} {reading.label}
+          <span className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: scaleColor }}>
+            {SCALE_GLYPH[reading.scale]} {reading.label} Activation
           </span>
         </div>
 
-        <p className="text-[0.72rem] text-stone-300 leading-relaxed">
-          {showFull
-            ? reading.verbatim
-            : reading.verbatim.slice(0, 320) + (reading.verbatim.length > 320 ? '…' : '')}
-        </p>
-
-        {reading.verbatim.length > 320 && (
-          <button
-            onClick={() => setShowFull(f => !f)}
-            className="flex items-center gap-1 text-[0.62rem] uppercase tracking-widest"
-            style={{ color: scaleColor }}
-          >
-            {showFull ? <><ChevronUp className="w-3 h-3" /> Show less</> : <><ChevronDown className="w-3 h-3" /> Read full interpretation</>}
-          </button>
-        )}
+        <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+          <AccordionContentWithPlayer text={reading.verbatim} />
+        </div>
       </div>
 
       {reading.modifiers.length > 0 && (
-        <div className="space-y-2">
-          <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-amber-600/60">
+        <div className="space-y-2 pt-2">
+          <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-amber-500/80">
             ✦ Cross-Digit Interactions
           </p>
           {reading.modifiers.map((mod, i) => (
-            <div key={i} className="flex gap-2 text-[0.68rem] text-amber-400/70 leading-relaxed border-l border-amber-700/30 pl-2">
-              <ArrowRight className="w-3 h-3 mt-0.5 shrink-0 text-amber-600/50" />
-              <span>{mod}</span>
+            <div key={i} className="bg-black/30 p-2 rounded-sm border-l border-amber-700/40">
+               <AccordionContentWithPlayer text={mod} />
             </div>
           ))}
         </div>
       )}
 
-      <div className="space-y-1">
-        <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-stone-600">
+      <div className="space-y-2 pt-4">
+        <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-stone-500">
           ◈ All Expression Levels
         </p>
-        <div className="grid grid-cols-1 gap-1">
+        <div className="grid grid-cols-1 gap-1.5">
           {allLevels.map(lvl => {
             const isActive = lvl.count === Math.min(reading.count, 6);
             const lvlColor = SCALE_COLORS[lvl.scale];
             return (
               <div
                 key={lvl.count}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded-sm border text-[0.62rem] transition-all duration-200 ${
-                  isActive ? 'opacity-100' : 'opacity-30'
+                className={`flex items-center gap-3 px-3 py-2 rounded-sm border text-[0.62rem] transition-all duration-200 backdrop-blur-sm ${
+                  isActive ? 'opacity-100' : 'opacity-25'
                 }`}
                 style={isActive
-                  ? { borderColor: `${lvlColor}44`, background: `${lvlColor}11`, color: lvlColor }
-                  : { borderColor: 'transparent' }
+                  ? { borderColor: `${lvlColor}66`, background: `${lvlColor}22`, color: lvlColor }
+                  : { borderColor: 'transparent', background: 'rgba(255,255,255,0.03)' }
                 }
               >
-                <span className="w-4 text-center font-mono font-bold">
+                <span className="w-4 text-center font-mono font-bold text-sm">
                   {lvl.count === 0 ? '—' : lvl.count}
                 </span>
                 <span className="shrink-0">{SCALE_GLYPH[lvl.scale]}</span>
-                <span className={isActive ? 'font-semibold' : 'text-stone-600'}>
+                <span className={isActive ? 'font-bold' : 'text-stone-500'}>
                   {lvl.label}
                 </span>
               </div>
@@ -334,38 +311,38 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
 
         return (
           <div key={line.id}
-            className={`border rounded-sm overflow-hidden transition-all duration-200 ${
+            className={`border rounded-sm overflow-hidden transition-all duration-200 backdrop-blur-md ${
               isActive
-                ? 'border-amber-600/40 bg-amber-900/10'
-                : 'border-stone-700/30 bg-stone-900/10'
+                ? 'border-amber-600/50 bg-amber-900/20'
+                : 'border-stone-700/30 bg-black/40'
             }`}
           >
             <button
               onClick={() => setExpanded(isOpen ? null : line.id)}
-              className="w-full flex items-center justify-between px-3 py-2.5 text-left"
+              className="w-full flex items-center justify-between px-3 py-3 text-left"
             >
               <div className="flex items-center gap-3">
-                <span className={`text-[0.52rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${
-                  line.type === 'row' ? 'bg-blue-900/30 text-blue-400/70' :
-                  line.type === 'column' ? 'bg-emerald-900/30 text-emerald-400/70' :
-                  'bg-violet-900/30 text-violet-400/70'
+                <span className={`text-[0.52rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm font-bold ${
+                  line.type === 'row' ? 'bg-blue-900/40 text-blue-300' :
+                  line.type === 'column' ? 'bg-emerald-900/40 text-emerald-300' :
+                  'bg-violet-900/40 text-violet-300'
                 }`}>
                   {line.type}
                 </span>
                 <div className="flex gap-1">
                   {line.digits.map(d => (
                     <span key={d}
-                      className={`font-cinzel text-[0.6rem] px-1 rounded-sm ${
+                      className={`font-cinzel text-[0.65rem] px-1.5 rounded-sm font-bold ${
                         (result.counts[d] || 0) > 0
-                          ? 'bg-amber-900/30 text-amber-400'
-                          : 'bg-stone-800/40 text-stone-600'
+                          ? 'bg-amber-500/30 text-amber-300'
+                          : 'bg-stone-800/60 text-stone-600'
                       }`}
                     >
                       {d}
                     </span>
                   ))}
                 </div>
-                <span className="font-cinzel text-[0.65rem] text-stone-300 tracking-wider">
+                <span className="font-cinzel text-[0.7rem] text-stone-200 tracking-wider font-semibold">
                   {line.name}
                 </span>
               </div>
@@ -375,13 +352,13 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                     <span key={i}
                       className={`w-1.5 h-1.5 rounded-full transition-all ${
                         i < total
-                          ? isActive ? 'bg-amber-500' : 'bg-amber-700/50'
-                          : 'bg-stone-700/30'
+                          ? isActive ? 'bg-amber-400' : 'bg-amber-700/60'
+                          : 'bg-stone-700/40'
                       }`}
                     />
                   ))}
                 </div>
-                {isOpen ? <ChevronUp className="w-3 h-3 text-stone-500" /> : <ChevronDown className="w-3 h-3 text-stone-500" />}
+                {isOpen ? <ChevronUp className="w-3 h-3 text-stone-400" /> : <ChevronDown className="w-3 h-3 text-stone-400" />}
               </div>
             </button>
 
@@ -394,13 +371,13 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-3 pb-3 pt-0 space-y-2 border-t border-stone-700/20">
-                    <p className="text-[0.65rem] text-amber-400/70 font-semibold tracking-wider pt-2">
+                  <div className="px-4 pb-4 pt-0 space-y-3 border-t border-stone-700/30">
+                    <p className="text-[0.65rem] text-amber-400 font-bold tracking-widest pt-3 uppercase">
                       {line.quality}
                     </p>
-                    <p className="text-[0.7rem] text-stone-400 leading-relaxed">
-                      {line.description}
-                    </p>
+                    <div className="text-[0.72rem] text-stone-200 leading-relaxed bg-black/20 p-3 rounded-sm">
+                      <AccordionContentWithPlayer text={line.description} />
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -428,45 +405,45 @@ function SynergiesPanel({ insights }: { insights: ComplementaryInsight[] }) {
 
   if (insights.length === 0) {
     return (
-      <p className="text-[0.68rem] text-stone-600 italic text-center py-4">
+      <p className="text-[0.68rem] text-stone-500 italic text-center py-8">
         No inter-digit synergies detected for this configuration.
       </p>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {insights.map((insight, i) => {
         const color = SYNERGY_COLORS[insight.type];
         const isOpen = expanded === i;
         return (
           <div key={i}
-            className="border rounded-sm overflow-hidden"
-            style={{ borderColor: `${color}33`, background: `${color}06` }}
+            className="border rounded-sm overflow-hidden backdrop-blur-md"
+            style={{ borderColor: `${color}44`, background: `${color}11` }}
           >
             <button
               onClick={() => setExpanded(isOpen ? null : i)}
-              className="w-full flex items-center justify-between px-3 py-2.5 text-left"
+              className="w-full flex items-center justify-between px-3 py-3 text-left"
             >
               <div className="flex items-center gap-3">
-                <span className="text-[0.52rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm font-semibold"
-                  style={{ color, background: `${color}18` }}>
+                <span className="text-[0.52rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm font-bold"
+                  style={{ color, background: `${color}22` }}>
                   {insight.type}
                 </span>
                 <div className="flex gap-1">
                   {insight.digits.map((d, di) => (
-                    <span key={di} className="font-cinzel text-[0.62rem] font-bold" style={{ color }}>
+                    <span key={di} className="font-cinzel text-[0.7rem] font-black" style={{ color }}>
                       {d}
                     </span>
                   ))}
                 </div>
-                <span className="font-cinzel text-[0.65rem] text-stone-300">
+                <span className="font-cinzel text-[0.7rem] text-stone-100 font-bold tracking-wide">
                   {insight.title}
                 </span>
               </div>
               {isOpen
-                ? <ChevronUp className="w-3 h-3 text-stone-500 shrink-0" />
-                : <ChevronDown className="w-3 h-3 text-stone-500 shrink-0" />
+                ? <ChevronUp className="w-3 h-3 text-stone-400 shrink-0" />
+                : <ChevronDown className="w-3 h-3 text-stone-400 shrink-0" />
               }
             </button>
             <AnimatePresence>
@@ -478,10 +455,10 @@ function SynergiesPanel({ insights }: { insights: ComplementaryInsight[] }) {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-3 pb-3 pt-0 border-t border-stone-700/20">
-                    <p className="text-[0.7rem] text-stone-300 leading-relaxed pt-2">
-                      {insight.insight}
-                    </p>
+                  <div className="px-4 pb-4 pt-0 border-t border-stone-700/20">
+                    <div className="text-[0.72rem] text-stone-200 leading-relaxed pt-3">
+                      <AccordionContentWithPlayer text={insight.insight} />
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -526,25 +503,25 @@ function WorkingNumbersPanel({ result }: { result: PsychomatrixResult }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {nums.map(({ n, title, role, desc }) => (
         <div key={title}
-          className="border border-stone-700/30 bg-stone-900/20 rounded-sm p-3 space-y-1.5"
+          className="border border-amber-700/30 bg-black/40 backdrop-blur-md rounded-sm p-4 space-y-2"
         >
-          <div className="flex items-end gap-2">
-            <span className="font-cinzel text-2xl font-bold text-amber-500/80 leading-none">
+          <div className="flex items-end gap-3">
+            <span className="font-cinzel text-3xl font-black text-amber-400 leading-none">
               {n}
             </span>
-            <span className="text-[0.52rem] uppercase tracking-widest text-amber-600/50 pb-0.5">
+            <span className="text-[0.52rem] uppercase tracking-widest text-amber-600/70 pb-1 font-bold">
               {title}
             </span>
           </div>
-          <p className="font-cinzel text-[0.62rem] text-amber-400/60 uppercase tracking-wide">
+          <p className="font-cinzel text-[0.65rem] text-amber-500 font-bold uppercase tracking-widest">
             {role}
           </p>
-          <p className="text-[0.67rem] text-stone-400 leading-relaxed">
-            {desc}
-          </p>
+          <div className="text-[0.7rem] text-stone-300 leading-relaxed">
+            <AccordionContentWithPlayer text={desc} />
+          </div>
         </div>
       ))}
     </div>
@@ -576,22 +553,22 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="text-center space-y-1">
         <div className="flex items-center justify-center gap-3">
           <Diamond />
-          <h2 className="font-cinzel text-[0.75rem] uppercase tracking-[0.35em] text-amber-500/70">
+          <h2 className="font-cinzel text-[0.75rem] uppercase tracking-[0.35em] text-amber-500 font-bold">
             Alexandrov&apos;s Psychomatrix
           </h2>
           <Diamond />
         </div>
-        <p className="font-cinzel text-[0.58rem] uppercase tracking-[0.25em] text-stone-600">
+        <p className="font-cinzel text-[0.58rem] uppercase tracking-[0.25em] text-stone-500 font-medium">
           Pythagorean Square · Digital Analysis
         </p>
-        {name && <p className="text-stone-500 text-[0.7rem] italic">for {name}</p>}
+        {name && <p className="text-stone-400 text-[0.75rem] italic font-body">for {name}</p>}
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { label: 'I', val: result.first,  sub: 'Develop' },
           { label: 'II', val: result.second, sub: 'Purpose' },
@@ -599,26 +576,26 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
           { label: 'IV', val: result.fourth, sub: 'Origin II' },
         ].map(({ label, val, sub }) => (
           <div key={label}
-            className="border border-stone-700/30 rounded-sm bg-stone-900/30 py-2 text-center space-y-0.5"
+            className="border border-stone-700/40 rounded-sm bg-black/40 backdrop-blur-md py-3 text-center space-y-1"
           >
-            <p className="font-cinzel text-[0.5rem] uppercase tracking-widest text-stone-600">{label}</p>
-            <p className="font-cinzel text-lg font-bold text-amber-500/70 leading-none">{val}</p>
-            <p className="font-cinzel text-[0.48rem] uppercase tracking-wide text-stone-600">{sub}</p>
+            <p className="font-cinzel text-[0.55rem] uppercase tracking-widest text-stone-500 font-bold">{label}</p>
+            <p className="font-cinzel text-xl font-black text-amber-400 leading-none">{val}</p>
+            <p className="font-cinzel text-[0.5rem] uppercase tracking-wide text-stone-600 font-bold">{sub}</p>
           </div>
         ))}
       </div>
 
-      <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide">
+      <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg">
         {TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`
-              flex-1 min-w-0 px-2 py-2 font-cinzel text-[0.58rem] uppercase tracking-widest
-              border-b-2 transition-all duration-200 whitespace-nowrap
+              flex-1 min-w-0 px-3 py-3 font-cinzel text-[0.6rem] uppercase tracking-widest
+              border-b-2 transition-all duration-300 whitespace-nowrap font-bold
               ${activeTab === tab
-                ? 'border-amber-500/60 text-amber-400'
-                : 'border-transparent text-stone-600 hover:text-stone-400'
+                ? 'border-amber-500 text-amber-400 bg-amber-500/10'
+                : 'border-transparent text-stone-500 hover:text-stone-300 hover:bg-white/5'
               }
             `}
           >
@@ -634,16 +611,16 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.2 }}
-          className="min-h-[200px]"
+          className="min-h-[300px]"
         >
           {activeTab === 'Matrix' && (
-            <div className="space-y-5">
+            <div className="space-y-6">
               <div
-                className="relative border border-stone-700/30 rounded-sm p-1.5"
-                style={{ background: 'linear-gradient(135deg, rgba(10,8,6,0.8) 0%, rgba(20,15,8,0.9) 100%)' }}
+                className="relative border border-stone-700/40 rounded-sm p-2 backdrop-blur-xl"
+                style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(20,15,8,0.7) 100%)' }}
               >
-                <div className="border border-stone-700/20 rounded-sm p-1.5">
-                  <div className="grid grid-cols-3 gap-1.5">
+                <div className="border border-stone-700/20 rounded-sm p-2 bg-black/20">
+                  <div className="grid grid-cols-3 gap-2">
                     {gridRows.map((row) =>
                       row.map(digit => (
                         <GridCell
@@ -657,7 +634,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                     )}
                   </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between px-1">
+                <div className="mt-3 flex items-center justify-between px-2">
                   <div className="flex gap-3 flex-wrap">
                     {result.activeLines.map(lineId => {
                       const line = PSYCHOMATRIX_LINE_MEANINGS.find(l => l.id === lineId);
@@ -665,7 +642,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                       const typeColor = line.type === 'row' ? '#60a5fa' : line.type === 'column' ? '#34d399' : '#a78bfa';
                       return (
                         <span key={lineId}
-                          className="text-[0.55rem] uppercase tracking-wider font-semibold"
+                          className="text-[0.58rem] uppercase tracking-widest font-black"
                           style={{ color: typeColor }}
                         >
                           ✦ {line.quality.split('&')[0].trim()}
@@ -675,15 +652,15 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                   </div>
                 </div>
               </div>
-              <p className="text-center text-[0.62rem] text-stone-600 uppercase tracking-widest">
+              <p className="text-center text-[0.65rem] text-stone-500 uppercase tracking-[0.2em] font-bold">
                 ↑ Tap a cell to reveal its full interpretation
               </p>
               {result.complementaryInsights.length > 0 && (
-                <div className="flex items-center gap-2 border border-amber-700/20 bg-amber-900/10 rounded-sm px-3 py-2">
-                  <Sparkles className="w-3 h-3 text-amber-500/60 shrink-0" />
-                  <p className="text-[0.65rem] text-amber-400/70">
+                <div className="flex items-center gap-3 border border-amber-700/30 bg-amber-900/20 backdrop-blur-md rounded-sm px-4 py-3">
+                  <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                  <p className="text-[0.7rem] text-stone-200">
                     <strong>{result.complementaryInsights.length}</strong> inter-digit synerg{result.complementaryInsights.length === 1 ? 'y' : 'ies'} detected.
-                    {' '}<button onClick={() => setActiveTab('Synergies')} className="underline underline-offset-2 hover:text-amber-300 transition-colors">View all →</button>
+                    {' '}<button onClick={() => setActiveTab('Synergies')} className="text-amber-400 font-bold underline underline-offset-4 hover:text-amber-300 transition-colors ml-1">View all →</button>
                   </p>
                 </div>
               )}
@@ -691,8 +668,8 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
           )}
 
           {activeTab === 'Detail' && (
-            <div className="space-y-4">
-              <div className="flex gap-1.5 flex-wrap">
+            <div className="space-y-5">
+              <div className="flex gap-2 flex-wrap justify-center bg-black/20 p-2 rounded-sm border border-white/5">
                 {Array.from({ length: 9 }, (_, i) => i + 1).map(d => {
                   const r = result.cellReadings.find(cr => cr.digit === d)!;
                   const color = SCALE_COLORS[r.scale];
@@ -700,14 +677,14 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                     <button
                       key={d}
                       onClick={() => setSelectedDigit(d)}
-                      className="flex flex-col items-center gap-0.5 px-2 py-1.5 border rounded-sm transition-all duration-200 min-w-[38px]"
+                      className="flex flex-col items-center gap-1 px-2.5 py-2 border rounded-sm transition-all duration-300 min-w-[42px] backdrop-blur-sm"
                       style={selectedDigit === d
-                        ? { borderColor: `${color}66`, background: `${color}15`, color }
-                        : { borderColor: 'rgba(68,68,68,0.3)', color: '#555' }
+                        ? { borderColor: `${color}`, background: `${color}33`, color }
+                        : { borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: '#777' }
                       }
                     >
-                      <span className="font-cinzel text-sm font-bold">{d}</span>
-                      <span className="text-[0.48rem]">{SCALE_GLYPH[r.scale]}</span>
+                      <span className="font-cinzel text-sm font-black">{d}</span>
+                      <span className="text-[0.5rem] font-bold">{SCALE_GLYPH[r.scale]}</span>
                     </button>
                   );
                 })}
@@ -719,30 +696,31 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
           )}
 
           {activeTab === 'Lines' && (
-            <div className="space-y-4">
-              <SectionHeader icon={<GitBranch className="w-3 h-3" />} title="Rows · Columns · Diagonals" />
+            <div className="space-y-5">
+              <SectionHeader icon={<GitBranch className="w-4 h-4" />} title="Rows · Columns · Diagonals" />
               <LinesPanel result={result} />
             </div>
           )}
 
           {activeTab === 'Synergies' && (
-            <div className="space-y-4">
-              <SectionHeader icon={<Sparkles className="w-3 h-3" />} title="Cross-Digit Interactions" />
+            <div className="space-y-5">
+              <SectionHeader icon={<Sparkles className="w-4 h-4" />} title="Cross-Digit Interactions" />
               <SynergiesPanel insights={result.complementaryInsights} />
             </div>
           )}
 
           {activeTab === 'Origins' && (
-            <div className="space-y-5">
-              <SectionHeader icon={<Info className="w-3 h-3" />} title="The Four Working Numbers" />
+            <div className="space-y-6">
+              <SectionHeader icon={<Info className="w-4 h-4" />} title="The Four Working Numbers" />
               <WorkingNumbersPanel result={result} />
-              <div className="border border-stone-700/20 rounded-sm p-3 bg-stone-900/20 space-y-2">
-                <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-stone-500">◈ Calculation Log</p>
-                <div className="space-y-1 font-mono text-[0.65rem] text-stone-400">
-                  <p><span className="text-stone-600">Birth date digits: </span>{`${day}`.split('').join('+')}+{`${month}`.split('').join('+')}+{`${year}`.split('').join('+')} = <span className="text-amber-400">{result.first}</span> <span className="text-stone-600 ml-2">(I)</span></p>
-                  <p><span className="text-stone-600">Sum of {result.first}: </span>{String(result.first).split('').join('+')} = <span className="text-amber-400">{result.second}</span> <span className="text-stone-600 ml-2">(II)</span></p>
-                  <p><span className="text-stone-600">{result.first} − 2×{String(day)[0]}: </span>{result.first} − {2 * Number(String(day)[0])} = <span className="text-amber-400">{result.third}</span> <span className="text-stone-600 ml-2">(III)</span></p>
-                  <p><span className="text-stone-600">Sum of {result.third}: </span>{String(result.third).split('').join('+')} = <span className="text-amber-400">{result.fourth}</span> <span className="text-stone-600 ml-2">(IV)</span></p>
+              
+              <div className="border border-stone-700/40 rounded-sm p-4 bg-black/40 backdrop-blur-md space-y-3">
+                <p className="font-cinzel text-[0.65rem] uppercase tracking-widest text-stone-400 font-bold">◈ Calculation Log</p>
+                <div className="space-y-2 font-mono text-[0.72rem] text-stone-200">
+                  <p className="flex justify-between border-b border-white/5 pb-1"><span className="text-stone-500">Birth date digits: </span><span>{`${day}`.split('').join('+')}+{`${month}`.split('').join('+')}+{`${year}`.split('').join('+')} = <span className="text-amber-400 font-bold">{result.first}</span> <span className="text-stone-600 ml-2">(I)</span></span></p>
+                  <p className="flex justify-between border-b border-white/5 pb-1"><span className="text-stone-500">Sum of (I): </span><span>{String(result.first).split('').join('+')} = <span className="text-amber-400 font-bold">{result.second}</span> <span className="text-stone-600 ml-2">(II)</span></span></p>
+                  <p className="flex justify-between border-b border-white/5 pb-1"><span className="text-stone-500">(I) − 2×{String(day)[0]}: </span><span>{result.first} − {2 * Number(String(day)[0])} = <span className="text-amber-400 font-bold">{result.third}</span> <span className="text-stone-600 ml-2">(III)</span></span></p>
+                  <p className="flex justify-between pb-1"><span className="text-stone-500">Sum of (III): </span><span>{String(result.third).split('').join('+')} = <span className="text-amber-400 font-bold">{result.fourth}</span> <span className="text-stone-600 ml-2">(IV)</span></span></p>
                 </div>
               </div>
             </div>
@@ -750,11 +728,13 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
         </motion.div>
       </AnimatePresence>
 
-      <div className="text-center pt-2 border-t border-stone-800/50">
-        <p className="text-[0.55rem] uppercase tracking-[0.3em] text-stone-700">
+      <div className="text-center pt-4 border-t border-stone-800/50">
+        <p className="text-[0.6rem] uppercase tracking-[0.4em] text-stone-600 font-bold">
           Based on the verbatim teachings of Professor A. Alexandrov
         </p>
       </div>
     </div>
   );
 }
+
+export default PsychomatrixDisplay;
