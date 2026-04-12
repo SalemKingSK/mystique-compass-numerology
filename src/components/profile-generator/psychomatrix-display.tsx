@@ -588,13 +588,13 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
         ))}
       </div>
 
-      <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg">
+      <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg gap-1">
         {TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`
-              flex-1 min-w-0 px-3 py-3 font-cinzel text-[0.6rem] uppercase tracking-widest
+              flex-1 min-w-0 px-1 py-3 font-cinzel text-[0.55rem] uppercase tracking-wider
               border-b-2 transition-all duration-300 whitespace-nowrap font-bold
               ${activeTab === tab
                 ? 'border-amber-500 text-amber-400 bg-amber-500/10'
