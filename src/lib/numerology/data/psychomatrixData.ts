@@ -123,7 +123,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   2: {
     digit: 2,
     cellName: 'Energy',
-    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan. The energy of Number 2 also characterizes compatibility through energy contact. Questions of vampirism and donorship are always about Number 2 energy. In any conversation, one person takes the position of the donor and the other the vampire. The donor is the one who starts speaking about the interests of the other. The one who is in the center of the conversation (or brings up his own interests) becomes the vampire. A transition from \'22\' to \'4\' is also possible: physically perfect and beautiful people always draw attention to themselves — their contact energy (Number 2) comes from their healthy body, and if they are not aggressive and are quiet and kind, they can attract others.',
+    intro: 'The Pythagorean number 2 represents human energy. It is necessary to understand that energy in this case is a person\'s behavior in the family, at work and in society. The energy of Number 2 is not exactly identical to the known energy of your body, which in acupuncture is called the Chi of the meridians. We call a person \'energetic\' if he can visualize a goal, find ways to achieve it and move forward to achieve it according to his own plan.',
     lineContext: 'Row 2 (2, 5, 8) — Family orientation. Column 1 (1, 2, 3) — Self-esteem.',
     meanings: [
       {
@@ -323,49 +323,49 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   6: {
     digit: 6,
     cellName: 'Labor / Manual Skills',
-    intro: 'Number 6 is one of the most controversial numbers. It should have kept the main meaning of number 9 (mind, knowledge), but turned its goals.',
+    intro: 'Number 6 is one of the most controversial and difficult numbers in this numerology system. If you look closely at the numbers, you can see that the shapes of numbers 6 and 9 are very similar, and this is not an excuse. Number 9 is responsible for a person\'s memory and his mind, which is always aimed at accumulating knowledge that helps a person survive. In this case, number 6 should have kept the main meaning of number 9 (mind, knowledge), but should have \'turned\' its goals, or rather: a person becomes forgetful of his loved ones, his mind works to accumulate knowledge that can help him advance to gaining authority in order to suppress, humiliate and finally destroy another person. The collected knowledge allows him to influence another person, his psyche, health; there are ways to destroy people (up to murder). Such knowledge is called \'black\', and the people who possess it are called \'magicians\'.',
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 2 (4, 5, 6) — Labor efficiency.',
     meanings: [
       {
         count: 0,
         label: 'Not Inclined to Manual Labor',
-        verbatim: 'If in the Pythagorean Square there is no Number 6, this means that the person is not inclined to manual labor, he doesn\'t like it and can be involved in it only by reason of necessity or having it as a duty. These are people of art and science.',
+        verbatim: 'If in the Pythagorean Square there is no Number 6, this means that the person is not inclined to manual labor, he doesn\'t like it and can be involved in it only by reason of necessity or having it as a duty. These are people of art and science. Don\'t try to accustom them to manual labor; they will never be good workers. Above all they are inclined to art or science as much as their numbers allow. When there is no Number 6 with 2-none, 4 (or more), 9 and 5-none — better try yourself in dancing (ballet), as such people are very mobile and have a strong body.',
         scale: 'absent'
       },
       {
         count: 1,
-        label: 'Mood-Based Labor',
-        verbatim: 'Having one Number 6 means that the person does manual labor based on his mood — when there is a desire. Performance is not the main thing as a result. If you try to force one who has only one \'6\' when he doesn\'t feel like working, you\'ll get a lot of problems as a result.',
+        label: 'Very Weak, Mood-Based Labor',
+        verbatim: 'Having one Number 6 means that the person does manual labor based on his mood — when there is a desire. You should never be indifferent to this quality. Performance is not the main thing as a result. One can perform any work, but it is a question of how good results will be and how happy he will be after finishing it. If you try to force one who has only one \'6\' when he doesn\'t feel like working, you\'ll get a lot of problems as a result. You are going to lose a lot of energy forcing him, and if he has agreed, that doesn\'t mean he starts working at once. After such work the person becomes angry, explosive and offended. For this reason it\'s not good when people with this sign are engaged in monotonous work with a strict schedule — this can lead to breakdowns, desire to change activity, alcoholism, illnesses. But if such a person started doing some work, you should never disturb him or give advice. Your offer to help won\'t be good too, because such people don\'t like teamwork.',
         scale: 'very-weak'
       },
       {
         count: 2,
-        label: 'Master of Any Craft',
-        verbatim: 'The sign \'66\' gives its owner ability to do everything — he is a master of any craft. Very often such people are great architects. The sign \'66\' can be named as sign of grounding. The matter is that people having this sign don\'t really like reading.',
+        label: 'Labor Given in Norm; Master of Any Craft',
+        verbatim: 'The sign \'66\' gives its owner ability to do everything — he is a master of any craft. Very often such people are great architects. The sign \'66\' can be named as sign of grounding. The matter is that people having this sign don\'t really like reading; they better watch telecasts or do anything but not reading. If somehow you managed to control the sign, then reading takes 1st place, and manual labor has the last. Before you decide what to do with your child who has \'66\' (Numbers 7 are absent — and this is very important), it is necessary to find out its opportunities as the future master. For a craftsman it is necessary to have good energy and good health: 22 (or 2222 and more) and 4 or more. In case the child possesses \'7\' (or more), it can become a master only carefully serving a duty to its parents. I would not advise choosing any profession connected with authority as it makes the person strict and indifferent towards others\' lives.',
         scale: 'norm'
       },
       {
         count: 3,
         label: 'Number of the Beast - Black Knowledge',
-        verbatim: 'The number of the beast. Satan (number 666) is the image of man and belongs to men. The greater number of \'6\' can be named \'number of the sorcerer or a witch\' as this sign is stronger. You should not be prejudiced, for that sign doesn\'t mean anything as the presence of such numbers as 8 and 7 constrain \'6\'.',
+        verbatim: 'The number of the beast. Satan (number 666) is the image of man and belongs to men. The greater number of \'6\' can be named \'number of the sorcerer or a witch\' as this sign is stronger. You should not be prejudiced, for that sign doesn\'t mean anything as the presence of such numbers as 8 and 7 constrain \'6\'. For example, a person has a set of numbers: 666, 7, 8. Then we can delete two numbers 6 and, accordingly, numbers 7 and 8, there will be left only one \'6\' — the man of moods (such deletion is able only when both numbers 7 and 8 haven\'t made transition; otherwise we deal with the person who, having started the conflict with the parents, has received a new quality: 666, 7, 8 transforms into 6666 and 11 with the loss of 4 or 22, that leads to irritability and authoritativeness).',
         scale: 'special'
       },
       {
         count: 4,
-        label: 'Sorcerer Sign - Dark Accumulation',
-        verbatim: 'Four 6\'s is the sorcerer sign in its full expression. The person has an uncanny ability to read and manipulate others\' psychology. Charisma is used as a tool of control. The person attracts followers who mirror their own shadow.',
+        label: 'Sorcerer Sign - Hidden Abilities',
+        verbatim: 'If there is \'6666\', being attached to similar ones (they are four in this case), they create a stable line, and the person starts to gather similar people around himself, and they show their hidden abilities: authority, cruelty, aggression. To protect yourself: if somebody tries to involve you into a conflict, the only way is to leave with an emotion of emptiness and indifference. The simplest way is laughter, which doesn\'t support any fright and doesn\'t bring any irritability or aggression. This is the Grand Chinese technique of leaving in emptiness which chi kung masters used when they met an opponent.',
         scale: 'strong'
       },
       {
         count: 5,
-        label: 'Black Mastery',
-        verbatim: 'Five 6\'s represents the peak of the dark labor quality in its dominant form. The accumulation of knowledge for purposes of influence and control becomes a consuming life-focus. Such a person can rise to significant positions of power.',
+        label: 'Black Mastery Dominant',
+        verbatim: 'Five 6\'s represents the peak of the dark labor quality in its dominant form. The accumulation of knowledge for purposes of influence and control becomes a consuming life-focus. Such a person can rise to significant positions of power. The potential for cruelty and structural aggression is at its maximum. Self-protection through "emptiness" and laughter is essential for those who interact with this intense energy.',
         scale: 'dominant'
       },
       {
         count: 6,
         label: 'Labor Overload - Self-Destruction',
-        verbatim: 'Six or more 6\'s triggers the complete overload inversion of the labor quality. The person burns through their own substance. The accumulated desire for control implodes into paranoia, self-sabotage, and the systematic destruction of everything they have built.',
+        verbatim: 'Six or more 6\'s triggers the complete overload inversion of the labor quality. The person burns through their own substance. The accumulated desire for control implodes into paranoia, self-sabotage, and the systematic destruction of everything they have built. The "sorcerer" energy turns inward, leading to internal psychic rupture.',
         scale: 'overload'
       }
     ]
