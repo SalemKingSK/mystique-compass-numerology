@@ -1,4 +1,3 @@
-
 'use client';
 
 /**
@@ -12,7 +11,7 @@ import type { NumerologyData, PersonalYearData } from './types';
 import {
   Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass,
   Activity, ChevronRight, CalendarDays, Zap, Star,
-  AlertTriangle, TrendingUp, CheckCircle2, ShieldAlert
+  AlertTriangle, TrendingUp, ShieldAlert
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
@@ -283,7 +282,7 @@ function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttribut
   React.useEffect(() => {
     const handleOrientation = (e: DeviceOrientationEvent) => {
       // heading (alpha) relative to north
-      const h = e.webkitCompassHeading || (360 - (e.alpha || 0));
+      const h = (e as any).webkitCompassHeading || (360 - (e.alpha || 0));
       setHeading(h);
 
       // pitch/roll (beta/gamma) to check if device is flat
@@ -419,7 +418,7 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement,{arrowsOfStrength:any[];ar
         {cats.map(cat=>(
           <div key={cat} className="space-y-2">
             <h4 className="font-cinzel text-[0.6rem] text-muted-foreground uppercase tracking-[0.2em] mb-2 px-2 border-l border-primary/30">{cat}</h4>
-            <Accordion type="multiple" className="w-full" value={openItems} onValueChange={onToggle}>
+            <Accordion type="multiple" className="w-full" value={openItems} onToggle={onToggle}>
               {[...arrowsOfStrength,...arrowsOfWeakness].filter(a=>(a.category||(a.type==='shadow'?'Deficiency':'Primary Plane'))===cat).map(arrow=>{
                 const isShadow=arrow.type==='shadow'||arrow.type==='weakness';
                 return(

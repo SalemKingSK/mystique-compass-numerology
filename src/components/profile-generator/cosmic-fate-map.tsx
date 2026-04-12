@@ -8,15 +8,15 @@ import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { INTERSECTION_SYNTHESIS } from '@/lib/cosmic-fate/intersections';
 import { CHINESE_CALENDAR } from '@/lib/new-astrology/chinese-calendar';
 import { BOOK } from '@/lib/cosmic-fate/book';
-import { ANIMALS, RELATIONS, CAT_META } from '@/lib/cosmic-fate/constants';
+import { ANIMALS, RELATIONS } from '@/lib/cosmic-fate/constants';
 import { CosmicRiskScanner } from './cosmic-risk-scanner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Badge }    from '@/components/ui/badge';
+import { Card }     from '@/components/ui/card';
+import { Input }    from '@/components/ui/input';
+import { Button }   from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, Globe, RotateCcw } from 'lucide-react';
+import { CalendarDays, Star, Compass, Activity, ShieldAlert, Telescope, BookOpen, Zap, RotateCcw } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
 interface Props {
@@ -117,6 +117,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const pmNames = ['', 'Initiation', 'Partnership', 'Creativity', 'Foundation', 'Freedom', 'Harmony', 'Retreat', 'Power', 'Completion'];
 
+  // Calculate all core stats based on readYear and birth data
   const stats = useMemo(() => {
     const py = reduce(reduce(birthMonth) + reduce(birthDay) + reduce(readYear));
     const uy = reduce(readYear);
@@ -158,6 +159,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
     return { py, uy, lp, bv, pm, pNum, pStage, cNum, age, birthSign, yearAnimalName, cat, p1end, p2end, p3end, p1, p2, p3, p4, c1, c2, c3, c4 };
   }, [birthDay, birthMonth, birthYear, readYear]);
 
+  // Derived lists moved to top level to follow Rules of Hooks
   const intersectionsList = useMemo(() => {
     const list = [];
     for (let y = readYear; y <= readYear + 30; y++) {
@@ -331,7 +333,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         border: "2px solid rgba(200,30,50,.7)",
         boxShadow: "0 0 24px rgba(200,30,50,.4)"
       };
-      badge = `⚠ PY${pyn} + ${statusTag}`;
+      badge = `⚠️ PY${pyn} + ${statusTag}`;
       statusColor = "#ef4444";
     } else if (state === 2) {
       cardStyles = {
@@ -471,7 +473,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
 
   const renderEnemy = () => (
     <div key={readYear} className="space-y-6 relative z-10 animate-in fade-in duration-500 dash-panel active">
-      <div className="section-header">⚠ &nbsp; Enemy Year Dynamics &nbsp; ⚠</div>
+      <div className="section-header">⚠️ &nbsp; Enemy Year Dynamics &nbsp; ⚠️</div>
       <div className="space-y-6">
         {CONVERGENCE_CARDS.map(card => (
           <Card key={card.year} className="p-6 bg-slate-950/60 border-primary/20">
@@ -554,7 +556,7 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
             { id: 'intersections', label: '🔥 Critical', icon: <Zap className="h-3 w-3" /> },
             { id: 'zodiac', label: '☯ Zodiac', icon: <BookOpen className="h-3 w-3" /> },
             { id: 'pinnacles', label: '◈ Pinnacle', icon: <Activity className="h-3 w-3" /> },
-            { id: 'enemy', label: '⚠ Enemy', icon: <ShieldAlert className="h-3 w-3" /> },
+            { id: 'enemy', label: '⚠️ Enemy', icon: <ShieldAlert className="h-3 w-3" /> },
             { id: 'scanner', label: '🔭 Scan', icon: <Telescope className="h-3 w-3" /> },
           ].map(tab => (
             <button 

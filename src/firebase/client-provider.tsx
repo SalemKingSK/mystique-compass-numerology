@@ -1,8 +1,14 @@
 'use client';
 
 import React, { useMemo, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { FirebaseProvider } from '@/firebase/provider';
 import { initializeFirebase } from '@/firebase';
+
+// Dynamic imports for heavy client-side components to resolve ChunkLoadErrors
+// Loaded here inside a Client Component to avoid Server Component dynamic restrictions
+const DynamicServiceWorker = dynamic(() => import('@/components/ServiceWorkerRegister'), { ssr: false });
+const DynamicCosmicNebula = dynamic(() => import('@/components/cosmic-nebula'), { ssr: false });
 
 interface FirebaseClientProviderProps {
   children: ReactNode;
@@ -20,6 +26,8 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       auth={firebaseServices.auth}
       firestore={firebaseServices.firestore}
     >
+      <DynamicServiceWorker />
+      <DynamicCosmicNebula />
       {children}
     </FirebaseProvider>
   );

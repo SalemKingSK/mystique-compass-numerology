@@ -1,7 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Toaster } from '@/components/ui/toaster';
-import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
-import CosmicNebula from '@/components/cosmic-nebula';
 import { FirebaseClientProvider } from '@/firebase';
 import './globals.css';
 
@@ -59,10 +56,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
-          <ServiceWorkerRegister />
-          <CosmicNebula />
           {children}
-          <Toaster />
         </FirebaseClientProvider>
       </body>
     </html>
