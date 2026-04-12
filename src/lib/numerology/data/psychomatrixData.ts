@@ -273,49 +273,49 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   5: {
     digit: 5,
     cellName: 'Logic / Intuition',
-    intro: 'Digit 5 in the psychomatrix answers for human logic and intuition, which, in turn, determines a person\'s ability to make plans and analyze situations.',
-    lineContext: 'Row 2 (2, 5, 8) — Family orientation. Column 2 (4, 5, 6) — Labor efficiency. Carnal diagonal (3, 5, 7) — Temperament. Spiritual diagonal (1, 5, 9) — Spiritual life.',
+    intro: 'Digit 5 in the psychomatrix answers for human logic and intuition, which, in turn, determines a person\'s ability to make plans and analyze situations, understand exact sciences and technique. Intuition (the ability to foresee steps or events) is almost impossible to strengthen, as it is either given from birth or a person does not use it. By logic we accept a person\'s ability to compose logical (sequential) links of reasoning that will lead to a correct decision.',
+    lineContext: '2nd column (4,5,6) — maintenance of family; 2nd row (2,5,8) — quality of family man; carnal diagonal (3,5,7) — carnal interests; spiritual diagonal (1,5,9) — spiritual life.',
     meanings: [
       {
         count: 0,
-        label: 'No Logic — Dreamer',
-        verbatim: 'Absence of Number 5 in Pythagoras Square means that the person doesn\'t use logic; he can be named a dreamer who constantly goes woolgathering. Such people build castles in the air and live in them. It is not necessary to make such a dreamer change his mind; leave him with his dreams.',
+        label: 'No Logic; Dreamer',
+        verbatim: 'Absence of Number 5 in Pythagoras Square means that the person doesn\'t use logic; he can be named a dreamer who constantly goes woolgathering. This is why it is not necessary to make far-reaching plans. The person doesn\'t plan, and simply draws up his dreams in the certain sequence, gives out desirable for real. Such people build castles in the air and live in them. It is not necessary to make such a dreamer change his mind; leave him with his dreams. When there is no \'5\' you shouldn\'t be actively engaged in technics and exact sciences; better choose a humanitarian direction or art. It is necessary for people around you to understand that exactly dreamers move forward our civilization, constantly generating utopian dreams in the form of their plans. A good example was V.I. Lenin who had no \'5\'s in Pythagoras Square. You shouldn\'t go into details and explain something to the person who doesn\'t have any \'5\'s. Just tell him what he should do, and he will be happy with it. The emotional part is more important for him than a logical explanation.',
         scale: 'absent'
       },
       {
         count: 1,
         label: 'Very Weak Logic',
-        verbatim: 'If in Pythagoras Square there is one \'5\' it means, that there is logic, but it is very weak and differs a little from quality \'5-not present\'. The person is the same dreamer. In time the person can grow an additional \'5\' (transition: 99 gives additional 5).',
+        verbatim: 'If in Pythagoras Square there is one \'5\' it means, that there is logic, but it is very weak and differs a little from quality \'5-not present\'. The person is the same dreamer. The unique difference concerns those people who have many \'3\'s and \'9\'s at the same time (two or more). A large interest in technics and exact sciences pushes people to studying these sciences, and strong memory fills itself with examples of logic that gives good results on its strengthening. In time the person can grow an additional \'5\' (transition: 99 gives additional 5). Before you push your child to exact sciences, look closely at its Pythagoras Square and make sure that it has energy (22, 2222 or more), the part of character for studying sciences (111 or 1111), and availability of strong memory (99 or 9999 or more).',
         scale: 'very-weak'
       },
       {
         count: 2,
         label: 'Strong Logic',
-        verbatim: 'People having two or more fives in the psychomatrix become a little boring, as they lay out all their reasoning into many steps. Such people can plan the future. They foresee almost every mistake, but not always can they secure themselves from them.',
+        verbatim: 'People having two or more fives in the psychomatrix become a little boring, as they lay out all their reasoning into many steps, which sometimes begin with a lengthy preamble, which is not pleasant at all, especially for those who don\'t have a 5. When choosing a partner for marriage, it is necessary to look at the difference in the number of digit 5, so that it does not exceed one digit, and it will be better if it is in favor of the man. Such people can plan the future. They foresee almost every mistake, but not always can they secure themselves from them, as very often the decision isn\'t dependent on them. Such people cannot be deceived, as they find out the truth by asking various questions, comparing with answers and finding contradictions. If they are soft and tolerant, even knowing that they are being deceived, they\'ll try not to tell about knowing it, but the repeated lie destroys friendship.',
         scale: 'norm'
       },
       {
         count: 3,
         label: 'Very Strong Logic, Special Sign',
-        verbatim: 'Strong logic. Having \'555\' noticeably weakens logic, doing its occurrence more like an unexpectedness than as a rule. In this case these figures are almost entirely owned by the line of maintenance of family (for men) or a line of family (for women).',
+        verbatim: 'Strong logic, included in four lines: 2nd column (4, 5, 6) — family maintenance, 2nd row (2, 5, 8) — quality of a family man, carnal diagonal (3, 5, 7) — carnal interests, spiritual diagonal (1, 5, 9) — spiritual life. Having \'555\' noticeably weakens logic, doing its occurrence more like an unexpectedness than as a rule. In this case these figures are almost entirely owned by the line of maintenance of family (for men) or a line of family (for women). Sometimes they can make predictions but as the horizon of vision is very large, the person more often doesn\'t trust himself, making his predictions seem unreal. These people understand mathematics and technics well, but as a rule choose a narrow speciality which is carefully mastered. This quality can be named \'laziness of logic.\' If there is \'5555\' (and more) in this case one can be called \'a prophet\'. Such people are almost never mistaken about their predictions. They can predict destinies.',
         scale: 'special'
       },
       {
         count: 4,
         label: 'Prophetic Logic',
-        verbatim: 'Four or more 5\'s: this person can be called a prophet. Such people are almost never mistaken about their predictions. They can predict destinies.',
+        verbatim: 'Four or more 5\'s: this person can be called a prophet. Such people are almost never mistaken about their predictions. They can predict destinies. The horizon of logical vision is so large that the person naturally perceives patterns across time — not as mysticism but as pattern-recognition elevated to a near-supernatural acuity. The danger is isolation: people around them cannot follow the reasoning, making the prophet feel perpetually misunderstood. The family line fully absorbs this energy; the person\'s greatest prophecies are often about those closest to them, and their greatest burden is knowing outcomes before they arrive.',
         scale: 'strong'
       },
       {
         count: 5,
         label: 'Logic Dominates All',
-        verbatim: 'Five 5\'s represents logic that has overwhelmed all other modes of being. Everything is analyzed; emotion, intuition, and spontaneity are absorbed into the analytical framework. The person is a supreme strategist but may find joy and presence nearly inaccessible.',
+        verbatim: 'Five 5\'s represents logic that has overwhelmed all other modes of being. Everything is analyzed; emotion, intuition, and spontaneity are absorbed into the analytical framework. The person is a supreme strategist but may find joy and presence nearly inaccessible. Relationships suffer as the person intellectualizes every interaction. Physical sensation and emotional experience, when they do break through, arrive with overwhelming intensity because they have been dammed so long.',
         scale: 'dominant'
       },
       {
         count: 6,
         label: 'Logic Overload — Paralysis',
-        verbatim: 'Six or more 5\'s triggers logic overload: the analytical capacity turns against itself. The person becomes paralyzed by over-analysis, unable to reach a decision because every decision generates an infinite regress of consequences to calculate.',
+        verbatim: 'Six or more 5\'s triggers logic overload: the analytical capacity turns against itself. The person becomes paralyzed by over-analysis, unable to reach a decision because every decision generates an infinite regress of consequences to calculate. The gift of foresight becomes a burden of anticipated disaster.',
         scale: 'overload'
       }
     ]
