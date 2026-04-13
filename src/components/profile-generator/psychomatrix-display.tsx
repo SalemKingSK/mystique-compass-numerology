@@ -8,14 +8,12 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Flame, Zap, Shield, Eye, Hammer, Star, Heart, Cpu,
-  ChevronDown, ChevronUp, Info, ArrowRight, Sparkles, GitBranch,
-  AlertTriangle, Crosshair, Atom, Wand2
+  ChevronDown, ChevronUp, Info, Sparkles, GitBranch,
+  AlertTriangle, Atom, Wand2
 } from 'lucide-react';
 import {
   calculatePsychomatrix,
   PSYCHOMATRIX_CELL_MEANINGS,
-  PSYCHOMATRIX_LINE_MEANINGS,
-  SCALE_LABELS,
   SCALE_COLORS,
   type PsychomatrixResult,
   type CellReading,
@@ -80,14 +78,13 @@ function Diamond({ className = '' }: { className?: string }) {
 
 function ScalePill({ scale }: { scale: string }) {
   const color = SCALE_COLORS[scale as keyof typeof SCALE_COLORS] || '#9ca3af';
-  const label = SCALE_LABELS[scale as keyof typeof SCALE_LABELS] || 'Unknown';
   return (
     <span
       className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-sm border"
       style={{ color, borderColor: `${color}44`, background: `${color}22` }}
     >
       <span>{SCALE_GLYPH[scale] || '●'}</span>
-      {label}
+      {scale.replace('-', ' ')}
     </span>
   );
 }
@@ -291,6 +288,8 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
       {PSYCHOMATRIX_LINE_INTERPRETATIONS.map(line => {
         const total = lineTotal(line.digits);
         const level = getLineLevel(line.id, total);
+        if (!level) return null;
+
         const isActive = total >= 3;
         const isOpen = expanded === line.id;
         const color = SCALE_COLORS[level.scale];
@@ -365,6 +364,15 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                       </div>
                     </div>
 
+                    {line.orthodox && (
+                      <div className="p-4 rounded-sm border border-blue-500/20 bg-blue-900/5">
+                        <p className="text-[0.6rem] font-cinzel font-bold tracking-widest uppercase text-blue-400 mb-2">Orthodox Interpretation</p>
+                        <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+                          <AccordionContentWithPlayer text={line.orthodox} />
+                        </div>
+                      </div>
+                    )}
+
                     {line.esoteric && (
                       <div className="p-4 rounded-sm border border-violet-500/30 bg-violet-900/10 backdrop-blur-md">
                         <div className="flex items-center gap-2 mb-2">
@@ -402,7 +410,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                       <div className="p-4 rounded-sm border border-rose-500/30 bg-rose-950/20 flex items-start gap-3">
                         <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
                         <div className="text-[0.7rem] text-rose-200 leading-relaxed">
-                          <strong className="block uppercase tracking-widest mb-1">Overload Warning</strong>
+                          <strong className="block uppercase tracking-widest mb-1 text-rose-400">Overload Warning</strong>
                           An overload of this quality triggers its inversion. The strength has become so dense that it collapses into its shadow form, sacrificing related qualities to feed the obsession.
                         </div>
                       </div>
