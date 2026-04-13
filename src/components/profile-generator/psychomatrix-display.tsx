@@ -182,7 +182,7 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
 function CellDetailPanel({ reading }: { reading: CellReading }) {
   const scaleColor = SCALE_COLORS[reading.scale];
   const cellDef = PSYCHOMATRIX_CELL_MEANINGS[reading.digit];
-  const allLevels = cellDef?.meanings ?? [];
+  const [showAll, setShowAll] = React.useState(false);
 
   return (
     <motion.div
@@ -239,35 +239,48 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
       </div>
 
       <div className="space-y-2 pt-4">
-        <p className="font-cinzel text-[0.6rem] uppercase tracking-widest text-stone-500">
-          ◈ All Expression Levels
-        </p>
-        <div className="grid grid-cols-1 gap-1.5">
-          {allLevels.map(lvl => {
-            const isActive = lvl.count === Math.min(reading.count, 6);
-            const lvlColor = SCALE_COLORS[lvl.scale];
-            return (
-              <div
-                key={lvl.count}
-                className={`flex items-center gap-3 px-3 py-2 rounded-sm border text-[0.62rem] transition-all duration-200 backdrop-blur-sm ${
-                  isActive ? 'opacity-100' : 'opacity-25'
-                }`}
-                style={isActive
-                  ? { borderColor: `${lvlColor}66`, background: `${lvlColor}22`, color: lvlColor }
-                  : { borderColor: 'transparent', background: 'rgba(255,255,255,0.03)' }
-                }
-              >
-                <span className="w-4 text-center font-mono font-bold text-sm">
-                  {lvl.count === 0 ? '—' : lvl.count}
-                </span>
-                <span className="shrink-0">{SCALE_GLYPH[lvl.scale] || '●'}</span>
-                <span className={isActive ? 'font-bold' : 'text-stone-500'}>
-                  {lvl.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+        <button 
+          onClick={() => setShowAll(!showAll)}
+          className="font-cinzel text-[0.6rem] uppercase tracking-widest text-stone-500 flex items-center gap-2 hover:text-stone-300 transition-colors"
+        >
+          ◈ {showAll ? 'Hide' : 'View'} Full Developmental Spectrum {showAll ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </button>
+        
+        <AnimatePresence>
+          {showAll && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="grid grid-cols-1 gap-1.5 overflow-hidden"
+            >
+              {cellDef.meanings.map(lvl => {
+                const isActive = lvl.count === Math.min(reading.count, 6);
+                const lvlColor = SCALE_COLORS[lvl.scale];
+                return (
+                  <div
+                    key={lvl.count}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-sm border text-[0.62rem] transition-all duration-200 backdrop-blur-sm ${
+                      isActive ? 'opacity-100' : 'opacity-25'
+                    }`}
+                    style={isActive
+                      ? { borderColor: `${lvlColor}66`, background: `${lvlColor}22`, color: lvlColor }
+                      : { borderColor: 'rgba(255,255,255,0.03)', background: 'rgba(0,0,0,0.2)' }
+                    }
+                  >
+                    <span className="w-4 text-center font-mono font-bold text-sm">
+                      {lvl.count === 0 ? '—' : lvl.count}
+                    </span>
+                    <span className="shrink-0">{SCALE_GLYPH[lvl.scale] || '●'}</span>
+                    <span className={isActive ? 'font-bold' : 'text-stone-500'}>
+                      {lvl.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
