@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LoShuGrid from '@/components/lo-shu-grid';
 import type { NumerologyData, PersonalYearData } from './types';
 import {
-  Wand2, BrainCircuit, Sparkles, Grid, Layers, Compass,
+  BrainCircuit, Sparkles, Grid, Layers, Compass,
   Activity, ChevronRight, CalendarDays, Zap, Star,
   AlertTriangle, TrendingUp, ShieldAlert
 } from 'lucide-react';
@@ -338,8 +338,8 @@ function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttribut
       <svg viewBox="0 0 260 260" style={{ width:'100%', maxWidth:280 }}>
         <defs>
           <radialGradient id="lc-bg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#1a0a3a"/><stop offset="100%" stopColor="#080318"/></radialGradient>
-          <filter id="lc-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id="lc-ng"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="lc-glow"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+          <filter id="lc-ng"><feGaussianBlur stdDeviation="4" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
         </defs>
         
         {/* Static Background */}
@@ -410,7 +410,7 @@ const InfoCard = ({ title, value, icon, onClick }: { title:string; value:string|
 );
 
 // ── ArrowsDisplay ─────────────────────────────────────────────────────────────
-const ArrowsDisplay = React.forwardRef<HTMLDivElement,{arrowsOfStrength:any[];arrowsOfWeakness:any[];openItems:string[];onToggle:(v:string[])=>void;birthDate:string;numberCounts:Record<number,number>}>(
+const ArrowsDisplay = React.forwardRef<HTMLDivElement,{arrowsOfStrength:any[];arrowsOfWeakness:any[];openItems:string[];onToggle:(v:string[]) => void;birthDate:string;numberCounts:Record<number,number>}>(
   ({arrowsOfStrength,arrowsOfWeakness,openItems,onToggle,birthDate,numberCounts},ref)=>{
     const cats=Array.from(new Set([...arrowsOfStrength.map(a=>a.category),...arrowsOfWeakness.map(a=>a.category)])).filter(Boolean);
     return(
@@ -474,6 +474,10 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       if(data){setPersonalYearAccordionValue('personal-year-detail');setTimeout(()=>pyDetailRef.current?.scrollIntoView({behavior:'smooth',block:'center'}),150);}
       else setPersonalYearAccordionValue('');
     }
+  };
+
+  const handleArrowToggle = (values: string[]) => {
+    setOpenSections(values);
   };
 
   return (
@@ -553,7 +557,15 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
       <ZodiacSection birthDay={birthDay} birthMonth={birthMonth} birthYear={birthYear}/>
 
-      <ArrowsDisplay ref={arrowsRef} arrowsOfStrength={arrowsOfStrength} arrowsOfWeakness={arrowsOfWeakness} openItems={openSections} onToggle={setOpenSections} birthDate={birthDate} numberCounts={numberCounts as Record<number,number>}/>
+      <ArrowsDisplay 
+        ref={arrowsRef} 
+        arrowsOfStrength={arrowsOfStrength} 
+        arrowsOfWeakness={arrowsOfWeakness} 
+        openItems={openSections} 
+        onToggle={handleArrowToggle} 
+        birthDate={birthDate} 
+        numberCounts={numberCounts as Record<number,number>}
+      />
 
       <div className="glass-card p-4" ref={kuaRef}>
         <SH icon={<Compass className="h-4 w-4"/>} title="Lucky Compass"/>

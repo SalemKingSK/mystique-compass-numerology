@@ -1,3 +1,4 @@
+
 'use client';
 
 /**
@@ -9,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Flame, Zap, Shield, Eye, Hammer, Star, Heart, Cpu,
   ChevronDown, ChevronUp, Info, Sparkles, GitBranch,
-  AlertTriangle, Atom, Wand2
+  AlertTriangle, Atom, Wand2, X, Layers, Activity
 } from 'lucide-react';
 import {
   calculatePsychomatrix,
@@ -407,7 +408,17 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                       </div>
                     </div>
 
-                    {line.transmutation && total >= 4 && (
+                    {level.overloadVerbatim && (
+                      <div className="p-4 rounded-sm border border-rose-500/30 bg-rose-950/20 flex items-start gap-3">
+                        <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                        <div className="text-[0.7rem] text-rose-200 leading-relaxed">
+                          <strong className="block uppercase tracking-widest mb-1 text-rose-400">Overload Warning</strong>
+                          <AccordionContentWithPlayer text={level.overloadVerbatim} />
+                        </div>
+                      </div>
+                    )}
+
+                    {line.transmutation && (
                       <div className="p-4 rounded-sm border border-amber-500/30 bg-amber-900/10">
                         <div className="flex items-center gap-2 mb-2">
                           <Wand2 className="w-3 h-3 text-amber-400" />
@@ -415,16 +426,6 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                         </div>
                         <div className="text-[0.72rem] text-amber-100 leading-relaxed italic">
                           <AccordionContentWithPlayer text={line.transmutation} />
-                        </div>
-                      </div>
-                    )}
-
-                    {level.scale === 'overload' && (
-                      <div className="p-4 rounded-sm border border-rose-500/30 bg-rose-950/20 flex items-start gap-3">
-                        <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                        <div className="text-[0.7rem] text-rose-200 leading-relaxed">
-                          <strong className="block uppercase tracking-widest mb-1 text-rose-400">Overload Warning</strong>
-                          An overload of this quality triggers its inversion. The strength has become so dense that it collapses into its shadow form, sacrificing related qualities to feed the obsession.
                         </div>
                       </div>
                     )}
