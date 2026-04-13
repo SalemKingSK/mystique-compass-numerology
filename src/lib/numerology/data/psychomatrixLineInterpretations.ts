@@ -1,3 +1,4 @@
+
 /**
  * @fileoverview ALEXANDROV'S PSYCHOMATRIX — Complete Line & Column Interpretations
  * Quantitative Scale for All Lines, Columns, and Diagonals
@@ -105,7 +106,7 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
       { count: 1, label: 'The Individualist', scale: 'very-weak', verbatim: 'Esoterically, this is a "Free Agent." They have either finished their family karma in past lives or are here on a mission that requires zero domestic ties.' },
       { count: 2, label: 'The Social Norm', scale: 'norm', verbatim: 'They want a family but won\'t die for it. They view family as a partnership of equals.' },
       { count: 3, label: 'The Social Norm', scale: 'special', verbatim: 'They want a family but won\'t die for it. They view family as a partnership of equals.' },
-      { count: 4, label: 'The Hearth-God/Goddess', scale: 'strong', verbatim: 'Family is the only reason for living. They absorb the pain of their relatives. They find it nearly impossible to divorce or leave a toxic family situation.' },
+      { count: 4, label: 'The Hearth-God/Goddess', scale: 'strong', verbatim: 'Family is the only reason for living. They absorb the pain of their relatives. They find it nearly impossible to divorce or leave a toxic family situation because their soul feels "responsible" for the group\'s survival.' },
       { count: 5, label: 'The Hearth-God/Goddess', scale: 'dominant', verbatim: 'Family is the only reason for living. They absorb the pain of their relatives. They find it nearly impossible to divorce or leave a toxic family situation.' },
       { count: 6, label: 'The Karmic Martyr', scale: 'overload', verbatim: 'The person is a "garbage collector" for family trauma. They take on the illnesses and financial failures of their parents and children. They must learn the "Uncensored Truth": You cannot save a sinking ship by drowning with it.' }
     ],

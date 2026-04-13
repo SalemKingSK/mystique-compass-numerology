@@ -1,3 +1,4 @@
+
 'use client';
 
 /**
@@ -418,7 +419,7 @@ const ArrowsDisplay = React.forwardRef<HTMLDivElement,{arrowsOfStrength:any[];ar
         {cats.map(cat=>(
           <div key={cat} className="space-y-2">
             <h4 className="font-cinzel text-[0.6rem] text-muted-foreground uppercase tracking-[0.2em] mb-2 px-2 border-l border-primary/30">{cat}</h4>
-            <Accordion type="multiple" className="w-full" value={openItems} onToggle={onToggle}>
+            <Accordion type="multiple" className="w-full" value={openItems} onValueChange={onToggle}>
               {[...arrowsOfStrength,...arrowsOfWeakness].filter(a=>(a.category||(a.type==='shadow'?'Deficiency':'Primary Plane'))===cat).map(arrow=>{
                 const isShadow=arrow.type==='shadow'||arrow.type==='weakness';
                 return(
