@@ -629,6 +629,45 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
         ))}
       </div>
 
+      {/* ── CONSTANT GRID AREA ── */}
+      <div
+        className="relative border border-stone-700/40 rounded-sm p-2 backdrop-blur-xl"
+        style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(20,15,8,0.7) 100%)' }}
+      >
+        <div className="border border-stone-700/20 rounded-sm p-2 bg-black/20">
+          <div className="grid grid-cols-3 gap-2">
+            {gridRows.map((row) =>
+              row.map(digit => (
+                <GridCell
+                  key={digit}
+                  digit={digit}
+                  reading={result.cellReadings.find(r => r.digit === digit)!}
+                  isSelected={selectedDigit === digit}
+                  onSelect={d => { setSelectedDigit(d); setActiveTab('Detail'); }}
+                />
+              ))
+            )}
+          </div>
+        </div>
+        <div className="mt-3 flex items-center justify-between px-2">
+          <div className="flex gap-3 flex-wrap">
+            {result.activeLines.map(lineId => {
+              const line = PSYCHOMATRIX_LINE_INTERPRETATIONS.find(l => l.id === lineId);
+              if (!line) return null;
+              const typeColor = line.type === 'row' ? '#60a5fa' : line.type === 'column' ? '#34d399' : '#a78bfa';
+              return (
+                <span key={lineId}
+                  className="text-[0.58rem] uppercase tracking-widest font-black"
+                  style={{ color: typeColor }}
+                >
+                  ✦ {line.name}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg gap-2 px-1">
         {TABS.map(tab => (
           <button
@@ -659,43 +698,6 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
         >
           {activeTab === 'Matrix' && (
             <div className="space-y-6">
-              <div
-                className="relative border border-stone-700/40 rounded-sm p-2 backdrop-blur-xl"
-                style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(20,15,8,0.7) 100%)' }}
-              >
-                <div className="border border-stone-700/20 rounded-sm p-2 bg-black/20">
-                  <div className="grid grid-cols-3 gap-2">
-                    {gridRows.map((row) =>
-                      row.map(digit => (
-                        <GridCell
-                          key={digit}
-                          digit={digit}
-                          reading={result.cellReadings.find(r => r.digit === digit)!}
-                          isSelected={selectedDigit === digit}
-                          onSelect={d => { setSelectedDigit(d); setActiveTab('Detail'); }}
-                        />
-                      ))
-                    )}
-                  </div>
-                </div>
-                <div className="mt-3 flex items-center justify-between px-2">
-                  <div className="flex gap-3 flex-wrap">
-                    {result.activeLines.map(lineId => {
-                      const line = PSYCHOMATRIX_LINE_INTERPRETATIONS.find(l => l.id === lineId);
-                      if (!line) return null;
-                      const typeColor = line.type === 'row' ? '#60a5fa' : line.type === 'column' ? '#34d399' : '#a78bfa';
-                      return (
-                        <span key={lineId}
-                          className="text-[0.58rem] uppercase tracking-widest font-black"
-                          style={{ color: typeColor }}
-                        >
-                          ✦ {line.name}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
               <p className="text-center text-[0.65rem] text-stone-500 uppercase tracking-[0.2em] font-bold">
                 ↑ Tap a cell to reveal its full interpretation
               </p>

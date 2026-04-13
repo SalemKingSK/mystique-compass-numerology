@@ -1,9 +1,6 @@
 /**
  * @fileoverview ALEXANDROV'S PSYCHOMATRIX — Complete Line & Column Interpretations
  * Quantitative Scale for All Lines, Columns, and Diagonals
- *
- * Based on the original teachings of Professor A. Alexandrov
- * Expanded with full per-count scale descriptions (0 through 6+)
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -45,7 +42,6 @@ export interface PsychomatrixLineInterpretation {
 
 /**
  * Returns the correct LineCountInterpretation for a given line total.
- * Rename to getLineLevel to fix UI runtime error.
  */
 export function getLineLevel(
   lineId: string,
@@ -68,7 +64,7 @@ export function computeLineTotal(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MAIN DATA — VERBATIM ALEXANDROV + ESOTERIC DEPTH
+// MAIN DATA
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[] = [
@@ -79,12 +75,12 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     name: 'Purpose',
     quality: 'Purposefulness — Goal Setting & Achievement',
     captionNote:
-      'Determines the presence of purposefulness as a quality of a person\'s character. The value of purposefulness as a personal characteristic is difficult to overestimate, since it is this parameter that depends on the correspondence of our desires and capabilities. After all, it is not a matter of financial well-being, but of the strength of desire, the general mood to achieve the goal.',
+      'The value of the first line of the psychomatrix (1, 4, 7) is responsible for the sense of purpose of a person, the ability to defend their views, to set goals and objectives.',
     orthodox: "This line measures a person's ability to defend their views, set life objectives, and see them through. It is the 'internal motor.'",
     esoteric: "This is the Line of the Ego's Sovereignty. It represents the soul's 'interference quota'—how much the universe allows this individual to alter their own fate through sheer willpower.",
     transmutation: "If Row 1 is overactive, the person 'burns' their health digits (4) to keep the engine running. Advise: your greatest weakness is your inability to stop.",
     levels: [
-      { count: 0, label: 'The Void', scale: 'absent', verbatim: 'Often called "The Drifter." Esoterically, these souls are in a "passive" incarnation. They are meant to learn from others rather than lead. Psychologically, they suffer from "imposter syndrome" regarding their own desires; they often wake up at age 40 wondering whose life they are living.' },
+      { count: 0, label: 'The Void', scale: 'absent', verbatim: 'This person has no developed sense of purpose. There is a profound absence of direction — not laziness in the ordinary sense, but an inability to crystallize desire into an aim.' },
       { count: 1, label: 'The Void', scale: 'very-weak', verbatim: 'Often called "The Drifter." Esoterically, these souls are in a "passive" incarnation. They are meant to learn from others rather than lead. Psychologically, they suffer from "imposter syndrome" regarding their own desires.' },
       { count: 2, label: 'The Balanced Will', scale: 'norm', verbatim: 'The individual can set realistic goals. They have enough "ego-fuel" to get what they want but enough flexibility to abandon a sinking ship.' },
       { count: 3, label: 'The Balanced Will', scale: 'special', verbatim: 'The individual can set realistic goals. They have enough "ego-fuel" to get what they want but enough flexibility to abandon a sinking ship.' },
@@ -105,11 +101,11 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     esoteric: "This is the Line of Ancestral Karma. It shows how deeply the soul is tethered to the 'Bloodline' and the 'Collective Debt.'",
     transmutation: "High Row 2 energy can be converted into 'Public Service' or 'Healing' if the individual does not have a biological family.",
     levels: [
-      { count: 0, label: 'The Individualist', scale: 'absent', verbatim: 'Esoterically, this is a "Free Agent." They have either finished their family karma in past lives or are here on a mission that requires zero domestic ties. They are often labeled "cold" or "selfish," but their true path is solitary evolution.' },
+      { count: 0, label: 'The Individualist', scale: 'absent', verbatim: 'Esoterically, this is a "Free Agent." They have either finished their family karma in past lives or are here on a mission that requires zero domestic ties.' },
       { count: 1, label: 'The Individualist', scale: 'very-weak', verbatim: 'Esoterically, this is a "Free Agent." They have either finished their family karma in past lives or are here on a mission that requires zero domestic ties.' },
       { count: 2, label: 'The Social Norm', scale: 'norm', verbatim: 'They want a family but won\'t die for it. They view family as a partnership of equals.' },
       { count: 3, label: 'The Social Norm', scale: 'special', verbatim: 'They want a family but won\'t die for it. They view family as a partnership of equals.' },
-      { count: 4, label: 'The Hearth-God/Goddess', scale: 'strong', verbatim: 'Family is the only reason for living. They absorb the pain of their relatives. They find it nearly impossible to divorce or leave a toxic family situation because their soul feels "responsible" for the group\'s survival.' },
+      { count: 4, label: 'The Hearth-God/Goddess', scale: 'strong', verbatim: 'Family is the only reason for living. They absorb the pain of their relatives. They find it nearly impossible to divorce or leave a toxic family situation.' },
       { count: 5, label: 'The Hearth-God/Goddess', scale: 'dominant', verbatim: 'Family is the only reason for living. They absorb the pain of their relatives. They find it nearly impossible to divorce or leave a toxic family situation.' },
       { count: 6, label: 'The Karmic Martyr', scale: 'overload', verbatim: 'The person is a "garbage collector" for family trauma. They take on the illnesses and financial failures of their parents and children. They must learn the "Uncensored Truth": You cannot save a sinking ship by drowning with it.' }
     ],
@@ -126,7 +122,7 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     esoteric: "This is the Line of the Flesh-Prison. It represents how 'grounded' the soul is in the 3D material world (Maya). It is the measure of 'Heaviness.'",
     transmutation: "High 6s (Labor) in this row can lead to 'Dark Alchemy'—manipulating the material world for purely selfish ends.",
     levels: [
-      { count: 0, label: 'The Revolutionist', scale: 'absent', verbatim: 'A "Light Soul." They can move to a new country with one suitcase. They lack "material memory." Esoterically, they are not deeply plugged into the Earth\'s frequency, which makes them great visionaries but poor managers.' },
+      { count: 0, label: 'The Revolutionist', scale: 'absent', verbatim: 'A "Light Soul." They can move to a new country with one suitcase. They lack "material memory."' },
       { count: 1, label: 'The Revolutionist', scale: 'very-weak', verbatim: 'A "Light Soul." They can move to a new country with one suitcase. They lack "material memory."' },
       { count: 2, label: 'The Foundation', scale: 'norm', verbatim: 'A healthy respect for routine and tradition.' },
       { count: 3, label: 'The Foundation', scale: 'special', verbatim: 'A healthy respect for routine and tradition.' },
@@ -143,8 +139,6 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     quality: 'Self-Esteem — Personal Confidence & Appraisal',
     captionNote:
       'A numerical indicator of the level of self-esteem. Hardly any other parameter is more important in the context of a person\'s desire to realize his own potential. But if low self-esteem is only indecisiveness, self-doubt, and therefore eternal circling in circles, then unjustifiably overestimated capabilities can lead to fatal mistakes and cruel disappointments.',
-    orthodox: "Self-worth, the desire to be noticed, and the courage to manifest one's potential in public.",
-    esoteric: "This is the Line of the Social Avatar. It shows how thick the 'Armor of the Ego' is when facing the world.",
     levels: [
       { count: 0, label: 'Invisible Man', scale: 'absent', verbatim: 'Even if they are geniuses, they will stand in the back of the room. They lack the "permission" to shine.' },
       { count: 1, label: 'Invisible Man', scale: 'very-weak', verbatim: 'Even if they are geniuses, they will stand in the back of the room. They lack the "permission" to shine.' },
@@ -163,11 +157,9 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     quality: 'Labor Efficiency — Physical & Practical Capacity',
     captionNote:
       'Describe a person\'s physical health, level of endurance, degree of inclination to work and possession of practical skills, as well as the ability to think logically. Thus, the second column serves as an indicator of labor efficiency as a qualitative characteristic of a person\'s ability to achieve a certain social status, to ensure his well-being and the well-being of his family.',
-    orthodox: "Professionalism, physical health, logical thinking, and the ability to work with the hands.",
-    esoteric: "This is the Line of the Craftsman/Alchemist. It measures the efficiency of 'Energy-to-Matter' conversion.",
     levels: [
       { count: 0, label: 'The Suspended', scale: 'absent', verbatim: 'These people are "ghosts" in the workplace. They may be brilliant, but they cannot monetize their ideas. They are "unfit" for the harsh vibrations of the market.' },
-      { count: 1, label: 'The Suspended', scale: 'very-weak', verbatim: 'These people are "ghosts" in the workplace. They are "unfit" for the harsh vibrations of the market.' },
+      { count: 1, label: 'The Suspended', scale: 'very-weak', verbatim: 'These people are "ghosts" in the workplace. They may be brilliant, but they cannot monetize their ideas. They are "unfit" for the harsh vibrations of the market.' },
       { count: 2, label: 'Balanced', scale: 'norm', verbatim: 'A healthy labor orientation given in norm.' },
       { count: 3, label: 'Balanced', scale: 'special', verbatim: 'A healthy labor orientation given in norm.' },
       { count: 4, label: 'Money Magnet', scale: 'strong', verbatim: 'They understand the physical laws of cause and effect. They build things that last.' },
@@ -180,11 +172,9 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     type: 'column',
     digits: [7, 8, 9],
     name: 'Talents',
-    quality: 'Talent Potential — Natural Channeling',
+    quality: 'Talent Potential — Natural Gifts & Readiness to Develop Them',
     captionNote:
       'Contains information about a person\'s talent. However, \'talents should be helped...\', people say, and the vast majority of people live their lives without ever discovering their talent, often without even suspecting its existence. Therefore, we can only talk about potential, the realization of which depends on all other personal qualities: diligence, purposefulness, sense of self-worth, etc.',
-    orthodox: "Luck, sense of duty, memory, and intellectual capacity.",
-    esoteric: "This is the Line of the Prophet/Oracle. It represents the 'Direct Channel' to the higher planes of information.",
     levels: [
       { count: 0, label: 'The Self-Made', scale: 'absent', verbatim: 'These people don\'t get "lucky breaks." Everything they have, they must earn through Column 2 (Labor). The Universe is "quiet" for them.' },
       { count: 1, label: 'The Self-Made', scale: 'very-weak', verbatim: 'These people don\'t get "lucky breaks." Everything they have, they must earn through Column 2 (Labor).' },
@@ -203,11 +193,9 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     quality: 'Spirituality — Search for the Divine Principle',
     captionNote:
       'Spiritual diagonal. Indicates the level of a person\'s spirituality. Do not confuse spirituality with religiosity. The degree of unity of a person with Nature (Nus, God) is determined by firmness of convictions and clarity of perception, balanced principles and willingness to compromise, to accept a different perspective.',
-    orthodox: "Faith, adherence to high ideals, and spiritual aspiration.",
-    esoteric: "This is the Vertical Ascension Path. It measures the soul's 'Exit Velocity' from the mundane.",
     levels: [
       { count: 0, label: 'Materialist', scale: 'absent', verbatim: 'No innate pull toward the transcendent. They only believe what they can touch. Their path is to find the "Sacred" within the "Common."' },
-      { count: 1, label: 'Materialist', scale: 'very-weak', verbatim: 'No innate pull toward the transcendent. Their path is to find the "Sacred" within the "Common."' },
+      { count: 1, label: 'Materialist', scale: 'very-weak', verbatim: 'No innate pull toward the transcendent.' },
       { count: 2, label: 'Normal Orientation', scale: 'norm', verbatim: 'Balanced spirituality given in norm.' },
       { count: 3, label: 'Spontaneous Spirit', scale: 'special', verbatim: 'Spontaneous spiritual activation occurs accidentally or unexpectedly.' },
       { count: 4, label: 'Saint/Seeker', scale: 'strong', verbatim: 'Strongly developed spirituality. They are naturally pulled toward the mystical.' },
@@ -223,15 +211,13 @@ export const PSYCHOMATRIX_LINE_INTERPRETATIONS: PsychomatrixLineInterpretation[]
     quality: 'Temperament — Carnal Nature & Intimacy',
     captionNote:
       'Carnal diagonal. An indicator of a person\'s temperament in terms of intimate, sexual relationships. It is the degree of matching of temperaments that often becomes the main factor that determines the duration and quality of a marriage.',
-    orthodox: "Sexual energy, charisma, visceral attraction, and 'thirst for life.'",
-    esoteric: "This is the Tantric Flow of Creation. It is the raw, 'red' energy of the lower chakras being moved by the heart (5).",
     levels: [
       { count: 0, label: 'The Cold Soul', scale: 'absent', verbatim: 'Not necessarily asexual, but "physically detached." They treat sex and food as "maintenance" rather than "pleasure." Esoterically, they are here to develop the mind, not the senses.' },
-      { count: 1, label: 'The Cold Soul', scale: 'very-weak', verbatim: 'Not necessarily asexual, but "physically detached." They treat sex and food as "maintenance" rather than "pleasure."' },
+      { count: 1, label: 'The Cold Soul', scale: 'very-weak', verbatim: 'Not necessarily asexual, but "physically detached."' },
       { count: 2, label: 'The Human', scale: 'norm', verbatim: 'Healthy carnal temperament given in norm. Balanced passions.' },
       { count: 3, label: 'The Human', scale: 'special', verbatim: 'Healthy carnal temperament given in norm. Balanced passions.' },
       { count: 4, label: 'The Magnet', scale: 'strong', verbatim: 'Intense charisma. They "leak" energy that others want to consume. They often attract "energy vampires" who want to bask in their fire.' },
-      { count: 5, label: 'The Magnet', scale: 'dominant', verbatim: 'Intense charisma. They often attract "energy vampires" who want to bask in their fire.' },
+      { count: 5, label: 'The Magnet', scale: 'dominant', verbatim: 'Intense charisma.' },
       { count: 6, label: 'The Black Hole', scale: 'overload', verbatim: 'The person is a slave to stimulation. Their "inner fire" burns so hot they need constant external "fuel"—sex, danger, drugs, or extreme emotions—just to feel alive.' }
     ],
   },
