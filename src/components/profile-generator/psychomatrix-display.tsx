@@ -8,7 +8,8 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Flame, Zap, Shield, Eye, Hammer, Star, Heart, Cpu,
-  ChevronDown, ChevronUp, Info, ArrowRight, Sparkles, GitBranch
+  ChevronDown, ChevronUp, Info, ArrowRight, Sparkles, GitBranch,
+  AlertTriangle, Crosshair, Atom, Wand2
 } from 'lucide-react';
 import {
   calculatePsychomatrix,
@@ -19,12 +20,10 @@ import {
   type PsychomatrixResult,
   type CellReading,
   type ComplementaryInsight,
-  type PsychomatrixCellMeaning,
 } from '@/lib/numerology/data/psychomatrixData';
 import {
   PSYCHOMATRIX_LINE_INTERPRETATIONS,
   getLineLevel,
-  LINE_SCALE_LABELS
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 
@@ -81,7 +80,7 @@ function Diamond({ className = '' }: { className?: string }) {
 
 function ScalePill({ scale }: { scale: string }) {
   const color = SCALE_COLORS[scale as keyof typeof SCALE_COLORS] || '#9ca3af';
-  const label = SCALE_LABELS[scale as keyof typeof SCALE_LABELS] || LINE_SCALE_LABELS[scale as keyof typeof LINE_SCALE_LABELS] || 'Unknown';
+  const label = SCALE_LABELS[scale as keyof typeof SCALE_LABELS] || 'Unknown';
   return (
     <span
       className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-sm border"
@@ -158,11 +157,6 @@ function GridCell({ digit, reading, isSelected, onSelect }: GridCellProps) {
                 {digit}
               </motion.span>
             ))}
-            {reading.count > 6 && (
-              <span className="text-[0.6rem] self-end mb-0.5 font-bold" style={{ color: scaleColor }}>
-                +{reading.count - 6}
-              </span>
-            )}
           </div>
         )}
       </div>
@@ -232,11 +226,6 @@ function CellDetailPanel({ reading }: { reading: CellReading }) {
         </div>
       </div>
 
-      <div className="text-[0.65rem] text-stone-400 leading-relaxed px-1">
-        <span className="text-amber-600/80 uppercase tracking-widest font-semibold not-italic">Lines: </span>
-        {cellDef.lineContext}
-      </div>
-
       <div
         className="border rounded-sm p-4 space-y-3 backdrop-blur-md"
         style={{ borderColor: `${scaleColor}44`, background: `${scaleColor}11` }}
@@ -304,8 +293,7 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
         const level = getLineLevel(line.id, total);
         const isActive = total >= 3;
         const isOpen = expanded === line.id;
-        // Fix: Use primary SCALE_COLORS map to avoid undefined lookups
-        const color = SCALE_COLORS[level.scale as keyof typeof SCALE_COLORS] || '#9ca3af';
+        const color = SCALE_COLORS[level.scale];
 
         return (
           <div key={line.id}
@@ -369,13 +357,25 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-4 pb-4 pt-0 space-y-3 border-t border-stone-700/30">
+                  <div className="px-4 pb-4 pt-0 space-y-4 border-t border-stone-700/30">
                     <div className="pt-3">
                       <p className="text-[0.6rem] font-cinzel uppercase tracking-[0.2em] text-amber-500/60 mb-2">Alexandrov Definition</p>
                       <div className="text-[0.72rem] text-stone-400 leading-relaxed italic mb-4 bg-black/20 p-3 rounded-sm border-l border-amber-700/30">
                         <AccordionContentWithPlayer text={line.captionNote} />
                       </div>
                     </div>
+
+                    {line.esoteric && (
+                      <div className="p-4 rounded-sm border border-violet-500/30 bg-violet-900/10 backdrop-blur-md">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Atom className="w-3 h-3 text-violet-400" />
+                          <p className="text-[0.6rem] font-cinzel font-bold tracking-widest uppercase text-violet-400">Esoteric Depth</p>
+                        </div>
+                        <div className="text-[0.75rem] text-violet-100 leading-relaxed">
+                          <AccordionContentWithPlayer text={line.esoteric} />
+                        </div>
+                      </div>
+                    )}
 
                     <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
                       <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
@@ -385,6 +385,28 @@ function LinesPanel({ result }: { result: PsychomatrixResult }) {
                         <AccordionContentWithPlayer text={level.verbatim} />
                       </div>
                     </div>
+
+                    {line.transmutation && total >= 4 && (
+                      <div className="p-4 rounded-sm border border-amber-500/30 bg-amber-900/10">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Wand2 className="w-3 h-3 text-amber-400" />
+                          <p className="text-[0.6rem] font-cinzel font-bold tracking-widest uppercase text-amber-400">Transmutation Logic</p>
+                        </div>
+                        <div className="text-[0.72rem] text-amber-100 leading-relaxed italic">
+                          <AccordionContentWithPlayer text={line.transmutation} />
+                        </div>
+                      </div>
+                    )}
+
+                    {level.scale === 'overload' && (
+                      <div className="p-4 rounded-sm border border-rose-500/30 bg-rose-950/20 flex items-start gap-3">
+                        <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                        <div className="text-[0.7rem] text-rose-200 leading-relaxed">
+                          <strong className="block uppercase tracking-widest mb-1">Overload Warning</strong>
+                          An overload of this quality triggers its inversion. The strength has become so dense that it collapses into its shadow form, sacrificing related qualities to feed the obsession.
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -599,7 +621,6 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
         ))}
       </div>
 
-      {/* Optimized Tab Bar Navigation */}
       <div className="flex border-b border-stone-700/30 overflow-x-auto scrollbar-hide bg-black/20 rounded-t-lg gap-2 px-1">
         {TABS.map(tab => (
           <button
