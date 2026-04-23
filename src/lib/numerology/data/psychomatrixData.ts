@@ -1,4 +1,3 @@
-
 'use client';
 
 /**
@@ -60,13 +59,193 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
     intro: 'Digit 1 in the psychomatrix answers for the character of a person, his willful qualities, strength of striving for power, ability to defend his own views.',
     lineContext: 'Row 1 (1, 4, 7) — Purposefulness. Column 1 (1, 2, 3) — Self-esteem. Spiritual diagonal (1, 5, 9) — Spiritual life.',
     meanings: [
-      { count: 0, label: 'Character Absent', verbatim: 'No digit 1 is present. The quality of character and will is absent or profoundly undeveloped.', scale: 'absent' },
-      { count: 1, label: 'Will-less, Egoistic', verbatim: 'Will-less, egoistic. One can say this is one of the most difficult characters. They are possessed by people contradictory in their nature. Having a will-less character, they avoid making any decisions, trying to shift them onto another person\'s shoulders. Running away from making a decision, they desperately imitate activity and vigorously show their willful qualities. That is why they always enter into an argument on any issue. As surprising as it may be, the subject of the argument is absolutely indifferent to them, as in the argument itself they are only interested in victory, they acutely need success, striving to show everyone the strength of character. Often become egoistic, achieving victory, they do not notice other people with their requests and troubles. Such people never make hasty decisions, give complex answers that can be understood differently, which gives them the opportunity to renounce their words, or even better — not make any decisions. Don\'t you dare accuse them of will-lessness. You will offend them, and they simply won\'t believe you, again showing their quality of a quarreler.', scale: 'very-weak' },
-      { count: 2, label: 'Soft Character, Praise-Seeking', verbatim: 'People having two units in the psychomatrix differ by a soft character, very love praise and earn it in every way. That is why they help others a lot, easily enter any company, are noticeable in it, as they strive to attract attention to themselves, to subsequently receive gratitude for a pleasant meeting. They know how to listen to another, if he does not try to pressure them. Very rarely use pressure on another person. They often lack firmness in defending their views, and they strive for a profession independent of anyone, however, the desire to receive praise pushes them into the field of doctor, teacher. Often they do not have purposefulness and self-esteem, which becomes a reason for underestimation of their goals. If they are lucky and in the Pythagoras Square there are \'22\' or \'2222 or more\', their initiative becomes more active.', scale: 'norm' },
-      { count: 3, label: 'Golden Mean', verbatim: 'Golden mean. Such people can find common language with any person. They can, if necessary, yield in an argument to anyone (even \'1\'). The main thing to know — one cannot pressure such a person, as defending himself, he will defeat anyone, even a despot. A person with the character \'golden mean\' makes a natural transition (about digit transitions we will speak separately) to a new character: \'1 and 8\' (we consider that digit 8 is absent). It corresponds to a soft and tolerant character. This external, deceptive softness pushes lovers of commanding others to test their power on those who have the character \'111\', which turns into an unexpected explosion of emotions, and this leads to conflict and suppression of the despot. If parents from childhood years have been suppressing a child with this type of character, then it can be said for sure that this child will grow up with little sense of duty towards his parents. Remember: everything in life goes in a circle. If one forgets about his duty towards his parents, then he himself should give birth to a child who will lose his sense of duty towards him.', scale: 'special' },
-      { count: 4, label: 'Strong, Volitional Character', verbatim: 'This is a volitional and strong character. These people know how to set goals before themselves. If they have energy (22 and more) — they are ready to enter into an argument and strive for victory. However, they always know the measure and do not cross certain boundaries, as they do not possess despotism. They always remember their interlocutor, not striving to offend him. Such people can make a decision immediately and rarely refuse it. If you have the character \'1111\', you need to learn to stop yourself if necessary. However, even more important — to learn to refuse a previously made decision if necessary. This character is a true gift of fate for any person, as it allows setting and achieving very high goals in any branch of human knowledge. Most importantly, this character helps reveal the talent of the person himself. For men, such character is better suited for parenthood or the military. Never forget, that this is the character of the leader who wishes to be better than others. Do not try to humiliate those with \'1111\'; it will lead to a great repulse.', scale: 'strong' },
-      { count: 5, label: 'Maximally Expressed Power & Leadership (Despot)', verbatim: 'Maximally expressed character of power and leadership. A person moves toward his goal, not paying attention to people standing nearby, even if the psychomatrix of this person has digits 8. Even tolerance (digits 8) cannot guaranteedly restrain the power-hungriness. Such people are rightly called despots. Unlimited power — or no power at all. Rarely can any of them stop, there is no limit to their power aspirations. It is this pursuit of power that creates a hostile environment around them. One can say for sure — the outcome of any despot is known, he himself begets his successor, who will also \'step on\' him himself. The only way to preserve oneself — is departure from power, as it has no boundaries. One despot will beget another, and there will be no end to this. Tolerance and the search for your own talent can be alternative realizations of this character. Such a person can become an unsurpassed artist, poet, dancer, or actor — all these are ways of realizing character \'11111\' when there is leadership, but no victims of despotism.', scale: 'dominant' },
-      { count: 6, label: 'Overload, Hidden Authority', verbatim: 'When the quantity of 1\'s has exceeded five figures, it is possible to speak about \'overload\' of the despot — that means sudden changes of one\'s character. The person starts to be afraid of his own latent character of aspiration to authority. By his own inquiries about authority, he clearly understands that he can never have it (tsar, the president). If it is not the highest authority, the goal has no value. Comprehension of the impossibility to receive full authority leads to his full refusal of it. Such people can open their latent plans only during moments of strong intoxication. They are very tolerant, quiet; explosions of emotions occur only after long accumulation of insults. When such a moment comes, one word is enough for the emission of the huge collected energy. It is necessary for close people to know about this and to try to liberate the stored insults at smaller quantities. The choice of work is defined not by interest, but by that degree of freedom which it gives: to not depend on the chief and to not depend on anybody at all.', scale: 'overload' }
+      { 
+        count: 0, 
+        label: 'Character Absent', 
+        verbatim: `One. Character
+
+Character "1"
+Character "1," or "one unit," is weak-willed and selfish.
+It can be said that this is one of the most complex character traits. It is possessed by people who are contradictory by nature.
+The fact is that, having a weak-willed character, they avoid making any decisions, trying to shift them to someone else.
+Escaping from making a decision, they desperately feign action and strenuously demonstrate their strong-willed qualities.
+This is why they always get into arguments about any issue. Surprisingly, they are completely indifferent to the subject of the dispute, as in the argument itself, they are only interested in winning; they desperately need success, striving to demonstrate their strength of character to everyone.
+They often become selfish in their pursuit of victory, ignoring other people with their requests and troubles. Such people never make hasty decisions and give complex answers that can be interpreted in different ways, allowing them to retract their statements or, even better, make no decisions at all.
+Don't even think of accusing them of lack of willpower: you'll offend them, and they simply won't believe you, once again displaying their argumentative nature.
+However, it's not all bad. They make the most wonderful deputies – deputies who are the "number two" behind the boss.
+
+Recommendations for character type "1"
+This is one of the most complex character types, as it contains a contradiction in its definition. Consider whether a person can be both selfish and weak-willed at the same time.
+Selfishness implies asserting one's own views, while weak-willedness implies subordination to the opinions of others.
+Let's try to understand this.
+A person with a weak-willed character, and knowing this for sure, tries to hide their flaw from prying eyes. This is precisely why he dons the mask of a businessman, convincing everyone around him of his exceptional willpower.
+Take a closer look at such a person, and everything will immediately become clear. He never dictates his will to anyone, but is a fanatical enforcer of his superior's opinion (order, directive).
+For him, the letter of the law is the ultimate truth. If he's given a document defining his authority, don't even think of arguing with him unless you have a document limiting or revoking that authority. Such people are natural performers.
+If you're interested in a way to negotiate with him that will allow you to win the argument without depriving such a person of his "victory," remember the following sequence:
+1. I agree with you...
+2. But I would personally do it differently, namely (short outline)...
+3. But I agree with you. Decide everything yourself...
+4. Pause until they offer their own solution. Don't be surprised; it will be your proposed solution, as the responsibility will fall on you, but the decision is yours.
+5. Bottom line: if everything goes well, they'll take credit for the decision. If it goes badly, they'll blame you.
+6. Ignore it.
+If the issue at hand is one you'd rather not risk, don't offer the "1" personality a choice of actions. Instead, present your solution as the only one, non-negotiable (even better if it's an order or directive, if they're your employee).
+My only request: don't overuse this method, as it's essential to preserve their ability to make independent decisions.
+Remember: the egoism of a "1" personality lies in their desire to win any argument, regardless of their area of ​​expertise or competence. Don't be surprised if they repeat the same jokes, parables, and aphorisms to you—this is also their way of gaining self-confidence.
+If your child has a similar personality, teach them to make decisions.
+Never rush to suppress their desire to lead; they will lose this ability without you.
+Remember: it is possible to change their personality through strong lines. For a "1" personality type, these are:
+1st row, "1, 4, 7";
+1st column, "1, 2, 3";
+spiritual diagonal, "1, 5, 9".`, 
+        scale: 'absent' 
+      },
+      { 
+        count: 1, 
+        label: 'Will-less, Egoistic', 
+        verbatim: `One. Character
+
+Character "1"
+Character "1," or "one unit," is weak-willed and selfish.
+It can be said that this is one of the most complex character traits. It is possessed by people who are contradictory by nature.
+The fact is that, having a weak-willed character, they avoid making any decisions, trying to shift them to someone else.
+Escaping from making a decision, they desperately feign action and strenuously demonstrate their strong-willed qualities.
+This is why they always get into arguments about any issue. Surprisingly, they are completely indifferent to the subject of the dispute, as in the argument itself, they are only interested in winning; they desperately need success, striving to demonstrate their strength of character to everyone.
+They often become selfish in their pursuit of victory, ignoring other people with their requests and troubles. Such people never make hasty decisions and give complex answers that can be interpreted in different ways, allowing them to retract their statements or, even better, make no decisions at all.
+Don't even think of accusing them of lack of willpower: you'll offend them, and they simply won't believe you, once again displaying their argumentative nature.
+However, it's not all bad. They make the most wonderful deputies – deputies who are the "number two" behind the boss.
+
+Recommendations for character type "1"
+This is one of the most complex character types, as it contains a contradiction in its definition. Consider whether a person can be both selfish and weak-willed at the same time.
+Selfishness implies asserting one's own views, while weak-willedness implies subordination to the opinions of others.
+Let's try to understand this.
+A person with a weak-willed character, and knowing this for sure, tries to hide their flaw from prying eyes. This is precisely why he dons the mask of a businessman, convincing everyone around him of his exceptional willpower.
+Take a closer look at such a person, and everything will immediately become clear. He never dictates his will to anyone, but is a fanatical enforcer of his superior's opinion (order, directive).
+For him, the letter of the law is the ultimate truth. If he's given a document defining his authority, don't even think of arguing with him unless you have a document limiting or revoking that authority. Such people are natural performers.
+If you're interested in a way to negotiate with him that will allow you to win the argument without depriving such a person of his "victory," remember the following sequence:
+1. I agree with you...
+2. But I would personally do it differently, namely (short outline)...
+3. But I agree with you. Decide everything yourself...
+4. Pause until they offer their own solution. Don't be surprised; it will be your proposed solution, as the responsibility will fall on you, but the decision is yours.
+5. Bottom line: if everything goes well, they'll take credit for the decision. If it goes badly, they'll blame you.
+6. Ignore it.
+If the issue at hand is one you'd rather not risk, don't offer the "1" personality a choice of actions. Instead, present your solution as the only one, non-negotiable (even better if it's an order or directive, if they're your employee).
+My only request: don't overuse this method, as it's essential to preserve their ability to make independent decisions.
+Remember: the egoism of a "1" personality lies in their desire to win any argument, regardless of their area of ​​expertise or competence. Don't be surprised if they repeat the same jokes, parables, and aphorisms to you—this is also their way of gaining self-confidence.
+If your child has a similar personality, teach them to make decisions.
+Never rush to suppress their desire to lead; they will lose this ability without you.
+Remember: it is possible to change their personality through strong lines. For a "1" personality type, these are:
+1st row, "1, 4, 7";
+1st column, "1, 2, 3";
+spiritual diagonal, "1, 5, 9".`, 
+        scale: 'very-weak' 
+      },
+      { 
+        count: 2, 
+        label: 'Soft Character, Praise-Seeking', 
+        verbatim: `Personality type "11"
+People with two "1"s in their psychomatrix are distinguished by a gentle nature, love praise, and earn it in every way. This is why they help others a lot, fit easily into any company, and are noticeable in it, as they strive to attract attention to themselves in order to later receive gratitude for a pleasant meeting. They know how to listen to others unless they try to pressure them. They very rarely use pressure on others.
+They often lack the firmness to defend their views and strive for a profession that is independent, but the desire for praise pushes them toward the medical and teaching professions.
+They often lack determination and self-esteem, which lowers their goals. If they are lucky enough to have "22" or "2222 or higher" in their psychomatrix, their initiative is greatly enhanced.
+
+Recommendations for an "11" personality
+Remember, the most important thing a person with this personality expects is praise.
+If you've assigned a daily chore list to your child with an "11," know that after completing one task, they'll expect praise for it and only then continue the list, receiving praise for each item separately.
+It's best to use the following plan.
+Tell them they must complete just one task, as they're better at it than others. Then, tell them about the tasks you'll be taking on and list them.
+When you get home, you'll be pleasantly surprised by a list of several "yours" tasks that your child completed to earn an extra dose of praise. Don't even think of scolding them if they haven't completed the task assigned to them.
+That's why assigning mandatory tasks that can be done tomorrow or not at all in the near future is a good idea. Praise, praise, and praise your child at every opportunity – and you won't have any problems with them.
+However, don't overpraise if your child has a score of 88 or 55 – they won't tolerate lies because they are "truth-seekers."`, 
+        scale: 'norm' 
+      },
+      { 
+        count: 3, 
+        label: 'Golden Mean', 
+        verbatim: `"111" personality type
+This personality type has the rather grandiose name "golden mean," which immediately distinguishes it from other personality types. Such people can find common ground with anyone.
+The fact is that they can, if necessary, yield to anyone in an argument (even a "1").
+The main thing to know is that you shouldn't pressure such a person, as in self-defense, they will defeat anyone, even a despot.
+A person with the "golden mean" personality type makes a natural transition (we will discuss the transitions between numbers separately) into a new personality type: "1 and 8" (we believe there is no such thing as the number 8). It corresponds to a gentle and tolerant character.
+ This outward, deceptive gentleness encourages those who like to dominate others to test their power against those with the "111" personality type. This results in an unexpected outburst of emotions, leading to conflict and the suppression of the despot.
+To summarize, the "111" personality type manifests itself softly, even weak-willed, in a calm environment, merging with the "1 and 8" personality type. However, should any threat, pressure, or conflict arise, this personality type produces an unexpected outburst of emotions comparable in strength to the "11111" personality type—the despot. In its average meaning, it is the "golden mean."
+
+Recommendations for the "111" personality type
+It is important to prevent someone with this personality type from becoming embittered, vindictive, and aggressive.
+The cause lies not in the person themselves, but in their environment. If parents suppress a child with this personality type from childhood, it's safe to say that their sense of duty to their own parents has weakened, pushing them to exert power over their own child.
+Remember! Life goes in cycles. If one forgets their duty to their parents, they will give birth to a child who will lose their sense of duty to them.
+If you have a "golden mean" personality, don't try to convince yourself of false tolerance; believe me: "kneeling" is not your destiny.
+Remember the words of Alexander Green: "Never do something you'll regret later." If you give in to someone out of pity, you'll explode later. The pity fades, and disappointment sets in, regretting what you've done.`, 
+        scale: 'special' 
+      },
+      { 
+        count: 4, 
+        label: 'Strong, Volitional Character', 
+        verbatim: `"1111" personality type
+This is a strong-willed and determined personality.
+These people know how to set goals. If they have energy (22 or more), they are ready to engage in debate and strive for victory. However, they always know their limits and do not overstep certain boundaries, as they are not despots. They are always mindful of their interlocutors, not seeking to offend them.
+If they have low energy (2-none or 2), they prefer to avoid an argument rather than waste their energy. They are self-confident and do not need to prove their superiority or knowledge.
+For men, this personality type is best suited to leadership or military positions. Women choose science, teaching (usually in higher education), law, or the courts, but not business.
+Never forget that this is the personality type of a leader who strives to be better than others. This is a serious reason for good, high-quality education.
+Don't think that they are always assertive and stubborn—that's not true. In their everyday, relaxed state, they are very reminiscent of those with "11" and "8." They love praise, but don't demand it, as they don't tolerate sycophancy and flirting.
+If you have this type of personality, it's advisable to develop your own personality so you don't later blame others for your lag.
+Don't try to humiliate someone with "1111"; this will only result in a firm and fearless response.
+These people can make decisions immediately and rarely back down from them.
+If you have an "1111" personality, you need to learn to stop yourself if necessary. However, it's even more important to learn to back down from a previous decision if necessary.
+It's worth noting that this type of personality is a true gift from fate for anyone, as it allows them to set and achieve very high goals in any field of human knowledge.
+Most importantly, this type of personality helps to reveal a person's talent.
+
+ Recommendations for the "1111" personality type
+If you have the "1111" personality type, never delude yourself into thinking you can easily yield leadership to another person. Such a misconception is quite dangerous: you won't be able to tolerate humiliation for long—it's unacceptable for you.
+Remember that every person is unique, and even if you haven't achieved leadership at work, you have a chance to develop your talent, and that's a chance to leave your mark on human history.
+Learn to overcome your laziness. You know how to set goals, and if you don't, it's because you don't want to. The day will come when you'll regret your cowardice, but it will be too late, and you'll feel resentment and sighs of regret.
+Your personality gives you everything: tolerance, determination, self-esteem, and firmness. It's unlikely anyone can hinder you, but you can become an obstacle to yourself.`, 
+        scale: 'strong' 
+      },
+      { 
+        count: 5, 
+        label: 'Maximally Expressed Power & Leadership (Despot)', 
+        verbatim: `The "11111" personality type
+A highly pronounced power and leadership trait. This person advances toward their goals, disregarding those around them, even if their psychomatrix is an 8.
+Even tolerance (8) cannot reliably curb their imperious nature.
+Such people are rightly called despots. Unlimited power—or no power at all. Rarely can they stop; there is no limit to their aspirations for power.
+It is precisely this pursuit of power that creates a hostile environment around them. It is safe to say that the outcome of any despot is known: they themselves beget their successors, who will also "step on" them.
+The only way to preserve oneself is to escape power, as it knows no bounds. One despot will beget another, and there will be no end.
+Tolerance and the pursuit of one's talent are the only ways to escape power. You can be an unrivaled artist, poet, dancer, actor, etc. These are all ways to realize the "11111" personality type, where there is leadership but no victimization by despotism.
+Oddly enough, with the "11111" personality type, a person should step away from power to avoid ruining their own lives and those of their loved ones. It's better to become a great creator than a domineering fool.
+Only understanding the characteristics of a despot's personality type will save you from conflict. Don't test your own strength if you have the "11111" personality type, and don't test the patience of another despot.
+
+Recommendations for the "11111" personality type
+It's hardest to give advice to those who never follow through, as they don't accept it due to their strength of character and self-righteousness. Life will judge for itself, but advice will be given nonetheless.
+✓ Run from power—it's your downfall and your losses.
+ ✓ If you live near a person with a despotic personality, you have only two options: either prevent the despot from revealing himself or submit to him.
+✓ Seek your potential in science, art, and craftsmanship, and develop your talent.
+✓ If you cannot tolerate humiliation and power over you, then don't create such a family.
+✓ Remembering that there are people around you is the best advice for a despot.
+✓ If your psychomatrix contains many 2s and 4s, it's best to take up sports, which will direct your energy toward victory.
+Being a despot is difficult. However, you can't blame someone for being born a despot. There are always reasons for this, rooted in their parents and their family history. If this happens, it's necessary to step away from power, finding yourself in creativity and developing your talent.`, 
+        scale: 'dominant' 
+      },
+      { 
+        count: 6, 
+        label: 'Overload, Hidden Authority', 
+        verbatim: `Characters "111111 and More"
+As soon as the number of ones exceeds five digits, we can speak of a despot's "overload," which signifies a dramatic change in character. The person begins to fear their hidden desire for power. One could say they fear themselves when they are angry.
+Based on their own demands for power, they clearly understand that they will never be able to attain it. The reason is both simple and surprising. God, the king, the president—lesser goals hold little interest for them.
+It is precisely this realization of the impossibility of attaining full power that leads them to completely renounce it.
+Such people may reveal their hidden plans only when they are highly intoxicated.
+They are very tolerant and calm, and emotional outbursts occur only after a long period of accumulated grievances. When such a moment arrives, a single word is enough to release the enormous pent-up energy.
+Close people should be aware of this and strive to release the accumulated resentment early, when it is less intense. Such people's sense of purpose is greatly reduced, as is their self-esteem. Their choice of work is determined not by their interest in it, but by the degree of freedom it offers: independence from management and independence from anyone.
+And most importantly, such people are fearless; they don't know how to back down. If you have an overloaded personality, you must learn to restrain your urge to "make promises" or argue, putting your life or health on the line. You won't be able to back down, and you only have one life.
+
+If you live with someone with an overloaded personality, help them; don't offend them with words or actions, lest this trigger an "explosion," which could ruin many lives.
+
+Recommendations for the "111111 and More" personality types
+What advice can you give to people with an overloaded despot personality type? "Be patient" is the simplest and most unfortunate advice. It's best to understand the obvious idea that follows from the question: "Who ruled the country during the time of A.S. Pushkin?"
+The Emperor's name was first, and Alexander Sergeevich wasn't even second. A person's significance for their time and the times that followed isn't determined by their title or social standing, much less by their material wealth.
+Talent is the measure that history will determine.
+If there's someone in your family with an overburdened personality, help them understand this simple idea, find the strength and desire to unleash their talent, and assist them in self-realization.
+It's essential to recognize their talent and carefully protect it from offense. Remember, even a single word or glance is enough to make them drop everything and be forever free of resentment.`, 
+        scale: 'overload' 
+      }
     ]
   },
   2: {
@@ -127,9 +306,9 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 2 (4, 5, 6) — Labor efficiency.',
     meanings: [
       { count: 0, label: 'Not Inclined to Manual Labor', verbatim: 'If in the Pythagorean Square there is no Number 6, this means that the person is not inclined to manual labor, he doesn\'t like it and can be involved in it only by reason of necessity or having it as a duty. These are people of art and science. Don\'t try to accustom them to manual labor; they will never be good workers. Above all they are inclined to art or science as much as their numbers allow. When there is no Number 6 with 2-none, 4 (or more), 9 and 5-none — better try yourself in dancing (ballet), as such people are very mobile and have a strong body.', scale: 'absent' },
-      { count: 1, label: 'Very Weak, Mood-Based Labor', verbatim: 'Having one Number 6 means that the person does manual labor based on his mood — when there is a desire. You should never be indifferent to this quality. Performance is not the main thing as a result. One can perform any work, but it is a question of how good results will be and how happy he will be after finishing it. If you try to force one who has only one \'6\' when he doesn\'t feel like working, you\'ll get a lot of problems as a result. You are going to lose a lot of energy forcing him, and if he has agreed, that doesn\'t mean he starts working at once. After such work the person becomes angry, explosive and offended. For this reason it\'s not good when people with this sign are engaged in monotonous work with a strict schedule — this can lead to breakdowns, desire to change activity, alcoholism, illnesses. But if such a person started doing some work, you should never disturb him or give advice. Your offer to help won\'t be good too, because such people don\'t like teamwork.', scale: 'very-weak' },
+      { count: 1, label: 'Very Weak, Mood-Based Labor', verbatim: 'Having one Number 6 means that the person does manual labor based on his mood — when there is a desire. You should never be dropped indifferent to this quality. Performance is not the main thing as a result. One can perform any work, but it is a question of how good results will be and how happy he will be after finishing it. If you try to force one who has only one \'6\' when he doesn\'t feel like working, you\'ll get a lot of problems as a result. You are going to lose a lot of energy forcing him, and if he has agreed, that doesn\'t mean he starts working at once. After such work the person becomes angry, explosive and offended. For this reason it\'s not good when people with this sign are engaged in monotonous work with a strict schedule — this can lead to breakdowns, desire to change activity, alcoholism, illnesses. But if such a person started doing some work, you should never disturb him or give advice. Your offer to help won\'t be good too, because such people don\'t like teamwork.', scale: 'very-weak' },
       { count: 2, label: 'Labor Given in Norm; Master of Any Craft', verbatim: 'The sign \'66\' gives its owner ability to do everything — he is a master of any craft. Very often such people are great architects. The sign \'66\' can be named as sign of grounding. The matter is that people having this sign don\'t really like reading; they better watch telecasts or do anything but not reading. If somehow you managed to control the sign, then reading takes 1st place, and manual labor has the last. Before you decide what to do with your child who has \'66\' (Numbers 7 are absent — and this is very important), it is necessary to find out its opportunities as the future master. For a craftsman it is necessary to have good energy and good health: 22 (or 2222 and more) and 4 or more. In case the child possesses \'7\' (or more), it can become a master only carefully serving a duty to its parents. I would not advise choosing any profession connected with authority as it makes the person strict and indifferent towards others\' lives.', scale: 'norm' },
-      { count: 3, label: 'The Number of the Beast; Black Knowledge', verbatim: 'The number of the beast. Satan (number 666) is the image of man and belongs to men. The greater number of \'6\' can be named \'number of the sorcerer or a witch\' as this sign is stronger. You should not be prejudiced, for that sign doesn\'t mean anything as the presence of such numbers as 8 and 7 constrain \'6\'. For example, a person has a set of numbers: 666, 7, 8. Then we can delete two numbers 6 and, accordingly, numbers 7 and 8, there will be left only one \'6\' — the man of moods (such deletion is able only when both numbers 7 and 8 haven\'t made transition; otherwise we deal with the person who, having started the conflict with the parents, has received a new quality: 666, 7, 8 transforms into 6666 and 11 with the loss of 4 or 22, that leads to irritability and authoritativeness). If there is \'6666\', being attached to similar ones (they are four in this case), they create a stable line, and the person starts to gather similar people around himself, and they show their hidden abilities: authority, cruelty, aggression. To protect yourself: if somebody tries to involve you into a conflict, the only way is to leave with an emotion of emptiness and indifference. The simplest way is laughter, which doesn\'t support any fright and doesn\'t bring any irritability or aggression. This is the Grand Chinese technique of leaving in emptiness which chi kung masters used when they met an opponent.', scale: 'special' }
+      { count: 3, label: 'The Number of the Beast; Black Knowledge', verbatim: 'The number of the beast. Satan (number 666) is the image of man and belongs to men. The greater number of \'6\' can be named \'number of the sorcerer or a witch\' as this sign is stronger. You should not be preserved, for that sign doesn\'t mean anything as the presence of such numbers as 8 and 7 constrain \'6\'. For example, a person has a set of numbers: 666, 7, 8. Then we can delete two numbers 6 and, accordingly, numbers 7 and 8, there will be left only one \'6\' — the man of moods (such deletion is able only when both numbers 7 and 8 haven\'t made transition; otherwise we deal with the person who, having started the conflict with the parents, has received a new quality: 666, 7, 8 transforms into 6666 and 11 with the loss of 4 or 22, that leads to irritability and authoritativeness). If there is \'6666\', being attached to similar ones (they are four in this case), they create a stable line, and the person starts to gather similar people around himself, and they show their hidden abilities: authority, cruelty, aggression. To protect yourself: if somebody tries to involve you into a conflict, the only way is to leave with an emotion of emptiness and indifference. The simplest way is laughter, which doesn\'t support any fright and doesn\'t bring any irritability or aggression. This is the Grand Chinese technique of leaving in emptiness which chi kung masters used when they met an opponent.', scale: 'special' }
     ]
   },
   7: {
@@ -161,7 +340,7 @@ export const PSYCHOMATRIX_CELL_MEANINGS: Record<number, PsychomatrixCellData> = 
   9: {
     digit: 9,
     cellName: 'Memory, Intellect, Clairvoyance',
-    intro: 'The number 9 in the psychomatrix is ​​responsible for a person\'s intelligence, memory, and clairvoyance. Why this number? It follows the number 8, and its characteristics should be related to the meaning of this number. Eight represents duty to loved ones, especially parents. After the death of parents, this duty takes on a new dimension—the need to remember them, and therefore the number 9 represents memory. When we speak of a person and their abilities, we typically evaluate their memory and draw conclusions about the strength of their mind: "They know so much (meaning, they remember so much), so they are intelligent." This can be debated, as our great Russian scientist M.V. Lomonosov once said, "Omniscience does not teach intelligence." Let\'s not get into polemics, but rather assume that accumulated knowledge improves a person\'s mind. Then we immediately get the answer to the question related to clairvoyance. Anyone who has accumulated a wealth of experience can foresee any situation, allowing them to make proactive predictions based on comparisons with what has already happened in their life, with events acquired through the process of accumulating information. That\'s why the sign "999 or more" can be considered a sign of clairvoyance, indicating a strong memory. It\'s a shame that such experience often goes unused. Unfortunately, people don\'t learn from the mistakes of others; they prefer to accumulate their own. It\'s important to remember that the number 9 is included in three lines: ▸ 3rd column – talent; ▸ 3rd row – stability; ▸ descending, spiritual diagonal – a person\'s spirituality. Consequently, this number can be captured and incorporated into one of these lines, causing a loss of memory and mental strength, especially if the nines are captured by the third line—stability—when a person remembers many everyday details and habits that clog their brain and memory. Excessive spirituality often leads to fanaticism (faith, passion, interests), which also robs a person of their intelligence when their brain operates on cyclical information implanted in it through psychological coding while being drawn into a particular area. It is necessary to develop and improve your memory from early childhood, when unique, natural characteristics are present. In early childhood, memory is figurative, "pictorial," based on many receptors for perceiving the surrounding world.',
+    intro: `The number 9 in the psychomatrix is ​​responsible for a person\'s intelligence, memory, and clairvoyance. Why this number? It follows the number 8, and its characteristics should be related to the meaning of this number. Eight represents duty to loved ones, especially parents. After the death of parents, this duty takes on a new dimension—the need to remember them, and therefore the number 9 represents memory. When we speak of a person and their abilities, we typically evaluate their memory and draw conclusions about the strength of their mind: "They know so much (meaning, they remember so much), so they are intelligent." This can be debated, as our great Russian scientist M.V. Lomonosov once said, "Omniscience does not teach intelligence." Let\'s not get into polemics, but rather assume that accumulated knowledge improves a person\'s mind. Then we immediately get the answer to the question related to clairvoyance. Anyone who has accumulated a wealth of experience can foresee any situation, allowing them to make proactive predictions based on comparisons with what has already happened in their life, with events acquired through the process of accumulating information. That\'s why the sign "999 or more" can be considered a sign of clairvoyance, indicating a strong memory. It\'s a shame that such experience often goes unused. Unfortunately, people don't learn from the mistakes of others; they prefer to accumulate their own. It\'s important to remember that the number 9 is included in three lines: ▸ 3rd column – talent; ▸ 3rd row – stability; ▸ descending, spiritual diagonal – a person\'s spirituality. Consequently, this number can be captured and incorporated into one of these lines, causing a loss of memory and mental strength, especially if the nines are captured by the third line—stability—when a person remembers many everyday details and habits that clog their brain and memory. Excessive spirituality often leads to fanaticism (faith, passion, interests), which also robs a person of their intelligence when their brain operates on cyclical information implanted in it through psychological coding while being drawn into a particular area. It is necessary to develop and improve your memory from early childhood, when unique, natural characteristics are present. In early childhood, memory is figurative, "pictorial," based on many receptors for perceiving the surrounding world.`,
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 3 (7, 8, 9) — Talent potential.',
     meanings: [
       { count: 0, label: 'No Memory/Intellect from Birth', verbatim: 'There are no nines — weak level of mental ability. For a person who doesn\'t have either a 5 or a 9, doing science becomes a problematic situation, due to the influence on his interests. The person doesn\'t hear others and has no logic. The behavior model was established from childhood — they won\'t believe it until they try it themselves. When bumps are full, they become too careful. Suspicious. Intuition is confused with fear. Naïve, find problems for themselves.', scale: 'absent' },
