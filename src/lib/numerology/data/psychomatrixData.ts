@@ -101,7 +101,7 @@ spiritual diagonal, "1, 5, 9".`,
       },
       { 
         count: 1, 
-        label: 'Will-less, Egoistic', 
+        label: 'Character "1"', 
         verbatim: `One. Character
 
 Character "1"
@@ -141,7 +141,7 @@ spiritual diagonal, "1, 5, 9".`,
       },
       { 
         count: 2, 
-        label: 'Soft Character, Praise-Seeking', 
+        label: 'Personality type "11"', 
         verbatim: `Personality type "11"
 People with two "1"s in their psychomatrix are distinguished by a gentle nature, love praise, and earn it in every way. This is why they help others a lot, fit easily into any company, and are noticeable in it, as they strive to attract attention to themselves in order to later receive gratitude for a pleasant meeting. They know how to listen to others unless they try to pressure them. They very rarely use pressure on others.
 They often lack the firmness to defend their views and strive for a profession that is independent, but the desire for praise pushes them toward the medical and teaching professions.
@@ -159,7 +159,7 @@ However, don't overpraise if your child has a score of 88 or 55 – they won't t
       },
       { 
         count: 3, 
-        label: 'Golden Mean', 
+        label: '"111" personality type', 
         verbatim: `"111" personality type
 This personality type has the rather grandiose name "golden mean," which immediately distinguishes it from other personality types. Such people can find common ground with anyone.
 The fact is that they can, if necessary, yield to anyone in an argument (even a "1").
@@ -178,7 +178,7 @@ Remember the words of Alexander Green: "Never do something you'll regret later."
       },
       { 
         count: 4, 
-        label: 'Strong, Volitional Character', 
+        label: '"1111" personality type', 
         verbatim: `"1111" personality type
 This is a strong-willed and determined personality.
 These people know how to set goals. If they have energy (22 or more), they are ready to engage in debate and strive for victory. However, they always know their limits and do not overstep certain boundaries, as they are not despots. They are always mindful of their interlocutors, not seeking to offend them.
@@ -202,7 +202,7 @@ Your personality gives you everything: tolerance, determination, self-esteem, an
       },
       { 
         count: 5, 
-        label: 'Maximally Expressed Power & Leadership (Despot)', 
+        label: 'The "11111" personality type', 
         verbatim: `The "11111" personality type
 A highly pronounced power and leadership trait. This person advances toward their goals, disregarding those around them, even if their psychomatrix is an 8.
 Even tolerance (8) cannot reliably curb their imperious nature.
@@ -226,7 +226,7 @@ Being a despot is difficult. However, you can't blame someone for being born a d
       },
       { 
         count: 6, 
-        label: 'Overload, Hidden Authority', 
+        label: 'Characters "111111 and More"', 
         verbatim: `Characters "111111 and More"
 As soon as the number of ones exceeds five digits, we can speak of a despot's "overload," which signifies a dramatic change in character. The person begins to fear their hidden desire for power. One could say they fear themselves when they are angry.
 Based on their own demands for power, they clearly understand that they will never be able to attain it. The reason is both simple and surprising. God, the king, the president—lesser goals hold little interest for them.
@@ -258,7 +258,7 @@ The energy of Number 2 also characterizes compatibility through energy contact. 
     meanings: [
       { 
         count: 0, 
-        label: 'Very Weak Energy, Vampire', 
+        label: '"2-None" Energy', 
         verbatim: `"2-None" Energy
 The absence of the number two in a psychomatrix indicates very low energy levels. Such individuals might be described as "vampires"—though one should not be alarmed by this term.
 Any person (even an energy "donor") will begin to "vampirize" energy from others when experiencing an acute deficit of their own (due to stress, arguments, illness, fright, or grief).
@@ -273,7 +273,7 @@ It is important to note the predisposition among people with low energy levels t
       },
       { 
         count: 1, 
-        label: 'Energy Deficiency', 
+        label: 'Energy "2"', 
         verbatim: `Energy "2"
 The presence of a single "2" in a psychomatrix indicates that the individual suffers from an energy deficit. While the simultaneous presence of the number "4" may slightly boost this energy level, the fundamental characteristics inherent to a weakened energy state remain unchanged. Such individuals exhibit all the traits typical of those who possess no "2s" in their psychomatrix: laziness, restlessness, and a tendency toward fussiness. The sole distinction lies in the fact that these traits manifest selectively and in waves: the individual may suddenly become restless, yet be lazy in a selective manner—seemingly designating specific "zones of laziness" where they permit themselves to relax and rest.
 These individuals also tend to avoid conflict, as they dislike expending their energy on such matters. Quite frequently, they perform good deeds for others with the specific aim of recouping their expended energy through praise—ideally, with a little extra thrown in. Praise, compliments, leadership roles, and standing out from the crowd—all these elements are characteristic of such individuals.
@@ -290,7 +290,7 @@ Bringing a dog into your home can yield excellent results in terms of boosting y
       },
       { 
         count: 2, 
-        label: 'Norm, Good Energy', 
+        label: 'Energy "22"', 
         verbatim: `Energy "22"
 If your psychomatrix contains two "twos," you can consider yourself fortunate. This represents the standard—the baseline level of energy essential for every human being—signifying that you possess a healthy energy reserve that is highly conducive to interacting with others and performing work.
 You are sociable and adept at establishing connections with other people. Individuals endowed with this type of energy make excellent storytellers, lecturers, and public speakers; energetically speaking, they are natural healers.
@@ -306,7 +306,7 @@ You must not allow this valuable energy to be squandered; instead, you must stri
       },
       { 
         count: 3, 
-        label: 'Extrasensory, Psychic Sign', 
+        label: 'The "222" Energy', 
         verbatim: `The "222" Energy
 If you have "222" in your psychomatrix, it signifies that you possess the mark of an "extrasensory person" from birth—or, simply put, you are an extrasensory individual.
 Before you embark on "astonishing sessions of healing, hypnosis, or clairvoyance," let us first clarify exactly what an "extrasensory person" is. The answer to this question is actually quite simple: an extrasensory person is someone who possesses special abilities that manifest specifically in response to extraordinary circumstances. Indeed, it is precisely the occurrence of unexpected events that draws a person bearing this sign into the realm of extrasensory perception. Under normal conditions, such an individual differs very little from someone who has only a single "2" in their psychomatrix; in other words, one can draw an equal sign between "2" and "222" in the absence of a specific, extraordinary situation.
@@ -322,7 +322,7 @@ It is essential to understand how such an individual heals others. Their methods
       },
       { 
         count: 4, 
-        label: 'Donor, Energy Overload', 
+        label: 'Energy Profile: "2222 and Above"', 
         verbatim: `Energy Profile: "2222 and Above"
 If your psychomatrix contains four or more "2s," it signifies that you are a "donor"—a person possessing an excess of energy that you are free to expend as you see fit.
 However, a challenge often arises regarding how to properly channel this available energy.
@@ -350,7 +350,8 @@ The final cause of illness lies in the inability to properly manage and utilize 
       {
         count: 0,
         label: 'The "3-Absent" Interest Profile',
-        verbatim: `The absence of the number 3 in a psychomatrix signifies a person's natural inclination toward the humanities and the arts.
+        verbatim: `The "3-Absent" Interest Profile
+The absence of the number 3 in a psychomatrix signifies a person's natural inclination toward the humanities and the arts.
 When discussing a child's interests—particularly those of a boy—a specific problem often arises. Almost all fathers believe that engaging in the humanities, and especially the arts, is entirely incompatible with "masculine" interests. Consequently, such interests are often actively stifled during childhood by "zealous" fathers who strive to instill in their sons a typically male interest in technology and engineering. This approach is not particularly wise, for it is nature itself that shapes a child and determines his true purpose in life.
 It is precisely because of the diversity of human interests that humanity continues to exist as a species on this planet; otherwise, we would have long since wiped ourselves out. Who, if not artists and humanists, has demonstrated the very possibility of peaceful coexistence for humanity as a species?
 Nature recognizes no such concepts as pity or compassion; within the natural world, only the principle of "survival of the fittest" prevails. However, this principle does not apply to human beings—even though individuals prone to aggression and conflict do appear among us, they are not the ones who drive humanity forward. It is philosophers and writers who offer us the opportunity to understand and pursue a non-aggressive path of progress.
@@ -367,7 +368,8 @@ The notion that you will be remembered by your children and grandchildren—but 
       {
         count: 1,
         label: 'Interest "3"',
-        verbatim: `If you have a single "3" in your psychomatrix—is this a good thing or a bad one? It depends entirely on you. If your goal is to develop your abilities, then you are definitely in luck; you are free to pursue any field of study, as you have not yet fully committed to the humanities, nor have you yet aligned yourself exclusively with the exact sciences. You can find an optimal path by engaging in disciplines that bridge these two branches of knowledge: the natural sciences, economics, law, and so on.
+        verbatim: `Interest "3"
+If you have a single "3" in your psychomatrix—is this a good thing or a bad one? It depends entirely on you. If your goal is to develop your abilities, then you are definitely in luck; you are free to pursue any field of study, as you have not yet fully committed to the humanities, nor have you yet aligned yourself exclusively with the exact sciences. You can find an optimal path by engaging in disciplines that bridge these two branches of knowledge: the natural sciences, economics, law, and so on.
 Crucially, you must understand that it is essential to choose a specific direction; otherwise, you risk doing yourself a disservice by allowing your interests to become too scattered.
 This is precisely the downside of the "3" quality: rather than focusing one's interest, it disperses it. Consequently—even among individuals with strong aptitude for academic work—many fail to pinpoint their true interests; having scattered their knowledge across various fields, they eventually abandon academia or never even attempt to pursue it seriously.
 Let me reiterate: you must precisely define the specific focus of your interests. If you fail to do so, it could be said that you lack a genuine interest in *any* particular field of knowledge—a risk that is especially high if you possess a low energy level (indicated by "2-none," "2," or "222").
@@ -382,7 +384,8 @@ The primary reason for such a misguided path of self-realization lies in the par
       {
         count: 2,
         label: '"33"',
-        verbatim: `Your psychomatrix contains two 3s; this indicates that you have an interest in the exact sciences and technology, but it does not necessarily mean that you are equipped to confidently pursue these fields.
+        verbatim: `"33"
+Your psychomatrix contains two 3s; this indicates that you have an interest in the exact sciences and technology, but it does not necessarily mean that you are equipped to confidently pursue these fields.
 It is essential to determine how best to channel this interest—or, if a direct path is not available, to identify which alternative direction your existing 3s should be steered toward.
 Let us assume that, in addition to the two 3s, your psychomatrix also contains two 5s (or more), a 22, and a 6. Taken together, these numbers suggest that—given your natural aptitudes—you possess strong logic and good energy levels, and that you are a person of shifting moods who occasionally enjoys working with their hands for personal pleasure. Based on this numerical configuration, one can conclude that you would likely make an excellent engineer or design specialist, as you possess the ability to fully grasp and navigate technological processes.
 Conversely, if your psychomatrix contains a 5 (or a missing 5), a 22, and a missing 6 (or a single 6), it can be said that—despite the presence of two 3s—you lack logical reasoning skills. The consequence of this is that while working with technology, you may accumulate experience and, by drawing upon it, eventually come to understand the specific equipment you have mastered; however, this does not qualify you as a truly skilled technical expert. You should refrain from attempting to test your abilities in the field of technical design or engineering, as your lack of logic would likely cause you to become a mere dreamer—someone capable only of fantasizing. Bringing your ideas to life in the real world would often prove simply impossible due to their inherent impracticality and lack of realism. Your best course of action would be to pursue a career in design (specifically, the aesthetic styling or external appearance of technology), thereby leaving the task of assessing the technical feasibility of your proposed aesthetics to those individuals who possess analytical capabilities.
@@ -395,7 +398,8 @@ The presence of two "3s" also has repercussions on other aspects of life, partic
       {
         count: 3,
         label: 'The "333" Interest Profile',
-        verbatim: `If your psychomatrix contains three "3s," it signifies that your interest in academic pursuits is inherently unstable—a trait that can manifest in various ways. While possessing a strong inclination toward the exact sciences and technology, such an individual often feels drawn to other fields of knowledge, leading to a shift in focus. Ideally, one interest should serve as a natural extension of the previous one; this ensures there is no discontinuity in accumulated knowledge—a gap that, if left unchecked, can often lead to a complete abandonment of one's work or vocation.
+        verbatim: `The "333" Interest Profile
+If your psychomatrix contains three "3s," it signifies that your interest in academic pursuits is inherently unstable—a trait that can manifest in various ways. While possessing a strong inclination toward the exact sciences and technology, such an individual often feels drawn to other fields of knowledge, leading to a shift in focus. Ideally, one interest should serve as a natural extension of the previous one; this ensures there is no discontinuity in accumulated knowledge—a gap that, if left unchecked, can often lead to a complete abandonment of one's work or vocation.
 The most optimal fields of study are those that draw upon the exact sciences (mathematics, physics, engineering). Consequently, you should seek to apply your knowledge in areas where other disciplines intersect with the exact sciences—such as mathematical linguistics, computer engineering, bionics, and so forth.
 Such transitions typically occur in individuals whose psychomatrix—in addition to the three "3s"—also features a "55" (or higher), a "99" (or higher), and/or a "22" (or higher) combination. As you can see, this profile describes individuals who possess strong logical faculties (the "5" factor) or a powerful memory (the "9" factor), coupled with a robust energy reserve (the "2" factor).
 Conversely, if the "5," "9," and "2" digits are weakly represented in the psychomatrix, the shift in interest will tend to veer in other directions—specifically, those associated with the particular "lines" or axes within the matrix that contain the number "3."
@@ -411,7 +415,8 @@ Every individual has the right to formulate their own hypothesis; its validity w
       {
         count: 4,
         label: 'The "3333 or More" Interest',
-        verbatim: `In our time, this is a rather rare sign, though it does appear occasionally. It signifies a profound interest in science and technology. One could say that such a person is born to be an inventor or a designer.
+        verbatim: `The "3333 or More" Interest
+In our time, this is a rather rare sign, though it does appear occasionally. It signifies a profound interest in science and technology. One could say that such a person is born to be an inventor or a designer.
 If the numbers 5 and 9 are active within the psychomatrix (appearing two or more times each), then it is essential to engage in science in its literal sense—that is, by working in a research institute or a laboratory.
 If the numbers 5 and 9 are weakly represented, one should not abandon the attempt to give expression to one's "3s." There is a simple yet reliable method for doing so: write a science fiction novel in which you can incorporate all your ideas and thoughts. Who could possibly fault a writer for the fact that their ideas are not grounded in reality? Science fiction is precisely the literary genre in which an individual is free to express their thoughts without constraint.
 I once proposed a concept for a new type of school—one designed to foster children's interests and aptitudes. This model envisioned introducing a mandatory subject for all students: "Imagination." Through this class, every child would be able to unlock their potential and share their thoughts without the fear of receiving a failing grade or being ridiculed.
@@ -431,11 +436,109 @@ It must be noted that after giving birth, any woman will experience a depletion 
     intro: 'Digit 4 in the psychomatrix answers for the health of a person. The assessment of fours in the psychomatrix does not allow evaluating the strength of a specific organ or highlighting those diseases to which a person is prone due to the peculiarities of his energy. Digit 4 answers for the human body, but this characteristic is more interesting than the state of health. By the presence of digit 4 in the psychomatrix, one can (without seeing the person and knowing nothing about him) assume how he looks, how attractive he is, how physically strong. Number 4 is included into following lines: 1st row (1, 4, 7) — purposefulness of the person, and 2nd column (4, 5, 6) — material maintenance of the family.',
     lineContext: 'Row 1 (1, 4, 7) — Purposefulness. Column 2 (4, 5, 6) — Material maintenance of the family.',
     meanings: [
-      { count: 0, label: 'No Health Given from Birth', verbatim: 'If in your psychomatrix there are no digits 4, this means you were not given health from birth and it is necessary to strengthen and take care of it. A strong body is quite difficult to grow, as it requires spending a lot of energy on this. Professional sports are not recommended, because exhausting of an organism from trainings is going to exceed the energy the person receives from a mobile way of life; after such overloads the person starts to hurt. People who don\'t have any \'4\'s are not good for performing manual labor as they don\'t have the health for it. If the person works physically he will search for sources of energy — alcohol, drugs, quarrels and family conflicts. It is necessary to strengthen the health through ancient improving systems: chi kung, yoga and others. Strengthening the health will make you able to target higher goals. It is possible to strengthen through transition: \'11\' transforms into \'8\' with additional \'4\', or \'6\' transforms into \'7\' with additional \'4\'. For this purpose it is necessary to become more tolerant or to make art a part of your life.', scale: 'absent' },
-      { count: 1, label: 'Very Weak Health', verbatim: 'Your Pythagoras Square has only one \'4\'. It speaks that you have health from birth, but it is insufficiently strong to say that prophylactics is not required. If you have \'2222 and more\' then you can try yourself in sports or manual labor. As when there is no \'4\', having only one the person starts to avoid conflicts as they lose health and energy through them. All recommendations for strengthening energy given for \'4-none\' will be useful here too. If you have poor health do not hurry with trying yourself in places where you will have authority above people. If you have good energy \'22\' or \'2222 and more\' and strong character with tolerance — 111 and 8, 1111 and 8, 11111 and 8 — it is possible to try yourself as \'the person of authority\'. If you do not have strong character (11, 1) you will quickly lose your health on the way to your dream (transition 8 to 11 with loss of 4 or 22). House affairs such as kitchen or garden also lead to loss of health, as transition of Number 7 to 6 causes loss of 4 or 22.', scale: 'very-weak' },
-      { count: 2, label: 'Health Given in Norm', verbatim: 'Health given in norm. A beautiful, strong body is given from birth. It is possible to try sports safely, even professionally, provided other numbers are also favorable (e.g., Number 6 for interest in manual labor).', scale: 'norm' },
-      { count: 3, label: 'Strong Health', verbatim: 'Your Pythagoras Square has \'44\' or more — it means strong health is given from birth and also a beautiful, strong body. It is possible to try yourself in sports safely, even professionally. Manual labor is also possible. Together with health you have sufficient purposefulness which allows you to target goals and reach them. At such strong numbers it is hard for the person to catch illness; if this happens (serious diseases) it is necessary to find the reason of illness. The basic problem — and it will inevitably arise before you — is a physical strength which is given to you from birth and which is often applied as the last \'argument\' in a dispute. Try to avoid using it in this case. The confidence in physical strength pushes to fisticuffs, especially those ones who have three fours (444). Possessing a strong body, they often lose health because of its undermining, not knowing any limits in work or sports.', scale: 'special' },
-      { count: 4, label: 'Exceptional Physical Strength & Vitality', verbatim: 'Very good health and virtually unlimited physical possibilities. Both men and women are naturally very strong physically. Men especially so — usually they find consolation not in women, but in alcohol, as strong health allows taking alcohol in almost unlimited quantities. This combination personifies a healthy person with an active lifestyle and high sexual potential.', scale: 'strong' }
+      { 
+        count: 0, 
+        label: 'Health Profile: "4-Absent"', 
+        verbatim: `Health Profile: "4-Absent"
+If the number 4 is missing from your psychomatrix, it signifies that you were not endowed with innate health at birth; consequently, you must actively work to strengthen and care for it. Cultivating a robust physique is quite challenging, as it demands a significant expenditure of energy. Engaging in professional sports—particularly strength-based disciplines—is not recommended, as the physical wear and tear resulting from such training will far outweigh the energy gains derived from an active lifestyle; under such strenuous loads, the individual is prone to falling ill. Individuals lacking a 4 in their psychomatrix are generally disinclined toward manual labor due to their limited physical reserves. Should such a person nevertheless engage in physical work, they will instinctively seek external sources to replenish their depleted energy—such as alcohol, drugs, or by instigating arguments and conflicts within the family.
+It is imperative that you prioritize strengthening your health; the most effective approach is to adopt one of the ancient holistic wellness systems, such as Wushu, Qigong, Yoga, or similar disciplines.
+By fortifying your health, you empower yourself to set and pursue loftier goals. You will find it easier to provide for your family, as you will possess the necessary physical stamina to perform your work effectively. Health can also be strengthened through the "conversion" of other numbers within your matrix: specifically, when an "11" converts into an "8" (yielding an additional "4"), or when a "6" converts into a "7" (yielding an additional "4"). To facilitate this conversion, you must cultivate the virtue of tolerance within yourself or actively engage in the arts. However, be careful not to conflate genuine artistic engagement—driven by a child's own intrinsic interest—with activities (such as music lessons) that parents impose upon a child, demanding genius-level proficiency simply because they have paid for the instruction.`, 
+        scale: 'absent' 
+      },
+      { 
+        count: 1, 
+        label: 'Health Profile: "4"', 
+        verbatim: `Health Profile: "4"
+If your psychomatrix contains exactly one instance of the number 4, it indicates that you were born with a baseline level of health; however, this constitution is not sufficiently robust to warrant neglecting preventive care or health maintenance.
+If, in addition to this single 4, your matrix also contains four or more instances of the number 2, you may successfully pursue a career in sports or engage in physically demanding labor.
+Much like those who completely lack the number 4, individuals with a single 4 in their matrix tend to avoid conflict, as engaging in disputes results in a significant depletion of their health and energy reserves.  All recommendations for boosting energy provided in the "Health: The '4-No's'" section remain valid and beneficial in this context.
+If you are in poor health (or lack it entirely), do not rush to choose a profession involving authority over others. It is essential to carefully assess the safety of such a step for your well-being.
+If you possess strong "22" energy—or "2222 or more"—combined with a strong character profile (specifically, the tolerance combinations of 111 and 8, 1111 and 8, or 11111 and 8), you may attempt to pursue a career as a "person of authority."
+However, if you lack a strong character profile (i.e., you have only 11 or 1), it is wiser to spare your health; otherwise, in your pursuit of your dream, you risk losing your health even faster (a process involving the numerical transition of 8 into 11, accompanied by the loss of 4 or 22).
+
+Excessive engagement in household chores or gardening can also lead to a decline in health, as this triggers a numerical transition of 7 into 6, resulting in the loss of 4 or 22. I believe anyone would agree that it is far easier to preserve one's health than to restore it.`, 
+        scale: 'very-weak' 
+      },
+      { 
+        count: 2, 
+        label: 'Health: "44 or More"', 
+        verbatim: `Health: "44 or More"
+If your psychomatrix contains two or more fours, it signifies that you have been endowed with robust health from birth—and, along with it, a beautiful, strong physique.
+You can confidently engage in sports, even at a professional level. Physical labor is also a viable option; however, you should also take into account other numbers—specifically the number 6, which governs one's inclination toward physical work (particularly if you have two or more sixes).
+Alongside your physical vitality, you possess a sufficient degree of determination to set goals and achieve them; however, an intense anxiety regarding your ability to provide for your family could potentially undermine these efforts.
+With such powerful numerical indicators, a person should not, in theory, fall ill. Should this occur—specifically in the case of serious ailments—it becomes imperative to identify the root cause of the illness, as discussed earlier.
+The primary challenge—one you will inevitably face—stems from the sheer physical strength you were born with, a power that is often wielded as a final "argument" in a dispute. Strive to refrain from resorting to such displays of force. Recall the old adage: "There is no defense against a crowbar—unless you have another crowbar." Do not delude yourself into thinking that luck will be on your side and that this metaphorical "crowbar" will simply pass you by.
+Overconfidence in one's physical prowess often propels individuals—particularly those with three fours (444)—into physical altercations. Despite possessing powerful physiques, they frequently compromise their health by overtaxing their bodies, failing to exercise moderation in their work or athletic pursuits.
+As for the influence of the number four on one's family life, it primarily manifests in the physical appearance of the spouses. It is no secret that we tend to select our life partners based on physical appearance—far less frequently based on intellect, and even more rarely based on sexual compatibility.
+While one's intellect can be assessed with relative ease, determining temperamental compatibility within a marriage remains a complex issue; this is largely due to societal norms regarding female propriety, which often create complications further down the line.  It is commendable that young people strive to remain faithful to tradition; however, there is a way to help them understand one another's temperament without resorting to physical intimacy.
+Examine each individual's "physical diagonal," and everything will fall into place; you will be able to assess each person's temperament based on the strength of this specific line (comprising the numbers 3, 5, and 7). Now, imagine that a person possesses a high number of 4s—which endows them with a beautiful physique—yet their physical diagonal is weak. This implies that potential difficulties may arise if one partner's temperament is significantly stronger than the other's.
+When seeking a partner, do not place your trust in physical appearance alone, as it is often deceptive; strong arms and broad shoulders do not necessarily equate to sexual vigor or potency. The number 4 bears no relation to a person's intimate life; therefore, consult the physical diagonal before attributing qualities that do not actually exist. This applies particularly to women who possess a strong physical diagonal (3, 5, 7). Ideally, the male partner should be one digit stronger than the female, or possess an equal number of digits within this specific diagonal.`, 
+        scale: 'norm' 
+      },
+      { 
+        count: 3, 
+        label: 'Health: "44 or More"', 
+        verbatim: `Health: "44 or More"
+If your psychomatrix contains two or more fours, it signifies that you have been endowed with robust health from birth—and, along with it, a beautiful, strong physique.
+You can confidently engage in sports, even at a professional level. Physical labor is also a viable option; however, you should also take into account other numbers—specifically the number 6, which governs one's inclination toward physical work (particularly if you have two or more sixes).
+Alongside your physical vitality, you possess a sufficient degree of determination to set goals and achieve them; however, an intense anxiety regarding your ability to provide for your family could potentially undermine these efforts.
+With such powerful numerical indicators, a person should not, in theory, fall ill. Should this occur—specifically in the case of serious ailments—it becomes imperative to identify the root cause of the illness, as discussed earlier.
+The primary challenge—one you will inevitably face—stems from the sheer physical strength you were born with, a power that is often wielded as a final "argument" in a dispute. Strive to refrain from resorting to such displays of force. Recall the old adage: "There is no defense against a crowbar—unless you have another crowbar." Do not delude yourself into thinking that luck will be on your side and that this metaphorical "crowbar" will simply pass you by.
+Overconfidence in one's physical prowess often propels individuals—particularly those with three fours (444)—into physical altercations. Despite possessing powerful physiques, they frequently compromise their health by overtaxing their bodies, failing to exercise moderation in their work or athletic pursuits.
+As for the influence of the number four on one's family life, it primarily manifests in the physical appearance of the spouses. It is no secret that we tend to select our life partners based on physical appearance—far less frequently based on intellect, and even more rarely based on sexual compatibility.
+While one's intellect can be assessed with relative ease, determining temperamental compatibility within a marriage remains a complex issue; this is largely due to societal norms regarding female propriety, which often create complications further down the line.  It is commendable that young people strive to remain faithful to tradition; however, there is a way to help them understand one another's temperament without resorting to physical intimacy.
+Examine each individual's "physical diagonal," and everything will fall into place; you will be able to assess each person's temperament based on the strength of this specific line (comprising the numbers 3, 5, and 7). Now, imagine that a person possesses a high number of 4s—which endows them with a beautiful physique—yet their physical diagonal is weak. This implies that potential difficulties may arise if one partner's temperament is significantly stronger than the other's.
+When seeking a partner, do not place your trust in physical appearance alone, as it is often deceptive; strong arms and broad shoulders do not necessarily equate to sexual vigor or potency. The number 4 bears no relation to a person's intimate life; therefore, consult the physical diagonal before attributing qualities that do not actually exist. This applies particularly to women who possess a strong physical diagonal (3, 5, 7). Ideally, the male partner should be one digit stronger than the female, or possess an equal number of digits within this specific diagonal.`, 
+        scale: 'special' 
+      },
+      { 
+        count: 4, 
+        label: 'Health: "44 or More"', 
+        verbatim: `Health: "44 or More"
+If your psychomatrix contains two or more fours, it signifies that you have been endowed with robust health from birth—and, along with it, a beautiful, strong physique.
+You can confidently engage in sports, even at a professional level. Physical labor is also a viable option; however, you should also take into account other numbers—specifically the number 6, which governs one's inclination toward physical work (particularly if you have two or more sixes).
+Alongside your physical vitality, you possess a sufficient degree of determination to set goals and achieve them; however, an intense anxiety regarding your ability to provide for your family could potentially undermine these efforts.
+With such powerful numerical indicators, a person should not, in theory, fall ill. Should this occur—specifically in the case of serious ailments—it becomes imperative to identify the root cause of the illness, as discussed earlier.
+The primary challenge—one you will inevitably face—stems from the sheer physical strength you were born with, a power that is often wielded as a final "argument" in a dispute. Strive to refrain from resorting to such displays of force. Recall the old adage: "There is no defense against a crowbar—unless you have another crowbar." Do not delude yourself into thinking that luck will be on your side and that this metaphorical "crowbar" will simply pass you by.
+Overconfidence in one's physical prowess often propels individuals—particularly those with three fours (444)—into physical altercations. Despite possessing powerful physiques, they frequently compromise their health by overtaxing their bodies, failing to exercise moderation in their work or athletic pursuits.
+As for the influence of the number four on one's family life, it primarily manifests in the physical appearance of the spouses. It is no secret that we tend to select our life partners based on physical appearance—far less frequently based on intellect, and even more rarely based on sexual compatibility.
+While one's intellect can be assessed with relative ease, determining temperamental compatibility within a marriage remains a complex issue; this is largely due to societal norms regarding female propriety, which often create complications further down the line.  It is commendable that young people strive to remain faithful to tradition; however, there is a way to help them understand one another's temperament without resorting to physical intimacy.
+Examine each individual's "physical diagonal," and everything will fall into place; you will be able to assess each person's temperament based on the strength of this specific line (comprising the numbers 3, 5, and 7). Now, imagine that a person possesses a high number of 4s—which endows them with a beautiful physique—yet their physical diagonal is weak. This implies that potential difficulties may arise if one partner's temperament is significantly stronger than the other's.
+When seeking a partner, do not place your trust in physical appearance alone, as it is often deceptive; strong arms and broad shoulders do not necessarily equate to sexual vigor or potency. The number 4 bears no relation to a person's intimate life; therefore, consult the physical diagonal before attributing qualities that do not actually exist. This applies particularly to women who possess a strong physical diagonal (3, 5, 7). Ideally, the male partner should be one digit stronger than the female, or possess an equal number of digits within this specific diagonal.`, 
+        scale: 'strong' 
+      },
+      { 
+        count: 5, 
+        label: 'Health: "44 or More"', 
+        verbatim: `Health: "44 or More"
+If your psychomatrix contains two or more fours, it signifies that you have been endowed with robust health from birth—and, along with it, a beautiful, strong physique.
+You can confidently engage in sports, even at a professional level. Physical labor is also a viable option; however, you should also take into account other numbers—specifically the number 6, which governs one's inclination toward physical work (particularly if you have two or more sixes).
+Alongside your physical vitality, you possess a sufficient degree of determination to set goals and achieve them; however, an intense anxiety regarding your ability to provide for your family could potentially undermine these efforts.
+With such powerful numerical indicators, a person should not, in theory, fall ill. Should this occur—specifically in the case of serious ailments—it becomes imperative to identify the root cause of the illness, as discussed earlier.
+The primary challenge—one you will inevitably face—stems from the sheer physical strength you were born with, a power that is often wielded as a final "argument" in a dispute. Strive to refrain from resorting to such displays of force. Recall the old adage: "There is no defense against a crowbar—unless you have another crowbar." Do not delude yourself into thinking that luck will be on your side and that this metaphorical "crowbar" will simply pass you by.
+Overconfidence in one's physical prowess often propels individuals—particularly those with three fours (444)—into physical altercations. Despite possessing powerful physiques, they frequently compromise their health by overtaxing their bodies, failing to exercise moderation in their work or athletic pursuits.
+As for the influence of the number four on one's family life, it primarily manifests in the physical appearance of the spouses. It is no secret that we tend to select our life partners based on physical appearance—far less frequently based on intellect, and even more rarely based on sexual compatibility.
+While one's intellect can be assessed with relative ease, determining temperamental compatibility within a marriage remains a complex issue; this is largely due to societal norms regarding female propriety, which often create complications further down the line.  It is commendable that young people strive to remain faithful to tradition; however, there is a way to help them understand one another's temperament without resorting to physical intimacy.
+Examine each individual's "physical diagonal," and everything will fall into place; you will be able to assess each person's temperament based on the strength of this specific line (comprising the numbers 3, 5, and 7). Now, imagine that a person possesses a high number of 4s—which endows them with a beautiful physique—yet their physical diagonal is weak. This implies that potential difficulties may arise if one partner's temperament is significantly stronger than the other's.
+When seeking a partner, do not place your trust in physical appearance alone, as it is often deceptive; strong arms and broad shoulders do not necessarily equate to sexual vigor or potency. The number 4 bears no relation to a person's intimate life; therefore, consult the physical diagonal before attributing qualities that do not actually exist. This applies particularly to women who possess a strong physical diagonal (3, 5, 7). Ideally, the male partner should be one digit stronger than the female, or possess an equal number of digits within this specific diagonal.`, 
+        scale: 'dominant' 
+      },
+      { 
+        count: 6, 
+        label: 'Health: "44 or More"', 
+        verbatim: `Health: "44 or More"
+If your psychomatrix contains two or more fours, it signifies that you have been endowed with robust health from birth—and, along with it, a beautiful, strong physique.
+You can confidently engage in sports, even at a professional level. Physical labor is also a viable option; however, you should also take into account other numbers—specifically the number 6, which governs one's inclination toward physical work (particularly if you have two or more sixes).
+Alongside your physical vitality, you possess a sufficient degree of determination to set goals and achieve them; however, an intense anxiety regarding your ability to provide for your family could potentially undermine these efforts.
+With such powerful numerical indicators, a person should not, in theory, fall ill. Should this occur—specifically in the case of serious ailments—it becomes imperative to identify the root cause of the illness, as discussed earlier.
+The primary challenge—one you will inevitably face—stems from the sheer physical strength you were born with, a power that is often wielded as a final "argument" in a dispute. Strive to refrain from resorting to such displays of force. Recall the old adage: "There is no defense against a crowbar—unless you have another crowbar." Do not delude yourself into thinking that luck will be on your side and that this metaphorical "crowbar" will simply pass you by.
+Overconfidence in one's physical prowess often propels individuals—particularly those with three fours (444)—into physical altercations. Despite possessing powerful physiques, they frequently compromise their health by overtaxing their bodies, failing to exercise moderation in their work or athletic pursuits.
+As for the influence of the number four on one's family life, it primarily manifests in the physical appearance of the spouses. It is no secret that we tend to select our life partners based on physical appearance—far less frequently based on intellect, and even more rarely based on sexual compatibility.
+While one's intellect can be assessed with relative ease, determining temperamental compatibility within a marriage remains a complex issue; this is largely due to societal norms regarding female propriety, which often create complications further down the line.  It is commendable that young people strive to remain faithful to tradition; however, there is a way to help them understand one another's temperament without resorting to physical intimacy.
+Examine each individual's "physical diagonal," and everything will fall into place; you will be able to assess each person's temperament based on the strength of this specific line (comprising the numbers 3, 5, and 7). Now, imagine that a person possesses a high number of 4s—which endows them with a beautiful physique—yet their physical diagonal is weak. This implies that potential difficulties may arise if one partner's temperament is significantly stronger than the other's.
+When seeking a partner, do not place your trust in physical appearance alone, as it is often deceptive; strong arms and broad shoulders do not necessarily equate to sexual vigor or potency. The number 4 bears no relation to a person's intimate life; therefore, consult the physical diagonal before attributing qualities that do not actually exist. This applies particularly to women who possess a strong physical diagonal (3, 5, 7). Ideally, the male partner should be one digit stronger than the female, or possess an equal number of digits within this specific diagonal.`, 
+        scale: 'overload' 
+      }
     ]
   },
   5: {
@@ -491,11 +594,7 @@ It must be noted that after giving birth, any woman will experience a depletion 
   9: {
     digit: 9,
     cellName: 'Memory, Intellect, Clairvoyance',
-    intro: `The number 9 in the psychomatrix is ​​responsible for a person's intelligence, memory, and clairvoyance. Why this number? It follows the number 8, and its characteristics should be related to the meaning of this number. Eight represents duty to loved ones, especially parents. After the death of parents, this duty takes on a new dimension—the need to remember them, and therefore the number 9 represents memory. When we speak of a person and their abilities, we typically evaluate their memory and draw conclusions about the strength of their mind: "They know so much (meaning, they remember so much), so they are intelligent." This can be debated, as our great Russian scientist M.V. Lomonosov once said, "Omniscience does not teach intelligence." Let's not get into polemics, but rather assume that accumulated knowledge improves a person's mind. Then we immediately get the answer to the question related to clairvoyance. Anyone who has accumulated a wealth of experience can foresee any situation, allowing them to make proactive predictions based on comparisons with what has already happened in their life, with events acquired through the process of accumulating information.
-
-That's why the sign "999 or more" can be considered a sign of clairvoyance, indicating a strong memory. It's a shame that such experience often goes unused. Unfortunately, people don't learn from the mistakes of others; they prefer to accumulate their own. It's important to remember that the number 9 is included in three lines: ▸ 3rd column – talent; ▸ 3rd row – stability; ▸ descending, spiritual diagonal – a person's spirituality. Consequently, this number can be captured and incorporated into one of these lines, causing a loss of memory and mental strength, especially if the nines are captured by the third line—stability—when a person remembers many everyday details and habits that clog their brain and memory. Excessive spirituality often leads to fanaticism (faith, passion, interests), which also robs a person of their intelligence when their brain operates on cyclical information implanted in it through psychological coding while being drawn into a particular area.
-
-It is necessary to develop and improve your memory from early childhood, when unique, natural characteristics are present. In early childhood, memory is figurative, "pictorial," based on many receptors for perceiving the surrounding world.`,
+    intro: `The number 9 in the psychomatrix is ​​responsible for a person's intelligence, memory, and clairvoyance. Why this number? It follows the number 8, and its characteristics should be related to the meaning of this number. Eight represents duty to loved ones, especially parents. After the death of parents, this duty takes on a new dimension—the need to remember them, and therefore the number 9 represents memory. When we speak of a person and their abilities, we typically evaluate their memory and draw conclusions about the strength of their mind: "They know so much (meaning, they remember so much), so they are intelligent." This can be debated, as our great Russian scientist M.V. Lomonosov once said, "Omniscience does not teach intelligence." Let's not get into polemics, but rather assume that accumulated knowledge improves a person's mind. Then we immediately get the answer to the question related to clairvoyance. Anyone who has accumulated a wealth of experience can foresee any situation, allowing them to make proactive predictions based on comparisons with what has already happened in their life, with events acquired through the process of accumulating information. That's why the sign "999 or more" can be considered a sign of clairvoyance, indicating a strong memory. It's a shame that such experience often goes unused. Unfortunately, people don't learn from the mistakes of others; they prefer to accumulate their own. It's important to remember that the number 9 is included in three lines: ▸ 3rd column – talent; ▸ 3rd row – stability; ▸ descending, spiritual diagonal – a person's spirituality. Consequently, this number can be captured and incorporated into one of these lines, causing a loss of memory and mental strength, especially if the nines are captured by the third line—stability—when a person remembers many everyday details and habits that clog their brain and memory. Excessive spirituality often leads to fanaticism (faith, passion, interests), which also robs a person of their intelligence when their brain operates on cyclical information implanted in it through psychological coding while being drawn into a particular area. It is necessary to develop and improve your memory from early childhood, when unique, natural characteristics are present. In early childhood, memory is figurative, "pictorial," based on many receptors for perceiving the surrounding world.`,
     lineContext: 'Row 3 (3, 6, 9) — Stability. Column 3 (7, 8, 9) — Talent potential.',
     meanings: [
       { count: 0, label: 'No Memory/Intellect from Birth', verbatim: 'There are no nines — weak level of mental ability. For a person who doesn\'t have either a 5 or a 9, doing science becomes a problematic situation, due to the influence on his interests. The person doesn\'t hear others and has no logic. The behavior model was established from childhood — they won\'t believe it until they try it themselves. When bumps are full, they become too careful. Suspicious. Intuition is confused with fear. Naïve, find problems for themselves.', scale: 'absent' },
