@@ -10,7 +10,7 @@ import {
   Brain, Flame, Zap, Shield, Eye, Hammer, Star, Heart, Cpu,
   ChevronDown, Info, Sparkles, GitBranch,
   AlertTriangle, Atom, Wand2, Activity, Layers, Zap as PowerIcon,
-  CircleDot, TrendingUp, TrendingDown, Minus, Loader2, Clock
+  CircleDot, TrendingUp, TrendingDown, Minus, BookOpen, ChevronRight, Clock
 } from 'lucide-react';
 import {
   calculatePsychomatrix,
@@ -25,8 +25,7 @@ import {
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { calculateDynamicPotentials } from '@/lib/numerology/dynamic-engine';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
-import { detectTransitions, type DetectedTransition, type MatrixState } from '@/lib/transitions/engine';
-import { generateTransitionAdvisory } from '@/lib/transitions/advisory-service';
+import { detectTransitions, type DetectedTransition, type MatrixState, type TransitionAdvisory } from '@/lib/transitions/engine';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -87,13 +86,23 @@ const URGENCY_CONFIG = {
   high:     { label:'HIGH',     color:'#f59e0b', bg:'rgba(245,158,11,0.1)', border:'rgba(245,158,11,0.3)' },
   moderate: { label:'ACTIVE',   color:'#a78bfa', bg:'rgba(167,139,250,0.1)', border:'rgba(167,139,250,0.28)' },
   latent:   { label:'LATENT',   color:'#60a5fa', bg:'rgba(96,165,250,0.08)', border:'rgba(96,165,250,0.2)' },
-};
+} as const;
 
-const DIRECTION_ICON = {
+const DIR_ICON = {
   ascent:  <TrendingUp  style={{ width:16, height:16, color:'#34d399' }} />,
   descent: <TrendingDown style={{ width:16, height:16, color:'#ef4444' }} />,
   dual:    <Minus       style={{ width:16, height:16, color:'#d4af37' }} />,
 };
+
+const SECTION_TITLES: Array<{ key: keyof TransitionAdvisory; label: string; icon: string }> = [
+  { key: 'anatomy',    label: 'Anatomy',      icon: '✦' },
+  { key: 'execution',  label: 'Execution',    icon: '⚙' },
+  { key: 'resistance', label: 'Resistance',   icon: '⚔' },
+  { key: 'timing',     label: 'Timing',       icon: '⌛' },
+  { key: 'karma',      label: 'Karma',        icon: '∞' },
+  { key: 'shadow',     label: 'Shadow',       icon: '◈' },
+  { key: 'synthesis',  label: 'Synthesis',    icon: '◎' },
+];
 
 function NumberArrow({ from, to, direction }: { from: number; to: number; direction: string }) {
   const col = direction === 'ascent' ? '#34d399' : direction === 'descent' ? '#ef4444' : '#d4af37';
@@ -113,26 +122,26 @@ function NumberArrow({ from, to, direction }: { from: number; to: number; direct
   );
 }
 
-function AdvisoryViewer({ text }: { text: string }) {
-  const sections = text.split(/###\s+SECTION \d+:/g).filter(Boolean);
-  const headers = [...text.matchAll(/###\s+SECTION \d+:\s*(.+)/g)].map(m => m[1].trim());
-  const [activeSection, setActiveSection] = React.useState(0);
+function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
+  const [active, setActive] = React.useState(0);
+  const section = SECTION_TITLES[active];
+  const text = advisory[section.key];
 
   return (
     <div className="mt-4 space-y-4">
       <div className="flex gap-1.5 flex-wrap">
-        {headers.map((h, i) => (
-          <button key={i} onClick={() => setActiveSection(i)}
+        {SECTION_TITLES.map((s, i) => (
+          <button key={s.key} onClick={() => setActive(i)}
             className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold border transition-all ${
-              activeSection === i ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-white/5 text-muted-foreground border-white/10'
+              active === i ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-white/5 text-muted-foreground border-white/10'
             }`}>
-            {i + 1}. {h.split('—')[0].trim()}
+            {i + 1}. {s.label}
           </button>
         ))}
       </div>
-      <motion.div key={activeSection} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[13px] leading-relaxed text-stone-300">
-        <h4 className="font-cinzel text-xs text-amber-500 mb-3 uppercase tracking-widest">{headers[activeSection]}</h4>
-        <div className="whitespace-pre-wrap">{sections[activeSection]?.trim()}</div>
+      <motion.div key={active} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[13px] leading-relaxed text-stone-300">
+        <h4 className="font-cinzel text-xs text-amber-500 mb-3 uppercase tracking-widest">{section.label} — Deep Reading</h4>
+        <div className="whitespace-pre-wrap">{text.trim()}</div>
       </motion.div>
     </div>
   );
@@ -140,22 +149,7 @@ function AdvisoryViewer({ text }: { text: string }) {
 
 function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState: MatrixState }) {
   const [open, setOpen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-  const [advisory, setAdvisory] = React.useState<string | null>(null);
   const urg = URGENCY_CONFIG[t.urgency];
-
-  const fetchAdvisory = async () => {
-    if (advisory) { setOpen(!open); return; }
-    setLoading(true); setOpen(true);
-    try {
-      const text = await generateTransitionAdvisory(t, matrixState);
-      setAdvisory(text);
-    } catch {
-      setAdvisory("Failed to generate advisory. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="border border-stone-700/40 rounded-sm bg-black/40 backdrop-blur-md overflow-hidden" style={{ borderLeft: `4px solid ${urg.color}` }}>
@@ -171,15 +165,28 @@ function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState
           </div>
         </div>
         <p className="text-[13px] text-stone-400 italic px-2 border-l border-white/10">{t.coreConflict}</p>
-        <button onClick={fetchAdvisory} className="w-full py-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <PowerIcon className="h-3 w-3" />}
-          {advisory ? (open ? 'Hide Advisory' : 'Show Full Advisory') : '✦ Generate Deep Advisory'}
+        
+        <div className="flex gap-2 flex-wrap">
+          <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] uppercase font-bold text-stone-400">
+            <PowerIcon className="w-3 h-3" /> Cost: {t.energyCost}
+          </span>
+          {t.warningActive && (
+            <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-rose-500/10 border border-rose-500/30 text-[10px] uppercase font-bold text-rose-400">
+              <Clock className="w-3 h-3" /> Year {matrixState.personalYear} Active
+            </span>
+          )}
+        </div>
+
+        <button onClick={() => setOpen(!open)} className="w-full py-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+          <BookOpen className="h-3 w-3" />
+          {open ? 'Hide Advisory' : 'Read 7-Section Advisory'}
+          {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         </button>
       </div>
       <AnimatePresence>
-        {open && advisory && (
+        {open && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="border-t border-stone-800/60 bg-black/20 p-5">
-            <AdvisoryViewer text={advisory} />
+            <AdvisoryViewer advisory={t.advisory} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -307,7 +314,7 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
     birthDay: day,
     birthMonth: month,
     birthYear: year,
-    gender: gender || 'male',
+    gender: (gender as 'male' | 'female') || 'male',
   }), [result.counts, personalYear, day, month, year, gender]);
 
   const transitions = React.useMemo(() => detectTransitions(matrixState), [matrixState]);
@@ -611,7 +618,7 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
 
           {activeTab === 'Synthesis' && (
             <div className="space-y-6">
-              {/* Transitions Section (Internal Addition) */}
+              {/* Transitions Section (Deterministic) */}
               <div className="space-y-5">
                 <SectionHeader icon={<Activity className="w-4 h-4" />} title="Karmic Life Transitions" />
                 {transitions.length === 0 ? (
