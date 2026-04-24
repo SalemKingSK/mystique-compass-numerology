@@ -1,10 +1,16 @@
 /**
  * MYSTIQUE COMPASS — Alexandrov Psychomatrix Transition Engine
+ * Deterministic logic: scans the full matrix and returns every
+ * transition the user is mathematically eligible for.
  */
 
 export interface MatrixState {
   counts: Record<number, number>;
   personalYear: number;
+  birthDay: number;
+  birthMonth: number;
+  birthYear: number;
+  gender: string;
 }
 
 export type TransitionDirection = 'ascent' | 'descent' | 'dual';
@@ -157,6 +163,62 @@ export function detectTransitions(state: MatrixState): DetectedTransition[] {
       warningActive: urgencyFromYear(personalYear, [2, 5, 14, 23]),
       overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
       countFrom: c(5), countTo: c(2),
+    });
+  }
+
+  // 7. HABIT → INTELLECT
+  if (c(3) >= 2) {
+    results.push({
+      id: '3_TO_9', from: 3, to: 9,
+      name: 'Habit into Intellect', subtitle: 'The Transmutation of Interest', direction: 'ascent',
+      urgency: c(3) >= 3 && c(9) === 0 ? 'critical' : 'moderate',
+      prerequisitesMet: `You hold ${c(3)} Threes. Habitual patterns dominate.`,
+      coreConflict: 'Converting curiosity-without-depth into profound intellectual mastery.',
+      warningActive: urgencyFromYear(personalYear, [3, 9, 12, 21]),
+      overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
+      countFrom: c(3), countTo: c(9),
+    });
+  }
+
+  // 8. INTELLECT → HABIT
+  if (c(9) >= 1 && (overloaded.includes(9) || personalYear === 3)) {
+    results.push({
+      id: '9_TO_3', from: 9, to: 3,
+      name: 'Intellect into Habit', subtitle: 'The Collapse of Wisdom', direction: 'descent',
+      urgency: overloaded.includes(9) ? 'critical' : 'latent',
+      prerequisitesMet: `Nine(s) carry risk of collapse into obsessive repetition.`,
+      coreConflict: 'Intellectual burnout regressing into compulsive habit and distraction.',
+      warningActive: urgencyFromYear(personalYear, [3, 9, 12, 21]),
+      overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
+      countFrom: c(9), countTo: c(3),
+    });
+  }
+
+  // 9. HEALTH → WILL
+  if (c(4) >= 2) {
+    results.push({
+      id: '4_TO_1', from: 4, to: 1,
+      name: 'Physical Health into Will', subtitle: 'The Body Becomes the Weapon', direction: 'ascent',
+      urgency: c(4) >= 3 ? 'high' : 'moderate',
+      prerequisitesMet: `Fours detected. Physical vitality can be transmuted.`,
+      coreConflict: 'Channeling bodily discipline into absolute force of will.',
+      warningActive: urgencyFromYear(personalYear, [4, 13, 22]),
+      overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
+      countFrom: c(4), countTo: c(1),
+    });
+  }
+
+  // 10. WILL → HEALTH
+  if (c(1) >= 1 && missing.includes(4)) {
+    results.push({
+      id: '1_TO_4', from: 1, to: 4,
+      name: 'Will Burning the Body', subtitle: 'The Price of Ambition', direction: 'descent',
+      urgency: c(1) >= 3 ? 'critical' : 'high',
+      prerequisitesMet: `Willpower present with NO native health foundation (4).`,
+      coreConflict: 'Unchecked ambition depleting physical health reserves.',
+      warningActive: urgencyFromYear(personalYear, [1, 4, 10, 13]),
+      overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
+      countFrom: c(1), countTo: c(4),
     });
   }
 

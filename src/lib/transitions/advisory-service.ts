@@ -36,7 +36,7 @@ function buildMissingNarrative(missing: number[]): string {
 }
 
 function urgencyLabel(u: DetectedTransition['urgency']): string {
-  return { critical: 'CRITICAL', high: 'HIGH PRIORITY', moderate: 'ACTIVE ADVISORY', latent: 'LATENT WATCH' }[u];
+  return { critical: 'CRITICAL — IMMEDIATE ACTION REQUIRED', high: 'HIGH PRIORITY', moderate: 'ACTIVE ADVISORY', latent: 'LATENT WATCH' }[u];
 }
 
 export async function generateTransitionAdvisory(
@@ -58,7 +58,7 @@ ABSOLUTE RULES:
 — Do NOT summarize. Do NOT be economical. Write as much as the subject requires.
 — Every section must directly reference the subject's specific numbers.
 — Maintain an uncompromising, analytical, and authoritative tone throughout.
-— Begin immediately with Section 1.
+— Do not use introductory fluff. Begin immediately with Section 1.
 
 SUBJECT'S COMPLETE PSYCHOMATRIX
 Present Numbers:
@@ -70,6 +70,7 @@ ${missingStr}
 Overloaded Numbers (Shadow Risk Zones): ${overloadStr}
 Active Matrix Arrows: ${arrowStr}
 Personal Year: Year ${state.personalYear}
+Gender: ${state.gender}
 
 TRANSITION UNDER ANALYSIS
 Transition: ${transition.name} — from ${transition.from} into ${transition.to}
@@ -79,13 +80,29 @@ Urgency Level: ${urgencyLabel(transition.urgency)}
 Core Conflict: ${transition.coreConflict}
 
 GENERATE THE ADVISORY IN EXACTLY THESE 7 SECTIONS:
+
 ### SECTION 1: THE ANATOMY OF THE TRANSITION
+Describe the exact psychomechanics of what this transition represents for THIS subject. Define what they are giving up (the ${transition.from}) and what they are attempting to acquire (the ${transition.to}). Address how their present numbers specifically shape the starting position.
+
 ### SECTION 2: THE MECHANICS OF EXECUTION
+Provide step-by-step, actionable psychological instructions for forcing this transition to materialize. Address how dominant and missing numbers create execution gaps and how to compensate.
+
 ### SECTION 3: ENVIRONMENTAL RESISTANCE & ACTIVE SABOTAGE
+Detail the external interference triggered by this transition. Who will attempt to sabotage? What psychological tactics will they use? Provide counter-strategies.
+
 ### SECTION 4: THE TIMING ORACLE — WHEN TO EXECUTE
+Using Personal Year ${state.personalYear} and the cycle logic, provide detailed timing. When is the optimal launch window? When is it catastrophic?
+
 ### SECTION 5: ANCESTRAL & KARMIC WEIGHT
+Address generational programming. What lineage wound would this transition break?
+
 ### SECTION 6: THE SHADOW STATES — WHAT FAILURE LOOKS LIKE
+Detail the symptoms of a stalled transition. Crisis events and emergency stabilization protocols.
+
 ### SECTION 7: THE ULTIMATE SYNTHESIS — THE NEW HUMAN
+Describe the completed state and how the new ${transition.to} energy harmonizes with the matrix.
+
+Begin immediately with Section 1.
 `.trim();
 
   const API_KEY = process.env.GEMINI_API_KEY;

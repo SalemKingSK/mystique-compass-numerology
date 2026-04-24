@@ -24,6 +24,7 @@ export interface AstroInsightOutput {
   element: string; // e.g., "Wood"
   month: number;
   year: number;
+  gender: string; // Added gender
   new_astrology_sign: string; // e.g. "Pisces/Snake"
   zodiacData: ZodiacData; // Holds all data for the Chinese sign
   signData: {
@@ -55,8 +56,8 @@ export interface NumerologyData {
   birthYear: number;
   psycheNum: number;
   destinyNum: number;
-  compoundNum: number;
-  compoundMeaning: string;
+  compoundNum: number | null;
+  compoundMeaning: string | null;
   reducedCompoundNum: number | null;
   reducedCompoundMeaning: string | null;
   karmicFateNum: number | null;

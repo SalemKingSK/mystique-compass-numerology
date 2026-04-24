@@ -284,10 +284,11 @@ interface PsychomatrixDisplayProps {
   day: number;
   month: number;
   year: number;
+  gender?: string;
   name?: string;
 }
 
-export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisplayProps) {
+export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }: PsychomatrixDisplayProps) {
   const result = React.useMemo(() =>
     calculatePsychomatrix(day, month, year),
     [day, month, year]
@@ -303,7 +304,11 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
   const matrixState: MatrixState = React.useMemo(() => ({
     counts: result.counts,
     personalYear,
-  }), [result.counts, personalYear]);
+    birthDay: day,
+    birthMonth: month,
+    birthYear: year,
+    gender: gender || 'male',
+  }), [result.counts, personalYear, day, month, year, gender]);
 
   const transitions = React.useMemo(() => detectTransitions(matrixState), [matrixState]);
 
@@ -606,7 +611,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
 
           {activeTab === 'Synthesis' && (
             <div className="space-y-6">
-              {/* Transitions Section (New Addition) */}
+              {/* Transitions Section (Internal Addition) */}
               <div className="space-y-5">
                 <SectionHeader icon={<Activity className="w-4 h-4" />} title="Karmic Life Transitions" />
                 {transitions.length === 0 ? (

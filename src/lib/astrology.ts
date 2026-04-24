@@ -53,8 +53,8 @@ export const getChineseZodiacSign = (day: number, month: number, year: number) =
   return { sign: fallbackSign, element: fallbackElement };
 };
 
-export async function getAstroInsight(input: { name: string; day: number; month: number; year: number; }): Promise<AstroInsightOutput> {
-    const { year, month, day, name } = input;
+export async function getAstroInsight(input: { name: string; day: number; month: number; year: number; gender: string }): Promise<AstroInsightOutput> {
+    const { year, month, day, name, gender } = input;
     
     const western_sign = getWesternZodiacSign(day, month);
     const { sign, element } = getChineseZodiacSign(day, month, year);
@@ -73,6 +73,7 @@ export async function getAstroInsight(input: { name: string; day: number; month:
         element,
         month,
         year,
+        gender,
         new_astrology_sign: newAstrologySignKey,
         zodiacData: signDataForZodiac,
         signData: signDataForNewAstrology,
