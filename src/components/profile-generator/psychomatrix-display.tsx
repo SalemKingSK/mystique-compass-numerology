@@ -1,3 +1,4 @@
+
 'use client';
 
 /**
@@ -268,51 +269,50 @@ function LineAnalysisCard({ line, result }: { line: PsychomatrixLineInterpretati
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-6">
-              {/* INTRODUCTION */}
-              <div className="space-y-4">
-                <SectionHeader icon={<Info className="w-4 h-4" />} title="Introduction" />
-                <div className="text-[0.75rem] text-stone-200 leading-relaxed">
-                  <AccordionContentWithPlayer text={line.introduction} />
-                </div>
-              </div>
-
-              {/* MEANINGS (Old & Count-Specific) */}
+            <div className="px-4 pb-4 space-y-8">
+              {/* MEANINGS BLOCK (Grouped Old/New Intro + Old/New Level) */}
               <div className="space-y-4">
                 <SectionHeader icon={<Layers className="w-4 h-4" />} title="Meanings" />
-                <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
-                  <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
-                    {level.label} ({total} digits)
-                  </p>
-                  <div className="text-[0.75rem] text-stone-200 leading-relaxed space-y-4">
-                    <p className="font-bold border-b border-white/5 pb-2 mb-2 italic text-amber-500/80">Primary Interpretation:</p>
+                <div className="text-[0.75rem] text-stone-200 leading-relaxed space-y-6">
+                  {/* Part 1: Old Introduction */}
+                  <div className="opacity-90 italic border-b border-white/5 pb-2">
+                    <AccordionContentWithPlayer text={line.introduction} />
+                  </div>
+
+                  {/* Part 2: Old Level Meaning (Verbatim) */}
+                  <div className="p-4 rounded-sm border border-amber-600/30 bg-amber-900/10">
+                    <p className="text-[0.65rem] font-black text-amber-500 uppercase tracking-widest mb-3">Primary Interpretation ({total} Digits)</p>
                     <AccordionContentWithPlayer text={level.verbatim} />
-                    
-                    <p className="font-bold border-b border-white/5 pb-2 mb-2 mt-4 italic text-amber-500/80">Deep Dive Analysis:</p>
+                  </div>
+
+                  {/* Part 3: New Introduction */}
+                  <div className="pt-2">
+                    <AccordionContentWithPlayer text={line.newIntroduction} />
+                  </div>
+
+                  {/* Part 4: New Level Meaning (Deep Dive) */}
+                  <div className="p-4 rounded-sm border border-stone-700/40 bg-black/40 shadow-inner">
                     <AccordionContentWithPlayer text={level.deepDive} />
                   </div>
                 </div>
               </div>
 
-              {/* INNER MECHANICS (Transmutation) */}
-              {line.transmutation && (
-                <div className="space-y-4">
-                  <SectionHeader icon={<Wand2 className="w-4 h-4" />} title="Inner Mechanics" />
-                  <div className="p-4 rounded-sm border border-amber-500/30 bg-amber-900/10">
-                    <div className="text-[0.72rem] text-amber-100 leading-relaxed italic">
-                      <AccordionContentWithPlayer text={line.transmutation} />
-                    </div>
+              {/* INNER MECHANICS */}
+              <div className="space-y-4">
+                <SectionHeader icon={<Wand2 className="w-4 h-4" />} title="Inner Mechanics" />
+                <div className="p-4 rounded-sm border border-amber-500/30 bg-amber-900/10 text-[0.72rem] text-amber-100 leading-relaxed space-y-6">
+                  <AccordionContentWithPlayer text={line.transmutation} />
+                  <div className="border-t border-amber-500/20 pt-4">
+                    <AccordionContentWithPlayer text={line.newMechanics} />
                   </div>
                 </div>
-              )}
+              </div>
 
-              {/* ALEXANDROV'S NOTE */}
+              {/* ALEXANDROV'S NOTE (Static) */}
               <div className="space-y-4">
                 <SectionHeader icon={<BookOpen className="w-4 h-4" />} title="Alexandrov's Note" />
-                <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
-                  <div className="text-[0.75rem] text-stone-200 leading-relaxed">
-                    <AccordionContentWithPlayer text={line.alexandrovNote} />
-                  </div>
+                <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md text-[0.75rem] text-stone-200 leading-relaxed">
+                  <AccordionContentWithPlayer text={line.alexandrovNote} />
                 </div>
               </div>
             </div>
@@ -666,16 +666,12 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
                       </div>
                     </div>
 
-                    {selectedReading.difficultyVerbatim && (
-                      <div className="space-y-4">
-                        <SectionHeader icon={<AlertTriangle className="w-4 h-4" />} title={`Difficulty in interpreting number ${selectedDigit}`} />
-                        <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
-                          <div className="text-[0.75rem] text-stone-200 leading-relaxed">
-                            <AccordionContentWithPlayer text={selectedReading.difficultyVerbatim} />
-                          </div>
-                        </div>
+                    <div className="space-y-4">
+                      <SectionHeader icon={<AlertTriangle className="w-4 h-4" />} title={`Difficulty in interpreting number ${selectedDigit}`} />
+                      <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md text-[0.75rem] text-stone-200 leading-relaxed">
+                        <AccordionContentWithPlayer text={selectedReading.difficultyVerbatim || "Analysis pending."} />
                       </div>
-                    )}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
