@@ -22,6 +22,7 @@ import {
 import {
   PSYCHOMATRIX_LINE_INTERPRETATIONS,
   getLineLevel,
+  type PsychomatrixLineInterpretation
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
 import { calculateDynamicPotentials } from '@/lib/numerology/dynamic-engine';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
@@ -203,7 +204,7 @@ function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LINE ITEM COMPONENT (Collapsible)
+// LINE ITEM COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
 function LineAnalysisCard({ line, result }: { line: PsychomatrixLineInterpretation; result: PsychomatrixResult }) {
@@ -267,27 +268,53 @@ function LineAnalysisCard({ line, result }: { line: PsychomatrixLineInterpretati
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-4">
-              <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
-                <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
-                  {level.label} ({total} digits)
-                </p>
+            <div className="px-4 pb-4 space-y-6">
+              {/* INTRODUCTION */}
+              <div className="space-y-4">
+                <SectionHeader icon={<Info className="w-4 h-4" />} title="Introduction" />
                 <div className="text-[0.75rem] text-stone-200 leading-relaxed">
-                  <AccordionContentWithPlayer text={level.verbatim} />
+                  <AccordionContentWithPlayer text={line.introduction} />
                 </div>
               </div>
 
-              {line.transmutation && (
-                <div className="p-4 rounded-sm border border-amber-500/30 bg-amber-900/10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Wand2 className="w-3 h-3 text-amber-400" />
-                    <p className="text-[0.6rem] font-cinzel font-bold tracking-widest uppercase text-amber-400">Inner Mechanics</p>
+              {/* MEANINGS (Old & Count-Specific) */}
+              <div className="space-y-4">
+                <SectionHeader icon={<Layers className="w-4 h-4" />} title="Meanings" />
+                <div className="p-4 rounded-sm border backdrop-blur-md" style={{ borderColor: `${color}44`, background: `${color}11` }}>
+                  <p className="text-[0.65rem] font-bold tracking-widest uppercase mb-2" style={{ color }}>
+                    {level.label} ({total} digits)
+                  </p>
+                  <div className="text-[0.75rem] text-stone-200 leading-relaxed space-y-4">
+                    <p className="font-bold border-b border-white/5 pb-2 mb-2 italic text-amber-500/80">Primary Interpretation:</p>
+                    <AccordionContentWithPlayer text={level.verbatim} />
+                    
+                    <p className="font-bold border-b border-white/5 pb-2 mb-2 mt-4 italic text-amber-500/80">Deep Dive Analysis:</p>
+                    <AccordionContentWithPlayer text={level.deepDive} />
                   </div>
-                  <div className="text-[0.72rem] text-amber-100 leading-relaxed italic">
-                    <AccordionContentWithPlayer text={line.transmutation} />
+                </div>
+              </div>
+
+              {/* INNER MECHANICS (Transmutation) */}
+              {line.transmutation && (
+                <div className="space-y-4">
+                  <SectionHeader icon={<Wand2 className="w-4 h-4" />} title="Inner Mechanics" />
+                  <div className="p-4 rounded-sm border border-amber-500/30 bg-amber-900/10">
+                    <div className="text-[0.72rem] text-amber-100 leading-relaxed italic">
+                      <AccordionContentWithPlayer text={line.transmutation} />
+                    </div>
                   </div>
                 </div>
               )}
+
+              {/* ALEXANDROV'S NOTE */}
+              <div className="space-y-4">
+                <SectionHeader icon={<BookOpen className="w-4 h-4" />} title="Alexandrov's Note" />
+                <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
+                  <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+                    <AccordionContentWithPlayer text={line.alexandrovNote} />
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
@@ -535,7 +562,7 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
                     className="border border-stone-700/40 rounded-sm bg-black/40 backdrop-blur-md py-3 text-center space-y-1"
                   >
                     <p className="font-cinzel text-[0.55rem] uppercase tracking-widest text-stone-500 font-bold">{label}</p>
-                    <p className="font-cinzel textxl font-black text-amber-400 leading-none">{val}</p>
+                    <p className="font-cinzel text-xl font-black text-amber-400 leading-none">{val}</p>
                     <p className="font-cinzel text-[0.5rem] uppercase tracking-wide text-stone-600 font-bold">{sub}</p>
                   </div>
                 ))}
