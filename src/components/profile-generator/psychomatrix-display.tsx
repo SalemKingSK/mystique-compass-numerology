@@ -90,8 +90,8 @@ const URGENCY_CONFIG = {
 
 const TRANSITION_SECTION_TITLES: Array<{ key: keyof TransitionAdvisory; label: string; icon: string }> = [
   { key: 'anatomy',    label: 'Anatomy',      icon: '✦' },
-  { key: 'mechanics',  label: 'Mechanics',    icon: '⚙' },
-  { key: 'sabotage',   label: 'Sabotage',     icon: '⚔' },
+  { key: 'execution',  label: 'Execution',    icon: '⚙' },
+  { key: 'resistance', label: 'Resistance',   icon: '⚔' },
   { key: 'synergy',    label: 'Synergy',      icon: '⚡' },
   { key: 'synthesis',  label: 'Synthesis',    icon: '◎' },
 ];
@@ -118,7 +118,7 @@ function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
   const [active, setActive] = React.useState(0);
   
   const activeSections = React.useMemo(() => {
-    return TRANSITION_SECTION_TITLES.filter(s => !!advisory[s.key]);
+    return TRANSITION_SECTION_TITLES.filter(s => !!advisory[s.key as keyof TransitionAdvisory]);
   }, [advisory]);
 
   React.useEffect(() => {
@@ -130,7 +130,7 @@ function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
   const section = activeSections[active];
   if (!section) return null;
   
-  const text = advisory[section.key] || "";
+  const text = advisory[section.key as keyof TransitionAdvisory] || "";
 
   return (
     <div className="mt-4 space-y-4">
@@ -144,11 +144,12 @@ function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
           </button>
         ))}
       </div>
-      <motion.div key={active} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[0.75rem] leading-relaxed text-stone-200">
+      <motion.div key={active} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[0.75rem] leading-relaxed text-stone-200 shadow-inner">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-cinzel text-xs text-amber-500 uppercase tracking-widest">{section.label} — Deep Reading</h4>
+          <AccordionContentWithPlayer text={text.trim()} />
         </div>
-        <AccordionContentWithPlayer text={text.trim()} />
+        <div className="whitespace-pre-wrap">{text.trim()}</div>
       </motion.div>
     </div>
   );
@@ -424,6 +425,7 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
   const [activeTab, setActiveTab] = React.useState<Tab>('Matrix');
 
   const selectedReading = result.cellReadings.find(r => r.digit === selectedDigit)!;
+  const selectedCellDef = PSYCHOMATRIX_CELL_MEANINGS[selectedDigit];
 
   const gridRows = [
     [1, 4, 7],
@@ -587,7 +589,7 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.25 }}
-                    className="space-y-4"
+                    className="space-y-6"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -612,17 +614,33 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
                       </div>
                     </div>
 
-                    <div
-                      className="border rounded-sm p-4 space-y-3 backdrop-blur-md"
-                      style={{ borderColor: `${SCALE_COLORS[selectedReading.scale]}44`, background: `${SCALE_COLORS[selectedReading.scale]}11` }}
-                    >
-                      <div className="text-[0.75rem] text-stone-200 leading-relaxed">
-                        <AccordionContentWithPlayer text={selectedReading.verbatim} />
+                    {/* Alexandrov's General Meaning Segment */}
+                    {selectedCellDef.generalMeaning && (
+                      <div className="space-y-4">
+                        <SectionHeader icon={<BookOpen className="w-4 h-4" />} title={`Alexandrov's Meaning of Number ${selectedDigit}`} />
+                        <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
+                          <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+                            <AccordionContentWithPlayer text={selectedCellDef.generalMeaning} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Repetition-Specific Meaning Segment */}
+                    <div className="space-y-4">
+                      <SectionHeader icon={<Layers className="w-4 h-4" />} title={`${selectedReading.label} Analysis`} />
+                      <div
+                        className="border rounded-sm p-4 space-y-3 backdrop-blur-md"
+                        style={{ borderColor: `${SCALE_COLORS[selectedReading.scale]}44`, background: `${SCALE_COLORS[selectedReading.scale]}11` }}
+                      >
+                        <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+                          <AccordionContentWithPlayer text={selectedReading.verbatim} />
+                        </div>
                       </div>
                     </div>
 
                     {selectedReading.difficultyVerbatim && (
-                      <div className="mt-8 space-y-4 pt-6 border-t border-stone-800/40">
+                      <div className="space-y-4">
                         <SectionHeader icon={<AlertTriangle className="w-4 h-4" />} title={`Difficulty in interpreting number ${selectedDigit}`} />
                         <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
                           <div className="text-[0.75rem] text-stone-200 leading-relaxed">
