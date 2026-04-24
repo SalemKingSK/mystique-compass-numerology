@@ -1,17 +1,16 @@
-
 'use client';
 
 /**
- * MYSTIQUE COMPASS — Alexandrov Psychomatrix / Pythagorean Square
+ * @fileoverview ALEXANDROV'S PSYCHOMATRIX — Complete Verbatim Reference Data
  */
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Flame, Zap, Shield, Eye, Hammer, Star, Heart, Cpu,
-  ChevronDown, ChevronUp, Info, Sparkles, GitBranch,
+  ChevronDown, Info, Sparkles, GitBranch,
   AlertTriangle, Atom, Wand2, Activity, Layers, Zap as PowerIcon,
-  CircleDot
+  CircleDot, TrendingUp, TrendingDown, Minus, Loader2, Clock
 } from 'lucide-react';
 import {
   calculatePsychomatrix,
@@ -19,14 +18,15 @@ import {
   SCALE_COLORS,
   type PsychomatrixResult,
   type CellReading,
-  type ComplementaryInsight,
 } from '@/lib/numerology/data/psychomatrixData';
 import {
   PSYCHOMATRIX_LINE_INTERPRETATIONS,
   getLineLevel,
 } from '@/lib/numerology/data/psychomatrixLineInterpretations';
-import { calculateDynamicPotentials, type DynamicMatrixResult } from '@/lib/numerology/dynamic-engine';
+import { calculateDynamicPotentials } from '@/lib/numerology/dynamic-engine';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
+import { detectTransitions, type DetectedTransition, type MatrixState } from '@/lib/transitions/engine';
+import { generateTransitionAdvisory } from '@/lib/transitions/advisory-service';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -66,59 +66,125 @@ function ScalePill({ scale }: { scale: string }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ZERO ANALYSIS ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface ZeroAnalysisResult {
-  hasAnyZero: boolean;
-  interpretations: string[];
+function reduceNum(n: number): number {
+  if (n === 11 || n === 22 || n === 33) return n;
+  let val = Math.abs(n);
+  while (val > 9) val = String(val).split('').reduce((a, d) => a + +d, 0);
+  return val || 9;
 }
 
-function analyzeZeros(day: number, month: number, year: number, workingNumbers: number[]): ZeroAnalysisResult {
-  const rawBirthDate = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;
-  
-  const hasZeroInDate = rawBirthDate.includes('0');
-  
-  const firstWorkingStr = workingNumbers[0].toString();
-  const secondWorkingStr = workingNumbers[1].toString();
-  const thirdWorkingStr = workingNumbers[2].toString();
-  const fourthWorkingStr = workingNumbers[3].toString();
+function getPersonalYear(d: number, m: number): number {
+  const yr = new Date().getFullYear();
+  return reduceNum(reduceNum(d) + reduceNum(m) + reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0)));
+}
 
-  const hasZeroInFirstOrSecond = firstWorkingStr.includes('0') || secondWorkingStr.includes('0');
-  const hasZeroInThirdOrFourth = thirdWorkingStr.includes('0') || fourthWorkingStr.includes('0');
+// ─────────────────────────────────────────────────────────────────────────────
+// TRANSITION COMPONENTS
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const hasAnyZero = hasZeroInDate || hasZeroInFirstOrSecond || hasZeroInThirdOrFourth;
+const URGENCY_CONFIG = {
+  critical: { label:'CRITICAL', color:'#ef4444', bg:'rgba(239,68,68,0.1)', border:'rgba(239,68,68,0.35)' },
+  high:     { label:'HIGH',     color:'#f59e0b', bg:'rgba(245,158,11,0.1)', border:'rgba(245,158,11,0.3)' },
+  moderate: { label:'ACTIVE',   color:'#a78bfa', bg:'rgba(167,139,250,0.1)', border:'rgba(167,139,250,0.28)' },
+  latent:   { label:'LATENT',   color:'#60a5fa', bg:'rgba(96,165,250,0.08)', border:'rgba(96,165,250,0.2)' },
+};
 
-  const interpretations: string[] = [];
+const DIRECTION_ICON = {
+  ascent:  <TrendingUp  style={{ width:16, height:16, color:'#34d399' }} />,
+  descent: <TrendingDown style={{ width:16, height:16, color:'#ef4444' }} />,
+  dual:    <Minus       style={{ width:16, height:16, color:'#d4af37' }} />,
+};
 
-  if (hasAnyZero) {
-    interpretations.push(`Meanings of the number 0:
-▸ absence;
-▸ emptiness (meaning being unfilled);
-▸ emptiness as the Great Void, used in Taoist philosophy.
-To force an opponent into the Void means to create conditions in which their active actions (attack) will lead them into an unstable state, into uncertainty, a dead end, and the inability to act according to a pre-determined plan.
-For example, in martial arts, the technique of "pulling toward" is used before pushing away. A similar "pull" is used along the opponent's thrust, when they fall into the void due to the additional acceleration received.
-Other meanings of the number 0:
-▸ truth as the primary authority underlying the universe;
-▸ death or disappearance;
-▸ loss (the emptiness of the lost).`);
-  }
+function NumberArrow({ from, to, direction }: { from: number; to: number; direction: string }) {
+  const col = direction === 'ascent' ? '#34d399' : direction === 'descent' ? '#ef4444' : '#d4af37';
+  return (
+    <svg viewBox="0 0 120 40" style={{ width:120, height:40, flexShrink:0 }}>
+      <defs>
+        <marker id={`ta-arrow-${from}${to}`} markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill={col}/>
+        </marker>
+      </defs>
+      <circle cx="20" cy="20" r="16" fill={`${col}1a`} stroke={col} strokeWidth="1.5" />
+      <text x="20" y="20" textAnchor="middle" dominantBaseline="middle" fontFamily="'Cinzel Decorative', serif" fontSize="13" fontWeight="700" fill={col}>{from}</text>
+      <line x1="37" y1="20" x2="80" y2="20" stroke={col} strokeWidth="1.5" markerEnd={`url(#ta-arrow-${from}${to})`} strokeDasharray="4 3" />
+      <circle cx="100" cy="20" r="16" fill={`${col}1a`} stroke={col} strokeWidth="1.5" />
+      <text x="100" y="20" textAnchor="middle" dominantBaseline="middle" fontFamily="'Cinzel Decorative', serif" fontSize="13" fontWeight="700" fill={col}>{to}</text>
+    </svg>
+  );
+}
 
-  if (hasZeroInDate) {
-    interpretations.push(`▸ A zero in the date of birth itself indicates the use of laws in everyday practice (law enforcement officer, prosecutor, police officer, civil engineer, or designer).`);
-  }
+function AdvisoryViewer({ text }: { text: string }) {
+  const sections = text.split(/###\s+SECTION \d+:/g).filter(Boolean);
+  const headers = [...text.matchAll(/###\s+SECTION \d+:\s*(.+)/g)].map(m => m[1].trim());
+  const [activeSection, setActiveSection] = React.useState(0);
 
-  if (hasZeroInFirstOrSecond) {
-    interpretations.push(`▸ A zero in the first or second additional number may indicate a person's need to discover the law themselves and comprehend the truth.
-However, never forget the negative interpretations of zero, when it can indicate an active escape from knowledge and truth, the possible danger of loss, and even death. For example, when analyzing a specific day on which a long or difficult trip is planned, you should be more attentive and careful on the road or cancel the trip altogether if the number 0 appears in the first or second number, which can indicate danger (emptiness).`);
-  }
+  return (
+    <div className="mt-4 space-y-4">
+      <div className="flex gap-1.5 flex-wrap">
+        {headers.map((h, i) => (
+          <button key={i} onClick={() => setActiveSection(i)}
+            className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold border transition-all ${
+              activeSection === i ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-white/5 text-muted-foreground border-white/10'
+            }`}>
+            {i + 1}. {h.split('—')[0].trim()}
+          </button>
+        ))}
+      </div>
+      <motion.div key={activeSection} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[13px] leading-relaxed text-stone-300">
+        <h4 className="font-cinzel text-xs text-amber-500 mb-3 uppercase tracking-widest">{headers[activeSection]}</h4>
+        <div className="whitespace-pre-wrap">{sections[activeSection]?.trim()}</div>
+      </motion.div>
+    </div>
+  );
+}
 
-  if (hasZeroInThirdOrFourth) {
-    interpretations.push(`▸ Zero in the third or fourth additional number indicates the presence of laws or truth at the basis of any actions, which may serve as an indication of the choice of a profession related to science or legislative activity (deputy, ruler, supreme court judge).`);
-  }
+function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState: MatrixState }) {
+  const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [advisory, setAdvisory] = React.useState<string | null>(null);
+  const urg = URGENCY_CONFIG[t.urgency];
 
-  return { hasAnyZero, interpretations };
+  const fetchAdvisory = async () => {
+    if (advisory) { setOpen(!open); return; }
+    setLoading(true); setOpen(true);
+    try {
+      const text = await generateTransitionAdvisory(t, matrixState);
+      setAdvisory(text);
+    } catch {
+      setAdvisory("Failed to generate advisory. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="border border-stone-700/40 rounded-sm bg-black/40 backdrop-blur-md overflow-hidden" style={{ borderLeft: `4px solid ${urg.color}` }}>
+      <div className="p-5 space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <NumberArrow from={t.from} to={t.to} direction={t.direction} />
+          <div className="flex-1 text-right">
+            <span className="text-[10px] font-black tracking-widest px-2 py-0.5 rounded-full" style={{ background: urg.bg, color: urg.color, border: `1px solid ${urg.border}` }}>
+              {urg.label}
+            </span>
+            <h3 className="font-cinzel text-sm text-stone-100 mt-2">{t.name}</h3>
+            <p className="text-[10px] text-stone-500 uppercase italic">{t.subtitle}</p>
+          </div>
+        </div>
+        <p className="text-[13px] text-stone-400 italic px-2 border-l border-white/10">{t.coreConflict}</p>
+        <button onClick={fetchAdvisory} className="w-full py-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <PowerIcon className="h-3 w-3" />}
+          {advisory ? (open ? 'Hide Advisory' : 'Show Full Advisory') : '✦ Generate Deep Advisory'}
+        </button>
+      </div>
+      <AnimatePresence>
+        {open && advisory && (
+          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="border-t border-stone-800/60 bg-black/20 p-5">
+            <AdvisoryViewer text={advisory} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -232,10 +298,14 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
     [year, result.counts]
   );
 
-  const zeroResult = React.useMemo(() => 
-    analyzeZeros(day, month, year, [result.first, result.second, result.third, result.fourth]),
-    [day, month, year, result]
-  );
+  const personalYear = React.useMemo(() => getPersonalYear(day, month), [day, month]);
+
+  const matrixState: MatrixState = React.useMemo(() => ({
+    counts: result.counts,
+    personalYear,
+  }), [result.counts, personalYear]);
+
+  const transitions = React.useMemo(() => detectTransitions(matrixState), [matrixState]);
 
   const [selectedDigit, setSelectedDigit] = React.useState<number>(1);
   const [activeTab, setActiveTab] = React.useState<Tab>('Matrix');
@@ -260,7 +330,7 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
             </h2>
             <Diamond />
           </div>
-          <p className="font-cinzel text-[0.58rem] uppercase tracking-[0.25em] text-stone- stone-500 font-medium">
+          <p className="font-cinzel text-[0.58rem] uppercase tracking-[0.25em] text-stone-500 font-medium">
             Pythagorean Square · Digital Analysis
           </p>
           {name && <p className="text-stone-400 text-[0.75rem] italic font-body">for {name}</p>}
@@ -357,11 +427,11 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
               </div>
 
               {/* Zero Analysis Section */}
-              {zeroResult.hasAnyZero && (
+              {result.zeroAnalysis.hasAnyZero && (
                 <div className="space-y-4 pt-4 border-t border-stone-800/40">
                   <SectionHeader icon={<CircleDot className="w-4 h-4" />} title="Analysis of the Great Void (0)" />
                   <div className="space-y-4">
-                    {zeroResult.interpretations.map((text, idx) => (
+                    {result.zeroAnalysis.interpretations.map((text, idx) => (
                       <div key={idx} className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
                         <div className="text-[0.72rem] text-stone-300 leading-relaxed italic">
                           <AccordionContentWithPlayer text={text} />
@@ -369,16 +439,6 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {result.complementaryInsights.length > 0 && (
-                <div className="flex items-center gap-3 border border-amber-700/30 bg-amber-900/20 backdrop-blur-md rounded-sm px-4 py-3">
-                  <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-                  <p className="text-[0.7rem] text-stone-200">
-                    <strong>{result.complementaryInsights.length}</strong> inter-digit synerg{result.complementaryInsights.length === 1 ? 'y' : 'ies'} detected.
-                    {' '}<button onClick={() => setActiveTab('Synthesis')} className="text-amber-400 font-bold underline underline-offset-4 hover:text-amber-300 transition-colors ml-1">View all →</button>
-                  </p>
                 </div>
               )}
             </div>
@@ -545,7 +605,21 @@ export function PsychomatrixDisplay({ day, month, year, name }: PsychomatrixDisp
           )}
 
           {activeTab === 'Synthesis' && (
-            <div className="space-y-5">
+            <div className="space-y-6">
+              {/* Transitions Section (New Addition) */}
+              <div className="space-y-5">
+                <SectionHeader icon={<Activity className="w-4 h-4" />} title="Karmic Life Transitions" />
+                {transitions.length === 0 ? (
+                  <p className="text-center py-6 text-stone-500 text-[0.72rem] uppercase tracking-widest">No major transitions detected in this configuration.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {transitions.map(t => (
+                      <TransitionCard key={t.id} t={t} matrixState={matrixState} />
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <SectionHeader icon={<Sparkles className="w-3 h-3" />} title="Cross-Digit Interactions" />
               <div className="space-y-3">
                 {result.complementaryInsights.map((insight, i) => {

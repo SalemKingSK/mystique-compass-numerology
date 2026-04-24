@@ -5,10 +5,6 @@
 export interface MatrixState {
   counts: Record<number, number>;
   personalYear: number;
-  birthDay: number;
-  birthMonth: number;
-  birthYear: number;
-  gender: 'male' | 'female';
 }
 
 export type TransitionDirection = 'ascent' | 'descent' | 'dual';
@@ -161,34 +157,6 @@ export function detectTransitions(state: MatrixState): DetectedTransition[] {
       warningActive: urgencyFromYear(personalYear, [2, 5, 14, 23]),
       overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
       countFrom: c(5), countTo: c(2),
-    });
-  }
-
-  // 7. HABIT → INTELLECT
-  if (c(3) >= 2) {
-    results.push({
-      id: '3_TO_9', from: 3, to: 9,
-      name: 'Habit into Intellect', subtitle: 'The Transmutation of Interest', direction: 'ascent',
-      urgency: c(3) >= 3 && c(9) === 0 ? 'critical' : 'moderate',
-      prerequisitesMet: `Threes dominate cognitive bandwidth. 9-intellect is dormant.`,
-      coreConflict: 'Converting addictive habitual loops into profound intellectual mastery.',
-      warningActive: urgencyFromYear(personalYear, [3, 9, 12, 21]),
-      overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
-      countFrom: c(3), countTo: c(9),
-    });
-  }
-
-  // 8. INTELLECT → HABIT
-  if (c(9) >= 1 && (overloaded.includes(9) || personalYear === 3)) {
-    results.push({
-      id: '9_TO_3', from: 9, to: 3,
-      name: 'Intellect into Habit', subtitle: 'The Collapse of Wisdom', direction: 'descent',
-      urgency: overloaded.includes(9) ? 'critical' : 'latent',
-      prerequisitesMet: `Intellectual capacity risks collapse into compulsive habit.`,
-      coreConflict: 'The regression of wisdom back into mindless repetition and burnout.',
-      warningActive: urgencyFromYear(personalYear, [3, 9, 12, 21]),
-      overloadedNumbers: overloaded, missingNumbers: missing, arrowsActive: arrows,
-      countFrom: c(9), countTo: c(3),
     });
   }
 
