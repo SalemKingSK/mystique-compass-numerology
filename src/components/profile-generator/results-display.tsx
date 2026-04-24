@@ -12,9 +12,10 @@ import { AstroDisplay } from './astro-display';
 import { NumerologyDisplay } from './numerology-display';
 import { CosmicFateMap } from './cosmic-fate-map';
 import { PsychomatrixDisplay } from './psychomatrix-display';
+import { TransitionsDisplay } from './transitions-display';
 import {
   ArrowLeft, History, Heart, Home, Users, Briefcase,
-  AlertTriangle, Brain, ChevronDown, BookUser
+  AlertTriangle, Brain, ChevronDown, BookUser, Zap
 } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
 import InstallButton from '../InstallButton';
@@ -228,7 +229,7 @@ function ResultsHeader({ name, newAstroSign, birthDate, onTabClick, activeTab }:
       <p className="text-[0.7rem] text-white/50 mt-1 font-cinzel uppercase tracking-[0.2em]">{birthDate}</p>
       
       {/* ── Overhauled Tab Arrangement ───────────────────────────────────── */}
-      {/* 2 Tabs Above, Numerology Central, 2 Tabs Below */}
+      {/* 2 Tabs Above, Numerology Central, 2 Tabs Below, 1 Extra Footer Tier */}
       <div className="w-full max-w-sm mx-auto mt-8 flex flex-col gap-3">
         {/* Top Tier */}
         <div className="grid grid-cols-2 gap-3">
@@ -245,6 +246,13 @@ function ResultsHeader({ name, newAstroSign, birthDate, onTabClick, activeTab }:
         <div className="grid grid-cols-2 gap-3">
           <AnimatedTab isActive={activeTab === 'psychomatrix'} onClick={() => onTabClick('psychomatrix')}>Psychomatrix</AnimatedTab>
           <AnimatedTab isActive={activeTab === 'cosmic-fate'} onClick={() => onTabClick('cosmic-fate')}>🌌 Fate Map</AnimatedTab>
+        </div>
+
+        {/* Footer Tier */}
+        <div className="w-full">
+          <AnimatedTab isActive={activeTab === 'transitions'} onClick={() => onTabClick('transitions')}>
+            <Zap className="h-3 w-3 inline mr-2" /> Transitions
+          </AnimatedTab>
         </div>
       </div>
     </div>
@@ -302,6 +310,7 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
               {activeTab === 'new-astro'    && <NewAstroSignDetails sign={insight.new_astrology_sign} signData={insight.signData} />}
               {activeTab === 'psychomatrix' && <PsychomatrixDisplay day={numerology.birthDay} month={numerology.birthMonth} year={numerology.birthYear} name={insight.name} />}
               {activeTab === 'cosmic-fate'  && <CosmicFateMap birthDay={numerology.birthDay} birthMonth={numerology.birthMonth} birthYear={numerology.birthYear} />}
+              {activeTab === 'transitions'  && <TransitionsDisplay numerology={numerology} />}
             </motion.div>
           </AnimatePresence>
         </div>
