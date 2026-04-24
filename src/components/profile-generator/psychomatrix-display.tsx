@@ -10,8 +10,7 @@ import {
   Brain, Flame, Zap, Shield, Eye, Hammer, Star, Heart, Cpu,
   ChevronDown, Info, Sparkles, GitBranch,
   AlertTriangle, Atom, Wand2, Activity, Layers, Zap as PowerIcon,
-  CircleDot, TrendingUp, TrendingDown, Minus, BookOpen, ChevronRight, Clock,
-  Volume2
+  CircleDot, TrendingUp, TrendingDown, Minus, BookOpen, ChevronRight, Clock
 } from 'lucide-react';
 import {
   calculatePsychomatrix,
@@ -89,12 +88,6 @@ const URGENCY_CONFIG = {
   latent:   { label:'LATENT',   color:'#60a5fa', bg:'rgba(96,165,250,0.08)', border:'rgba(96,165,250,0.2)' },
 } as const;
 
-const DIR_ICON = {
-  ascent:  <TrendingUp  style={{ width:16, height:16, color:'#34d399' }} />,
-  descent: <TrendingDown style={{ width:16, height:16, color:'#ef4444' }} />,
-  dual:    <Minus       style={{ width:16, height:16, color:'#d4af37' }} />,
-};
-
 const TRANSITION_SECTION_TITLES: Array<{ key: keyof TransitionAdvisory; label: string; icon: string }> = [
   { key: 'anatomy',    label: 'Anatomy',      icon: '✦' },
   { key: 'mechanics',  label: 'Mechanics',    icon: '⚙' },
@@ -151,7 +144,7 @@ function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
           </button>
         ))}
       </div>
-      <motion.div key={active} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[13px] leading-relaxed text-stone-300">
+      <motion.div key={active} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[0.75rem] leading-relaxed text-stone-200">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-cinzel text-xs text-amber-500 uppercase tracking-widest">{section.label} — Deep Reading</h4>
         </div>
@@ -540,7 +533,7 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
                     className="border border-stone-700/40 rounded-sm bg-black/40 backdrop-blur-md py-3 text-center space-y-1"
                   >
                     <p className="font-cinzel text-[0.55rem] uppercase tracking-widest text-stone-500 font-bold">{label}</p>
-                    <p className="font-cinzel text-xl font-black text-amber-400 leading-none">{val}</p>
+                    <p className="font-cinzel textxl font-black text-amber-400 leading-none">{val}</p>
                     <p className="font-cinzel text-[0.5rem] uppercase tracking-wide text-stone-600 font-bold">{sub}</p>
                   </div>
                 ))}
@@ -630,9 +623,11 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
 
                     {selectedReading.difficultyVerbatim && (
                       <div className="mt-8 space-y-4 pt-6 border-t border-stone-800/40">
-                        <SectionHeader icon={<AlertTriangle className="w-4 h-4" />} title={`Difficulty in interpreting number ${selectedReading.digit}`} />
+                        <SectionHeader icon={<AlertTriangle className="w-4 h-4" />} title={`Difficulty in interpreting number ${selectedDigit}`} />
                         <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
-                          <AccordionContentWithPlayer text={selectedReading.difficultyVerbatim} />
+                          <div className="text-[0.75rem] text-stone-200 leading-relaxed">
+                            <AccordionContentWithPlayer text={selectedReading.difficultyVerbatim} />
+                          </div>
                         </div>
                       </div>
                     )}
