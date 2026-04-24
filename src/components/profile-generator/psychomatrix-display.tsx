@@ -1,3 +1,4 @@
+
 'use client';
 
 /**
@@ -96,11 +97,9 @@ const DIR_ICON = {
 
 const SECTION_TITLES: Array<{ key: keyof TransitionAdvisory; label: string; icon: string }> = [
   { key: 'anatomy',    label: 'Anatomy',      icon: '✦' },
-  { key: 'execution',  label: 'Execution',    icon: '⚙' },
-  { key: 'resistance', label: 'Resistance',   icon: '⚔' },
-  { key: 'timing',     label: 'Timing',       icon: '⌛' },
-  { key: 'karma',      label: 'Karma',        icon: '∞' },
-  { key: 'shadow',     label: 'Shadow',       icon: '◈' },
+  { key: 'mechanics',  label: 'Mechanics',    icon: '⚙' },
+  { key: 'sabotage',   label: 'Sabotage',     icon: '⚔' },
+  { key: 'synergy',    label: 'Synergy',      icon: '⚡' },
   { key: 'synthesis',  label: 'Synthesis',    icon: '◎' },
 ];
 
@@ -124,13 +123,28 @@ function NumberArrow({ from, to, direction }: { from: number; to: number; direct
 
 function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
   const [active, setActive] = React.useState(0);
-  const section = SECTION_TITLES[active];
-  const text = advisory[section.key];
+  
+  // Filter sections that actually have content to avoid layout gaps or errors
+  const activeSections = React.useMemo(() => {
+    return SECTION_TITLES.filter(s => !!advisory[s.key]);
+  }, [advisory]);
+
+  // Adjust active index if it's out of bounds after filtering
+  React.useEffect(() => {
+    if (active >= activeSections.length) {
+      setActive(0);
+    }
+  }, [activeSections, active]);
+
+  const section = activeSections[active];
+  if (!section) return null;
+  
+  const text = advisory[section.key] || "";
 
   return (
     <div className="mt-4 space-y-4">
       <div className="flex gap-1.5 flex-wrap">
-        {SECTION_TITLES.map((s, i) => (
+        {activeSections.map((s, i) => (
           <button key={s.key} onClick={() => setActive(i)}
             className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold border transition-all ${
               active === i ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-white/5 text-muted-foreground border-white/10'
@@ -179,7 +193,7 @@ function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState
 
         <button onClick={() => setOpen(!open)} className="w-full py-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
           <BookOpen className="h-3 w-3" />
-          {open ? 'Hide Advisory' : 'Read 7-Section Advisory'}
+          {open ? 'Hide Advisory' : 'Read Deep Advisory'}
           {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         </button>
       </div>
