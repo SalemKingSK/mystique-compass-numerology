@@ -3,11 +3,11 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, TrendingUp, TrendingDown, Minus,
-         Loader2, ChevronDown, Zap, Shield, Clock } from 'lucide-react';
-import { detectTransitions, type DetectedTransition, type MatrixState } from '@/lib/transitions/engine';
-import { generateTransitionAdvisory } from '@/lib/transitions/advisory-service';
+         ChevronDown, ChevronRight, Zap, Shield, Clock, BookOpen, Sparkles } from 'lucide-react';
+import { detectTransitions, type DetectedTransition, type MatrixState, type TransitionAdvisory } from '@/lib/transitions/engine';
 import type { NumerologyData } from './types';
 
+// ── helpers ──────────────────────────────────────────────────────────────────
 function reduceNum(n: number): number {
   if (n===11||n===22||n===33) return n;
   let val = Math.abs(n);
@@ -50,26 +50,39 @@ function NumberArrow({ from, to, direction }: { from: number; to: number; direct
   );
 }
 
-function AdvisoryViewer({ text }: { text: string }) {
-  const sections = text.split(/###\s+SECTION \d+:/g).filter(Boolean);
-  const headers = [...text.matchAll(/###\s+SECTION \d+:\s*(.+)/g)].map(m => m[1].trim());
-  const [activeSection, setActiveSection] = React.useState(0);
+function AdvisoryViewer({ advisory }: { advisory: TransitionAdvisory }) {
+  const SECTION_TITLES: Array<{ key: keyof TransitionAdvisory; label: string; icon: React.ReactNode }> = [
+    { key: 'anatomy',    label: 'Anatomy',      icon: <BookOpen className="w-3 h-3" /> },
+    { key: 'mechanics',  label: 'Mechanics',    icon: <Zap className="w-3 h-3" /> },
+    { key: 'sabotage',   label: 'Sabotage',     icon: <Shield className="w-3 h-3" /> },
+    { key: 'synthesis',  label: 'Synthesis',    icon: <Sparkles className="w-3 h-3" /> },
+  ];
+
+  // Add synergy if present
+  if (advisory.synergy) {
+    SECTION_TITLES.push({ key: 'synergy', label: 'Synergy', icon: <Zap className="w-3 h-3 text-amber-500" /> });
+  }
+
+  const [active, setActive] = React.useState(0);
+  const section = SECTION_TITLES[active];
+  const text = advisory[section.key];
 
   return (
     <div className="mt-4 space-y-4">
       <div className="flex gap-1.5 flex-wrap">
-        {headers.map((h, i) => (
-          <button key={i} onClick={() => setActiveSection(i)}
-            className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold border transition-all ${
-              activeSection === i ? 'bg-primary/20 text-primary border-primary/40' : 'bg-white/5 text-muted-foreground border-white/10'
+        {SECTION_TITLES.map((s, i) => (
+          <button key={s.key} onClick={() => setActive(i)}
+            className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold border transition-all flex items-center gap-1.5 ${
+              active === i ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-white/5 text-stone-500 border-white/10'
             }`}>
-            {i + 1}. {h.split('—')[0].trim()}
+            {s.icon} {i + 1}. {s.label}
           </button>
         ))}
       </div>
-      <motion.div key={activeSection} initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-4 rounded-xl bg-black/40 border border-white/5 text-[13px] leading-relaxed text-slate-300">
-        <h4 className="font-cinzel text-xs text-primary mb-3 uppercase tracking-widest">{headers[activeSection]}</h4>
-        <div className="whitespace-pre-wrap">{sections[activeSection]?.trim()}</div>
+      <motion.div key={active} initial={{ opacity:0 }} animate={{ opacity:1 }} 
+        className="p-4 rounded-xl bg-black/40 border border-white/5 text-[13px] leading-relaxed text-stone-300 shadow-inner">
+        <h4 className="font-cinzel text-xs text-amber-500 mb-3 uppercase tracking-widest">{section.label} — Strategic Insight</h4>
+        <div className="whitespace-pre-wrap">{text?.trim()}</div>
       </motion.div>
     </div>
   );
@@ -77,25 +90,10 @@ function AdvisoryViewer({ text }: { text: string }) {
 
 function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState: MatrixState }) {
   const [open, setOpen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-  const [advisory, setAdvisory] = React.useState<string | null>(null);
   const urg = URGENCY_CONFIG[t.urgency];
 
-  const fetchAdvisory = async () => {
-    if (advisory) { setOpen(!open); return; }
-    setLoading(true); setOpen(true);
-    try {
-      const text = await generateTransitionAdvisory(t, matrixState);
-      setAdvisory(text);
-    } catch {
-      setAdvisory("Failed to generate advisory. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <Card className="glass-card border-white/10 overflow-hidden" style={{ borderLeft: `4px solid ${urg.color}` }}>
+    <div className="border border-stone-700/40 rounded-sm bg-black/40 backdrop-blur-md overflow-hidden" style={{ borderLeft: `4px solid ${urg.color}` }}>
       <div className="p-5 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <NumberArrow from={t.from} to={t.to} direction={t.direction} />
@@ -103,20 +101,37 @@ function TransitionCard({ t, matrixState }: { t: DetectedTransition; matrixState
             <span className="text-[10px] font-black tracking-widest px-2 py-0.5 rounded-full" style={{ background: urg.bg, color: urg.color, border: `1px solid ${urg.border}` }}>
               {urg.label}
             </span>
-            <h3 className="font-cinzel text-sm text-slate-100 mt-2">{t.name}</h3>
-            <p className="text-[10px] text-muted-foreground uppercase italic">{t.subtitle}</p>
+            <h3 className="font-cinzel text-sm text-stone-100 mt-2">{t.name}</h3>
+            <p className="text-[10px] text-stone-500 uppercase italic">{t.subtitle}</p>
           </div>
         </div>
-        <p className="text-xs text-slate-400 italic px-2 border-l border-white/10">{t.coreConflict}</p>
-        <button onClick={fetchAdvisory} className="w-full py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
-          {advisory ? 'View Full Advisory' : '✦ Generate Deep Advisory'}
+        <p className="text-[13px] text-stone-400 italic px-2 border-l border-white/10">{t.coreConflict}</p>
+        
+        <div className="flex gap-2 flex-wrap">
+          <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] uppercase font-bold text-stone-400">
+            <Zap className="w-3 h-3" /> Cost: {t.energyCost}
+          </span>
+          {t.warningActive && (
+            <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-rose-500/10 border border-rose-500/30 text-[10px] uppercase font-bold text-rose-400">
+              <Clock className="w-3 h-3" /> Year {matrixState.personalYear} Active
+            </span>
+          )}
+        </div>
+
+        <button onClick={() => setOpen(!open)} className="w-full py-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg">
+          <BookOpen className="h-3 w-3" />
+          {open ? 'Hide Advisory' : 'Read Deep Advisory'}
+          {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         </button>
       </div>
       <AnimatePresence>
-        {open && advisory && <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} className="border-t border-white/5 bg-black/20 p-5"><AdvisoryViewer text={advisory} /></motion.div>}
+        {open && (
+          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="border-t border-stone-800/60 bg-black/20 p-5">
+            <AdvisoryViewer advisory={t.advisory} />
+          </motion.div>
+        )}
       </AnimatePresence>
-    </Card>
+    </div>
   );
 }
 
