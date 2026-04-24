@@ -17,6 +17,7 @@ export interface PsychomatrixCellData {
   intro: string;
   lineContext: string;
   meanings: PsychomatrixCellMeaning[];
+  difficultyVerbatim?: string;
 }
 
 export interface PsychomatrixResult {
@@ -47,6 +48,7 @@ export interface CellReading {
   verbatim: string;
   scale: PsychomatrixCellMeaning['scale'];
   modifiers: string[];
+  difficultyVerbatim?: string;
 }
 
 export interface ComplementaryInsight {
@@ -179,6 +181,46 @@ Talent is the measure that history will determine.
 If there's someone in your family with an overburdened personality, help them understand this simple idea, find the strength and desire to unleash their talent, and assist them in self-realization.
 It's essential to recognize their talent and carefully protect it from offense. Remember, even a single word or glance is enough to make them drop everything and be forever free of resentment.`;
 
+const DIFF_1 = `Reader: Is it fair to say that the more ones a person has in their psychomatrix, the more rigid or unyielding they will be?
+Author: Certainly not. If the number of ones exceeds five, the individual actually becomes very tolerant and calm. Moreover, it is essential to remember that the presence of two or more eights in a person's psychomatrix results in a high degree of tolerance, regardless of the number of ones present.
+Reader: Suppose a birth date contains the combination 111—representing the "golden mean"—yet lacks any eights. The individual has cultivated tolerance and kindness within themselves. Can we say that they have now come to resemble a person who was born with a character profile featuring both a single 1 (implying egoism and a lack of willpower) and a single 8 (implying tolerance, albeit to a limited degree)?
+Author: Let us carefully examine this process: the transformation of 11s into an 8. As stated in the book, this transition is accompanied by a simultaneous secondary transition—or, to be precise, by the *emergence* of two additional twos. These twos provide the individual with the energy required to exercise tolerance toward others; consequently, the person does not expend their own vital energy on this effort and, as a result, does not "vampirize"—or drain—energy from others during arguments and conflicts. In this specific instance, the complete transition can be represented as follows: 111 → 1, 8, and 22. This signifies that the individual is gentle and tolerant toward those around them, yet remains capable of standing up for themselves when necessary, as the inherent quality of the 111 combination—that of being able to "subdue any despot"—remains intact.
+Reader: Consider an individual whose psychomatrix contains both 11 and 88; they aspire to power and eventually attain it. Can we say that they will subsequently acquire a new quality—one that is essential for their role—specifically, the combination of 1111 and 8?
+Author: Let us analyze this particular transition. As previously noted, the transition of an 8 into an 11 is accompanied by the *loss* of two twos; thus, in its complete form, the equation reads: 8 → 11 minus 22 (or minus 4, which is mathematically equivalent). Thus, such a "boss" will exhibit the following numerical pattern: from the combination of 11 and 88, he transitions to 1111 and 8 and minus 22. This triggers a loss of energy and, as a consequence, a form of "energy vampirism," which culminates in the loss of the second 8 and a shift into a new qualitative state: 111111 and minus 2222 (or 44). This configuration signifies an explosive temperament accompanied by a depletion of both energy and health. The leadership style of such a "boss" boils down to excessive leniency—allowing everyone to "walk all over him"—followed by a sudden emotional outburst once he feels he has been taken advantage of. One could say that this is an unsuccessful outcome.
+Reader: Suppose a person's psychomatrix contains the numbers 11111 and 8. Could one describe him as a despot—albeit one who knows how to exercise self-control?
+Author: There can be no question of despotism in this case. In this specific situation, two scenarios are possible: the 11111 and 8 combination may transition into 111, 88, and 22; and subsequently—into 1, 888, and 44 (or possibly 2222). This second transition is not, however, inevitable. If external pressure is applied to the individual, an explosive temperament may manifest—but this is distinct from being a despot.
+Reader: Is it fair to say that power corrupts everyone?
+Author: Certainly—if one defines power as a means of enslavement or subjugation, then, yes, that is true. However, if one views power as a form of rational administration—or as the guidance of collective efforts while taking into account the individual characteristics of one's subordinates—then there are indeed people who are naturally inclined toward leadership roles. Such individuals should possess the following attributes: 1111 (which must be accompanied by an 8—though having multiple 8s is acceptable); 22 (or more); and, ideally, strong intellect (99 or higher) and logical aptitude (5 or higher). The ideal numerical profile for a leader would be 1111, 22, 8, 99, and 5 (while this specific combination is not the absolute *best* possible, it represents a very strong foundation—one that could be brought even closer to perfection by adding another 8 and another 5).
+Reader: Let us imagine two married couples. The first couple: the husband has 11 and 8, while the wife has 1111 and no eights; the second couple: the husband has 111 and 88, while the wife has 1111 and 8. How should leadership be distributed between the spouses in these families?
+Author: To preserve a family, tranquility is the primary necessity. Based on this premise, the following conclusion can be drawn. For the first family: since the husband’s assertion of leadership entails a loss of energy—and since the wife’s concessions cannot be perpetual in nature, given that she surpasses her husband in strength of character—the scenario in which the husband holds the leadership role is not entirely conducive to the preservation of the family unit. The resulting configuration would be: Husband—1111 (minus 22); Wife—11, 8, and 22. If she were to exert pressure on her husband, her profile would shift to 1111 (accompanied by an emotional outburst, as the "twos" she had previously acquired would be lost). Ultimately, the outcome would be a configuration where both spouses possess 1111—representing a clash between two powerful personalities. The most acceptable scenario is one of equality, albeit with "quiet" leadership exercised by the wife; specifically: Husband—11 and 8; Wife—11, 8, and 22. However, it is imperative to prevent any emotional outbursts on her part, as such occurrences would yield no benefit to the family.
+Conclusion: If, when forming a family with these specific characteristics, the husband is unwilling to cede leadership to his wife, then the endeavor should not be attempted—for the experiment will inevitably end in "war."
+The example of the second couple allows for the husband to assume the role of leader, as the wife’s transition to a new qualitative state—represented by the numbers 11 and 88, or 22—is inevitable; consequently, the husband will retain his original character, which naturally leads to his leadership. The sole condition that must be observed is this: leadership is not a form of dictatorship, but rather a responsibility that one voluntarily assumes. The husband must bear in mind that, in certain matters, he needs to yield to his wife so as not to stifle her individuality. However, within the overall family dynamic, the husband will maintain the position of leader. Numerically, this is represented as follows: Husband—111 and 88; Wife—11 and 88, 22 (indicating that the husband possesses the stronger character).
+Conclusion: Before you establish a family, analyze and discuss the terms regarding which spouse will assume the role of leader; only then will it become clear to you whether or not you are capable of yielding to the other person (bearing in mind that the rights of husband and wife are absolutely equal).
+Reader: It so happens that a child possesses a stronger character than their parents. What should be done?
+Author: The answer lies within the question itself: "What do you mean by 'it just so happens'?" Nothing occurs by chance. There are only two possible explanations.
+Parents of such children have themselves forgotten their sense of duty toward their own parents; as a karmic consequence, they have been given children whose characters are stronger than their own. No amount of "warfare" against the child will yield the desired result.
+The solution to this problem is unequivocal: the parents must reconnect with their own parents and mend their relationship with them. This will inevitably have a ripple effect on the child, who will undergo the same transformation toward a gentler character that their parents have undergone. This is the only way out—there are no others; any alternative approach will merely result in a repetition of this same situation with the grandchildren, and so on. This is, in essence, the Law of Karmic Retribution. However, if an analysis of this situation reveals that the parents are fully fulfilling their obligations toward their own parents—meaning there is no resentment, malice, or hostility between them—then it indicates that a hex has infiltrated the family. This hex was likely cast before the child's birth with the specific intent of sowing discord between the children and their parents. The solution to this problem is as follows: the hex must be removed (through prayers or therapeutic massage), after which the child should be surrounded with kindness and attention; this approach will lead to a softening of the child's character.
+For reference: if a child has been afflicted by a hex since birth, they will typically suffer from bronchitis or pneumonia before the age of one, and during early childhood, they will exhibit a fear of the dark. They may also experience nightmares and, occasionally, bedwetting. When attempting to remove a hex, do not approach the matter with indifference—a hex will not simply dissipate on its own. However, you should also avoid placing your trust in the first "amateurs" or self-proclaimed "specialists" in hex removal you encounter. There is a very high risk of falling victim to a charlatan. Rely only on verified sources of information when vetting the person who will be assisting you.
+Reader: Is it fair to say that a person with a higher number of "ones" is more driven than someone with fewer ones?
+Author: If we evaluate the influence of the number "one" specifically within the first row (which governs goal-orientation), then a person with a high count of ones will indeed possess a significantly higher level of drive. This is because they are capable of assuming personal responsibility for decision-making—a factor that accelerates and energizes their progress toward a specific goal. However, one must not forget that the number "one" also figures into the first column (which governs self-esteem). This implies that such an individual may become prone to narcissism (manifesting as an inflated sense of self-importance), thereby remaining completely stagnant in their pursuit of any concrete objective. Worse still, they may channel the energy of their "ones" into the direct suppression of others—leveraging their strength of character to dominate—which ultimately serves only to further impede their own progress toward their goals. It is important not to forget that a person requires not only determination but also strength, energy, talent, and other qualities that lead to the achievement of one’s goals.
+At the same time, I will address a related question concerning the significance of the number one appearing within the "Spirituality Diagonal." If an individual possesses a high number of ones, it may indicate that—within the realm of spirituality—they are more likely to veer toward fanaticism than toward true spiritual growth; that is, they may resort to dictatorial behavior under the guise of "higher motives" (employing every available tool: morality, religion, a quest for absolute truth, a struggle for ideological purity, and much else).
+Reader: How does one explain strength of character—and the capacity for one person to dominate another—given that the dominant individual possesses a greater number of ones within their psychomatrix?
+Author: For a clearer illustration, try listing the character traits vertically rather than horizontally; everything will then become perfectly clear. Imagine that a person's character corresponds to their physical height.
+ 
+1
+1 1
+1 1 1
+1 1 1 1
+1 1 1 1 1
+1 1 1 1 1 1
+1 1 1 1 1 1 1 — this gives us the various levels of conversation.
+ 
+Consequently, a person with a "lower" character (for example, 11) will address someone with a "higher" character (for example, 1111) not face-to-face, but rather at the level of their abdomen—a place where there are no ears. The result is that the person with the higher character level projects their remarks downward; these remarks reach the person below them, yet the higher individual does not, in turn, "hear" their lower-level interlocutor. If they so desire, they can "bend down," but to do so, they require a compelling reason (for instance, an interest in the other person, energy they wish to draw from them, pity for them, respect, or other specific interests). Regardless of these specific reasons, however, that individual remains the leader in the conversation or argument—a fact that must be taken into account whenever two people are conversing (provided, of course, that you know the other person's date of birth).
+Conclusion: This is particularly crucial during business meetings where mutual agreement is required (for example, when selecting company representatives)!
+Reader: Would it be accurate to say that, in most cases, a child replicates the character of one of their parents?
+Author: Precisely so. The child does not replicate the character *exactly*, but rather a variation of it, taking into account the potential numerical shifts involving the digits 1 and 8. If it happens that a child's character aligns with *none* of the possible variations derived from their parents, then, in all likelihood, this indicates the activation of a karmic penalty or a malevolent influence. It is essential to examine the ratio of "positive" to "negative" digits within the psychomatrices of both the parents and the child.
+One should refrain from drawing ill-considered conclusions regarding infidelity—such assumptions are both demeaning and unfounded. Instead, look at the child's face; that is where evidence of infidelity would be most clearly reflected—specifically, if the child has inherited absolutely *none* of the physical features of either their father or their mother.`;
+
 // ─── VERBATIM TEXT BLOCKS (ENERGY 2) ────────────────────────────────────────
 
 const EN_2_NONE = `"2-None" Energy
@@ -225,8 +267,7 @@ It is for these very reasons that many extrasensory individuals strive to be the
 It is best to seek employment that does not involve constant interaction with people, as the inherent instability of this energy can lead to complications in interpersonal relationships. Professions that are free of heavy physical labor (due to the aforementioned tendency toward laziness) yet offer limited contact with the public are the most suitable choices—for instance, working as a driver, or in an archive, warehouse, or museum.
  
 Recommendations for the "222" Energy
-The most important thing you must grasp is the unique nature of the extrasensory energy. It enables the individual to monitor the state of all their internal organs on a daily basis, thereby warding off illness—and even protecting against malevolent influences such as hexes or the "evil eye." An extrasensory person falls ill only when they consciously desire to take a rest, or when they have been "talked into" becoming ill by external suggestion. One must not foist a diagnosis upon such people; rather, they must be convinced of their absolute health.
-If, however, an extrasensory individual claims that an illness is approaching, they simply need to rest without a specific pretext (a sick leave certificate or medical note constitutes a pretext). One must not entertain any thoughts of illness; otherwise, the illness will be self-induced, as the individual will focus their energy directly upon it.
+The most important thing you must grasp is the unique nature of the extrasensory energy. It enables the individual to monitor the state of all their internal organs on a daily basis, thereby warding off illness—and even protecting against malevolent influences such as hexes or the "evil eye." An extrasensory person falls ill only when they consciously desire to take a rest, or when they have been "talked into" becoming ill by external suggestion. One must not entertain any thoughts of illness; otherwise, the illness will be self-induced, as the individual will focus their energy directly upon it.
 It is essential to understand how such an individual heals others. Their methods are remarkably simple: attention, kindness, responsiveness, and tenderness—qualities they lavish upon their "patient." Do not expect this state to endure for long—it lasts no more than two days, after which they revert to their customary withdrawn and short-tempered demeanor.`;
 
 const EN_2222_AND_MORE = `Energy Profile: "2222 and Above"
@@ -563,7 +604,7 @@ Character "1," or "one unit," is weak-willed and selfish.
 It can be said that this is one of the most complex character traits. It is possessed by people who are contradictory by nature.
 The fact is that, having a weak-willed character, they avoid making any decisions, trying to shift them to someone else.
 Escaping from making a decision, they desperately feign action and strenuously demonstrate their strong-willed qualities.
-This is why they always get into arguments about any issue. Surprisingly, they are completely indifferent to the subject of the dispute, as in the argument itself, they are only interested in winning; they desperately need success, striving to demonstrate their strength of character to everyone.
+This is why they always get into arguments about any issue. Surprisingly, they are completelyનું indifferent to the subject of the dispute, as in the argument itself, they are only interested in winning; they desperately need success, striving to demonstrate their strength of character to everyone.
 They often become selfish in their pursuit of victory, ignoring other people with their requests and troubles. Such people never make hasty decisions and give complex answers that can be interpreted in different ways, allowing them to retract their statements or, even better, make no decisions at all.
 Don't even think of accusing them of lack of willpower: you'll offend them, and they simply won't believe you, once again displaying their argumentative nature.
 However, it's not all bad. They make the most wonderful deputies – deputies who are the "number two" behind the boss.
@@ -600,7 +641,8 @@ spiritual diagonal, "1, 5, 9".`,
       { count: 4, label: '"1111" personality type', verbatim: CHAR_1111, scale: 'strong' },
       { count: 5, label: 'The "11111" personality type', verbatim: CHAR_11111, scale: 'dominant' },
       { count: 6, label: 'Characters "111111 and More"', verbatim: CHAR_111111, scale: 'overload' }
-    ]
+    ],
+    difficultyVerbatim: DIFF_1
   },
   2: {
     digit: 2,
@@ -819,7 +861,16 @@ export function calculatePsychomatrix(day: number, month: number, year: number):
     const count = counts[digit] || 0;
     const cellDef = PSYCHOMATRIX_CELL_MEANINGS[digit];
     const meaning = getPsychomatrixCellMeaning(digit, count);
-    cellReadings.push({ digit, count, cellName: cellDef.cellName, label: meaning.label, verbatim: meaning.verbatim, scale: meaning.scale, modifiers: [] });
+    cellReadings.push({ 
+      digit, 
+      count, 
+      cellName: cellDef.cellName, 
+      label: meaning.label, 
+      verbatim: meaning.verbatim, 
+      scale: meaning.scale, 
+      modifiers: [],
+      difficultyVerbatim: cellDef.difficultyVerbatim
+    });
   }
 
   const rawBirthDate = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;

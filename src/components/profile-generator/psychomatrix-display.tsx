@@ -1,4 +1,3 @@
-
 'use client';
 
 /**
@@ -628,6 +627,15 @@ export function PsychomatrixDisplay({ day, month, year, gender = 'male', name }:
                         <AccordionContentWithPlayer text={selectedReading.verbatim} />
                       </div>
                     </div>
+
+                    {selectedReading.difficultyVerbatim && (
+                      <div className="mt-8 space-y-4 pt-6 border-t border-stone-800/40">
+                        <SectionHeader icon={<AlertTriangle className="w-4 h-4" />} title={`Difficulty in interpreting number ${selectedReading.digit}`} />
+                        <div className="p-4 rounded-sm border border-stone-700/30 bg-black/40 backdrop-blur-md">
+                          <AccordionContentWithPlayer text={selectedReading.difficultyVerbatim} />
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
