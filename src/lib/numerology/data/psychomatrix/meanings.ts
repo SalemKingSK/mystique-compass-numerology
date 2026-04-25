@@ -3,48 +3,11 @@ import { PsychomatrixCellMeaning } from "../psychomatrixData";
 export const PSYCHOMATRIX_MAIN_MEANINGS: Record<number, PsychomatrixCellMeaning[]> = {
   1: [
     {
-      count: 0,
-      label: 'Character Type "1"',
-      scale: 'absent',
-      verbatim: `Character Type "1"—or "the single one"—is characterized by a lack of willpower and by egoism.
-It could be argued that this is one of the most complex character types. It is found in individuals who are contradictory by nature.
-The issue is that, possessing a weak-willed nature, they avoid making any decisions whatsoever, attempting instead to shift the burden onto someone else's shoulders.
-In their flight from decision-making, they desperately feign activity and go to great lengths to demonstrate their strength of will.
-This is precisely why they invariably engage in arguments over every conceivable issue. Surprising as it may seem, the actual subject of the dispute is a matter of total indifference to them; their sole interest in the argument itself is victory—they have a desperate need for success, driven by a desire to demonstrate their strength of character to everyone around them.
-They often become self-absorbed; in their pursuit of victory, they remain oblivious to the needs and troubles of others.
-Such individuals never make hasty decisions; instead, they offer convoluted responses open to multiple interpretations—a tactic that allows them to retract their statements later, or, better yet, to avoid making any firm decisions at all.
-Do not, under any circumstances, accuse them of being weak-willed: you will offend them, and they will simply refuse to believe you—thereby once again displaying their argumentative nature.
-However, the situation is not entirely bleak. They make for truly excellent deputies—specifically deputies—serving as the "number two" figure standing just behind the leader.
-
-Recommendations Regarding Character Type "1"
-This represents one of the most complex character types, as its very definition contains an inherent contradiction. Consider this: can a person simultaneously be an egoist and a weak-willed individual?
-Egoism implies the forceful assertion of one's own views, whereas a lack of willpower implies submission to the opinions of others.
-Let us attempt to unravel this paradox.
-Possessing a weak-willed nature—and being acutely aware of it—the individual strives to conceal this shortcoming from the prying eyes of the outside world. It is precisely for this reason that he dons the mask of a professional, using every action to convince those around him of his exceptional willpower.
-Observe such a person closely, and everything will immediately become clear to you. He never imposes his own will upon anyone; instead, he acts as a fanatical implementer of his superior's views—be they orders or directives.
-For him, the letter of the law constitutes the ultimate truth. If he has been entrusted with a document defining his authority, do not even think of arguing with him unless you possess a document that limits or revokes that authority. Such people are natural-born implementers.
-If you are looking for a way to converse with him—one that allows you to win an argument without depriving this type of person of his sense of "victory"—then commit the following conversational sequence to memory:
-1. "I agree with you..."
-2. "However, I personally would have done things differently—specifically [present a brief outline]..."
-3. "But I do agree with you. You make the final call..."
-4. Pause and wait until he proposes his own plan of action. Do not be surprised: it will be the very solution you suggested, for while the responsibility will ultimately rest on your shoulders, the solution itself is, after all, yours.
-5. The Outcome: If everything goes well, he will claim credit for the decision. If things go poorly, he will place the blame on you.
-6. Let this roll right off your back.
-If the matter at hand involves a situation where you wish to avoid taking any risks, do not offer a person with this "Type 1" personality a choice of actions; instead, present your solution to him as the only option—one that is not open to discussion. (It is even more effective if you frame it as a direct order or directive—provided, of course, that he is your subordinate.)
-One final request: do not overuse this method, as it is essential to preserve this individual's capacity to make independent decisions. Remember: the egoism of a person with a "1" personality type lies in their desire to win every argument, regardless of the subject matter or their own level of expertise.
-Do not be surprised if they repeat the same jokes, parables, or aphorisms to you—this, too, is their way of building self-confidence.
-If your child possesses this type of personality, accustom them to the practice of making decisions.
-Never be too quick to stifle their desire to take the lead; they will lose this capacity on their own, without any intervention from you.
-Bear in mind: it is possible to modify their personality through the use of "strong lines." For the "1" personality type, these are:
-The 1st row: "1, 4, 7";
-The 1st column: "1, 2, 3";
-The spiritual diagonal: "1, 5, 9".`
-    },
-    {
       count: 1,
       label: 'Character Type "1"',
       scale: 'very-weak',
-      verbatim: `Character Type "1"—or "the single one"—is characterized by a lack of willpower and by egoism.
+      verbatim: `Character Type "1"
+Character Type "1"—or "the single one"—is characterized by a lack of willpower and by egoism.
 It could be argued that this is one of the most complex character types. It is found in individuals who are contradictory by nature.
 The issue is that, possessing a weak-willed nature, they avoid making any decisions whatsoever, attempting instead to shift the burden onto someone else's shoulders.
 In their flight from decision-making, they desperately feign activity and go to great lengths to demonstrate their strength of will.
@@ -76,13 +39,15 @@ Never be too quick to stifle their desire to take the lead; they will lose this 
 Bear in mind: it is possible to modify their personality through the use of "strong lines." For the "1" personality type, these are:
 The 1st row: "1, 4, 7";
 The 1st column: "1, 2, 3";
-The spiritual diagonal: "1, 5, 9".`
+The spiritual diagonal: "1, 5, 9".`,
+      scale: 'very-weak'
     },
     {
       count: 2,
       label: 'The "11" Personality Type',
       scale: 'norm',
-      verbatim: `Individuals whose psychomatrix contains two "ones" are characterized by a gentle nature; they crave praise and actively seek to earn it in every way possible. For this very reason, they are eager to help others and find it easy to fit into any social circle. They tend to stand out in a crowd, as they strive to attract attention in the hope of subsequently receiving gratitude for their pleasant company.
+      verbatim: `The "11" Personality Type
+Individuals whose psychomatrix contains two "ones" are characterized by a gentle nature; they crave praise and actively seek to earn it in every way possible. For this very reason, they are eager to help others and find it easy to fit into any social circle. They tend to stand out in a crowd, as they strive to attract attention in the hope of subsequently receiving gratitude for their pleasant company.
 They possess the ability to listen to others, provided that the other person does not attempt to pressure them. They themselves very rarely resort to pressuring others.
 They often lack the firmness required to stand up for their own views, and while they may aspire to a profession that offers complete independence, their deep-seated desire for praise frequently steers them toward careers such as medicine or teaching.
 They often lack a strong sense of purpose and self-esteem, which can lead them to set their sights too low. However, if they are fortunate enough to have a "22" (or "2222" or more) present in their psychomatrix, their initiative and drive become dramatically amplified.
@@ -100,7 +65,8 @@ However, do not overpraise him if he possesses the numbers 88 or 55—for in tha
       count: 3,
       label: 'The "111" Character',
       scale: 'special',
-      verbatim: `This character bears the rather grand title of the "Golden Mean," a designation that immediately sets it apart from other character types. Individuals of this type possess the ability to find common ground with anyone.
+      verbatim: `The "111" Character
+This character bears the rather grand title of the "Golden Mean," a designation that immediately sets it apart from other character types. Individuals of this type possess the ability to find common ground with anyone.
 The key lies in the fact that, when necessary, they are willing to yield in an argument to anyone—even to a "1" (the most dominant type).
 The most important thing to understand is that one must never apply pressure to such a person; for when acting in self-defense, they will defeat anyone—even a despot.
 A person with the "Golden Mean" character undergoes a transition—natural for them (we will discuss numerical transitions separately)—into a new character type: "1 and 8" (a type we define as lacking the number 8). This corresponds to a gentle and tolerant disposition.
@@ -118,7 +84,8 @@ Recall the words of Alexander Grin: "Never do anything you will later regret." I
       count: 4,
       label: 'The "1111" Personality Type',
       scale: 'strong',
-      verbatim: `This is a strong-willed and powerful personality.
+      verbatim: `The "1111" Personality Type
+This is a strong-willed and powerful personality.
 These individuals know how to set goals for themselves. If they possess high energy levels (a score of 22 or higher), they are ready to engage in a debate and strive for victory. However, they always know where to draw the line and do not cross certain boundaries, as they are not despotic by nature. They remain mindful of their conversational partner at all times, taking care not to cause offense.
 If their energy levels are low (a score of 2—or a complete absence of 2s), they prefer to withdraw from arguments rather than waste their strength in vain. They are self-assured and feel no need to prove their superiority or demonstrate the extent of their knowledge.
 For men, this personality type is best suited for leadership roles or military careers. Women with this profile tend to gravitate toward academia, teaching (particularly at the university level), the legal profession, or the judiciary—though rarely toward the business world.
@@ -130,7 +97,7 @@ These individuals are capable of making immediate decisions and rarely choose to
 If you possess the "1111" personality type, you must learn to exercise self-restraint when the situation calls for it. However—and perhaps even more importantly—you must also learn to abandon a previously made decision if circumstances dictate that doing so is necessary.
 It is worth noting that this personality type represents a true gift of fate for any individual, as it empowers them to set and achieve exceptionally ambitious goals within any field of human knowledge.
 Above all else, this personality type serves to unlock and reveal the individual's own unique talents.
-
+ 
 Recommendations for the "1111" Personality Type
 With a "1111" personality, never delude yourself into thinking that you can easily cede a leadership role to another person. Such a misconception is highly dangerous: you will not be able to tolerate subordination for long—it is simply unacceptable to you.
 Do not forget that every individual is unique; even if you fail to attain a leadership position in your professional life, you still have the opportunity to fully realize your talents—and therein lies the chance to leave your mark on human history.
@@ -141,7 +108,8 @@ Your character endows you with everything you need: resilience, determination, s
       count: 5,
       label: 'The "11111" Character Type',
       scale: 'dominant',
-      verbatim: `This character type represents the most extreme expression of authority and leadership. Such an individual pursues their goals without regard for those around them—even if their psychomatrix happens to contain the number 8.
+      verbatim: `The "11111" Character Type
+This character type represents the most extreme expression of authority and leadership. Such an individual pursues their goals without regard for those around them—even if their psychomatrix happens to contain the number 8.
 Even the presence of "tolerance" (represented by the number 8) cannot reliably curb this inherent authoritarianism.
 People of this type are aptly described as despots. For them, it is a choice between absolute power or no power at all. Few are ever able to stop themselves; their lust for power knows no bounds.
 It is precisely this relentless pursuit of power that creates a hostile environment around them. One can state with certainty that the ultimate fate of any despot is predetermined: they inevitably breed their own successor—someone who will, in turn, rise up to strike them down.
@@ -164,7 +132,8 @@ Being a despot is difficult. However, one cannot blame a person simply for havin
       count: 6,
       label: '"111111 and Beyond" Character Types',
       scale: 'overload',
-      verbatim: `As soon as the number of ones exceeds five digits, one can speak of a "despot overload"—signifying a drastic shift in character. The individual begins to fear their own latent drive for power. It could be said that they fear their own self when in a rage.
+      verbatim: `"111111 and Beyond" Character Types
+As soon as the number of ones exceeds five digits, one can speak of a "despot overload"—signifying a drastic shift in character. The individual begins to fear their own latent drive for power. It could be said that they fear their own self when in a rage.
 Given their own demands for power, they clearly understand that they can never truly possess it. The reason is both simple and remarkable: God, King, President—lesser ambitions hold almost no interest for them.
 It is precisely this realization—that attaining absolute power is impossible—that leads them to renounce it entirely.
 Such individuals may reveal their hidden agendas only when under the influence of heavy intoxication.
@@ -269,11 +238,87 @@ The final cause of illness lies in the inability to properly manage and utilize 
     }
   ],
   3: [
-    { count: 0, label: 'Humane orientation', verbatim: 'Absent: Natural inclination toward the humanities and the arts.', scale: 'absent' },
-    { count: 1, label: 'Unstable interest', verbatim: 'Single 3: Interest depends on mood. Creative potential needs focus.', scale: 'very-weak' },
-    { count: 2, label: 'Technical aptitude', verbatim: 'Double 3: Strong interest in exact sciences and technology. Potential for engineering.', scale: 'norm' },
-    { count: 3, label: 'Scientific potential', verbatim: 'Triple 3: High potential for science but lacks persistence. Interest may scatter.', scale: 'special' },
-    { count: 4, label: 'Genius interest', verbatim: 'Quadruple 3: Intense interest in technology and invention. Born designer or researcher.', scale: 'strong' }
+    {
+      count: 0,
+      label: 'The "3-Absent" Interest Profile',
+      scale: 'absent',
+      verbatim: `The "3-Absent" Interest Profile
+The absence of the number 3 in a psychomatrix signifies a person's natural inclination toward the humanities and the arts.
+When discussing a child's interests—particularly those of a boy—a specific problem often arises. Almost all fathers believe that engaging in the humanities, and especially the arts, is entirely incompatible with "masculine" interests. Consequently, such interests are often actively stifled during childhood by "zealous" fathers who strive to instill in their sons a typically male interest in technology and engineering. This approach is not particularly wise, for it is nature itself that shapes a child and determines his true purpose in life.
+It is precisely because of the diversity of human interests that humanity continues to exist as a species on this planet; otherwise, we would have long since wiped ourselves out. Who, if not artists and humanists, has demonstrated the very possibility of peaceful coexistence for humanity as a species?
+Nature recognizes no such concepts as pity or compassion; within the natural world, only the principle of "survival of the fittest" prevails. However, this principle does not apply to human beings—even though individuals prone to aggression and conflict do appear among us, they are not the ones who drive humanity forward. It is philosophers and writers who offer us the opportunity to understand and pursue a non-aggressive path of progress.
+If your child lacks the number 3 in their psychomatrix, allow them to fulfill their unique mission for the benefit of humanity: they were born to create new facets of philosophy, art, and culture. They perceive technology only superficially—judging it primarily by its elegance and aesthetic beauty.
+Given that the number 3 is a component of various numerical lines within the matrix, its absence can indicate a certain instability in a person's interests, as well as a tendency toward underestimating their own capabilities. This often leads to a delayed realization of their true potential and identity; indeed, many individuals lacking the number 3 never fully "unfold" their talents. By the time they finally grasp their true calling, they have often already established families, raised children, and settled into careers—at which point, any opportunity to cultivate their innate talent (which is governed by the third column of numbers: 7, 8, and 9) has effectively vanished. It is essential to grasp one very simple concept: we ourselves determine the threshold of our own aging.
+If, at the age of 20, a person considers themselves fully "settled"—with habits already set in stone—then do not be offended if, five years later, wrinkles appear and, by the time you turn 30, you look every bit of 35 or 40.
+Recall the line from Captain Vrungel’s song: "The name you give your yacht determines how she’ll sail." The same applies to a human being: the sooner you mentally cast yourself as "old," the sooner you will physically age.
+Attempting to "unfold" your true self does not mean changing professions or quitting the job that puts food on your table. Rather, it signifies the necessity of unlocking your innate talent—a process that requires you to actually make the attempt.
+If you have an inclination toward the arts and the humanities (indicated by the absence of the numbers 3 and 6, and the presence of many numbers in the third column), then start drawing, sculpting, or composing music. Do not be surprised by this suggestion; it is a vital necessity for you.
+At the end of their lives, everyone takes stock of their journey; consider, then, what legacy you will leave behind—something that might give others a reason to remember you.
+The notion that you will be remembered by your children and grandchildren—but not by your great-grandchildren, who likely won't even recall your name—is a hollow one. Leave behind something tangible—something you have created in the process of striving to unlock your true potential. I believe Kazimir Malevich’s Black Square serves as an excellent example of such "simple genius."`
+    },
+    {
+      count: 1,
+      label: 'Interest "3"',
+      scale: 'very-weak',
+      verbatim: `Interest "3"
+If you have a single "3" in your psychomatrix—is this a good thing or a bad one? It depends entirely on you. If your goal is to develop your abilities, then you are definitely in luck; you are free to pursue any field of study, as you have not yet fully committed to the humanities, nor have you yet aligned yourself exclusively with the exact sciences. You can find an optimal path by engaging in disciplines that bridge these two branches of knowledge: the natural sciences, economics, law, and so on.
+Crucially, you must understand that it is essential to choose a specific direction; otherwise, you risk doing yourself a disservice by allowing your interests to become too scattered.
+This is precisely the downside of the "3" quality: rather than focusing one's interest, it disperses it. Consequently—even among individuals with strong aptitude for academic work—many fail to pinpoint their true interests; having scattered their knowledge across various fields, they eventually abandon academia or never even attempt to pursue it seriously.
+Let me reiterate: you must precisely define the specific focus of your interests. If you fail to do so, it could be said that you lack a genuine interest in any particular field of knowledge—a risk that is especially high if you possess a low energy level (indicated by "2-none," "2," or "222").
+As you may have noticed, the chapter titled "Interest: '3-None'" offered no specific recommendations regarding marriage or the significance of the number "3" itself in that context. The reason is that the number "3," in and of itself, has almost no bearing on marital matters (aside from the influence it exerts when appearing within specific "lines" of the psychomatrix). Furthermore, regarding the notion of "amplifying" the power of the number "3": this concept is essentially meaningless. Since the number "3" pertains specifically to a person's interests, how could one logically claim that an individual's interest in a given subject has been "amplified" solely by the presence of this number? I believe that any such amplification is actually influenced by other numbers within the psychomatrix—or, more accurately, by other fundamental personality traits of the individual in question. For the sake of illustration, let us assume that a person, having actively immersed themselves in the exact sciences and technology, has begun to amplify the influence of the number 3. Yet, you will observe that this number has effectively "dropped out" of their palm lines; consequently, the individual has suffered a noticeable decline in the strength of the qualities governed by those lines—specifically, stability, sexual vitality, and self-esteem.
+Consider this: would it truly benefit the family if an individual were to diminish these vital qualities in favor of pursuing an interest in technology and the exact sciences? More often than not, when events unfold in this manner, the individual fails to fully realize their potential even in their chosen field, as they lack a natural aptitude for those particular sciences.
+There is no need to fabricate virtues for yourself or to attempt to cultivate traits that will yield no fruitful results; it is far better to unleash your true talent within those domains of human knowledge where your innate strengths truly lie. Reflect on this: one might succeed in becoming a competent engineer or economist, yet in doing so, effectively vanish from the world as the talented artist, writer, or expert in other fields of human endeavor that one was destined to become.
+Do not attempt to convince yourself that you have already contributed enough to your current scientific field; you have yet to discover the full extent of what you are capable of achieving if only you were to unlock your true, natural abilities.
+
+The primary reason for such a misguided path of self-realization lies in the parents' failure to recognize their child's true aptitudes. Following in one's parents' footsteps is a valid choice only when the child possesses a genuine inclination to do so; it is never justified, however, if the cost is the destruction of a unique talent.`
+    },
+    {
+      count: 2,
+      label: 'Interest "33"',
+      scale: 'norm',
+      verbatim: `Interest "33"
+Your psychomatrix contains two threes; this indicates that you possess an interest in the exact sciences and technology, though it does not necessarily mean that you can confidently undertake the study or practice of these fields.
+It is essential to determine how you can best channel this interest—or, if a direct path is unavailable, to identify which alternative direction your existing threes should be guided toward.
+Let us assume that, in addition to the two threes, your psychomatrix contains two (or more) fives, a "22," and a "6." Taken together, these numbers suggest that—given your innate aptitudes—you possess strong logic and good energy levels, and that you are a person of moods who occasionally enjoys working with their hands for personal pleasure. Based on this numerical configuration, one can conclude that you would likely make an excellent engineer or design specialist, as you possess the capacity to fully grasp and navigate technological processes.
+Conversely, if your psychomatrix contains a five (or a missing five), a "22," and a missing six (or a single six), it can be said that—despite the presence of two threes—you lack logical reasoning skills. The consequence of this is that while working with technology, you may accumulate practical experience and, by applying it, eventually come to understand the specific equipment you have mastered; however, this does not qualify you as a skilled technical expert. You should refrain from attempting to test your abilities in the field of technical design or engineering, as your lack of logic would likely result in your becoming a mere dreamer—someone capable only of fantasizing. Bringing your ideas to life in the real world would often prove simply impossible due to their inherent impracticality and lack of realism. Your best course of action would be to pursue a career in design (specifically, the aesthetic styling or external appearance of technology), thereby entrusting the task of verifying the technical feasibility of your proposed aesthetics to those individuals who possess analytical capabilities.
+In this specific scenario, the absence of the number five—or even the presence of a single nine—does not constitute an impediment; indeed, it is precisely the role of the designer to challenge and inspire engineers to push the boundaries of technical possibility in order to create more aesthetically pleasing technology. A designer should not limit themselves to the constraints of current capabilities—unless the task involves designing an enclosure for a pre-existing device; even in that specific instance, however, the work should be entrusted to a designer who possesses at least one "5."
+Sometimes, a passion for technology can become a domestic disaster, as any attempt to repair household appliances invariably renders them completely unusable. This scenario typically arises when an individual possesses an abundance of energy, a strong-willed nature (or a prominent "1"), yet lacks a "5" and has only a single "9."
+If you know that your husband or son possesses such numerical traits, do not give them any reason to believe they are technically gifted. For a child with this profile, the best career choice is one that allows them to be around and work with technology without engaging in its repair—a task that is, for them, impossible due to a lack of the requisite logic and memory. Remember that there are numerous professions involving technology, and the vast majority of them do not entail repair work (e.g., driver, salesperson, operator, etc.).
+The presence of two "3s" also has repercussions on other aspects of life, particularly regarding one's intimate life. An individual with this configuration takes a keen interest in the techniques of sex—a pursuit that constitutes a genuine need for them—and this is a factor that must be taken into account when establishing a family. Do not overlook such ancient treatises as the Kama Sutra and The Secrets of the Jade Chamber.`
+    },
+    {
+      count: 3,
+      label: 'The "333" Interest Profile',
+      scale: 'special',
+      verbatim: `The "333" Interest Profile
+If your psychomatrix contains three "3s," it signifies that your interest in academic pursuits is inherently unstable—a trait that can manifest in various ways. While possessing a strong inclination toward the exact sciences and technology, such an individual often feels drawn to other fields of knowledge, leading to a shift in focus. Ideally, one interest should serve as a natural extension of the previous one; this ensures there is no discontinuity in accumulated knowledge—a gap that, if left unchecked, can often lead to a complete abandonment of one's work or vocation.
+The most optimal fields of study are those that draw upon the exact sciences (mathematics, physics, engineering). Consequently, you should seek to apply your knowledge in areas where other disciplines intersect with the exact sciences—such as mathematical linguistics, computer engineering, bionics, and so forth.
+Such transitions typically occur in individuals whose psychomatrix—in addition to the three "3s"—also features a "55" (or higher), a "99" (or higher), and/or a "22" (or higher) combination. As you can see, this profile describes individuals who possess strong logical faculties (the "5" factor) or a powerful memory (the "9" factor), coupled with a robust energy reserve (the "2" factor).
+Conversely, if the "5," "9," and "2" digits are weakly represented in the psychomatrix, the shift in interest will tend to veer in other directions—specifically, those associated with the particular "lines" or axes within the matrix that contain the number "3."
+Consequently, the individual may develop a heightened interest in their intimate life, particularly when a deep-seated need for emotional or physical closeness arises. Alternatively, there may be a sudden and intense resurgence of various personal habits or routines (such as morning jogging, reading before bed, etc.).
+A less favorable scenario arises when the individual experiences a sharp increase in self-criticism—sometimes bordering on self-flagellation—though an even worse outcome is the sudden unleashing of unbridled ambition. One should prepare for such crises in advance, as they typically emerge as a result of physical exhaustion, emotional burnout, or interpersonal conflict.
+While it is quite difficult to prevent such a crisis entirely, it is certainly possible to mitigate its severity and impact. One’s loved ones should step in to help—those capable of understanding the individual’s state of mind and assisting them in overcoming their difficulties: a wife’s attentiveness, a friend’s support in new endeavors, and so forth.
+The most important thing to remember is that the presence of three "threes" has always been associated with an interest in science; this signifies that the individual is duty-bound to unlock their full potential.
+Fascinating results can be achieved by synthesizing one’s various personal interests into a single cohesive theory. We rarely witness a truly compelling synthesis of sciences, as each of the disciplines being combined tends to vie for dominance; consequently, no true synthesis takes place—there is merely a borrowing of methods or techniques. It is a different matter entirely when various sciences converge within the mind of a single individual who has cultivated an equal interest in each of them—for this is precisely what gives birth to entirely new disciplines and bodies of knowledge.
+The only things that can hinder a person from realizing their full potential are a lack of self-belief, laziness, and an undue deference to "authorities"—figures who invariably reject anything new, as it poses a threat to the prestige and reputation they have so painstakingly constructed.
+Every individual has the right to formulate their own hypothesis; its validity will ultimately be proven or disproven by the passage of time—not by any self-proclaimed "learned scholar."`
+    },
+    {
+      count: 4,
+      label: 'The "3333 or More" Interest',
+      scale: 'strong',
+      verbatim: `The "3333 or More" Interest
+In our time, this is a rather rare sign, though it does appear occasionally. It signifies a profound interest in science and technology. One could say that such a person is born to be an inventor or a designer.
+If the numbers 5 and 9 are active within the psychomatrix (appearing two or more times each), then it is essential to engage in science in its literal sense—that is, by working in a research institute or a laboratory.
+If the numbers 5 and 9 are weakly represented, one should not abandon the attempt to give expression to one's "3s." There is a simple yet reliable method for doing so: write a science fiction novel in which you can incorporate all your ideas and thoughts. Who could possibly fault a writer for the fact that their ideas are not grounded in reality? Science fiction is precisely the literary genre in which an individual is free to express their thoughts without constraint.
+I once proposed a concept for a new type of school—one designed to foster children's interests and aptitudes. This model envisioned introducing a mandatory subject for all students: "Imagination." Through class, every child would be able to unlock their potential and share their thoughts without the fear of receiving a failing grade or being ridiculed.
+Is it not obvious that truly groundbreaking innovations are slow to enter our lives? This is because, among the general population, only 5–7% possess a forward-looking mindset; the rest merely refine what already exists—and it is precisely this latter group that hinders the acceptance of new theories. I am convinced that if every individual were free to voice all their ideas without worrying about how they would be perceived, the world would make tremendous strides in understanding the ultimate purpose of existence.
+When analyzing any individual's psychomatrix, always carefully evaluate the presence and significance of the number 3, as this factor will largely determine that person's choice of profession and personal interests.
+
+Let me reiterate: to successfully realize one's potential as a skilled technical specialist or a professional in the exact sciences, the psychomatrix must contain two or more instances of the number 5. If, however, these numbers are absent—or if there is only a single 5—it is inadvisable to engage in the repair or assembly of machinery, as a lack of logical aptitude will inevitably lead to errors. Conversely, if the presence of the number 5 is weak, yet the number 3 appears frequently (three times or more), one should pursue a career in design or begin writing science fiction novels; these avenues provide an excellent opportunity to channel this specific interest.
+In women, the energy associated with the number 3 is most often absorbed by other life lines; these lines enable them to express this energy—not within the realms of science or technology—but rather within the domestic sphere: in homemaking, relationships, and personal style. This outcome is far preferable to a situation where a woman sacrifices qualities essential to family life by immersing herself deeply in the study of the exact sciences or technical fields.
+It must be noted that after giving birth, any woman will experience a depletion of her energy reserves; this inevitably leads to a shift in her interests and goals, meaning that her passion for complex academic disciplines may wane—regardless of whether or not her husband actively supports her personal development. I believe it is precisely for this purely physiological reason that men generally have a greater opportunity to fully realize their potential than women do. Thus, I offer but one piece of advice to the ladies: do not delay—make haste.`
+    }
   ],
   4: [
     { count: 0, label: 'Weak health', verbatim: 'Absent: No innate health at birth. Requires active care and holistic practices.', scale: 'absent' },
