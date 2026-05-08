@@ -3,6 +3,7 @@
 import React, { forwardRef } from "react";
 import { BookUser, Star, Sparkles, Lock } from "lucide-react";
 import { AccordionContentWithPlayer } from "./accordion-content-with-player";
+import PsychicNumberDetailPanel from "@/components/PsychicNumberDetailPanel";
 
 interface CoreVibrationsProps {
   psycheNum: number;
@@ -49,7 +50,7 @@ export const CoreVibrations = forwardRef<HTMLDivElement, CoreVibrationsProps>(({
               className="core-v-layer-badge" 
               style={{ background: `${badgeColor}22`, color: badgeColor, borderColor: `${badgeColor}55` }}
             >
-              Layer {layerNum}
+              Chamber {layerNum}
             </span>
             <span className="core-v-acc-title">
               {title}
@@ -67,16 +68,22 @@ export const CoreVibrations = forwardRef<HTMLDivElement, CoreVibrationsProps>(({
           )}
         </button>
 
-        {isOpen && !isLocked && content && (
+        {isOpen && !isLocked && (
           <div className="core-v-acc-body">
              <div className="core-v-meaning-card" style={{ borderLeftColor: badgeColor }}>
-                <div className="flex items-center gap-2 mb-3">
-                    {icon}
-                    <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: badgeColor }}>
-                        {title} Activation
-                    </span>
-                </div>
-                <AccordionContentWithPlayer text={content} />
+                {id === 'psyche' ? (
+                  <PsychicNumberDetailPanel number={psycheNum} johariMeaning={psychicMeaning.description} />
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 mb-3">
+                        {icon}
+                        <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: badgeColor }}>
+                            {title} Activation
+                        </span>
+                    </div>
+                    <AccordionContentWithPlayer text={content || ""} />
+                  </>
+                )}
              </div>
           </div>
         )}
