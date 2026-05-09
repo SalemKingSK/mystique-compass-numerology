@@ -1,5 +1,4 @@
-
-'use client';
+"use client";
 
 /**
  * MYSTIQUE COMPASS — Premium Numerology Display
@@ -12,7 +11,7 @@ import type { NumerologyData, PersonalYearData } from './types';
 import {
   BrainCircuit, Sparkles, Grid, Layers, Compass,
   Activity, ChevronRight, CalendarDays, Zap, Star,
-  AlertTriangle, TrendingUp, ShieldAlert
+  AlertTriangle, TrendingUp, ShieldAlert, ChevronDown
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
@@ -104,6 +103,14 @@ function SH({ icon, title }: { icon: React.ReactNode; title: string }) {
     </div>
   );
 }
+
+// ── InfoCard ─────────────────────────────────────────────────────────────────
+const InfoCard = ({ title, value, icon, onClick }: { title:string; value:string|number; icon:React.ReactNode; onClick?:()=>void }) => (
+  <div className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square ${onClick?'transition-all duration-300 hover:bg-purple-500/20 cursor-pointer':''}`} onClick={onClick}>
+    <div className="flex items-center gap-2 text-purple-200/80">{icon}<p className="text-[0.6rem] font-cinzel uppercase tracking-widest">{title}</p></div>
+    <p className="text-5xl font-bold text-yellow-300 mt-2 font-decorative drop-shadow-lg">{value||''}</p>
+  </div>
+);
 
 // ── This Year Banner ──────────────────────────────────────────────────────────
 function ThisYearBanner({ birthDay, birthMonth }: { birthDay: number; birthMonth: number }) {
@@ -220,231 +227,6 @@ function MissingNumbers({ numberCounts }: { numberCounts: { [k: string]: number 
   );
 }
 
-// ── Pinnacles & Challenges ────────────────────────────────────────────────────
-function PinnaclesAccordion({ destinyNum, birthDay, birthMonth, birthYear }: { destinyNum:number; birthDay:number; birthMonth:number; birthYear:number }) {
-  const stages = calcPinnacles(destinyNum, birthDay, birthMonth, birthYear);
-  const [open, setOpen] = React.useState<number|null>(stages.findIndex(s=>s.active)+1 || null);
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
-      {stages.map(s => (
-        <div key={s.stage} style={{ borderRadius:'0.9rem', border: s.active ? '1px solid rgba(212,175,55,0.45)' : '1px solid rgba(124,58,237,0.18)', background: s.active ? 'rgba(20,5,50,0.85)' : 'rgba(12,4,32,0.7)', overflow:'hidden', transition:'border-color 0.3s' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.9rem 1rem', cursor:'pointer', userSelect:'none', gap:'0.5rem' }}
-            onClick={() => setOpen(open===s.stage ? null : s.stage)}>
-            <div style={{ display:'flex', flexDirection:'column', gap:'0.2rem', flex:1 }}>
-              {s.active && (
-                <span style={{ display:'inline-flex', alignItems:'center', gap:'0.3rem', fontFamily:"'Cinzel',serif", fontSize:'0.45rem', letterSpacing:'0.2em', textTransform:'uppercase', color:'#34d399', background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:99, padding:'0.15rem 0.5rem', width:'fit-content', marginBottom:'0.1rem' }}>
-                  <TrendingUp style={{ width:8, height:8 }}/> You Are Here
-                </span>
-              )}
-              <span style={{ fontFamily:"'Cinzel',serif", fontSize:'0.7rem', fontWeight:600, color:'rgba(210,195,240,0.85)', letterSpacing:'0.05em' }}>{s.label}</span>
-              <span style={{ fontFamily:"'Cinzel',serif", fontSize:'0.5rem', letterSpacing:'0.12em', color:'rgba(212,175,55,0.45)' }}>Ages {s.ages}</span>
-            </div>
-            <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
-              {[{v:s.p,gold:true},{v:s.c,gold:false}].map(({v,gold},i)=>(
-                <div key={i} style={{ width:32, height:32, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Cinzel Decorative',serif", fontSize:'0.85rem', fontWeight:700, background: gold ? 'rgba(212,175,55,0.15)' : 'rgba(239,68,68,0.1)', border: gold ? '1px solid rgba(212,175,55,0.4)' : '1px solid rgba(239,68,68,0.3)', color: gold ? '#d4af37' : '#ef4444' }}>{v}</div>
-              ))}
-              <span style={{ color:'rgba(212,175,55,0.4)', fontSize:'0.7rem', transition:'transform 0.25s', transform: open===s.stage ? 'rotate(180deg)' : 'none' }}>▾</span>
-            </div>
-          </div>
-          <AnimatePresence>
-            {open===s.stage && (
-              <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }} transition={{ duration:0.35, ease:[0.23,1,0.32,1] }}
-                style={{ padding:'0 1rem 1rem' }}>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
-                  {[
-                    { label:`✦ Pinnacle ${s.p} — Opportunity`, text:PINNACLE_DESC[s.p]||'', gold:true },
-                    { label:`⚡ Challenge ${s.c} — Lesson`,     text:CHALLENGE_DESC[s.c]||'', gold:false },
-                  ].map(({ label, text, gold },i) => (
-                    <div key={i} style={{ border:'1px solid rgba(255,255,255,0.05)', borderRadius:'0.6rem', padding:'0.75rem', fontSize:'0.75rem', lineHeight:1.65, color:'rgba(210,195,240,0.7)', background: gold ? 'rgba(212,175,55,0.06)' : 'rgba(239,68,68,0.06)', borderLeft: gold ? '2px solid rgba(212,175,55,0.4)' : '2px solid rgba(239,68,68,0.35)' }}>
-                      <div style={{ fontFamily:"'Cinzel',serif", fontSize:'0.55rem', letterSpacing:'0.18em', textTransform:'uppercase', color: gold ? 'rgba(212,175,55,0.7)' : 'rgba(239,68,68,0.7)', marginBottom:'0.4rem' }}>{label}</div>
-                      {text}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Lucky Compass SVG ─────────────────────────────────────────────────────────
-function LuckyCompassSVG({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttributes:NumerologyData['kuaAttributes'] }) {
-  const kua = KUA_DATA_COMPASS[kuaNum] || KUA_DATA_COMPASS[1];
-  const [heading, setHeading] = React.useState(0);
-  const [isLevel, setIsLevel] = React.useState(true);
-  const [permissionState, setPermissionState] = React.useState<'unasked' | 'granted' | 'denied'>('unasked');
-
-  const dirs8 = ['N','NE','E','SE','S','SW','W','NW'];
-  const CX=130, CY=130, R=110, RN=82;
-
-  React.useEffect(() => {
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      // heading (alpha) relative to north
-      const h = (e as any).webkitCompassHeading || (360 - (e.alpha || 0));
-      setHeading(h);
-
-      // pitch/roll (beta/gamma) to check if device is flat
-      const pitch = Math.abs(e.beta || 0);
-      const roll = Math.abs(e.gamma || 0);
-      setIsLevel(pitch < 15 && roll < 15);
-    };
-
-    if (permissionState === 'granted') {
-      window.addEventListener('deviceorientation', handleOrientation);
-    }
-    return () => window.removeEventListener('deviceorientation', handleOrientation);
-  }, [permissionState]);
-
-  const requestPermission = async () => {
-    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-      try {
-        const res = await (DeviceOrientationEvent as any).requestPermission();
-        setPermissionState(res === 'granted' ? 'granted' : 'denied');
-      } catch (e) {
-        setPermissionState('denied');
-      }
-    } else {
-      setPermissionState('granted');
-    }
-  };
-
-  function pos(dir: string, r: number){ 
-    const idx = dirs8.indexOf(dir);
-    const a = (idx * 45 - 90) * Math.PI / 180; 
-    return {x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)}; 
-  }
-
-  return (
-    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'1rem' }}>
-      
-      {/* Compass Header / Status */}
-      <div className="flex w-full justify-between items-center px-2 mb-2">
-        <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full animate-pulse ${isLevel ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-          <span className={`font-cinzel text-[0.6rem] uppercase tracking-widest ${isLevel ? 'text-emerald-400' : 'text-amber-400'}`}>
-            {isLevel ? 'Level & Reliable' : 'Tilted / Unreliable'}
-          </span>
-        </div>
-        {permissionState !== 'granted' && (
-          <Button variant="ghost" size="sm" onClick={requestPermission} className="h-6 text-[0.5rem] uppercase tracking-tighter border border-primary/30">
-            Activate Sensor
-          </Button>
-        )}
-      </div>
-
-      <svg viewBox="0 0 260 260" style={{ width:'100%', maxWidth:280 }}>
-        <defs>
-          <radialGradient id="lc-bg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#1a0a3a"/><stop offset="100%" stopColor="#080318"/></radialGradient>
-          <filter id="lc-glow"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-          <filter id="lc-ng"><feGaussianBlur stdDeviation="4" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-        </defs>
-        
-        {/* Static Background */}
-        <circle cx={CX} cy={CY} r={R+8} fill="url(#lc-bg)" stroke="rgba(124,58,237,0.18)" strokeWidth="1"/>
-        
-        {/* Rotating Dial Group */}
-        <g style={{ transformOrigin: `${CX}px ${CY}px`, transform: `rotate(${-heading}deg)`, transition: 'transform 0.1s linear' }}>
-          {Array.from({length:72},(_,i)=>{const a=(i*5-90)*Math.PI/180,big=i%9===0,r1=R-(big?12:5);return(<line key={i} x1={CX+r1*Math.cos(a)} y1={CY+r1*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke={big?'rgba(212,175,55,0.35)':'rgba(124,58,237,0.2)'} strokeWidth={big?1.2:0.6}/>);})}
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(212,175,55,0.22)" strokeWidth="1"/>
-          <circle cx={CX} cy={CY} r={60} fill="none" stroke="rgba(124,58,237,0.15)" strokeWidth="0.8" strokeDasharray="3 4"/>
-          <circle cx={CX} cy={CY} r={35} fill="none" stroke="rgba(212,175,55,0.1)" strokeWidth="0.8"/>
-          {[0,45,90,135].map(deg=>{const a=deg*Math.PI/180;return(<line key={deg} x1={CX-R*Math.cos(a)} y1={CY-R*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke="rgba(124,58,237,0.1)" strokeWidth="0.6"/>);})}
-          {dirs8.map(dir=>{const p=pos(dir,RN),best=kua.best.includes(dir),avoid=kua.avoid.includes(dir),nr=best?12:avoid?9:7,nc=best?kua.colour:avoid?'#ef4444':'rgba(255,255,255,0.2)';return(
-            <g key={dir} filter={best?'url(#lc-ng)':undefined}>
-              <circle cx={p.x} cy={p.y} r={nr} fill={`${nc}22`} stroke={nc} strokeWidth={best?2:1}/>
-              {best&&<circle cx={p.x} cy={p.y} r={nr*1.6} fill="none" stroke={nc} strokeWidth="0.8" strokeOpacity="0.3"><animate attributeName="r" values={`${nr};${nr*2.2};${nr}`} dur="2.5s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite"/></circle>}
-              <text x={p.x} y={p.y+1} textAnchor="middle" dominantBaseline="middle" fontSize={best?7:6} fill={best?nc:avoid?'#ef4444':'rgba(200,180,240,0.4)'} fontFamily="'Cinzel',serif" fontWeight={best?'bold':'normal'}>{dir}</text>
-            </g>
-          );})}
-        </g>
-
-        {/* Static Pointer Overlay */}
-        <g filter="url(#lc-glow)">
-          <polygon points={`${CX},${CY-32} ${CX-7},${CY} ${CX},${CY-10} ${CX+7},${CY}`} fill="#d4af37" fillOpacity="0.9"/>
-          <polygon points={`${CX},${CY+32} ${CX-7},${CY} ${CX},${CY+10} ${CX+7},${CY}`} fill="#7c3aed" fillOpacity="0.7"/>
-        </g>
-        <circle cx={CX} cy={CY} r={7} fill="#1a0a3a" stroke="rgba(212,175,55,0.6)" strokeWidth="1.5"/>
-        <circle cx={CX} cy={CY} r={3} fill="#d4af37"/>
-        <text x={CX} y={CY+48} textAnchor="middle" fontFamily="'Cinzel Decorative',serif" fontSize="18" fontWeight="700" fill="#d4af37" fillOpacity="0.8" filter="url(#lc-glow)">{kuaNum}</text>
-        <text x={CX} y={CY+60} textAnchor="middle" fontFamily="'Cinzel',serif" fontSize="5.5" letterSpacing="3" fill="rgba(212,175,55,0.4)">KUA NUMBER</text>
-      </svg>
-
-      {/* Legend & Direction List */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.4rem 1rem', width:'100%' }}>
-        {[...kua.best.slice(0,4).map(d=>({d,t:'Auspicious',c:kua.colour})), ...kua.avoid.slice(0,4).map(d=>({d,t:'Avoid',c:'#ef4444'}))].map(({d,t,c},i)=>(
-          <div key={i} style={{ display:'flex', alignItems:'center', gap:'0.4rem', fontSize:'0.68rem', color:'rgba(210,195,240,0.65)' }}>
-            <div style={{ width:8, height:8, borderRadius:'50%', background:c, boxShadow:t==='Auspicious'?`0 0 6px ${c}`:'none', flexShrink:0 }}/>
-            <span style={{ fontWeight:700 }}>{d}</span>
-            <span style={{ fontSize:'0.55rem', fontFamily:"'Cinzel',serif", letterSpacing:'0.12em', textTransform:'uppercase', color: t==='Auspicious' ? '#34d399' : '#ef4444', opacity: 0.7, marginLeft:'auto' }}>{t}</span>
-          </div>
-        ))}
-      </div>
-
-      {!isLevel && (
-        <div className="p-2 rounded bg-amber-500/10 border border-amber-500/30 text-[0.65rem] text-amber-200/80 italic text-center w-full">
-          <ShieldAlert className="inline h-3 w-3 mr-1" /> For accurate alignment, please hold your phone flat.
-        </div>
-      )}
-
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flexWrap:'wrap', gap:'0.5rem', padding:'0.6rem 1rem', borderRadius:'0.75rem', background:'rgba(212,175,55,0.06)', border:'1px solid rgba(212,175,55,0.15)', width:'100%' }}>
-        {[['Trigram',kua.name],['Element',kua.element]].map(([l,v],i)=>(
-          <span key={i} style={{ fontFamily:"'Cinzel',serif", fontSize:'0.55rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(212,175,55,0.65)' }}>
-            {i>0&&<span style={{ color:'rgba(212,175,55,0.3)', marginRight:'0.5rem' }}>·</span>}
-            {l}: <strong style={{ color:'#d4af37' }}>{v}</strong>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── InfoCard ─────────────────────────────────────────────────────────────────
-const InfoCard = ({ title, value, icon, onClick }: { title:string; value:string|number; icon:React.ReactNode; onClick?:()=>void }) => (
-  <div className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center aspect-square ${onClick?'transition-all duration-300 hover:bg-purple-500/20 cursor-pointer':''}`} onClick={onClick}>
-    <div className="flex items-center gap-2 text-purple-200/80">{icon}<p className="text-[0.6rem] font-cinzel uppercase tracking-widest">{title}</p></div>
-    <p className="text-5xl font-bold text-yellow-300 mt-2 font-decorative drop-shadow-lg">{value||''}</p>
-  </div>
-);
-
-// ── ArrowsDisplay ─────────────────────────────────────────────────────────────
-const ArrowsDisplay = React.forwardRef<HTMLDivElement,{arrowsOfStrength:any[];arrowsOfWeakness:any[];openItems:string[];onToggle:(v:string[]) => void;birthDate:string;numberCounts:Record<number,number>}>(
-  ({arrowsOfStrength,arrowsOfWeakness,openItems,onToggle,birthDate,numberCounts},ref)=>{
-    const cats=Array.from(new Set([...arrowsOfStrength.map(a=>a.category),...arrowsOfWeakness.map(a=>a.category)])).filter(Boolean);
-    return(
-      <div className="glass-card p-4 space-y-6" ref={ref}>
-        <SH icon={<Activity className="h-4 w-4"/>} title="Arrows of Power"/>
-        {cats.map(cat=>(
-          <div key={cat} className="space-y-2">
-            <h4 className="font-cinzel text-[0.6rem] text-muted-foreground uppercase tracking-[0.2em] mb-2 px-2 border-l border-primary/30">{cat}</h4>
-            <Accordion type="multiple" className="w-full" value={openItems} onValueChange={onToggle}>
-              {[...arrowsOfStrength,...arrowsOfWeakness].filter(a=>(a.category||(a.type==='shadow'?'Deficiency':'Primary Plane'))===cat).map(arrow=>{
-                const isShadow=arrow.type==='shadow'||arrow.type==='weakness';
-                return(
-                  <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4 mb-1 border-l-[3px] border-l-[#c8a84b]/40">
-                    <AccordionTrigger>
-                      <span className={`text-left font-cinzel text-[0.7rem] uppercase tracking-wider flex items-center gap-2 ${isShadow?'text-rose-400':'text-emerald-400'}`}>
-                        {isShadow?<ChevronRight className="h-3 w-3 rotate-90"/>:<ChevronRight className="h-3 w-3"/>}
-                        {arrow.name} ({arrow.numbers.join('-')})
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="font-body text-base leading-relaxed">
-                      <LoshuArrowDetailPanel arrowId={arrow.id} existingMeaning={arrow.description} birthDate={birthDate} externalCounts={numberCounts as any}/>
-                    </AccordionContent>
-                  </AccordionItem>
-                );
-              })}
-            </Accordion>
-          </div>
-        ))}
-      </div>
-    );
-  }
-);
-ArrowsDisplay.displayName='ArrowsDisplay';
-
 // ── Main Export ───────────────────────────────────────────────────────────────
 export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }) {
   const {
@@ -455,7 +237,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
     psychicMeaning,specialTraitMeaning,destinyMeaning,
   } = numerology;
 
-  const [openSections,setOpenSections]=React.useState<string[]>([]);
   const [selectedPersonalYear,setSelectedPersonalYear]=React.useState<PersonalYearData|null>(null);
   const [personalYearAccordionValue,setPersonalYearAccordionValue]=React.useState('');
   const [activeCoreLayer,setActiveCoreLayer]=React.useState<string|null>(null);
@@ -474,10 +255,6 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
       if(data){setPersonalYearAccordionValue('personal-year-detail');setTimeout(()=>pyDetailRef.current?.scrollIntoView({behavior:'smooth',block:'center'}),150);}
       else setPersonalYearAccordionValue('');
     }
-  };
-
-  const handleArrowToggle = (values: string[]) => {
-    setOpenSections(values);
   };
 
   return (
@@ -500,6 +277,7 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
         destinyNum={destinyNum} 
         destinyMeaning={destinyMeaning} 
         birthDay={birthDay} 
+        birthMonth={birthMonth}
         specialTraitMeaning={specialTraitMeaning} 
         activeLayer={activeCoreLayer} 
         onLayerChange={setActiveCoreLayer}
@@ -557,19 +335,202 @@ export function NumerologyDisplay({ numerology }: { numerology: NumerologyData }
 
       <ZodiacSection birthDay={birthDay} birthMonth={birthMonth} birthYear={birthYear}/>
 
-      <ArrowsDisplay 
-        ref={arrowsRef} 
-        arrowsOfStrength={arrowsOfStrength} 
-        arrowsOfWeakness={arrowsOfWeakness} 
-        openItems={openSections} 
-        onToggle={handleArrowToggle} 
-        birthDate={birthDate} 
-        numberCounts={numberCounts as Record<number,number>}
-      />
+      <div className="glass-card p-4" ref={arrowsRef}>
+        <SH icon={<Activity className="h-4 w-4"/>} title="Arrows of Power"/>
+        <Accordion type="multiple" className="w-full">
+          {[...arrowsOfStrength,...arrowsOfWeakness].map(arrow=>{
+            const isShadow=arrow.type==='shadow'||arrow.type==='weakness';
+            return(
+              <AccordionItem value={arrow.name} key={arrow.name} className="glass-card px-4 mb-1 border-l-[3px] border-l-[#c8a84b]/40">
+                <AccordionTrigger>
+                  <span className={`text-left font-cinzel text-[0.7rem] uppercase tracking-wider flex items-center gap-2 ${isShadow?'text-rose-400':'text-emerald-400'}`}>
+                    {isShadow?<ChevronRight className="h-3 w-3 rotate-90"/>:<ChevronRight className="h-3 w-3"/>}
+                    {arrow.name} ({arrow.numbers.join('-')})
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="font-body text-base leading-relaxed">
+                  <LoshuArrowDetailPanel arrowId={arrow.id} existingMeaning={arrow.description} birthDate={birthDate} externalCounts={numberCounts as any}/>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      </div>
 
       <div className="glass-card p-4" ref={kuaRef}>
         <SH icon={<Compass className="h-4 w-4"/>} title="Lucky Compass"/>
-        <LuckyCompassSVG kuaNum={kuaNum} kuaAttributes={kuaAttributes}/>
+        <LuckyCompass 
+          kuaNum={kuaNum} 
+          kuaAttributes={kuaAttributes as any}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Pinnacles & Challenges ────────────────────────────────────────────────────
+function PinnaclesAccordion({ destinyNum, birthDay, birthMonth, birthYear }: { destinyNum:number; birthDay:number; birthMonth:number; birthYear:number }) {
+  const stages = calcPinnacles(destinyNum, birthDay, birthMonth, birthYear);
+  const [open, setOpen] = React.useState<number|null>(stages.findIndex(s=>s.active)+1 || null);
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
+      {stages.map(s => (
+        <div key={s.stage} style={{ borderRadius:'0.9rem', border: s.active ? '1px solid rgba(212,175,55,0.45)' : '1px solid rgba(124,58,237,0.18)', background: s.active ? 'rgba(20,5,50,0.85)' : 'rgba(12,4,32,0.7)', overflow:'hidden', transition:'border-color 0.3s' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyBetween:'space-between', padding:'0.9rem 1rem', cursor:'pointer', userSelect:'none', gap:'0.5rem' }}
+            onClick={() => setOpen(open===s.stage ? null : s.stage)}>
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.2rem', flex:1 }}>
+              {s.active && (
+                <span style={{ display:'inline-flex', alignItems:'center', gap:'0.3rem', fontFamily:"'Cinzel',serif", fontSize:'0.45rem', letterSpacing:'0.2em', textTransform:'uppercase', color:'#34d399', background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:99, padding:'0.15rem 0.5rem', width:'fit-content', marginBottom:'0.1rem' }}>
+                  <TrendingUp style={{ width:8, height:8 }}/> You Are Here
+                </span>
+              )}
+              <div className="flex items-center justify-between w-full">
+                <span style={{ fontFamily:"'Cinzel',serif", fontSize:'0.7rem', fontWeight:600, color:'rgba(210,195,240,0.85)', letterSpacing:'0.05em' }}>{s.label}</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center">
+                    <div style={{ width:32, height:32, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Cinzel Decorative',serif", fontSize:'0.85rem', fontWeight:700, background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.4)', color: '#d4af37' }}>{s.p}</div>
+                    <span className="text-[7px] text-white/40 uppercase mt-0.5">PIN</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div style={{ width:32, height:32, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Cinzel Decorative',serif", fontSize:'0.85rem', fontWeight:700, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>{s.c}</div>
+                    <span className="text-[7px] text-white/40 uppercase mt-0.5">CHA</span>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 text-white/20 transition-transform duration-300 ${open === s.stage ? 'rotate-180' : ''}`} />
+                </div>
+              </div>
+              <span style={{ fontFamily:"'Cinzel',serif", fontSize:'0.5rem', letterSpacing:'0.12em', color:'rgba(212,175,55,0.45)' }}>Ages {s.ages}</span>
+            </div>
+          </div>
+          <AnimatePresence>
+            {open===s.stage && (
+              <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }} transition={{ duration:0.35, ease:[0.23,1,0.32,1] }}
+                style={{ padding:'0 1rem 1rem' }}>
+                <div className="space-y-4">
+                    <div className="p-4 rounded-xl bg-emerald-950/10 border-l-2 border-emerald-500/40">
+                       <h4 className="font-cinzel text-[10px] text-emerald-400 uppercase tracking-widest mb-2">Pinnacle {s.p} — Soul Opportunity</h4>
+                       <div className="text-[13px] leading-relaxed text-stone-300">
+                          <AccordionContentWithPlayer text={PINNACLE_DESC[s.p]||''} />
+                       </div>
+                    </div>
+                    <div className="p-4 rounded-xl bg-rose-950/10 border-l-2 border-rose-500/40">
+                       <h4 className="font-cinzel text-[10px] text-rose-400 uppercase tracking-widest mb-2">Challenge {s.c} — Soul Lesson</h4>
+                       <div className="text-[13px] leading-relaxed text-stone-300 italic">
+                          <AccordionContentWithPlayer text={CHALLENGE_DESC[s.c]||''} />
+                       </div>
+                    </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LuckyCompass({ kuaNum, kuaAttributes }: { kuaNum:number; kuaAttributes: { element: string; colors: string; season: string; directions: Record<string, string> } }) {
+  const kua = KUA_DATA_COMPASS[kuaNum] || KUA_DATA_COMPASS[1];
+  const [heading, setHeading] = React.useState(0);
+  const [isLevel, setIsLevel] = React.useState(true);
+  const [permissionState, setPermissionState] = React.useState<'unasked' | 'granted' | 'denied'>('unasked');
+
+  const dirs8 = ['N','NE','E','SE','S','SW','W','NW'];
+  const CX=130, CY=130, R=110, RN=82;
+
+  React.useEffect(() => {
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      const h = (e as any).webkitCompassHeading || (360 - (e.alpha || 0));
+      setHeading(h);
+      const pitch = Math.abs(e.beta || 0);
+      const roll = Math.abs(e.gamma || 0);
+      setIsLevel(pitch < 15 && roll < 15);
+    };
+
+    if (permissionState === 'granted') {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    return () => window.removeEventListener('deviceorientation', handleOrientation);
+  }, [permissionState]);
+
+  const requestPermission = async () => {
+    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      try {
+        const res = await (DeviceOrientationEvent as any).requestPermission();
+        setPermissionState(res === 'granted' ? 'granted' : 'denied');
+      } catch (e) {
+        setPermissionState('denied');
+      }
+    } else {
+      setPermissionState('granted');
+    }
+  };
+
+  function pos(dir: string, r: number){ 
+    const idx = dirs8.indexOf(dir);
+    const a = (idx * 45 - 90) * Math.PI / 180; 
+    return {x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)}; 
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex w-full justify-between items-center px-2 mb-2">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full animate-pulse ${isLevel ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+          <span className={`font-cinzel text-[0.6rem] uppercase tracking-widest ${isLevel ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {isLevel ? 'Level & Reliable' : 'Tilted / Unreliable'}
+          </span>
+        </div>
+        {permissionState !== 'granted' && (
+          <Button variant="ghost" size="sm" onClick={requestPermission} className="h-6 text-[0.5rem] uppercase tracking-tighter border border-primary/30">
+            Activate Sensor
+          </Button>
+        )}
+      </div>
+
+      <svg viewBox="0 0 260 260" style={{ width:'100%', maxWidth:280 }}>
+        <defs>
+          <radialGradient id="lc-bg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#1a0a3a"/><stop offset="100%" stopColor="#080318"/></radialGradient>
+          <filter id="lc-glow"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+          <filter id="lc-ng"><feGaussianBlur stdDeviation="4" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+        </defs>
+        
+        <circle cx={CX} cy={CY} r={R+8} fill="url(#lc-bg)" stroke="rgba(124,58,237,0.18)" strokeWidth="1"/>
+        
+        <g style={{ transformOrigin: `${CX}px ${CY}px`, transform: `rotate(${-heading}deg)`, transition: 'transform 0.1s linear' }}>
+          {Array.from({length:72},(_,i)=>{const a=(i*5-90)*Math.PI/180,big=i%9===0,r1=R-(big?12:5);return(<line key={i} x1={CX+r1*Math.cos(a)} y1={CY+r1*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke={big?'rgba(212,175,55,0.35)':'rgba(124,58,237,0.2)'} strokeWidth={big?1.2:0.6}/>);})}
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(212,175,55,0.22)" strokeWidth="1"/>
+          <circle cx={CX} cy={CY} r={60} fill="none" stroke="rgba(124,58,237,0.15)" strokeWidth="0.8" strokeDasharray="3 4"/>
+          <circle cx={CX} cy={CY} r={35} fill="none" stroke="rgba(212,175,55,0.1)" strokeWidth="0.8"/>
+          {[0,45,90,135].map(deg=>{const a=deg*Math.PI/180;return(<line key={deg} x1={CX-R*Math.cos(a)} y1={CY-R*Math.sin(a)} x2={CX+R*Math.cos(a)} y2={CY+R*Math.sin(a)} stroke="rgba(124,58,237,0.1)" strokeWidth="0.6"/>);})}
+          {dirs8.map(dir=>{const p=pos(dir,RN),best=kua.best.includes(dir),avoid=kua.avoid.includes(dir),nr=best?12:avoid?9:7,nc=best?kua.colour:avoid?'#ef4444':'rgba(255,255,255,0.2)';return(
+            <g key={dir} filter={best?'url(#lc-ng)':undefined}>
+              <circle cx={p.x} cy={p.y} r={nr} fill={`${nc}22`} stroke={nc} strokeWidth={best?2:1}/>
+              {best&&<circle cx={p.x} cy={p.y} r={nr*1.6} fill="none" stroke={nc} strokeWidth="0.8" strokeOpacity="0.3"><animate attributeName="r" values={`${nr};${nr*2.2};${nr}`} dur="2.5s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite"/></circle>}
+              <text x={p.x} y={p.y+1} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill={best?nc:avoid?'#ef4444':'rgba(200,180,240,0.4)'} fontFamily="'Cinzel',serif" fontWeight={best?'bold':'normal'}>{dir}</text>
+            </g>
+          );})}
+        </g>
+
+        <g filter="url(#lc-glow)">
+          <polygon points={`${CX},${CY-32} ${CX-7},${CY} ${CX},${CY-10} ${CX+7},${CY}`} fill="#d4af37" fillOpacity="0.9"/>
+          <polygon points={`${CX},${CY+32} ${CX-7},${CY} ${CX},${CY+10} ${CX+7},${CY}`} fill="#7c3aed" fillOpacity="0.7"/>
+        </g>
+        <circle cx={CX} cy={CY} r={7} fill="#1a0a3a" stroke="rgba(212,175,55,0.6)" strokeWidth="1.5"/>
+        <circle cx={CX} cy={CY} r={3} fill="#d4af37"/>
+        <text x={CX} y={CY+48} textAnchor="middle" fontFamily="'Cinzel Decorative',serif" fontSize="18" fontWeight="700" fill="#d4af37" fillOpacity="0.8" filter="url(#lc-glow)">{kuaNum}</text>
+        <text x={CX} y={CY+60} textAnchor="middle" fontFamily="'Cinzel',serif" fontSize="5.5" letterSpacing="3" fill="rgba(212,175,55,0.4)">KUA NUMBER</text>
+      </svg>
+
+      <div className="grid grid-cols-2 gap-4 w-full">
+        {Object.entries(kuaAttributes.directions).map(([key, value], i) => (
+          <div key={i} className="flex items-center gap-2 p-2 rounded bg-white/5 border border-white/10">
+            <div className={`w-1.5 h-1.5 rounded-full ${['Success', 'Health', 'Family', 'Personal-Growth'].includes(key) ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+            <div className="flex flex-col">
+              <span className="text-[7px] uppercase tracking-widest text-white/40">{key}</span>
+              <span className="text-[10px] font-bold text-white/90">{value}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

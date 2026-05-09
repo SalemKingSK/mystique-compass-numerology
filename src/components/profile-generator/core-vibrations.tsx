@@ -11,6 +11,7 @@ interface CoreVibrationsProps {
   destinyNum: number;
   destinyMeaning: { title: string; description: string };
   birthDay: number;
+  birthMonth: number;
   specialTraitMeaning: string | null;
   activeLayer: string | null;
   onLayerChange: (layer: string | null) => void;
@@ -22,6 +23,7 @@ export const CoreVibrations = forwardRef<HTMLDivElement, CoreVibrationsProps>(({
   destinyNum,
   destinyMeaning,
   birthDay,
+  birthMonth,
   specialTraitMeaning,
   activeLayer,
   onLayerChange
@@ -72,7 +74,11 @@ export const CoreVibrations = forwardRef<HTMLDivElement, CoreVibrationsProps>(({
           <div className="core-v-acc-body">
              <div className="core-v-meaning-card" style={{ borderLeftColor: badgeColor }}>
                 {id === 'psyche' ? (
-                  <PsychicNumberDetailPanel number={psycheNum} johariMeaning={psychicMeaning.description} />
+                  <PsychicNumberDetailPanel 
+                    number={psycheNum} 
+                    johariMeaning={psychicMeaning.description} 
+                    birthMonth={birthMonth}
+                  />
                 ) : (
                   <>
                     <div className="flex items-center gap-2 mb-3">
