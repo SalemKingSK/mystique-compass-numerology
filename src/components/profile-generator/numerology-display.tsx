@@ -66,11 +66,6 @@ function calcPinnacles(lp: number, d: number, m: number, y: number) {
     { stage: 3, label: 'Third Pinnacle',  ages: `${firstEnd + 10} – ${firstEnd + 18}`, p: p3, c: c3, active: age > firstEnd + 9 && age <= firstEnd + 18 },
     { stage: 4, label: 'Fourth Pinnacle', ages: `${firstEnd + 19}+`,               p: p4, c: c4, active: age > firstEnd + 18 },
   ];
-}`,              p:p1, c:c1, active:age<firstEnd },
-    { stage:2, label:'Second Pinnacle', ages:`${firstEnd} – ${firstEnd+9}`,   p:p2, c:c2, active:age>=firstEnd&&age<firstEnd+9 },
-    { stage:3, label:'Third Pinnacle',  ages:`${firstEnd+9} – ${firstEnd+18}`,p:p3, c:c3, active:age>=firstEnd+9&&age<firstEnd+18 },
-    { stage:4, label:'Fourth Pinnacle', ages:`${firstEnd+18}+`,               p:p4, c:c4, active:age>=firstEnd+18 },
-  ];
 }
 
 const YEAR_COLOUR: Record<number,string> = {1:'#ef4444',2:'#c084fc',3:'#fbbf24',4:'#34d399',5:'#60a5fa',6:'#f472b6',7:'#818cf8',8:'#f59e0b',9:'#a78bfa'};

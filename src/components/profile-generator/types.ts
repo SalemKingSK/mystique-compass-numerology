@@ -27,7 +27,9 @@ export interface AstroInsightOutput {
   gender: string; // Added gender
   new_astrology_sign: string; // e.g. "Pisces/Snake"
   zodiacData: ZodiacData; // Holds all data for the Chinese sign
+  cosmicProfile?: string;
   signData: {
+
     description?: string;
     love?: string;
     compatibilities?: string;

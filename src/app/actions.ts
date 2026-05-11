@@ -1,7 +1,8 @@
-'use server';
 
+'use server';
 import { getAstroInsight, type AstroInsightInput } from '@/lib/astrology';
 import { generateLoShuData } from '@/lib/numerology';
+import { buildCosmicProfile } from '@/lib/cosmic-synthesizer-enhanced'; // Import the enhanced synthesizer
 
 export async function getAstroInsightAction(formData: AstroInsightInput) {
   try {
@@ -14,8 +15,10 @@ export async function getAstroInsightAction(formData: AstroInsightInput) {
         Promise.resolve(generateLoShuData(formData))
     ]);
 
+    // Generate the enhanced cosmic profile
+    const cosmicProfile = buildCosmicProfile(formData.name, insightResult, numerologyResult);
 
-    return { success: true, insight: insightResult, numerology: numerologyResult };
+    return { success: true, insight: insightResult, numerology: numerologyResult, cosmicProfile };
   } catch (error) {
     console.error('Error getting insight:', error);
     return { success: false, error: 'An error occurred while fetching insights. Please try again.' };

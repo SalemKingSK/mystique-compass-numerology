@@ -23,6 +23,7 @@ interface Props {
   birthDay: number;
   birthMonth: number;
   birthYear: number;
+  cosmicProfile: string;
 }
 
 const reduce = (n: number): number => {
@@ -108,7 +109,7 @@ const stripHtml = (html: string) => {
   return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ');
 };
 
-export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
+export function CosmicFateMap({ birthDay, birthMonth, birthYear, cosmicProfile }: Props) {
   const [activeTab, setActiveTab] = useState('synthesis');
   const [readYear, setReadYear] = useState(new Date().getFullYear());
   const [inputYear, setInputYear] = useState(new Date().getFullYear().toString());
@@ -246,8 +247,8 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear }: Props) {
         </div>
 
         <Card className="p-6 bg-slate-900/60 border-primary/20">
-          <div className="section-header">✦ &nbsp; Your {readYear} Reading &nbsp; ✦</div>
-          <AccordionContentWithPlayer text={oracleText} />
+          <div className="section-header">✦ &nbsp; Cosmic Profile Synthesis &nbsp; ✦</div>
+          <AccordionContentWithPlayer text={cosmicProfile} />
         </Card>
       </div>
     );
