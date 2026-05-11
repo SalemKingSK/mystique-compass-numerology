@@ -29,6 +29,21 @@ export const ScrollableTextDisplay: React.FC<Props> = ({ text, activeSentenceInd
     return null;
   }
 
+  const renderContent = (content: string) => {
+    // Support for bold: **text**
+    // Support for highlight: ==text==
+    const parts = content.split(/(\*\*.*?\*\*|==.*?==)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-bold text-primary">{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('==') && part.endsWith('==')) {
+        return <mark key={i} className="bg-primary/30 text-primary-foreground px-1 rounded">{part.slice(2, -2)}</mark>;
+      }
+      return part;
+    });
+  };
+
   return (
     <div className="scroll-container" ref={containerRef}>
       {sentences.map((sentence, idx) => (
@@ -39,7 +54,7 @@ export const ScrollableTextDisplay: React.FC<Props> = ({ text, activeSentenceInd
           }}
           className={idx === activeSentenceIndex ? 'reading' : ''}
         >
-          {sentence}
+          {renderContent(sentence)}
         </span>
       ))}
     </div>
