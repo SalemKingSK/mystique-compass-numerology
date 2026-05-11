@@ -17,6 +17,7 @@ import {
   AlertTriangle, Brain, ChevronDown, BookUser
 } from 'lucide-react';
 import { AccordionContentWithPlayer } from './accordion-content-with-player';
+import { getCheiroAlerts } from '@/lib/numerology/cheiro-alerts';
 import InstallButton from '../InstallButton';
 import { ZOO } from '@/lib/cosmic-fate/zoo';
 import { buildCosmicProfile } from '@/lib/cosmic-synthesizer';
@@ -37,23 +38,61 @@ function getPersonalYear(d: number, m: number): number {
   );
 }
 
-function detectWarning(numerology: NumerologyData): string | null {
+function detectWarning(numerology: NumerologyData): { message: string; type: 'info' | 'success' | 'warn' }[] {
+  const warnings: { message: string; type: 'info' | 'success' | 'warn' }[] = [];
   const py = getPersonalYear(numerology.birthDay, numerology.birthMonth);
-  if (py === 4) return 'Personal Year 4 detected — the Consolidation cycle often brings restriction and forced slowing. Prioritise foundations over ambition this year.';
-  if (py === 7) return 'Personal Year 7 detected — an inward, sacrificial year. Avoid major financial or relational decisions. The cosmos asks for retreat, not expansion.';
-  if (py === 9) return 'Personal Year 9 detected — the Great Completion. Endings are imminent. Avoid clinging to what is already departing. Radical release unlocks Year 1.';
+  
+  if (py === 4) warnings.push({ message: 'Personal Year 4 detected — the Consolidation cycle often brings restriction and forced slowing. Prioritise foundations over ambition this year.', type: 'warn' });
+  if (py === 7) warnings.push({ message: 'Personal Year 7 detected — an inward, sacrificial year. Avoid major financial or relational decisions. The cosmos asks for retreat, not expansion.', type: 'warn' });
+  if (py === 9) warnings.push({ message: 'Personal Year 9 detected — the Great Completion. Endings are imminent. Avoid clinging to what is already departing. Radical release unlocks Year 1.', type: 'warn' });
+  
   const missing8 = !numerology.numberCounts?.[String(8)] || numerology.numberCounts[String(8)] === 0;
-  if (missing8 && (py === 2 || py === 4)) return 'Financial karma is active — Missing 8 combined with your current Personal Year creates a vulnerable window. Caution with investments.';
-  return null;
+  if (missing8 && (py === 2 || py === 4)) warnings.push({ message: 'Financial karma is active — Missing 8 combined with your current Personal Year creates a vulnerable window. Caution with investments.', type: 'warn' });
+
+  // Add Cheiro-based alerts
+  const cheiroAlerts = getCheiroAlerts(numerology.psycheNum);
+  cheiroAlerts.forEach(alert => warnings.push({ message: alert.message, type: alert.severity }));
+
+  return warnings;
 }
 
 // ── Warning Banner ────────────────────────────────────────────────────────────
-function WarningBanner({ message }: { message: string }) {
+function WarningBanner({ message, type = 'warn' }: { message: string; type?: 'info' | 'success' | 'warn' }) {
   const [dismissed, setDismissed] = React.useState(false);
   if (dismissed) return null;
+
+  const config = {
+    warn: {
+      color: '#ef4444',
+      bg: 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(154,12,50,0.1))',
+      border: 'rgba(239,68,68,0.3)',
+      title: '⚠ Cosmic Warning Detected',
+      textColor: 'rgba(255,180,180,0.85)'
+    },
+    success: {
+      color: '#10b981',
+      bg: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,78,59,0.1))',
+      border: 'rgba(16,185,129,0.3)',
+      title: '✦ Fortunate Alignment',
+      textColor: 'rgba(180,255,220,0.85)'
+    },
+    info: {
+      color: '#3b82f6',
+      bg: 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(30,58,138,0.1))',
+      border: 'rgba(59,130,246,0.3)',
+      title: 'ℹ Cosmic Insight',
+      textColor: 'rgba(180,220,255,0.85)'
+    }
+  }[type];
+
   return (
     <motion.div initial={{ opacity: 0, y: -12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.5, delay: 0.4 }}
       className="rd-warning"
+      style={{
+        background: config.bg,
+        border: `1px solid ${config.border}`,
+        boxShadow: `0 0 24px ${config.color}14, inset 0 1px 0 ${config.color}1a`
+      }}
     >
       <style>{`
         .rd-warning {
@@ -64,26 +103,23 @@ function WarningBanner({ message }: { message: string }) {
           padding: 0.9rem 1rem;
           margin-bottom: 1rem;
           border-radius: 0.9rem;
-          background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(154,12,50,0.1));
-          border: 1px solid rgba(239,68,68,0.3);
-          box-shadow: 0 0 24px rgba(239,68,68,0.08), inset 0 1px 0 rgba(239,68,68,0.1);
         }
         .rd-warning::before {
           content:'';
           position:absolute;
           top:0; left:10%; right:10%;
           height:1px;
-          background:linear-gradient(90deg,transparent,rgba(239,68,68,0.5),transparent);
+          background:linear-gradient(90deg,transparent,${config.color}80,transparent);
         }
       `}</style>
-      <AlertTriangle style={{ width: 20, height: 20, color: '#ef4444', flexShrink: 0, marginTop: 2 }} />
+      <AlertTriangle style={{ width: 20, height: 20, color: config.color, flexShrink: 0, marginTop: 2 }} />
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: "'Cinzel',serif", fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#ef4444', marginBottom: '0.3rem' }}>
-          ⚠ Cosmic Warning Detected
+        <div style={{ fontFamily: "'Cinzel',serif", fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: config.color, marginBottom: '0.3rem' }}>
+          {config.title}
         </div>
-        <div style={{ fontSize: '0.78rem', color: 'rgba(255,180,180,0.85)', lineHeight: 1.6 }}>{message}</div>
+        <div style={{ fontSize: '0.78rem', color: config.textColor, lineHeight: 1.6 }}>{message}</div>
       </div>
-      <button onClick={() => setDismissed(true)} style={{ background: 'none', border: 'none', color: 'rgba(239,68,68,0.4)', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1, padding: 0, flexShrink: 0, transition: 'color 0.2s' }}>×</button>
+      <button onClick={() => setDismissed(true)} style={{ background: 'none', border: 'none', color: `${config.color}66`, cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1, padding: 0, flexShrink: 0, transition: 'color 0.2s' }}>×</button>
     </motion.div>
   );
 }
@@ -268,7 +304,7 @@ function FloatingNavigation({ onReset, onHistoryOpen }: { onReset: () => void; o
 export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: { insight: AstroInsightOutput; numerology: NumerologyData; onReset: () => void; onHistoryOpen: () => void }) {
   const [activeTab, setActiveTab] = React.useState('astro');
   const [showReveal, setShowReveal] = React.useState(true);
-  const warning = React.useMemo(() => detectWarning(numerology), [numerology]);
+  const warnings = React.useMemo(() => detectWarning(numerology), [numerology]);
 
   React.useEffect(() => {
     return () => { if (typeof window !== 'undefined' && window.speechSynthesis?.speaking) window.speechSynthesis.cancel(); };
@@ -291,7 +327,11 @@ export function ResultsDisplay({ insight, numerology, onReset, onHistoryOpen }: 
         className="results-background w-full min-h-screen flex flex-col p-4">
         <div className="w-full max-w-4xl mx-auto flex-grow">
           <ResultsHeader name={insight.name} newAstroSign={insight.new_astrology_sign} birthDate={formatDate()} onTabClick={setActiveTab} activeTab={activeTab} />
-          <AnimatePresence>{warning && <WarningBanner message={warning} />}</AnimatePresence>
+          <AnimatePresence>
+            {warnings.map((w, idx) => (
+              <WarningBanner key={idx} message={w.message} type={w.type} />
+            ))}
+          </AnimatePresence>
           <CosmicProfilerPanel insight={insight} numerology={numerology} />
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 10, scale: 0.99 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.99 }} transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}>
