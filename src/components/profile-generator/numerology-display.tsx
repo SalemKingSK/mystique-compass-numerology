@@ -24,30 +24,49 @@ import { PINNACLE_DESC, CHALLENGE_DESC } from '@/lib/cosmic-fate/pinnacles';
 import { Button } from '@/components/ui/button';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
-function reduceNum(n: number): number {
-  if (n === 11 || n === 22 || n === 33) return n;
+function reduceNum(n: number, allowMaster: boolean = true): number {
+  if (n === 0) return 0;
   let val = Math.abs(n);
-  while (val > 9) val = String(val).split('').reduce((a, d) => a + +d, 0);
+  while (val > 9) {
+    if (allowMaster && (val === 11 || val === 22 || val === 33)) return val;
+    val = String(val).split('').reduce((a, d) => a + +d, 0);
+  }
   return val || 9;
 }
 function personalYearNow(d: number, m: number) {
   const yr = new Date().getFullYear();
-  return reduceNum(reduceNum(d) + reduceNum(m) + reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0)));
+  return reduceNum(reduceNum(d, true) + reduceNum(m, true) + reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0), true), true);
 }
 function calcPinnacles(lp: number, d: number, m: number, y: number) {
-  const firstEnd = 36 - lp;
-  const yearDigits = (yr: number) => reduceNum(String(yr).split('').reduce((a,c)=>a+ +c,0));
-  const p1 = reduceNum(reduceNum(d)+reduceNum(m));
-  const p2 = reduceNum(reduceNum(d)+yearDigits(y));
-  const p3 = reduceNum(p1+p2);
-  const p4 = reduceNum(reduceNum(m)+yearDigits(y));
-  const c1 = reduceNum(Math.abs(reduceNum(d)-reduceNum(m)));
-  const c2 = reduceNum(Math.abs(reduceNum(d)-yearDigits(y)));
-  const c3 = reduceNum(Math.abs(c1-c2));
-  const c4 = reduceNum(Math.abs(reduceNum(m)-yearDigits(y)));
+  // Step 1: Reduce the three components of the birth date
+  const redM = reduceNum(m, true);
+  const redD = reduceNum(d, true);
+  const redY = reduceNum(y, true);
+
+  // PINNACLE CALCULATIONS
+  const p1 = reduceNum(redM + redD, true);
+  const p2 = reduceNum(redD + redY, true);
+  const p3 = reduceNum(p1 + p2, true);
+  const p4 = reduceNum(redM + redY, true);
+
+  // CHALLENGE CALCULATIONS
+  const c1 = reduceNum(Math.abs(redM - redD), false);
+  const c2 = reduceNum(Math.abs(redD - redY), false);
+  const c3 = reduceNum(Math.abs(c1 - c2), false);
+  const c4 = reduceNum(Math.abs(redM - redY), false);
+
+  // TIMING
+  const reducedLP = reduceNum(lp, false);
+  const firstEnd = 36 - reducedLP;
   const age = new Date().getFullYear() - y;
+
   return [
-    { stage:1, label:'First Pinnacle',  ages:`0 – ${firstEnd}`,              p:p1, c:c1, active:age<firstEnd },
+    { stage: 1, label: 'First Pinnacle',  ages: `0 – ${firstEnd}`,              p: p1, c: c1, active: age <= firstEnd },
+    { stage: 2, label: 'Second Pinnacle', ages: `${firstEnd + 1} – ${firstEnd + 9}`,   p: p2, c: c2, active: age > firstEnd && age <= firstEnd + 9 },
+    { stage: 3, label: 'Third Pinnacle',  ages: `${firstEnd + 10} – ${firstEnd + 18}`, p: p3, c: c3, active: age > firstEnd + 9 && age <= firstEnd + 18 },
+    { stage: 4, label: 'Fourth Pinnacle', ages: `${firstEnd + 19}+`,               p: p4, c: c4, active: age > firstEnd + 18 },
+  ];
+}`,              p:p1, c:c1, active:age<firstEnd },
     { stage:2, label:'Second Pinnacle', ages:`${firstEnd} – ${firstEnd+9}`,   p:p2, c:c2, active:age>=firstEnd&&age<firstEnd+9 },
     { stage:3, label:'Third Pinnacle',  ages:`${firstEnd+9} – ${firstEnd+18}`,p:p3, c:c3, active:age>=firstEnd+9&&age<firstEnd+18 },
     { stage:4, label:'Fourth Pinnacle', ages:`${firstEnd+18}+`,               p:p4, c:c4, active:age>=firstEnd+18 },
@@ -116,8 +135,8 @@ const InfoCard = ({ title, value, icon, onClick }: { title:string; value:string|
 function ThisYearBanner({ birthDay, birthMonth }: { birthDay: number; birthMonth: number }) {
   const today = new Date();
   const py  = personalYearNow(birthDay, birthMonth);
-  const pm  = reduceNum(py + today.getMonth() + 1);
-  const pd  = reduceNum(py + today.getDate() + today.getMonth() + 1);
+  const pm  = reduceNum(py + today.getMonth() + 1, false);
+  const pd  = reduceNum(py + today.getDate() + today.getMonth() + 1, false);
   const col = YEAR_COLOUR[py] || '#d4af37';
   const theme = YEAR_THEME[py];
   const dateStr = today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
