@@ -28,8 +28,18 @@ interface Props {
 
 const reduce = (n: number): number => {
   let s = Math.abs(n);
+  if (s === 11 || s === 22 || s === 33) return s;
+  while (s > 9) { 
+    s = String(s).split('').reduce((a, c) => a + (+c), 0); 
+    if (s === 11 || s === 22 || s === 33) return s;
+  }
+  return s === 0 ? 0 : (s || 9);
+};
+
+const reduceChallenge = (n: number): number => {
+  let s = Math.abs(n);
   while (s > 9) { s = String(s).split('').reduce((a, c) => a + (+c), 0); }
-  return s || 9;
+  return s;
 };
 
 const lpName = (n: number) => ['', 'The Initiator', 'The Cooperative', 'The Creative', 'The Builder', 'The Freedom Seeker', 'The Harmonizer', 'The Seeker', 'The Achiever', 'The Humanitarian'][n] || '';
@@ -143,10 +153,10 @@ export function CosmicFateMap({ birthDay, birthMonth, birthYear, cosmicProfile }
     else if (age <= p3end) { pStage = 3; pNum = p3; }
     else { pStage = 4; pNum = p4; }
 
-    const c1 = Math.abs(reduce(birthMonth) - reduce(birthDay));
-    const c2 = Math.abs(reduce(birthDay) - reduce(birthYear));
-    const c3 = Math.abs(c1 - c2);
-    const c4 = Math.abs(reduce(birthMonth) - reduce(birthYear));
+    const c1 = reduceChallenge(Math.abs(reduce(birthMonth) - reduce(birthDay)));
+    const c2 = reduceChallenge(Math.abs(reduce(birthDay) - reduce(birthYear)));
+    const c3 = reduceChallenge(Math.abs(c1 - c2));
+    const c4 = reduceChallenge(Math.abs(reduce(birthMonth) - reduce(birthYear)));
     let cNum;
     if (age <= p1end) cNum = c1;
     else if (age <= p2end) cNum = c2;
